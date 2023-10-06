@@ -1,3 +1,0 @@
-C:/Users/nguye/OneDrive/Desktop/CPSC427/aria/CMakeFiles/salmon.dir
-C:/Users/nguye/OneDrive/Desktop/CPSC427/aria/CMakeFiles/ALL_BUILD.dir
-C:/Users/nguye/OneDrive/Desktop/CPSC427/aria/CMakeFiles/ZERO_CHECK.dir
