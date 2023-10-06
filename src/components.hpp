@@ -4,20 +4,21 @@
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
 
-// Player component
+// Aria component
 struct Player
 {
 
 };
 
-// Turtles have a hard shell
-struct HardShell
+// All data relevant to the resources of entities
+struct Resources
 {
-
+	float health = 100.f;
+	float mana = 100.f;
 };
 
-// Fish and Salmon have a soft shell
-struct SoftShell
+// Structure to store entities that can shoot projectiles
+struct Projectiles
 {
 
 };
