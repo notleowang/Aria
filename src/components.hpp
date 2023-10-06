@@ -10,12 +10,6 @@ struct Player
 
 };
 
-// Enemy component
-struct Enemy
-{
-
-};
-
 // All data relevant to the resources of entities
 struct Resources
 {
