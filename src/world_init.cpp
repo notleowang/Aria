@@ -1,6 +1,14 @@
 #include "world_init.hpp"
 #include "tiny_ecs_registry.hpp"
 
+Entity createAria(RenderSystem* renderer, vec2 pos)
+{
+	auto entity = Entity();
+	return entity;
+}
+
+
+/*
 Entity createSalmon(RenderSystem* renderer, vec2 pos)
 {
 	auto entity = Entity();
@@ -84,6 +92,7 @@ Entity createTurtle(RenderSystem* renderer, vec2 position)
 
 	return entity;
 }
+*/
 
 Entity createLine(vec2 position, vec2 scale)
 {
@@ -107,6 +116,7 @@ Entity createLine(vec2 position, vec2 scale)
 	return entity;
 }
 
+/*
 Entity createPebble(vec2 pos, vec2 size)
 {
 	auto entity = Entity();
@@ -128,3 +138,4 @@ Entity createPebble(vec2 pos, vec2 size)
 
 	return entity;
 }
+*/

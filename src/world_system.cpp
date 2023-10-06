@@ -148,6 +148,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	/*
 	// Spawning new turtles
 	next_turtle_spawn -= elapsed_ms_since_last_update * current_speed;
 	if (registry.hardShells.components.size() <= MAX_TURTLES && next_turtle_spawn < 0.f) {
@@ -168,11 +169,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	if (registry.softShells.components.size() <= MAX_FISH && next_fish_spawn < 0.f) {
 		// !!!  TODO A1: Create new fish with createFish({0,0}), as for the Turtles above
 	}
-
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// TODO A2: HANDLE PEBBLE SPAWN HERE
-	// DON'T WORRY ABOUT THIS UNTIL ASSIGNMENT 2
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	*/
 
 	// Processing the salmon state
 	assert(registry.screenStates.components.size() <= 1);
@@ -220,13 +217,11 @@ void WorldSystem::restart_game() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
+	/*
 	// Create a new salmon
 	player_salmon = createSalmon(renderer, { 100, 200 });
 	registry.colors.insert(player_salmon, {1, 0.8f, 0.8f});
 
-	// !! TODO A2: Enable static pebbles on the ground, for reference
-	// Create pebbles on the floor, use this for reference
-	/*
 	for (uint i = 0; i < 20; i++) {
 		int w, h;
 		glfwGetWindowSize(window, &w, &h);
@@ -239,6 +234,7 @@ void WorldSystem::restart_game() {
 	*/
 }
 
+/*
 // Compute collisions between entities
 void WorldSystem::handle_collisions() {
 	// Loop over all collisions detected by the physics system
@@ -280,6 +276,7 @@ void WorldSystem::handle_collisions() {
 	// Remove all collisions from this simulation step
 	registry.collisions.clear();
 }
+*/
 
 // Should the game be over ?
 bool WorldSystem::is_over() const {
