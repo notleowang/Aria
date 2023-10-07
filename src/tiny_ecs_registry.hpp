@@ -12,7 +12,9 @@ class ECSRegistry
 public:
 	// Manually created list of all components this game has
 	ComponentContainer<DeathTimer> deathTimers;
-	ComponentContainer<Motion> motions;
+	ComponentContainer<Position> positions;
+	ComponentContainer<Velocity> velocities;
+	ComponentContainer<Direction> directions;
 	ComponentContainer<Collision> collisions;
 	ComponentContainer<Player> players;
 	ComponentContainer<Enemy> enemies;
@@ -28,7 +30,9 @@ public:
 	{
 		// TODO: A1 add a LightUp component
 		registry_list.push_back(&deathTimers);
-		registry_list.push_back(&motions);
+		registry_list.push_back(&positions);
+		registry_list.push_back(&velocities);
+		registry_list.push_back(&directions);
 		registry_list.push_back(&collisions);
 		registry_list.push_back(&players);
 		registry_list.push_back(&meshPtrs);
