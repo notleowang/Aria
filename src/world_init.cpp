@@ -106,11 +106,13 @@ Entity createLine(vec2 position, vec2 scale)
 		 GEOMETRY_BUFFER_ID::DEBUG_LINE });
 
 	// Create motion
+	/*
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
 	motion.position = position;
 	motion.scale = scale;
+	*/
 
 	registry.debugComponents.emplace(entity);
 	return entity;
