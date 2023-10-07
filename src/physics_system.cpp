@@ -36,28 +36,28 @@ void PhysicsSystem::step(float elapsed_ms)
 		Position& position = position_container.components[i];	// i-th object in Position Component Container
 		Entity entity = position_container.entities[i];			// Grab the i-th entity with the Position Component
 		Velocity& velocity = registry.velocities.get(entity);	// Get the velocity for the i-th entity as well
-		float step_seconds = elapsed_ms / 1000.f;;
+		float step_seconds = elapsed_ms / 1000.f;
 		position.position += velocity.velocity * step_seconds;
 	}
 
-	// Check for collisions between all moving entities
-	for(uint i = 0; i < position_container.components.size(); i++)
-	{
-		Position& position_i = position_container.components[i];
-		Entity entity_i = position_container.entities[i];
-		
-		// note starting j at i+1 to compare all (i,j) pairs only once (and to not compare with itself)
-		for(uint j = i+1; j < position_container.components.size(); j++)
-		{
-			Position& position_i = position_container.components[j];
-			if (collides(position_i, position_i))
-			{
-				Entity entity_j = position_container.entities[j];
-				// Create a collisions event
-				// We are abusing the ECS system a bit in that we potentially insert muliple collisions for the same entity
-				registry.collisions.emplace_with_duplicates(entity_i, entity_j);
-				registry.collisions.emplace_with_duplicates(entity_j, entity_i);
-			}
-		}
-	}
+	//// Check for collisions between all moving entities
+	//for(uint i = 0; i < position_container.components.size(); i++)
+	//{
+	//	Position& position_i = position_container.components[i];
+	//	Entity entity_i = position_container.entities[i];
+	//	
+	//	// note starting j at i+1 to compare all (i,j) pairs only once (and to not compare with itself)
+	//	for(uint j = i+1; j < position_container.components.size(); j++)
+	//	{
+	//		Position& position_i = position_container.components[j];
+	//		if (collides(position_i, position_i))
+	//		{
+	//			Entity entity_j = position_container.entities[j];
+	//			// Create a collisions event
+	//			// We are abusing the ECS system a bit in that we potentially insert muliple collisions for the same entity
+	//			registry.collisions.emplace_with_duplicates(entity_i, entity_j);
+	//			registry.collisions.emplace_with_duplicates(entity_j, entity_i);
+	//		}
+	//	}
+	//}
 }

@@ -7,6 +7,34 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
+Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
+{
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SALMON);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// set initial component values
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	position.scale = mesh.original_size * 150.f;
+	position.scale.x *= -1; // point front to the right; with sprites this wont be a thing?
+	// TODO: how to we integrate direction into our entities?
+
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity = { 0.f, 0.f };
+
+	// Create and (empty) Salmon component to be able to refer to all turtles
+	registry.players.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
+			EFFECT_ASSET_ID::SALMON,
+			GEOMETRY_BUFFER_ID::SALMON });
+
+	return entity;
+}
 
 /*
 Entity createSalmon(RenderSystem* renderer, vec2 pos)

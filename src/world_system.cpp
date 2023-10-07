@@ -9,6 +9,7 @@
 #include "physics_system.hpp"
 
 // Game configuration
+const float PLAYER_SPEED = 300.f;
 
 // Create the world
 WorldSystem::WorldSystem() {
@@ -163,6 +164,10 @@ void WorldSystem::restart_game() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
+	player = createTestSalmon(renderer, { 100, 200 });
+	//registry.colors.insert(player, { 1, 0.8f, 0.8f });
+
+
 	/*
 	// Create a new player component
 	player = createPlayer(renderer, { 100, 200 });
@@ -229,6 +234,38 @@ bool WorldSystem::is_over() const {
 
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
+
+	// TODO: solve issue where player is faster on the diagonals
+	Velocity& player_velocity = registry.velocities.get(player);
+
+	if (action == GLFW_PRESS) {
+		if (key == GLFW_KEY_UP) {
+			player_velocity.velocity.y -= PLAYER_SPEED;
+		}
+		else if (key == GLFW_KEY_DOWN) {
+			player_velocity.velocity.y += PLAYER_SPEED;
+		}
+		else if (key == GLFW_KEY_LEFT) {
+			player_velocity.velocity.x -= PLAYER_SPEED;
+		}
+		else if (key == GLFW_KEY_RIGHT) {
+			player_velocity.velocity.x += PLAYER_SPEED;
+		}
+	}
+	if (action == GLFW_RELEASE) {
+		if (key == GLFW_KEY_UP) {
+			player_velocity.velocity.y += PLAYER_SPEED;
+		}
+		else if (key == GLFW_KEY_DOWN) {
+			player_velocity.velocity.y -= PLAYER_SPEED;
+		}
+		else if (key == GLFW_KEY_LEFT) {
+			player_velocity.velocity.x += PLAYER_SPEED;
+		}
+		else if (key == GLFW_KEY_RIGHT) {
+			player_velocity.velocity.x -= PLAYER_SPEED;
+		}
+	}
 
 	// Resetting game (currently disabled, think about adding this back in later)
 	//if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
