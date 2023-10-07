@@ -33,7 +33,7 @@ public:
 	bool step(float elapsed_ms);
 
 	// Check for collisions
-	void handle_collisions();
+	// void handle_collisions();
 
 	// Should the game be over ?
 	bool is_over()const;
@@ -48,20 +48,12 @@ private:
 	// OpenGL window handle
 	GLFWwindow* window;
 
-	// Number of fish eaten by the salmon, displayed in the window title
-	unsigned int points;
-
 	// Game state
 	RenderSystem* renderer;
-	float current_speed;
-	float next_turtle_spawn;
-	float next_fish_spawn;
-	Entity player_salmon;
+	Entity player;
 
 	// music references
-	Mix_Music* background_music;
-	Mix_Chunk* salmon_dead_sound;
-	Mix_Chunk* salmon_eat_sound;
+	Mix_Music* background_music; // TODO: change background music for our game
 
 	// C++ random number generator
 	std::default_random_engine rng;

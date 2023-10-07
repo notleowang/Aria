@@ -4,30 +4,55 @@
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
 
-// Player component
+// Aria component
 struct Player
 {
 
 };
 
-// Turtles have a hard shell
-struct HardShell
+// Enemy component
+struct Enemy
 {
 
 };
 
-// Fish and Salmon have a soft shell
-struct SoftShell
+// All data relevant to the resources of entities
+struct Resources
+{
+	float health = 100.f;
+	float mana = 100.f;
+};
+
+// Structure to store entities that can shoot projectiles
+struct Projectiles
 {
 
 };
 
-// All data relevant to the shape and motion of entities
-struct Motion {
+// All data relevant to the position of entities
+struct Position {
 	vec2 position = { 0.f, 0.f };
-	float angle = 0.f;
-	vec2 velocity = { 0.f, 0.f };
 	vec2 scale = { 10.f, 10.f };
+};
+
+// Data relevant to velocity of entities
+struct Velocity {
+	vec2 velocity = { 0.f, 0.f };
+};
+
+// Data relevant to direction of entities
+struct Direction {
+	enum direction
+	{
+		N,
+		NE,
+		E,
+		SE,
+		S,
+		SW,
+		W,
+		NW,
+	};
 };
 
 // Stucture to store collision information

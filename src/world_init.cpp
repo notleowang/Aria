@@ -1,7 +1,13 @@
 #include "world_init.hpp"
 #include "tiny_ecs_registry.hpp"
 
-Entity createSalmon(RenderSystem* renderer, vec2 pos)
+Entity createAria(RenderSystem* renderer, vec2 pos)
+{
+	auto entity = Entity();
+	return entity;
+}
+
+Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 {
 	auto entity = Entity();
 
@@ -9,13 +15,15 @@ Entity createSalmon(RenderSystem* renderer, vec2 pos)
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SALMON);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	// Setting initial motion values
-	Motion& motion = registry.motions.emplace(entity);
-	motion.position = pos;
-	motion.angle = 0.f;
-	motion.velocity = { 0.f, 0.f };
-	motion.scale = mesh.original_size * 150.f;
-	motion.scale.x *= -1; // point front to the right
+	// set initial component values
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	position.scale = mesh.original_size * 150.f;
+	position.scale.x *= -1; // point front to the right; with sprites this wont be a thing?
+	// TODO: how to we integrate direction into our entities?
+
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity = { 0.f, 0.f };
 
 	// Create and (empty) Salmon component to be able to refer to all turtles
 	registry.players.emplace(entity);
@@ -28,6 +36,7 @@ Entity createSalmon(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
+/*
 Entity createFish(RenderSystem* renderer, vec2 position)
 {
 	// Reserve en entity
@@ -84,6 +93,7 @@ Entity createTurtle(RenderSystem* renderer, vec2 position)
 
 	return entity;
 }
+*/
 
 Entity createLine(vec2 position, vec2 scale)
 {
@@ -97,34 +107,14 @@ Entity createLine(vec2 position, vec2 scale)
 		 GEOMETRY_BUFFER_ID::DEBUG_LINE });
 
 	// Create motion
+	/*
 	Motion& motion = registry.motions.emplace(entity);
 	motion.angle = 0.f;
 	motion.velocity = { 0.f, 0.f };
 	motion.position = position;
 	motion.scale = scale;
+	*/
 
 	registry.debugComponents.emplace(entity);
-	return entity;
-}
-
-Entity createPebble(vec2 pos, vec2 size)
-{
-	auto entity = Entity();
-
-	// Setting initial motion values
-	Motion& motion = registry.motions.emplace(entity);
-	motion.position = pos;
-	motion.angle = 0.f;
-	motion.velocity = { 0.f, 0.f };
-	motion.scale = size;
-
-	// Create and (empty) Salmon component to be able to refer to all turtles
-	registry.hardShells.emplace(entity);
-	registry.renderRequests.insert(
-		entity,
-		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::PEBBLE,
-			GEOMETRY_BUFFER_ID::PEBBLE });
-
 	return entity;
 }

@@ -11,16 +11,16 @@ class ECSRegistry
 
 public:
 	// Manually created list of all components this game has
-	// TODO: A1 add a LightUp component
 	ComponentContainer<DeathTimer> deathTimers;
-	ComponentContainer<Motion> motions;
+	ComponentContainer<Position> positions;
+	ComponentContainer<Velocity> velocities;
+	ComponentContainer<Direction> directions;
 	ComponentContainer<Collision> collisions;
 	ComponentContainer<Player> players;
+	ComponentContainer<Enemy> enemies;
 	ComponentContainer<Mesh*> meshPtrs;
 	ComponentContainer<RenderRequest> renderRequests;
 	ComponentContainer<ScreenState> screenStates;
-	ComponentContainer<SoftShell> softShells;
-	ComponentContainer<HardShell> hardShells;
 	ComponentContainer<DebugComponent> debugComponents;
 	ComponentContainer<vec3> colors;
 
@@ -30,14 +30,14 @@ public:
 	{
 		// TODO: A1 add a LightUp component
 		registry_list.push_back(&deathTimers);
-		registry_list.push_back(&motions);
+		registry_list.push_back(&positions);
+		registry_list.push_back(&velocities);
+		registry_list.push_back(&directions);
 		registry_list.push_back(&collisions);
 		registry_list.push_back(&players);
 		registry_list.push_back(&meshPtrs);
 		registry_list.push_back(&renderRequests);
 		registry_list.push_back(&screenStates);
-		registry_list.push_back(&softShells);
-		registry_list.push_back(&hardShells);
 		registry_list.push_back(&debugComponents);
 		registry_list.push_back(&colors);
 	}
