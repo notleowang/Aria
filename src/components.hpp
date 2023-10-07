@@ -29,12 +29,30 @@ struct Projectiles
 
 };
 
-// All data relevant to the shape and motion of entities
-struct Motion {
+// All data relevant to the position of entities
+struct Position {
 	vec2 position = { 0.f, 0.f };
-	float angle = 0.f;
-	vec2 velocity = { 0.f, 0.f };
 	vec2 scale = { 10.f, 10.f };
+};
+
+// Data relevant to velocity of entities
+struct Velocity {
+	vec2 velocity = { 0.f, 0.f };
+};
+
+// Data relevant to direction of entities
+struct Direction {
+	enum direction
+	{
+		N,
+		NE,
+		E,
+		SE,
+		S,
+		SW,
+		W,
+		NW,
+	};
 };
 
 // Stucture to store collision information
