@@ -155,9 +155,10 @@ void WorldSystem::restart_game() {
 	registry.list_all_components();
 	printf("Restarting\n");
 
+	// !!!
 	// Remove all entities that we created
-	while (registry.motions.entities.size() > 0)
-	    registry.remove_all_components_of(registry.motions.entities.back());
+	while (registry.positions.entities.size() > 0)
+	    registry.remove_all_components_of(registry.positions.entities.back());
 
 	// Debugging for memory/component leaks
 	registry.list_all_components();
