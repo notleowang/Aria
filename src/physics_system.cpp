@@ -30,12 +30,13 @@ void PhysicsSystem::step(float elapsed_ms)
 {
 	// Move fish based on how much time has passed, this is to (partially) avoid
 	// having entities move at different speed based on the machine.
-	auto& position_container = registry.positions;
-	for(uint i = 0; i < position_container.size(); i++)
+	auto& velocity_container = registry.velocities;
+	for(uint i = 0; i < velocity_container.size(); i++)
 	{
+		auto& position_container = registry.positions;
 		Position& position = position_container.components[i];	// i-th object in Position Component Container
 		Entity entity = position_container.entities[i];			// Grab the i-th entity with the Position Component
-		Velocity& velocity = registry.velocities.get(entity);	// Get the velocity for the i-th entity as well
+		Velocity& velocity = velocity_container.get(entity);	// Get the velocity for the i-th entity as well
 		float step_seconds = elapsed_ms / 1000.f;
 		position.position += velocity.velocity * step_seconds;
 	}
