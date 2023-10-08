@@ -40,19 +40,21 @@ struct Velocity {
 	vec2 velocity = { 0.f, 0.f };
 };
 
+
 // Data relevant to direction of entities
+typedef enum {
+	N,
+	NE,
+	E,
+	SE,
+	S,
+	SW,
+	W,
+	NW,
+} DIRECTION;
+
 struct Direction {
-	enum direction
-	{
-		N,
-		NE,
-		E,
-		SE,
-		S,
-		SW,
-		W,
-		NW,
-	};
+	DIRECTION direction;
 };
 
 // Stucture to store collision information
