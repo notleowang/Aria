@@ -16,6 +16,12 @@ struct Enemy
 
 };
 
+// Terrain
+struct Terrain
+{
+
+};
+
 // All data relevant to the resources of entities
 struct Resources
 {

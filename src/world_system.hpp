@@ -51,6 +51,7 @@ private:
 	// Game state
 	RenderSystem* renderer;
 	Entity player;
+	Entity terrain;
 
 	// music references
 	Mix_Music* background_music; // TODO: change background music for our game

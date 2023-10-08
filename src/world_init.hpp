@@ -15,6 +15,9 @@ Entity createAria(RenderSystem* renderer, vec2 pos);
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);
 
+// creates a terrain with fixed size (TODO: figure out good size of the terrain)
+Entity createTerrain(RenderSystem* renderer, vec2 pos);
+
 // test
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos);
 
