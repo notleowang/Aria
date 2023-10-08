@@ -10,6 +10,7 @@
 
 // Game configuration
 const float PLAYER_SPEED = 300.f;
+const float PROJECTILE_SPEED = 1000.f;
 
 // Create the world
 WorldSystem::WorldSystem() {
@@ -32,7 +33,7 @@ WorldSystem::~WorldSystem() {
 
 // Debugging
 namespace {
-	void glfw_err_cb(int error, const char *desc) {
+	void glfw_err_cb(int error, const char* desc) {
 		fprintf(stderr, "%d: %s", error, desc);
 	}
 }
@@ -107,7 +108,7 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 	fprintf(stderr, "Loaded music\n");
 
 	// Set all states to default
-    restart_game();
+	restart_game();
 }
 
 // Update our game world
@@ -119,12 +120,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	// Remove debug info from the last step
 	while (registry.debugComponents.entities.size() > 0)
-	    registry.remove_all_components_of(registry.debugComponents.entities.back());
+		registry.remove_all_components_of(registry.debugComponents.entities.back());
 
 
 	// Processing the salmon state
 	assert(registry.screenStates.components.size() <= 1);
-    ScreenState &screen = registry.screenStates.components[0];
+	ScreenState& screen = registry.screenStates.components[0];
 
 	// We can choose to have a death timer when the player reaches 0 HP.
  //   float min_timer_ms = 3000.f;
@@ -159,7 +160,7 @@ void WorldSystem::restart_game() {
 	// !!!
 	// Remove all entities that we created
 	while (registry.positions.entities.size() > 0)
-	    registry.remove_all_components_of(registry.positions.entities.back());
+		registry.remove_all_components_of(registry.positions.entities.back());
 
 	// Debugging for memory/component leaks
 	registry.list_all_components();
@@ -177,8 +178,8 @@ void WorldSystem::restart_game() {
 		int w, h;
 		glfwGetWindowSize(window, &w, &h);
 		float radius = 30 * (uniform_dist(rng) + 0.3f); // range 0.3 .. 1.3
-		Entity pebble = createPebble({ uniform_dist(rng) * w, h - uniform_dist(rng) * 20 }, 
-			         { radius, radius });
+		Entity pebble = createPebble({ uniform_dist(rng) * w, h - uniform_dist(rng) * 20 },
+					 { radius, radius });
 		float brightness = uniform_dist(rng) * 0.5 + 0.5;
 		registry.colors.insert(pebble, { brightness, brightness, brightness});
 	}
@@ -237,6 +238,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	// TODO: solve issue where player is faster on the diagonals
 	Velocity& player_velocity = registry.velocities.get(player);
+	Position& player_position = registry.positions.get(player);
 
 	if (action == GLFW_PRESS) {
 		if (key == GLFW_KEY_UP) {
@@ -250,6 +252,18 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		}
 		else if (key == GLFW_KEY_RIGHT) {
 			player_velocity.velocity.x += PLAYER_SPEED;
+		}
+
+		if (key == GLFW_KEY_SPACE) {
+			Entity projectile = createProjectile(renderer, { 0.f,0.f }, { 0.f,0.f });
+
+			Position& projectile_position = registry.positions.get(projectile);
+			projectile_position.position = player_position.position; // change to player pos
+
+			Velocity& projectile_velocity = registry.velocities.get(projectile);
+			// Get player direction
+			projectile_velocity.velocity = { PROJECTILE_SPEED,0.f }; //TODO: Compute velocity from direction and PROJECTILE_SPEED
+
 		}
 	}
 	if (action == GLFW_RELEASE) {
