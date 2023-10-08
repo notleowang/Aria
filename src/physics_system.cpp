@@ -33,10 +33,10 @@ void PhysicsSystem::step(float elapsed_ms)
 	auto& velocity_container = registry.velocities;
 	for(uint i = 0; i < velocity_container.size(); i++)
 	{
+		Velocity& velocity = velocity_container.components[i];
 		auto& position_container = registry.positions;
-		Position& position = position_container.components[i];	// i-th object in Position Component Container
-		Entity entity = position_container.entities[i];			// Grab the i-th entity with the Position Component
-		Velocity& velocity = velocity_container.get(entity);	// Get the velocity for the i-th entity as well
+		Entity entity = velocity_container.entities[i];			// Grab the i-th entity with the Velocity Component
+		Position& position = position_container.get(entity);	// Get the position for the i-th entity
 		float step_seconds = elapsed_ms / 1000.f;
 		position.position += velocity.velocity * step_seconds;
 	}
