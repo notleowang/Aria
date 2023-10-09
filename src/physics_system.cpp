@@ -12,7 +12,7 @@ vec2 get_bounding_box(const Position& position)
 // This is a SUPER APPROXIMATE check that puts a circle around the bounding boxes and sees
 // if the center point of either object is inside the other's bounding-box-circle. You can
 // surely implement a more accurate detection
-bool collides(const Position& position1, const Position& position2)
+bool circleCollides(const Position& position1, const Position& position2)
 {
 	vec2 dp = position1.position - position2.position;
 	float dist_squared = dot(dp,dp);
@@ -26,38 +26,55 @@ bool collides(const Position& position1, const Position& position2)
 	return false;
 }
 
+bool boxCollides(const Position& position1, const Position& position2)
+{
+	float width_1 = abs(position1.scale.x);
+	float width_2 = abs(position2.scale.x);
+	float height_1 = abs(position1.scale.y);
+	float height_2 = abs(position2.scale.y);
+	if (position1.position.x - width_1/2 < position2.position.x + width_2 / 2 &&
+		position1.position.x + width_1/2 > position2.position.x - width_2 / 2 &&
+		position1.position.y + height_1 / 2 > position2.position.y - height_2 / 2 &&
+		position1.position.y - height_1 / 2 < position2.position.y + height_2 / 2
+		)
+		return true;
+	return false;
+}
+
 void PhysicsSystem::step(float elapsed_ms)
 {
 	// Move fish based on how much time has passed, this is to (partially) avoid
 	// having entities move at different speed based on the machine.
-	auto& position_container = registry.positions;
-	for(uint i = 0; i < position_container.size(); i++)
+	auto& velocity_container = registry.velocities;
+	for (uint i = 0; i < velocity_container.size(); i++)
 	{
-		Position& position = position_container.components[i];	// i-th object in Position Component Container
-		Entity entity = position_container.entities[i];			// Grab the i-th entity with the Position Component
-		Velocity& velocity = registry.velocities.get(entity);	// Get the velocity for the i-th entity as well
+		Velocity& velocity = velocity_container.components[i];
+		auto& position_container = registry.positions;
+		Entity entity = velocity_container.entities[i];			// Grab the i-th entity with the Velocity Component
+		Position& position = position_container.get(entity);	// Get the position for the i-th entity
 		float step_seconds = elapsed_ms / 1000.f;
 		position.position += velocity.velocity * step_seconds;
 	}
 
-	//// Check for collisions between all moving entities
-	//for(uint i = 0; i < position_container.components.size(); i++)
-	//{
-	//	Position& position_i = position_container.components[i];
-	//	Entity entity_i = position_container.entities[i];
-	//	
-	//	// note starting j at i+1 to compare all (i,j) pairs only once (and to not compare with itself)
-	//	for(uint j = i+1; j < position_container.components.size(); j++)
-	//	{
-	//		Position& position_i = position_container.components[j];
-	//		if (collides(position_i, position_i))
-	//		{
-	//			Entity entity_j = position_container.entities[j];
-	//			// Create a collisions event
-	//			// We are abusing the ECS system a bit in that we potentially insert muliple collisions for the same entity
-	//			registry.collisions.emplace_with_duplicates(entity_i, entity_j);
-	//			registry.collisions.emplace_with_duplicates(entity_j, entity_i);
-	//		}
-	//	}
-	//}
+	// Check for collisions with entities that have a velocity
+	for (uint i = 0; i < velocity_container.size(); i++) 
+	{
+		auto& position_container = registry.positions;
+		Entity entity_i = velocity_container.entities[i];
+		Position& position_i = position_container.get(entity_i);
+
+		// Currently pretty inefficient as there are some duplicate checks but having separate velocity and position make it a bit difficult
+		// We could also just do over all entities with a position component... but we'll consider it if this becomes too inefficient
+		for (uint j = 0; j < position_container.components.size(); j++) {
+			Position& position_j = position_container.components[j];
+			if (&position_j != &position_i) {
+				if (boxCollides(position_i, position_j)) {
+					Entity entity_j = position_container.entities[j];
+					registry.collisions.emplace_with_duplicates(entity_i, entity_j);
+					registry.collisions.emplace_with_duplicates(entity_j, entity_i);
+				}
+			}
+
+		}
+	}
 }

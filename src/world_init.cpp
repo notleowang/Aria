@@ -11,11 +11,9 @@ Entity createTerrain(vec2 pos, vec2 size)
 {
 	auto entity = Entity();
 
-
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 	position.scale = size;
-
 
 	registry.terrain.emplace(entity);
 	registry.renderRequests.insert(

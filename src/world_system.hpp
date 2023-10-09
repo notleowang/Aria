@@ -33,7 +33,7 @@ public:
 	bool step(float elapsed_ms);
 
 	// Check for collisions
-	// void handle_collisions();
+	void handle_collisions();
 
 	// Should the game be over ?
 	bool is_over()const;
@@ -52,8 +52,7 @@ private:
 	RenderSystem* renderer;
 	Entity player;
 	
-	// TODO: change to list of terrain
-	Entity terrain;
+	std::vector<Entity> terrains;
 
 	// music references
 	Mix_Music* background_music; // TODO: change background music for our game
