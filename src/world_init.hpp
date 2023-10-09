@@ -16,7 +16,7 @@ Entity createAria(RenderSystem* renderer, vec2 pos);
 Entity createLine(vec2 position, vec2 size);
 
 // creates a terrain with fixed size (TODO: figure out good size of the terrain)
-Entity createTerrain(RenderSystem* renderer, vec2 pos);
+Entity createTerrain(vec2 pos, vec2 size);
 
 // test
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos);

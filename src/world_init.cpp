@@ -7,23 +7,22 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
-Entity createTerrain(RenderSystem* renderer, vec2 pos)
+Entity createTerrain(vec2 pos, vec2 size)
 {
 	auto entity = Entity();
 
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SALMON); // TODO: change to terrain
-	registry.meshPtrs.emplace(entity, &mesh);
 
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
-	position.scale = mesh.original_size * 150.f;
+	position.scale = size;
 
 
 	registry.terrain.emplace(entity);
 	registry.renderRequests.insert(
-		entity, { TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::SALMON,
-			GEOMETRY_BUFFER_ID::SALMON });
+		entity, 
+		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
+			EFFECT_ASSET_ID::TERRAIN,
+			GEOMETRY_BUFFER_ID::TERRAIN });
 	
 	return entity;
 }

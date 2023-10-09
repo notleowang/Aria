@@ -51,6 +51,8 @@ private:
 	// Game state
 	RenderSystem* renderer;
 	Entity player;
+	
+	// TODO: change to list of terrain
 	Entity terrain;
 
 	// music references

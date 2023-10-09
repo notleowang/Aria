@@ -165,7 +165,9 @@ void WorldSystem::restart_game() {
 	registry.list_all_components();
 
 	player = createTestSalmon(renderer, { 100, 200 });
-	terrain = createTerrain(renderer, { 200, 400 });
+
+	// TODO: change to list of terrain
+	terrain = createTerrain({200, 400}, {200, 200});
 	//registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
 
