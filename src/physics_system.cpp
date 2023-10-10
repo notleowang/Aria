@@ -69,43 +69,9 @@ bool rectCollides(const Position& position1, const Position& position2, Entity& 
 
 void PhysicsSystem::step(float elapsed_ms)
 {
-	// Move fish based on how much time has passed, this is to (partially) avoid
-	// having entities move at different speed based on the machine.
 	auto& velocity_container = registry.velocities;
-	for (uint i = 0; i < velocity_container.size(); i++)
-	{
-		Velocity& velocity = velocity_container.components[i];
-		auto& position_container = registry.positions;
-		Entity entity = velocity_container.entities[i];			// Grab the i-th entity with the Velocity Component
-		Position& position = position_container.get(entity);	// Get the position for the i-th entity
-		float step_seconds = elapsed_ms / 1000.f;
-		if (registry.collisions.has(entity)) {
-			Collision& collision = registry.collisions.get(entity);
-			if (collision.direction == 0) {
-				position.position.x -= 1; // to remove stacked collisions
-				position.position.y += velocity.velocity.y * step_seconds;
-			}
-			if (collision.direction == 1) {
-				position.position.x += 1;
-				position.position.y += velocity.velocity.y * step_seconds;
-			}
-			if (collision.direction == 2) {
-				position.position.x += velocity.velocity.x * step_seconds;
-				position.position.y -= 1;
-			}
-			if (collision.direction == 3) {
-				position.position.x += velocity.velocity.x * step_seconds;
-				position.position.y += 1;
-			}
-			registry.collisions.remove(entity);
-		}
-		else {
-			position.position += velocity.velocity * step_seconds;
-		}
-	}
-
 	// Check for collisions with entities that have a velocity
-	for (uint i = 0; i < velocity_container.size(); i++) 
+	for (uint i = 0; i < velocity_container.size(); i++)
 	{
 		auto& position_container = registry.positions;
 		Entity entity_i = velocity_container.entities[i];
@@ -120,6 +86,42 @@ void PhysicsSystem::step(float elapsed_ms)
 				rectCollides(position_i, position_j, entity_i, entity_j);
 			}
 
+		}
+	}
+
+	// Move based on how much time has passed, this is to (partially) avoid
+	// having entities move at different speed based on the machine.
+	for (uint i = 0; i < velocity_container.size(); i++)
+	{
+		Velocity& velocity = velocity_container.components[i];
+		auto& position_container = registry.positions;
+		Entity entity = velocity_container.entities[i];			// Grab the i-th entity with the Velocity Component
+		Position& position = position_container.get(entity);	// Get the position for the i-th entity
+		float step_seconds = elapsed_ms / 1000.f;
+		if (registry.collisions.has(entity)) {
+			Collision& collision = registry.collisions.get(entity);
+			Entity& other_entity = collision.other_entity;
+			Position& other_position = position_container.get(other_entity);
+			if (collision.direction == 0) {
+				position.position.x = other_position.position.x - abs(other_position.scale.x / 2) - abs(position.scale.x/2);
+				position.position.y += velocity.velocity.y * step_seconds;
+			}
+			if (collision.direction == 1) {
+				position.position.x = other_position.position.x + abs(other_position.scale.x / 2) + abs(position.scale.x / 2);
+				position.position.y += velocity.velocity.y * step_seconds;
+			}
+			if (collision.direction == 2) {
+				position.position.x += velocity.velocity.x * step_seconds;
+				position.position.y = other_position.position.y - abs(other_position.scale.y / 2) - abs(position.scale.y / 2);
+			}
+			if (collision.direction == 3) {
+				position.position.x += velocity.velocity.x * step_seconds;
+				position.position.y = other_position.position.y + abs(other_position.scale.y / 2) + abs(position.scale.y / 2);;
+			}
+			registry.collisions.remove(entity);
+		}
+		else {
+			position.position += velocity.velocity * step_seconds;
 		}
 	}
 }
