@@ -66,7 +66,12 @@ struct Collision
 {
 	// Note, the first object is stored in the ECS container.entities
 	Entity other_entity; // the second object involved in the collision
-	Collision(Entity& other_entity) { this->other_entity = other_entity; };
+	int direction; // 0 = left, 1 = right, 2 = up, 3 = down
+	               // The object collides to the <direction> of the other entity
+	Collision(Entity& other_entity, int direction) { 
+		this->other_entity = other_entity; 
+		this->direction = direction;
+	};
 };
 
 // Data structure for toggling debug mode

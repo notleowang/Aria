@@ -26,18 +26,44 @@ bool circleCollides(const Position& position1, const Position& position2)
 	return false;
 }
 
-bool boxCollides(const Position& position1, const Position& position2)
+bool rectCollides(const Position& position1, const Position& position2, Entity& entity_i, Entity& entity_j)
 {
-	float width_1 = abs(position1.scale.x);
-	float width_2 = abs(position2.scale.x);
-	float height_1 = abs(position1.scale.y);
-	float height_2 = abs(position2.scale.y);
-	if (position1.position.x - width_1/2 < position2.position.x + width_2 / 2 &&
-		position1.position.x + width_1/2 > position2.position.x - width_2 / 2 &&
-		position1.position.y + height_1 / 2 > position2.position.y - height_2 / 2 &&
-		position1.position.y - height_1 / 2 < position2.position.y + height_2 / 2
+	float rect1_left = position1.position.x - abs(position1.scale.x) / 2;
+	float rect1_right = position1.position.x + abs(position1.scale.x) / 2;
+	float rect1_top = position1.position.y - abs(position1.scale.y) / 2;
+	float rect1_bottom = position1.position.y + abs(position1.scale.y) / 2;
+	float rect2_left = position2.position.x - abs(position2.scale.x) / 2;
+	float rect2_right = position2.position.x + abs(position2.scale.x) / 2;
+	float rect2_top = position2.position.y - abs(position2.scale.y) / 2;
+	float rect2_bottom = position2.position.y + abs(position2.scale.y) / 2;
+	if (rect1_left < rect2_right && rect1_right > rect2_left &&
+		rect1_bottom > rect2_top &&
+		rect1_top < rect2_bottom
 		)
+	{
+		float overlap_left = rect1_right - rect2_left;
+		float overlap_right = rect2_right - rect1_left;
+		float overlap_top = rect1_bottom - rect2_top;
+		float overlap_bottom = rect2_bottom - rect1_top;
+
+		float min_overlap = min(overlap_left, min(overlap_right, min(overlap_top, overlap_bottom)));
+
+		int direction;
+		if (min_overlap == overlap_left) {
+			direction = 0;
+		}
+		else if (min_overlap == overlap_right) {
+			direction = 1;
+		}
+		else if (min_overlap == overlap_top) {
+			direction = 2;
+		}
+		else if (min_overlap == overlap_bottom) {
+			direction = 3;
+		}
+		registry.collisions.emplace_with_duplicates(entity_i, entity_j, direction);
 		return true;
+	}
 	return false;
 }
 
@@ -53,7 +79,29 @@ void PhysicsSystem::step(float elapsed_ms)
 		Entity entity = velocity_container.entities[i];			// Grab the i-th entity with the Velocity Component
 		Position& position = position_container.get(entity);	// Get the position for the i-th entity
 		float step_seconds = elapsed_ms / 1000.f;
-		position.position += velocity.velocity * step_seconds;
+		if (registry.collisions.has(entity)) {
+			Collision& collision = registry.collisions.get(entity);
+			if (collision.direction == 0) {
+				position.position.x -= 1; // to remove stacked collisions
+				position.position.y += velocity.velocity.y * step_seconds;
+			}
+			if (collision.direction == 1) {
+				position.position.x += 1;
+				position.position.y += velocity.velocity.y * step_seconds;
+			}
+			if (collision.direction == 2) {
+				position.position.x += velocity.velocity.x * step_seconds;
+				position.position.y -= 1;
+			}
+			if (collision.direction == 3) {
+				position.position.x += velocity.velocity.x * step_seconds;
+				position.position.y += 1;
+			}
+			registry.collisions.remove(entity);
+		}
+		else {
+			position.position += velocity.velocity * step_seconds;
+		}
 	}
 
 	// Check for collisions with entities that have a velocity
@@ -68,11 +116,8 @@ void PhysicsSystem::step(float elapsed_ms)
 		for (uint j = 0; j < position_container.components.size(); j++) {
 			Position& position_j = position_container.components[j];
 			if (&position_j != &position_i) {
-				if (boxCollides(position_i, position_j)) {
-					Entity entity_j = position_container.entities[j];
-					registry.collisions.emplace_with_duplicates(entity_i, entity_j);
-					registry.collisions.emplace_with_duplicates(entity_j, entity_i);
-				}
+				Entity& entity_j = position_container.entities[j];
+				rectCollides(position_i, position_j, entity_i, entity_j);
 			}
 
 		}
