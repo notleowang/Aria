@@ -7,6 +7,31 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
+Entity createTestStationaryTexture(RenderSystem* renderer, vec2 pos)
+{
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Initialize the motion
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	position.scale = vec2({ 700.f, 700.f });
+
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity = { 0.f, 0.f };
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::LANDSCAPE,
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 {
 	auto entity = Entity();

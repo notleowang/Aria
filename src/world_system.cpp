@@ -164,9 +164,8 @@ void WorldSystem::restart_game() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
+	Entity entity = createTestStationaryTexture(renderer, { 600, 400 });
 	player = createTestSalmon(renderer, { 100, 200 });
-	//registry.colors.insert(player, { 1, 0.8f, 0.8f });
-
 
 	/*
 	// Create a new player component
