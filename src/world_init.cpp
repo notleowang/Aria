@@ -36,7 +36,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 	auto& position = registry.positions.emplace(entity);
 	position.position = pos;
 
-	position.scale = vec2({ 100, 100 });
+	position.scale = vec2({ 150, 100 });
 
 	// Create and (empty) Turtle component to be able to refer to all turtles
 	registry.enemies.emplace(entity);
@@ -67,6 +67,8 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = { 0.f, 0.f };
+
+	Resources& resources = registry.resources.emplace(entity);
 
 	// Create and (empty) Salmon component to be able to refer to all turtles
 	registry.players.emplace(entity);

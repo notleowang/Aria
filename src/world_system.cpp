@@ -126,27 +126,32 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	assert(registry.screenStates.components.size() <= 1);
     ScreenState &screen = registry.screenStates.components[0];
 
-	// We can choose to have a death timer when the player reaches 0 HP.
- //   float min_timer_ms = 3000.f;
-	//for (Entity entity : registry.deathTimers.entities) {
-	//	// progress timer
-	//	DeathTimer& timer = registry.deathTimers.get(entity);
-	//	timer.timer_ms -= elapsed_ms_since_last_update;
-	//	if(timer.timer_ms < min_timer_ms){
-	//		min_timer_ms = timer.timer_ms;
-	//	}
+	for (Entity entity : registry.invulnerableTimers.entities) {
+		// progress timer
+		InvulnerableTimer& timer = registry.invulnerableTimers.get(entity);
+		timer.timer_ms -= elapsed_ms_since_last_update;
+		if (timer.timer_ms <= 0) {
+			registry.invulnerableTimers.remove(entity);
+		}
+	}
 
-	//	// restart the game once the death timer expired
-	//	if (timer.timer_ms < 0) {
-	//		registry.deathTimers.remove(entity);
-	//		screen.screen_darken_factor = 0;
- //           restart_game();
-	//		return true;
-	//	}
-	//}
-	// reduce window brightness if any of the present salmons is dying
-	//screen.screen_darken_factor = 1 - min_timer_ms / 3000;
-
+    float min_timer_ms = 3000.f;
+	for (Entity entity : registry.deathTimers.entities) {
+		// progress timer
+		DeathTimer& timer = registry.deathTimers.get(entity);
+		timer.timer_ms -= elapsed_ms_since_last_update;
+		if (timer.timer_ms < min_timer_ms) {
+			min_timer_ms = timer.timer_ms;
+		}
+		// restart the game once the death timer expired
+		if (timer.timer_ms < 0) {
+			registry.deathTimers.remove(entity);
+			screen.screen_darken_factor = 0;
+			restart_game();
+			return true;
+		}
+	}
+	screen.screen_darken_factor = 1 - min_timer_ms / 3000;
 	return true;
 }
 
@@ -160,6 +165,10 @@ void WorldSystem::restart_game() {
 	// Remove all entities that we created
 	while (registry.positions.entities.size() > 0)
 	    registry.remove_all_components_of(registry.positions.entities.back());
+	while (registry.velocities.entities.size() > 0)
+		registry.remove_all_components_of(registry.velocities.entities.back());
+	while (registry.resources.entities.size() > 0)
+		registry.remove_all_components_of(registry.resources.entities.back());
 
 	// Debugging for memory/component leaks
 	registry.list_all_components();
@@ -198,8 +207,7 @@ void WorldSystem::restart_game() {
 
 // Compute collisions between entities
 void WorldSystem::handle_collisions() {
-
-
+	if (registry.deathTimers.has(player)) { return; }
 	// Loop over all collisions detected by the physics system
 	auto& collisionsRegistry = registry.collisions;
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
@@ -207,21 +215,27 @@ void WorldSystem::handle_collisions() {
 		Entity entity = collisionsRegistry.entities[i];
 		Entity entity_other = collisionsRegistry.components[i].other_entity;
 
-		if (registry.players.has(entity)) {
-			Player& player = registry.players.get(entity);
-
-			// Checking Player - Enemy collisions
-			if (registry.enemies.has(entity_other)) {
-				printf("collided with enemy, reduce hp, and remove collision");
-				registry.collisions.remove(entity);
+		// Checking Player - Enemy collisions
+		if (registry.enemies.has(entity_other)) {
+			if (!registry.invulnerableTimers.has(entity)) {
+				Resources& player_resource = registry.resources.get(entity);
+				player_resource.health -= registry.enemies.get(entity_other).damage;
+				printf("player hp: %f\n", player_resource.health);
+				registry.invulnerableTimers.emplace(entity);
+				if (player_resource.health <= 0) {
+					registry.deathTimers.emplace(entity);
+					registry.velocities.get(player).velocity = vec2(0.f, 0.f);
+					// TODO: play death sound here
+				}
 			}
 		}
+	}
+	registry.collisions.clear();
 			//if (registry.hardShells.has(entity_other)) {
 	//			// initiate death unless already dying
 	//			if (!registry.deathTimers.has(entity)) {
 	//				// Scream, reset timer, and make the salmon sink
 	//				registry.deathTimers.emplace(entity);
-	//				Mix_PlayChannel(-1, salmon_dead_sound, 0);
 
 	//				// !!! TODO A1: change the salmon orientation and color on death
 	//			}
@@ -236,10 +250,7 @@ void WorldSystem::handle_collisions() {
 	//			}
 	//		}
 	//	}
-	}
 
-	//// Remove all collisions from this simulation step
-	//registry.collisions.clear();
 }
 
 // Should the game be over ?
@@ -249,7 +260,7 @@ bool WorldSystem::is_over() const {
 
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
-
+	if (registry.deathTimers.has(player)) { return; }
 	// TODO: solve issue where player is faster on the diagonals
 	Velocity& player_velocity = registry.velocities.get(player);
 

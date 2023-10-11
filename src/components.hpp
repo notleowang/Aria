@@ -13,7 +13,7 @@ struct Player
 // Enemy component
 struct Enemy
 {
-
+	float damage = 10.f;
 };
 
 // Terrain
@@ -93,7 +93,13 @@ struct DebugComponent
 	// Note, an empty struct has size 1
 };
 
-// A timer that will be associated to dying salmon
+// A timer that will be associated to an entity having an invulnerability period to damage
+struct InvulnerableTimer
+{
+	float timer_ms = 1000.f;
+};
+
+// A timer that will be associated to an entity dying
 struct DeathTimer
 {
 	float timer_ms = 3000.f;

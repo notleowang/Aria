@@ -65,7 +65,9 @@ bool rectCollides(const Position& position1, const Position& position2, Entity& 
 			direction = 3;
 		}
 
-		registry.collisions.emplace_with_duplicates(entity_i, entity_j, direction);
+		if (!registry.collisions.has(entity_i)) {
+			registry.collisions.emplace_with_duplicates(entity_i, entity_j, direction);
+		}
 		return true;
 	}
 	return false;
@@ -127,7 +129,6 @@ void PhysicsSystem::step(float elapsed_ms)
 				position.position.x += velocity.velocity.x * step_seconds;
 				position.position.y = other_position.position.y + abs(other_position.scale.y / 2) + abs(position.scale.y / 2);;
 			}
-			registry.collisions.remove(entity);
 		}
 		else {
 			position.position += velocity.velocity * step_seconds;
