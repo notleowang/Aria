@@ -96,6 +96,9 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel) {
 	position.position = pos;
 	//position.scale = ??
 
+
+	registry.projectiles.emplace(entity);
+
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = vel;
 

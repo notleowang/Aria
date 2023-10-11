@@ -326,16 +326,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	}
 
 	if (action == GLFW_PRESS && key == GLFW_KEY_SPACE) {
-		Entity projectile = createProjectile(renderer, { 0.f,0.f }, { 0.f,0.f });
+		Velocity vel = computeVelocity(PROJECTILE_SPEED, player_direction);
+		Entity projectile = createProjectile(renderer,player_position.position, vel.velocity);
 		Mix_PlayChannel(-1, projectile_sound, 0);
-
-		Position& projectile_position = registry.positions.get(projectile);
-		projectile_position.position = player_position.position; // change to player pos
-
-		Velocity& projectile_velocity = registry.velocities.get(projectile);
-		// Get player direction
-		projectile_velocity.velocity = { PROJECTILE_SPEED,0.f }; //TODO: Compute velocity from direction and PROJECTILE_SPEED
-
 	}
 
 	// Resetting game (currently disabled, think about adding this back in later)
