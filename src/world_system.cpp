@@ -10,7 +10,7 @@
 
 // Game configuration
 const float PLAYER_SPEED = 300.f;
-const float PROJECTILE_SPEED = 1000.f;
+const float PROJECTILE_SPEED = 700.f;
 
 // Create the world
 WorldSystem::WorldSystem() {
@@ -22,6 +22,8 @@ WorldSystem::~WorldSystem() {
 	// Destroy music components
 	if (background_music != nullptr)
 		Mix_FreeMusic(background_music);
+	if (projectile_sound != nullptr)
+		Mix_FreeChunk(projectile_sound);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -90,7 +92,8 @@ GLFWwindow* WorldSystem::create_window() {
 	}
 
 	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
-	//salmon_dead_sound = Mix_LoadWAV(audio_path("salmon_dead.wav").c_str()); // keeping one so we know how to load future wavs
+	projectile_sound = Mix_LoadWAV(audio_path("projectile.wav").c_str());
+	//salmon_dead_sound = Mix_LoadWAv(audio_path("salmon_dead.wav").c_str()); // keeping one so we know how to load future wavs
 
 	if (background_music == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
@@ -241,6 +244,20 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	Position& player_position = registry.positions.get(player);
 
 	if (action == GLFW_PRESS) {
+		
+		if (key == GLFW_KEY_SPACE) {
+			Entity projectile = createProjectile(renderer, { 0.f,0.f }, { 0.f,0.f });
+			Mix_PlayChannel(-1, projectile_sound, 0);
+
+			Position& projectile_position = registry.positions.get(projectile);
+			projectile_position.position = player_position.position; // change to player pos
+
+			Velocity& projectile_velocity = registry.velocities.get(projectile);
+			// Get player direction
+			projectile_velocity.velocity = { PROJECTILE_SPEED,0.f }; //TODO: Compute velocity from direction and PROJECTILE_SPEED
+
+		}
+
 		if (key == GLFW_KEY_UP) {
 			player_velocity.velocity.y -= PLAYER_SPEED;
 		}
@@ -252,18 +269,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		}
 		else if (key == GLFW_KEY_RIGHT) {
 			player_velocity.velocity.x += PLAYER_SPEED;
-		}
-
-		if (key == GLFW_KEY_SPACE) {
-			Entity projectile = createProjectile(renderer, { 0.f,0.f }, { 0.f,0.f });
-
-			Position& projectile_position = registry.positions.get(projectile);
-			projectile_position.position = player_position.position; // change to player pos
-
-			Velocity& projectile_velocity = registry.velocities.get(projectile);
-			// Get player direction
-			projectile_velocity.velocity = { PROJECTILE_SPEED,0.f }; //TODO: Compute velocity from direction and PROJECTILE_SPEED
-
 		}
 	}
 	if (action == GLFW_RELEASE) {

@@ -56,7 +56,6 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel) {
 		{ TEXTURE_ASSET_ID::TURTLE, //TODO: Change texture asset- the projectiles are currently turtles
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE });
-
 	return entity;
 }
 
