@@ -23,5 +23,5 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos);
 
 // test
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos);
-
+Entity createTestStationaryTexture(RenderSystem* renderer, vec2 pos);
 

@@ -47,7 +47,6 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 		 GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
-
 }
 
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos)

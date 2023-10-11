@@ -157,7 +157,8 @@ struct Mesh
 
 enum class TEXTURE_ASSET_ID {
 	FISH = 0,
-	TURTLE = FISH + 1,
+	LANDSCAPE = FISH + 1,
+	TURTLE = LANDSCAPE + 1,
 	TEXTURE_COUNT = TURTLE + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;

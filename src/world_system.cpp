@@ -188,7 +188,6 @@ void WorldSystem::restart_game() {
 	enemies.push_back(createEnemy(renderer, {600, 600}));
 	//registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
-
 	/*
 	// Create a new player component
 	player = createPlayer(renderer, { 100, 200 });
