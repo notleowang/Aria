@@ -70,6 +70,9 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 
 	Resources& resources = registry.resources.emplace(entity);
 
+	Direction& direction = registry.directions.emplace(entity);
+	direction.direction = DIRECTION::E;
+
 	// Create and (empty) Salmon component to be able to refer to all turtles
 	registry.players.emplace(entity);
 	registry.renderRequests.insert(
