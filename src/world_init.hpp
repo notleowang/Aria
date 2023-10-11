@@ -15,6 +15,12 @@ Entity createAria(RenderSystem* renderer, vec2 pos);
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);
 
+// creates a terrain with fixed size
+Entity createTerrain(vec2 pos, vec2 size);
+
+// mock enemy TODO: change enemy implementation
+Entity createEnemy(RenderSystem* renderer, vec2 pos);
+
 // test
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos);
 
