@@ -34,7 +34,7 @@ public:
 	bool step(float elapsed_ms);
 
 	// Check for collisions
-	// void handle_collisions();
+	void handle_collisions();
 
 	// Should the game be over ?
 	bool is_over()const;
@@ -52,6 +52,9 @@ private:
 	// Game state
 	RenderSystem* renderer;
 	Entity player;
+	
+	std::vector<Entity> terrains;
+	std::vector<Entity> enemies;
 
 	vec2 player_starting_pos;
 	std::vector<Enemy> enemies;
