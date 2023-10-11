@@ -1,6 +1,7 @@
 // Header
 #include "world_system.hpp"
 #include "world_init.hpp"
+#include "utils.hpp"
 
 // stlib
 #include <cassert>
@@ -263,34 +264,51 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (registry.deathTimers.has(player)) { return; }
 	// TODO: solve issue where player is faster on the diagonals
 	Velocity& player_velocity = registry.velocities.get(player);
+	Direction& player_direction = registry.directions.get(player);
 
-	if (action == GLFW_PRESS) {
-		if (key == GLFW_KEY_UP) {
-			player_velocity.velocity.y -= PLAYER_SPEED;
-		}
-		else if (key == GLFW_KEY_DOWN) {
-			player_velocity.velocity.y += PLAYER_SPEED;
-		}
-		else if (key == GLFW_KEY_LEFT) {
-			player_velocity.velocity.x -= PLAYER_SPEED;
-		}
-		else if (key == GLFW_KEY_RIGHT) {
-			player_velocity.velocity.x += PLAYER_SPEED;
-		}
+	// get states of each arrow key
+	int state_up = glfwGetKey(window, GLFW_KEY_UP);
+	int state_down = glfwGetKey(window, GLFW_KEY_DOWN);
+	int state_left = glfwGetKey(window, GLFW_KEY_LEFT);
+	int state_right = glfwGetKey(window, GLFW_KEY_RIGHT);
+
+	DIRECTION new_direction = DIRECTION::NONE;
+
+	if ((state_up == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_RELEASE && state_right == GLFW_RELEASE) ||
+		(state_up == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_PRESS && state_right == GLFW_PRESS)) {
+		new_direction = DIRECTION::N;
 	}
-	if (action == GLFW_RELEASE) {
-		if (key == GLFW_KEY_UP) {
-			player_velocity.velocity.y += PLAYER_SPEED;
-		}
-		else if (key == GLFW_KEY_DOWN) {
-			player_velocity.velocity.y -= PLAYER_SPEED;
-		}
-		else if (key == GLFW_KEY_LEFT) {
-			player_velocity.velocity.x += PLAYER_SPEED;
-		}
-		else if (key == GLFW_KEY_RIGHT) {
-			player_velocity.velocity.x -= PLAYER_SPEED;
-		}
+	else if ((state_down == GLFW_PRESS && state_up == GLFW_RELEASE && state_left == GLFW_RELEASE && state_right == GLFW_RELEASE) ||
+		(state_down == GLFW_PRESS && state_up == GLFW_RELEASE && state_left == GLFW_PRESS && state_right == GLFW_PRESS)) {
+		new_direction = DIRECTION::S;
+	}
+	else if ((state_left == GLFW_PRESS && state_down == GLFW_RELEASE && state_up == GLFW_RELEASE && state_right == GLFW_RELEASE) ||
+		(state_left == GLFW_PRESS && state_down == GLFW_PRESS && state_up == GLFW_PRESS && state_right == GLFW_RELEASE)) {
+		new_direction = DIRECTION::W;
+	}
+	else if ((state_right == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_RELEASE && state_up == GLFW_RELEASE) ||
+		(state_right == GLFW_PRESS && state_down == GLFW_PRESS && state_left == GLFW_RELEASE && state_up == GLFW_PRESS)) {
+		new_direction = DIRECTION::E;
+	}
+	else if ((state_up == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_PRESS && state_right == GLFW_RELEASE)) {
+		new_direction = DIRECTION::NW;
+	}
+	else if ((state_up == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_RELEASE && state_right == GLFW_PRESS)) {
+		new_direction = DIRECTION::NE;
+	}
+	else if ((state_up == GLFW_RELEASE && state_down == GLFW_PRESS && state_left == GLFW_PRESS && state_right == GLFW_RELEASE)) {
+		new_direction = DIRECTION::SW;
+	}
+	else if ((state_up == GLFW_RELEASE && state_down == GLFW_PRESS && state_left == GLFW_RELEASE && state_right == GLFW_PRESS)) {
+		new_direction = DIRECTION::SE;
+	}
+
+	if (new_direction != DIRECTION::NONE) {
+		player_direction.direction = new_direction;
+		player_velocity = computeVelocity(PLAYER_SPEED, player_direction);
+	}
+	else {
+		player_velocity = computeVelocity(0.0, player_direction);
 	}
 
 	// Resetting game (currently disabled, think about adding this back in later)

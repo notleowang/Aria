@@ -57,6 +57,7 @@ typedef enum {
 	SW,
 	W,
 	NW,
+	NONE
 } DIRECTION;
 
 struct Direction {
