@@ -100,8 +100,11 @@ GLFWwindow* WorldSystem::create_window() {
 	return window;
 }
 
-void WorldSystem::init(RenderSystem* renderer_arg) {
+void WorldSystem::init(RenderSystem* renderer_arg, GameLevel level) {
 	this->renderer = renderer_arg;
+	this->player_starting_pos = level.getPlayerStartingPos();
+	this->exit_door_pos = level.getExitDoorPos();
+	this->enemies = level.getEnemies();
 	// Playing background music indefinitely
 	Mix_PlayMusic(background_music, -1);
 	fprintf(stderr, "Loaded music\n");
@@ -164,7 +167,7 @@ void WorldSystem::restart_game() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
-	player = createTestSalmon(renderer, { 100, 200 });
+	player = createTestSalmon(renderer, this->player_starting_pos);
 	//registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
 
