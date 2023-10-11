@@ -274,35 +274,44 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 	DIRECTION new_direction = DIRECTION::NONE;
 
+	// up
 	if ((state_up == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_RELEASE && state_right == GLFW_RELEASE) ||
 		(state_up == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_PRESS && state_right == GLFW_PRESS)) {
 		new_direction = DIRECTION::N;
 	}
+	// down
 	else if ((state_down == GLFW_PRESS && state_up == GLFW_RELEASE && state_left == GLFW_RELEASE && state_right == GLFW_RELEASE) ||
 		(state_down == GLFW_PRESS && state_up == GLFW_RELEASE && state_left == GLFW_PRESS && state_right == GLFW_PRESS)) {
 		new_direction = DIRECTION::S;
 	}
+	// left
 	else if ((state_left == GLFW_PRESS && state_down == GLFW_RELEASE && state_up == GLFW_RELEASE && state_right == GLFW_RELEASE) ||
 		(state_left == GLFW_PRESS && state_down == GLFW_PRESS && state_up == GLFW_PRESS && state_right == GLFW_RELEASE)) {
 		new_direction = DIRECTION::W;
 	}
+	// right
 	else if ((state_right == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_RELEASE && state_up == GLFW_RELEASE) ||
 		(state_right == GLFW_PRESS && state_down == GLFW_PRESS && state_left == GLFW_RELEASE && state_up == GLFW_PRESS)) {
 		new_direction = DIRECTION::E;
 	}
+	// up and left
 	else if ((state_up == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_PRESS && state_right == GLFW_RELEASE)) {
 		new_direction = DIRECTION::NW;
 	}
+	// up and right
 	else if ((state_up == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_RELEASE && state_right == GLFW_PRESS)) {
 		new_direction = DIRECTION::NE;
 	}
+	// down and right
 	else if ((state_up == GLFW_RELEASE && state_down == GLFW_PRESS && state_left == GLFW_PRESS && state_right == GLFW_RELEASE)) {
 		new_direction = DIRECTION::SW;
 	}
+	// down and left
 	else if ((state_up == GLFW_RELEASE && state_down == GLFW_PRESS && state_left == GLFW_RELEASE && state_right == GLFW_PRESS)) {
 		new_direction = DIRECTION::SE;
 	}
 
+	// set the player velocity based on the new_direction
 	if (new_direction != DIRECTION::NONE) {
 		player_direction.direction = new_direction;
 		player_velocity = computeVelocity(PLAYER_SPEED, player_direction);
