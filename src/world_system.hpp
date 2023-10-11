@@ -53,15 +53,9 @@ private:
 	RenderSystem* renderer;
 	Entity player;
 	
-	std::vector<Entity> terrains;
-	std::vector<Entity> enemies;
-
 	vec2 player_starting_pos;
-	std::vector<Enemy> enemies;
-	//std::vector<Terrain> terrain;
-	std::vector<vec2> light_source_pos;
 	vec2 exit_door_pos;
-
+	std::vector<vec4> terrains_attrs;
 
 	// music references
 	Mix_Music* background_music; // TODO: change background music for our game

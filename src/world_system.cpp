@@ -104,7 +104,8 @@ void WorldSystem::init(RenderSystem* renderer_arg, GameLevel level) {
 	this->renderer = renderer_arg;
 	this->player_starting_pos = level.getPlayerStartingPos();
 	this->exit_door_pos = level.getExitDoorPos();
-	this->enemies = level.getEnemies();
+	this->terrains_attrs = level.getTerrains();
+	//this->enemies = level.getEnemies();
 	// Playing background music indefinitely
 	Mix_PlayMusic(background_music, -1);
 	fprintf(stderr, "Loaded music\n");
@@ -176,16 +177,13 @@ void WorldSystem::restart_game() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
-	player = createTestSalmon(renderer, this->player_starting_pos);
-	// player = createTestSalmon(renderer, { 400, 400 });
-
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
-	// terrains.push_back(createTerrain({ 600, 400 }, { 100, 100 }));
-	// terrains.push_back(createTerrain({ 600, 50 }, { 1000, 100 }));
-	// terrains.push_back(createTerrain({ 50, 400 }, { 100, 800 }));
-	// terrains.push_back(createTerrain({ 600 , 750 }, { 1000, 100 }));
-	// terrains.push_back(createTerrain({ 1150, 400 }, { 100, 800 }));
-	// TODO: make terrain based on level design (currently just hardcoded to go around screen)
+	player = createTestSalmon(renderer, this->player_starting_pos);
+
+	for (uint i = 0; i < this->terrains_attrs.size(); i++) {
+		vec4 terrain_i = this->terrains_attrs[i];
+		createTerrain(vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]));
+	}
 	
 	// TODO: change create enemy (only a mock to test collisions)
 	// enemies.push_back(createEnemy(renderer, {600, 600}));
