@@ -173,6 +173,9 @@ void WorldSystem::restart_game() {
 	terrains.push_back(createTerrain({ 600 , 750 }, { 1000, 100 }));
 	terrains.push_back(createTerrain({ 1150, 400 }, { 100, 800 }));
 	// TODO: make terrain based on level design (currently just hardcoded to go around screen)
+	
+	// TODO: change create enemy (only a mock to test collisions)
+	enemies.push_back(createEnemy(renderer, {600, 600}));
 	//registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
 
@@ -195,19 +198,25 @@ void WorldSystem::restart_game() {
 
 // Compute collisions between entities
 void WorldSystem::handle_collisions() {
+
+
 	// Loop over all collisions detected by the physics system
-	//auto& collisionsRegistry = registry.collisions;
-	//for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
-	//	// The entity and its collider
-	//	Entity entity = collisionsRegistry.entities[i];
-	//	Entity entity_other = collisionsRegistry.components[i].other_entity;
+	auto& collisionsRegistry = registry.collisions;
+	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
+		// The entity and its collider
+		Entity entity = collisionsRegistry.entities[i];
+		Entity entity_other = collisionsRegistry.components[i].other_entity;
 
-	//	// For now, we are only interested in collisions that involve the salmon
-	//	if (registry.players.has(entity)) {
-	//		//Player& player = registry.players.get(entity);
+		if (registry.players.has(entity)) {
+			Player& player = registry.players.get(entity);
 
-	//		// Checking Player - HardShell collisions
-	//		if (registry.hardShells.has(entity_other)) {
+			// Checking Player - Enemy collisions
+			if (registry.enemies.has(entity_other)) {
+				printf("collided with enemy, reduce hp, and remove collision");
+				registry.collisions.remove(entity);
+			}
+		}
+			//if (registry.hardShells.has(entity_other)) {
 	//			// initiate death unless already dying
 	//			if (!registry.deathTimers.has(entity)) {
 	//				// Scream, reset timer, and make the salmon sink
@@ -227,7 +236,7 @@ void WorldSystem::handle_collisions() {
 	//			}
 	//		}
 	//	}
-	//}
+	}
 
 	//// Remove all collisions from this simulation step
 	//registry.collisions.clear();

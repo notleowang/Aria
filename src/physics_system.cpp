@@ -26,6 +26,9 @@ bool circleCollides(const Position& position1, const Position& position2)
 	return false;
 }
 
+// Function that checks if two entities collides using a rectangular bounding-box.
+// If there is a collision between two entities, add a Collision component to the Component container
+// marking both entities involved in the collision and the direction which entity i hit entity j from.
 bool rectCollides(const Position& position1, const Position& position2, Entity& entity_i, Entity& entity_j)
 {
 	float rect1_left = position1.position.x - abs(position1.scale.x) / 2;
@@ -61,6 +64,7 @@ bool rectCollides(const Position& position1, const Position& position2, Entity& 
 		else if (min_overlap == overlap_bottom) {
 			direction = 3;
 		}
+
 		registry.collisions.emplace_with_duplicates(entity_i, entity_j, direction);
 		return true;
 	}
@@ -99,9 +103,14 @@ void PhysicsSystem::step(float elapsed_ms)
 		Position& position = position_container.get(entity);	// Get the position for the i-th entity
 		float step_seconds = elapsed_ms / 1000.f;
 		if (registry.collisions.has(entity)) {
+			// This collision prevents the first entity from moving INTO the second entity of the collision component
 			Collision& collision = registry.collisions.get(entity);
 			Entity& other_entity = collision.other_entity;
 			Position& other_position = position_container.get(other_entity);
+			if (registry.enemies.has(other_entity)) {
+				position.position += velocity.velocity * step_seconds;
+				continue;
+			}
 			if (collision.direction == 0) {
 				position.position.x = other_position.position.x - abs(other_position.scale.x / 2) - abs(position.scale.x/2);
 				position.position.y += velocity.velocity.y * step_seconds;

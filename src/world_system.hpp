@@ -53,6 +53,7 @@ private:
 	Entity player;
 	
 	std::vector<Entity> terrains;
+	std::vector<Entity> enemies;
 
 	// music references
 	Mix_Music* background_music; // TODO: change background music for our game
