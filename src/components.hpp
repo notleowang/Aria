@@ -13,6 +13,12 @@ struct Player
 // Enemy component
 struct Enemy
 {
+	float damage = 10.f;
+};
+
+// Terrain
+struct Terrain
+{
 
 };
 
@@ -40,19 +46,21 @@ struct Velocity {
 	vec2 velocity = { 0.f, 0.f };
 };
 
+
 // Data relevant to direction of entities
+typedef enum {
+	N,
+	NE,
+	E,
+	SE,
+	S,
+	SW,
+	W,
+	NW,
+} DIRECTION;
+
 struct Direction {
-	enum direction
-	{
-		N,
-		NE,
-		E,
-		SE,
-		S,
-		SW,
-		W,
-		NW,
-	};
+	DIRECTION direction;
 };
 
 // Stucture to store collision information
@@ -60,7 +68,12 @@ struct Collision
 {
 	// Note, the first object is stored in the ECS container.entities
 	Entity other_entity; // the second object involved in the collision
-	Collision(Entity& other_entity) { this->other_entity = other_entity; };
+	int direction; // 0 = left, 1 = right, 2 = up, 3 = down
+	               // The object collides to the <direction> of the other entity
+	Collision(Entity& other_entity, int direction) { 
+		this->other_entity = other_entity; 
+		this->direction = direction;
+	};
 };
 
 // Data structure for toggling debug mode
@@ -82,7 +95,13 @@ struct DebugComponent
 	// Note, an empty struct has size 1
 };
 
-// A timer that will be associated to dying salmon
+// A timer that will be associated to an entity having an invulnerability period to damage
+struct InvulnerableTimer
+{
+	float timer_ms = 1000.f;
+};
+
+// A timer that will be associated to an entity dying
 struct DeathTimer
 {
 	float timer_ms = 3000.f;
@@ -149,7 +168,8 @@ enum class EFFECT_ASSET_ID {
 	SALMON = PEBBLE + 1,
 	TEXTURED = SALMON + 1,
 	WATER = TEXTURED + 1,
-	EFFECT_COUNT = WATER + 1
+	TERRAIN = WATER + 1,
+	EFFECT_COUNT = TERRAIN + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
@@ -159,7 +179,8 @@ enum class GEOMETRY_BUFFER_ID {
 	PEBBLE = SPRITE + 1,
 	DEBUG_LINE = PEBBLE + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,
-	GEOMETRY_COUNT = SCREEN_TRIANGLE + 1
+	TERRAIN = SCREEN_TRIANGLE + 1,
+	GEOMETRY_COUNT = TERRAIN + 1
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 

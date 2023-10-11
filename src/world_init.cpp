@@ -7,7 +7,25 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
-Entity createTestStationaryTexture(RenderSystem* renderer, vec2 pos)
+Entity createTerrain(vec2 pos, vec2 size)
+{
+	auto entity = Entity();
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	position.scale = size;
+
+	registry.terrain.emplace(entity);
+	registry.renderRequests.insert(
+		entity, 
+		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
+			EFFECT_ASSET_ID::TERRAIN,
+			GEOMETRY_BUFFER_ID::TERRAIN });
+	
+	return entity;
+}
+
+Entity createEnemy(RenderSystem* renderer, vec2 pos)
 {
 	auto entity = Entity();
 
@@ -15,17 +33,16 @@ Entity createTestStationaryTexture(RenderSystem* renderer, vec2 pos)
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	// Initialize the motion
-	Position& position = registry.positions.emplace(entity);
+	auto& position = registry.positions.emplace(entity);
 	position.position = pos;
-	position.scale = vec2({ 700.f, 700.f });
 
-	Velocity& velocity = registry.velocities.emplace(entity);
-	velocity.velocity = { 0.f, 0.f };
+	position.scale = vec2({ 150, 100 });
 
+	// Create and (empty) Turtle component to be able to refer to all turtles
+	registry.enemies.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::LANDSCAPE,
+		{ TEXTURE_ASSET_ID::TURTLE,
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 
@@ -49,6 +66,8 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = { 0.f, 0.f };
+
+	Resources& resources = registry.resources.emplace(entity);
 
 	// Create and (empty) Salmon component to be able to refer to all turtles
 	registry.players.emplace(entity);

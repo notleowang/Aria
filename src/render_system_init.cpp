@@ -163,31 +163,50 @@ void RenderSystem::initializeGlGeometryBuffers()
 	const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::SPRITE, textured_vertices, textured_indices);
 
+	// Initializing terrain
+	std::vector<ColoredVertex> terrain_vertices(4);
+	std::vector<uint16_t> terrain_indices;
+	terrain_vertices[0].position = {-0.5, -0.5, -0.1};
+	terrain_vertices[1].position = {-0.5, 0.5, -0.1};
+	terrain_vertices[2].position = {0.5, -0.5, -0.1};
+	terrain_vertices[3].position  = {0.5, 0.5, -0.1};
+	terrain_indices.push_back(0);
+	terrain_indices.push_back(1);
+	terrain_indices.push_back(2);
+	terrain_indices.push_back(1);
+	terrain_indices.push_back(3);
+	terrain_indices.push_back(2);
+	int geom_index = (int)GEOMETRY_BUFFER_ID::TERRAIN;
+	meshes[geom_index].vertices = terrain_vertices;
+	meshes[geom_index].vertex_indices = terrain_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::TERRAIN, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
+
+
 	////////////////////////
 	// Initialize pebble
-	std::vector<ColoredVertex> pebble_vertices;
-	std::vector<uint16_t> pebble_indices;
-	constexpr float z = -0.1f;
-	constexpr int NUM_TRIANGLES = 62;
+	//std::vector<ColoredVertex> pebble_vertices;
+	//std::vector<uint16_t> pebble_indices;
+	//constexpr float z = -0.1f;
+	//constexpr int NUM_TRIANGLES = 62;
 
-	for (int i = 0; i < NUM_TRIANGLES; i++) {
-		const float t = float(i) * M_PI * 2.f / float(NUM_TRIANGLES - 1);
-		pebble_vertices.push_back({});
-		pebble_vertices.back().position = { 0.5 * cos(t), 0.5 * sin(t), z };
-		pebble_vertices.back().color = { 0.8, 0.8, 0.8 };
-	}
-	pebble_vertices.push_back({});
-	pebble_vertices.back().position = { 0, 0, 0 };
-	pebble_vertices.back().color = { 0.8, 0.8, 0.8 };
-	for (int i = 0; i < NUM_TRIANGLES; i++) {
-		pebble_indices.push_back((uint16_t)i);
-		pebble_indices.push_back((uint16_t)((i + 1) % NUM_TRIANGLES));
-		pebble_indices.push_back((uint16_t)NUM_TRIANGLES);
-	}
-	int geom_index = (int)GEOMETRY_BUFFER_ID::PEBBLE;
-	meshes[geom_index].vertices = pebble_vertices;
-	meshes[geom_index].vertex_indices = pebble_indices;
-	bindVBOandIBO(GEOMETRY_BUFFER_ID::PEBBLE, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
+	//for (int i = 0; i < NUM_TRIANGLES; i++) {
+	//	const float t = float(i) * M_PI * 2.f / float(NUM_TRIANGLES - 1);
+	//	pebble_vertices.push_back({});
+	//	pebble_vertices.back().position = { 0.5 * cos(t), 0.5 * sin(t), z };
+	//	pebble_vertices.back().color = { 0.8, 0.8, 0.8 };
+	//}
+	//pebble_vertices.push_back({});
+	//pebble_vertices.back().position = { 0, 0, 0 };
+	//pebble_vertices.back().color = { 0.8, 0.8, 0.8 };
+	//for (int i = 0; i < NUM_TRIANGLES; i++) {
+	//	pebble_indices.push_back((uint16_t)i);
+	//	pebble_indices.push_back((uint16_t)((i + 1) % NUM_TRIANGLES));
+	//	pebble_indices.push_back((uint16_t)NUM_TRIANGLES);
+	//}
+	//int geom_index = (int)GEOMETRY_BUFFER_ID::PEBBLE;
+	//meshes[geom_index].vertices = pebble_vertices;
+	//meshes[geom_index].vertex_indices = pebble_indices;
+	//bindVBOandIBO(GEOMETRY_BUFFER_ID::PEBBLE, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
 
 	//////////////////////////////////
 	// Initialize debug line
