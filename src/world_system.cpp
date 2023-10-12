@@ -105,7 +105,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, GameLevel level) {
 	this->player_starting_pos = level.getPlayerStartingPos();
 	this->exit_door_pos = level.getExitDoorPos();
 	this->terrains_attrs = level.getTerrains();
-	//this->enemies = level.getEnemies();
+	this->enemies_attrs = level.getEnemies();
 	// Playing background music indefinitely
 	Mix_PlayMusic(background_music, -1);
 	fprintf(stderr, "Loaded music\n");
@@ -184,9 +184,11 @@ void WorldSystem::restart_game() {
 		vec4 terrain_i = this->terrains_attrs[i];
 		createTerrain(vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]));
 	}
-	
-	// TODO: change create enemy (only a mock to test collisions)
-	// enemies.push_back(createEnemy(renderer, {600, 600}));
+
+	for (uint i = 0; i < this->enemies_attrs.size(); i++) {
+		std::array<float, 6> enemy_i = this->enemies_attrs[0];
+		createEnemy(renderer, vec2(enemy_i[0], enemy_i[1]));
+	}
 	//registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
 

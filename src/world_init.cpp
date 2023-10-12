@@ -27,6 +27,7 @@ Entity createTerrain(vec2 pos, vec2 size)
 
 Entity createEnemy(RenderSystem* renderer, vec2 pos)
 {
+	// TODO: change enemy implementation to include different enemy types
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
