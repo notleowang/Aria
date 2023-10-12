@@ -293,7 +293,6 @@ bool WorldSystem::is_over() const {
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (registry.deathTimers.has(player)) { return; }
-	// TODO: solve issue where player is faster on the diagonals
 	Velocity& player_velocity = registry.velocities.get(player);
 	Position& player_position = registry.positions.get(player);
 	Direction& player_direction = registry.directions.get(player);
@@ -353,18 +352,40 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	}
 
 	if (action == GLFW_PRESS && key == GLFW_KEY_SPACE) {
+		printf("firing\n");
 		Velocity vel = computeVelocity(PROJECTILE_SPEED, player_direction);
-		Entity projectile = createProjectile(renderer,player_position.position, vel.velocity);
+		vec2 proj_position = player_position.position;
+		// TODO: need to figure out the most consistent way to find the middle of the sprites.
+		switch (player_direction.direction) {
+		case DIRECTION::N:
+			proj_position = vec2(player_position.position.x, player_position.position.y - abs(player_position.scale.y / 2));
+			break;
+		case DIRECTION::NE: 
+		case DIRECTION::E:
+		case DIRECTION::SE:
+			proj_position = vec2(player_position.position.x + abs(player_position.scale.x / 2), player_position.position.y);
+			break;
+		case DIRECTION::S:
+			proj_position = vec2(player_position.position.x , player_position.position.y + abs(player_position.scale.y/2));
+			break;
+		case DIRECTION::NW:
+		case DIRECTION::W:
+		case DIRECTION::SW:
+			proj_position = vec2(player_position.position.x - abs(player_position.scale.x / 2), player_position.position.y);
+			break;
+		default:
+			break;
+		}
+		Entity projectile = createProjectile(renderer, proj_position, vel.velocity);
 		Mix_PlayChannel(-1, projectile_sound, 0);
 	}
 
 	// Resetting game (currently disabled, think about adding this back in later)
-	//if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
-	//	int w, h;
-	//	glfwGetWindowSize(window, &w, &h);
-
-	//  restart_game();
-	//}
+	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
+		int w, h;
+		glfwGetWindowSize(window, &w, &h);
+	  restart_game();
+	}
 
 	// Debugging
 	//if (key == GLFW_KEY_D) {
