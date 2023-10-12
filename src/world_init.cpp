@@ -48,7 +48,6 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 		 GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
-
 }
 
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
@@ -70,6 +69,9 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
+
+	Direction& direction = registry.directions.emplace(entity);
+	direction.direction = DIRECTION::E;
 
 	// Create and (empty) Salmon component to be able to refer to all turtles
 	registry.players.emplace(entity);

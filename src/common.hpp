@@ -48,4 +48,9 @@ struct Transform {
 	void translate(vec2 offset);
 };
 
+struct Camera {
+	mat3 projectionMat;
+	void centerAt(vec2 pos);
+};
+
 bool gl_has_errors();

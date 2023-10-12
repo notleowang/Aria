@@ -21,6 +21,24 @@ void Transform::translate(vec2 offset)
 	mat = mat * T;
 }
 
+void Camera::centerAt(vec2 pos)
+{
+	// Fake projection matrix, scales with respect to window coordinates
+	float left = pos.x - (float)window_width_px / 2;
+	float top = pos.y - (float)window_height_px / 2;
+	float right = pos.x + (float)window_width_px / 2;
+	float bottom = pos.y + (float)window_height_px / 2;
+
+	gl_has_errors();
+
+	float sx = 2.f / (right - left);
+	float sy = 2.f / (top - bottom);
+	float tx = -(right + left) / (right - left);
+	float ty = -(top + bottom) / (top - bottom);
+
+	projectionMat = { {sx, 0.f, 0.f}, {0.f, sy, 0.f}, {tx, ty, 1.f} };
+}
+
 bool gl_has_errors()
 {
 	GLenum error = glGetError();
