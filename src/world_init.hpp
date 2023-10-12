@@ -12,6 +12,7 @@ const float TURTLE_BB_HEIGHT = 0.4f * 202.f;
 
 // the player
 Entity createAria(RenderSystem* renderer, vec2 pos);
+Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel);
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);
 

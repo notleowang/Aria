@@ -11,6 +11,7 @@
 
 // Game configuration
 const float PLAYER_SPEED = 300.f;
+const float PROJECTILE_SPEED = 700.f;
 
 // Create the world
 WorldSystem::WorldSystem() {
@@ -22,6 +23,8 @@ WorldSystem::~WorldSystem() {
 	// Destroy music components
 	if (background_music != nullptr)
 		Mix_FreeMusic(background_music);
+	if (projectile_sound != nullptr)
+		Mix_FreeChunk(projectile_sound);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -33,7 +36,7 @@ WorldSystem::~WorldSystem() {
 
 // Debugging
 namespace {
-	void glfw_err_cb(int error, const char *desc) {
+	void glfw_err_cb(int error, const char* desc) {
 		fprintf(stderr, "%d: %s", error, desc);
 	}
 }
@@ -90,7 +93,8 @@ GLFWwindow* WorldSystem::create_window() {
 	}
 
 	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
-	//salmon_dead_sound = Mix_LoadWAV(audio_path("salmon_dead.wav").c_str()); // keeping one so we know how to load future wavs
+	projectile_sound = Mix_LoadWAV(audio_path("projectile.wav").c_str());
+	//salmon_dead_sound = Mix_LoadWAv(audio_path("salmon_dead.wav").c_str()); // keeping one so we know how to load future wavs
 
 	if (background_music == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
@@ -112,7 +116,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, GameLevel level) {
 	fprintf(stderr, "Loaded music\n");
 
 	// Set all states to default
-    restart_game();
+	restart_game();
 }
 
 // Update our game world
@@ -124,12 +128,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 	// Remove debug info from the last step
 	while (registry.debugComponents.entities.size() > 0)
-	    registry.remove_all_components_of(registry.debugComponents.entities.back());
+		registry.remove_all_components_of(registry.debugComponents.entities.back());
 
 
 	// Processing the salmon state
 	assert(registry.screenStates.components.size() <= 1);
-    ScreenState &screen = registry.screenStates.components[0];
+	ScreenState& screen = registry.screenStates.components[0];
 
 	for (Entity entity : registry.invulnerableTimers.entities) {
 		// progress timer
@@ -205,8 +209,8 @@ void WorldSystem::restart_game() {
 		int w, h;
 		glfwGetWindowSize(window, &w, &h);
 		float radius = 30 * (uniform_dist(rng) + 0.3f); // range 0.3 .. 1.3
-		Entity pebble = createPebble({ uniform_dist(rng) * w, h - uniform_dist(rng) * 20 }, 
-			         { radius, radius });
+		Entity pebble = createPebble({ uniform_dist(rng) * w, h - uniform_dist(rng) * 20 },
+					 { radius, radius });
 		float brightness = uniform_dist(rng) * 0.5 + 0.5;
 		registry.colors.insert(pebble, { brightness, brightness, brightness});
 	}
@@ -224,7 +228,7 @@ void WorldSystem::handle_collisions() {
 		Entity entity_other = collisionsRegistry.components[i].other_entity;
 
 		// Checking Player - Enemy collisions
-		if (registry.enemies.has(entity_other)) {
+		if (registry.enemies.has(entity_other) && registry.players.has(entity)) {
 			if (!registry.invulnerableTimers.has(entity)) {
 				Resources& player_resource = registry.resources.get(entity);
 				player_resource.health -= registry.enemies.get(entity_other).damage;
@@ -237,6 +241,26 @@ void WorldSystem::handle_collisions() {
 				}
 			}
 		}
+
+		// Checking Projectile - Enemy collisions
+		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity)) {
+			// TODO: Enemies should take damage when hit by projectile
+			Resources& enemy_resource = registry.resources.get(entity_other);
+			enemy_resource.health -= registry.projectiles.get(entity).damage;
+			printf("enemy hp: %f\n", enemy_resource.health);
+			if (enemy_resource.health <= 0) {
+				registry.remove_all_components_of(entity_other);
+				// TODO: play death sound here
+			}
+			registry.remove_all_components_of(entity);
+		}
+
+		// Checking Projectile - Wall collisions
+		if (registry.terrain.has(entity_other) && registry.projectiles.has(entity)) {
+			// TODO: Enemies should take damage when hit by projectile
+			registry.remove_all_components_of(entity);
+		}
+
 	}
 	registry.collisions.clear();
 			//if (registry.hardShells.has(entity_other)) {
@@ -269,8 +293,8 @@ bool WorldSystem::is_over() const {
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (registry.deathTimers.has(player)) { return; }
-	// TODO: solve issue where player is faster on the diagonals
 	Velocity& player_velocity = registry.velocities.get(player);
+	Position& player_position = registry.positions.get(player);
 	Direction& player_direction = registry.directions.get(player);
 
 	// get states of each arrow key
@@ -327,13 +351,40 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		player_velocity = computeVelocity(0.0, player_direction);
 	}
 
-	// Resetting game (currently disabled, think about adding this back in later)
-	//if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
-	//	int w, h;
-	//	glfwGetWindowSize(window, &w, &h);
+	if (action == GLFW_PRESS && key == GLFW_KEY_SPACE) {
+		Velocity vel = computeVelocity(PROJECTILE_SPEED, player_direction);
+		vec2 proj_position = player_position.position;
+		// TODO: need to figure out the most consistent way to find the middle of the sprites.
+		switch (player_direction.direction) {
+		case DIRECTION::N:
+			proj_position = vec2(player_position.position.x, player_position.position.y - abs(player_position.scale.y / 2));
+			break;
+		case DIRECTION::NE:
+		case DIRECTION::E:
+		case DIRECTION::SE:
+			proj_position = vec2(player_position.position.x + abs(player_position.scale.x / 2), player_position.position.y);
+			break;
+		case DIRECTION::S:
+			proj_position = vec2(player_position.position.x , player_position.position.y + abs(player_position.scale.y/2));
+			break;
+		case DIRECTION::NW:
+		case DIRECTION::W:
+		case DIRECTION::SW:
+			proj_position = vec2(player_position.position.x - abs(player_position.scale.x / 2), player_position.position.y);
+			break;
+		default:
+			break;
+		}
+		Entity projectile = createProjectile(renderer, proj_position, vel.velocity);
+		Mix_PlayChannel(-1, projectile_sound, 0);
+	}
 
-	//  restart_game();
-	//}
+	// Resetting game (currently disabled, think about adding this back in later)
+	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
+		int w, h;
+		glfwGetWindowSize(window, &w, &h);
+	  restart_game();
+	}
 
 	// Debugging
 	//if (key == GLFW_KEY_D) {

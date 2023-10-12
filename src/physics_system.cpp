@@ -65,7 +65,7 @@ bool rectCollides(const Position& position1, const Position& position2, Entity& 
 			direction = 3;
 		}
 
-		if (!registry.collisions.has(entity_i)) {
+		if (!registry.collisions.has(entity_i) && !registry.projectiles.has(entity_j)) {
 			registry.collisions.emplace_with_duplicates(entity_i, entity_j, direction);
 		}
 		return true;
@@ -91,7 +91,6 @@ void PhysicsSystem::step(float elapsed_ms)
 				Entity& entity_j = position_container.entities[j];
 				rectCollides(position_i, position_j, entity_i, entity_j);
 			}
-
 		}
 	}
 

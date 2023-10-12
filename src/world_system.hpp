@@ -60,6 +60,7 @@ private:
 
 	// music references
 	Mix_Music* background_music; // TODO: change background music for our game
+	Mix_Chunk* projectile_sound;
 
 	// C++ random number generator
 	std::default_random_engine rng;

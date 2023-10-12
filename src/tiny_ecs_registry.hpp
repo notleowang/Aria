@@ -13,6 +13,7 @@ public:
 	// Manually created list of all components this game has
 	ComponentContainer<DeathTimer> deathTimers;
 	ComponentContainer<Resources> resources;
+	ComponentContainer<Projectiles> projectiles;
 	ComponentContainer<InvulnerableTimer> invulnerableTimers;
 	ComponentContainer<Position> positions;
 	ComponentContainer<Velocity> velocities;
@@ -34,6 +35,7 @@ public:
 	{
 		// TODO: A1 add a LightUp component
 		registry_list.push_back(&deathTimers);
+		registry_list.push_back(&projectiles);
 		registry_list.push_back(&resources);
 		registry_list.push_back(&invulnerableTimers);
 		registry_list.push_back(&positions);

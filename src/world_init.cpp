@@ -39,6 +39,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 
 	position.scale = vec2({ 150, 100 });
 
+
 	// Create and (empty) Turtle component to be able to refer to all turtles
 	registry.enemies.emplace(entity);
 	registry.renderRequests.insert(
@@ -46,6 +47,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 		{ TEXTURE_ASSET_ID::TURTLE,
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
+	registry.resources.emplace(entity);
 
 	return entity;
 }
@@ -100,6 +102,32 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 
 	return entity;
 }
+
+Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel) {
+	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// Set initial position and velocity for the projectile
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	//position.scale = ??
+
+	registry.projectiles.emplace(entity);
+
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity = vel;
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::TURTLE, //TODO: Change texture asset- the projectiles are currently turtles
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE });
+	return entity;
+}
+
 
 /*
 Entity createFish(RenderSystem* renderer, vec2 position)
