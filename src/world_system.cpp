@@ -352,7 +352,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	}
 
 	if (action == GLFW_PRESS && key == GLFW_KEY_SPACE) {
-		printf("firing\n");
 		Velocity vel = computeVelocity(PROJECTILE_SPEED, player_direction);
 		vec2 proj_position = player_position.position;
 		// TODO: need to figure out the most consistent way to find the middle of the sprites.
@@ -360,7 +359,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		case DIRECTION::N:
 			proj_position = vec2(player_position.position.x, player_position.position.y - abs(player_position.scale.y / 2));
 			break;
-		case DIRECTION::NE: 
+		case DIRECTION::NE:
 		case DIRECTION::E:
 		case DIRECTION::SE:
 			proj_position = vec2(player_position.position.x + abs(player_position.scale.x / 2), player_position.position.y);
