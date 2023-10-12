@@ -50,6 +50,23 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
+Entity createExitDoor(vec2 pos) {
+	auto entity = Entity();
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	position.scale = vec2(100.f, 100.f);
+
+	registry.exitDoors.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
+			EFFECT_ASSET_ID::TERRAIN,
+			GEOMETRY_BUFFER_ID::TERRAIN });
+
+	return entity;
+}
+
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 {
 	auto entity = Entity();

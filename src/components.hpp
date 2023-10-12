@@ -22,6 +22,12 @@ struct Terrain
 
 };
 
+// Exit door
+struct ExitDoor
+{
+
+};
+
 // All data relevant to the resources of entities
 struct Resources
 {
