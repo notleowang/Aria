@@ -15,6 +15,9 @@
 //	VEL_Y = VEL_X + 1
 //};
 
+const int TERRAIN_ATTRIBUTES = 4;
+const int ENEMY_ATTRIBUTES = 6;
+
 class GameLevel
 {
 public:
@@ -24,7 +27,7 @@ public:
 	std::vector<vec4> terrains_attr;
 	
 	// pos_x, pos_y, vel_x, vel_y, scale_x, scale_y
-	std::vector<std::array<float, 6>> enemies_attr;
+	std::vector<std::array<float, ENEMY_ATTRIBUTES>> enemies_attr;
 
 	bool init(uint level);
 
@@ -40,7 +43,7 @@ public:
 		return terrains_attr;
 	}
 
-	std::vector<std::array<float,6>>& getEnemies() {
+	std::vector<std::array<float,ENEMY_ATTRIBUTES>>& getEnemies() {
 		return enemies_attr;
 	}
 };

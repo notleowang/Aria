@@ -56,7 +56,7 @@ private:
 	vec2 player_starting_pos;
 	vec2 exit_door_pos;
 	std::vector<vec4> terrains_attrs;
-	std::vector<std::array<float, 6>> enemies_attrs;
+	std::vector<std::array<float, ENEMY_ATTRIBUTES>> enemies_attrs;
 
 	// music references
 	Mix_Music* background_music; // TODO: change background music for our game

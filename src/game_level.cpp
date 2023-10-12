@@ -10,7 +10,7 @@ bool GameLevel::init(uint level) {
 		case 1:
 		{
 			std::vector<vec4>& terrains = this->terrains_attr;
-			std::vector<std::array<float, 6>>& enemies = this->enemies_attr;
+			std::vector<std::array<float, ENEMY_ATTRIBUTES>>& enemies = this->enemies_attr;
 			this->player_starting_pos = vec2(400, 400);
 			terrains.push_back(vec4(600, 400, 100, 100));
 			terrains.push_back(vec4(600, 50, 1000, 100));
