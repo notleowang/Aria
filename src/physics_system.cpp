@@ -66,7 +66,7 @@ bool rectCollides(const Position& position1, const Position& position2, Entity& 
 		}
 
 		if (!registry.collisions.has(entity_i) && !registry.projectiles.has(entity_j)) {
-			registry.collisions.emplace_with_duplicates(entity_i, entity_j, direction);
+			registry.collisions.emplace(entity_i, entity_j, direction);
 		}
 		return true;
 	}
@@ -108,7 +108,7 @@ void PhysicsSystem::step(float elapsed_ms)
 			Collision& collision = registry.collisions.get(entity);
 			Entity& other_entity = collision.other_entity;
 			Position& other_position = position_container.get(other_entity);
-			if (registry.enemies.has(other_entity)) {
+			if (registry.enemies.has(other_entity) || registry.exitDoors.has(other_entity)) {
 				position.position += velocity.velocity * step_seconds;
 				continue;
 			}

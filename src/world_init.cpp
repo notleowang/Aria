@@ -62,9 +62,9 @@ Entity createExitDoor(vec2 pos) {
 	registry.exitDoors.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::TERRAIN,
-			GEOMETRY_BUFFER_ID::TERRAIN });
+		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
+			EFFECT_ASSET_ID::EXIT_DOOR,
+			GEOMETRY_BUFFER_ID::EXIT_DOOR});
 
 	return entity;
 }

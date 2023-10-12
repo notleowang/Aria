@@ -38,6 +38,8 @@ public:
 
 	// Should the game be over ?
 	bool is_over()const;
+
+	void win_level();
 private:
 	// Input callback functions
 	void on_key(int key, int, int action, int mod);
@@ -45,6 +47,8 @@ private:
 
 	// restart level
 	void restart_game();
+
+	bool levelDone;
 
 	// OpenGL window handle
 	GLFWwindow* window;
