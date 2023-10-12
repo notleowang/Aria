@@ -2,11 +2,34 @@
 In the eerie village of Grimhaven, shrouded in perpetual mist and shadows, Aria's journey begins. 
 
 ## Milestone 1
-### Provide a README.md providing entry points to each of the implemented features and explain them where necessary.
+### Entry Points
 - [Movement Controls](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/0d59974eadc6cf1e6482af4443dfe1ed5fba9fb9/src/world_system.cpp#L270)
 - Camera Controls: [Camera struct](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/d37c69f8169b5c6068eda0682ba48fa821cc33ef/src/common.hpp#L51),  [function call and projection matrix](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/d37c69f8169b5c6068eda0682ba48fa821cc33ef/src/render_system.cpp#L205), [function definition](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/d37c69f8169b5c6068eda0682ba48fa821cc33ef/src/common.cpp#L24)
 
-### Your submission should align with your proposed development plan: Provide a write-up explaining how your milestone aligns with the plan. Explain all discrepancies and submit an updated proposal when such discrepancies occur.
+### Development Plan
+- Your submission should align with your proposed development plan: Provide a write-up explaining how your milestone aligns with the plan. Explain all discrepancies and submit an updated proposal when such discrepancies occur.
 
-### Game Design Documentation: Document the ECS design pattern used in your game. Enumerate the game entities and actionable components used. Draw a diagram of the interaction between entities and components.
+### ECS Design Pattern
+The ECS design pattern we used was the one provided by A1 which is..
+
+### Game Entities
+- Player
+- Enemy
+- Terrain
+- Exit Door
+
+### Actionable Components
+- Velocity
+- Position
+- Collision
+- Direction
+- Invulnerable Death Timer
+- Death Timer
+- Resource
+- Mesh
+- Render Request
+- Screen State
+- Color
+
+### Entity Component Diagram
 ![ECS diagram](docu/images/M1_ECS_diagram.png)
