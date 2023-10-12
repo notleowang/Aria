@@ -12,6 +12,7 @@
 #include <SDL_mixer.h>
 
 #include "render_system.hpp"
+#include "game_level.hpp"
 
 // Container for all our entities and game logic. Individual rendering / update is
 // deferred to the relative update() methods
@@ -24,7 +25,7 @@ public:
 	GLFWwindow* create_window();
 
 	// starts the game
-	void init(RenderSystem* renderer);
+	void init(RenderSystem* renderer, GameLevel level);
 
 	// Releases all associated resources
 	~WorldSystem();
@@ -48,20 +49,17 @@ private:
 	// OpenGL window handle
 	GLFWwindow* window;
 
-	// Number of fish eaten by the salmon, displayed in the window title
-	unsigned int points;
-
 	// Game state
 	RenderSystem* renderer;
-	float current_speed;
-	float next_turtle_spawn;
-	float next_fish_spawn;
-	Entity player_salmon;
+	Entity player;
+	
+	vec2 player_starting_pos;
+	vec2 exit_door_pos;
+	std::vector<vec4> terrains_attrs;
+	std::vector<std::array<float, ENEMY_ATTRIBUTES>> enemies_attrs;
 
 	// music references
-	Mix_Music* background_music;
-	Mix_Chunk* salmon_dead_sound;
-	Mix_Chunk* salmon_eat_sound;
+	Mix_Music* background_music; // TODO: change background music for our game
 
 	// C++ random number generator
 	std::default_random_engine rng;

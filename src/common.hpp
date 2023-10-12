@@ -5,6 +5,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <array>
 
 // glfw (OpenGL)
 #define NOMINMAX
@@ -45,6 +46,11 @@ struct Transform {
 	void scale(vec2 scale);
 	void rotate(float radians);
 	void translate(vec2 offset);
+};
+
+struct Camera {
+	mat3 projectionMat;
+	void centerAt(vec2 pos);
 };
 
 bool gl_has_errors();

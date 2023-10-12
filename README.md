@@ -1,4 +1,4 @@
-# Aria
+# Aria: Whispers of Darkness
 In the eerie village of Grimhaven, shrouded in perpetual mist and shadows, Aria's journey begins. 
 
 ## Milestone 1

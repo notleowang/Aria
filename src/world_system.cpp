@@ -1,6 +1,7 @@
 // Header
 #include "world_system.hpp"
 #include "world_init.hpp"
+#include "utils.hpp"
 
 // stlib
 #include <cassert>
@@ -9,16 +10,10 @@
 #include "physics_system.hpp"
 
 // Game configuration
-const size_t MAX_TURTLES = 15;
-const size_t MAX_FISH = 5;
-const size_t TURTLE_DELAY_MS = 2000 * 3;
-const size_t FISH_DELAY_MS = 5000 * 3;
+const float PLAYER_SPEED = 300.f;
 
-// Create the fish world
-WorldSystem::WorldSystem()
-	: points(0)
-	, next_turtle_spawn(0.f)
-	, next_fish_spawn(0.f) {
+// Create the world
+WorldSystem::WorldSystem() {
 	// Seeding rng with random device
 	rng = std::default_random_engine(std::random_device()());
 }
@@ -27,10 +22,6 @@ WorldSystem::~WorldSystem() {
 	// Destroy music components
 	if (background_music != nullptr)
 		Mix_FreeMusic(background_music);
-	if (salmon_dead_sound != nullptr)
-		Mix_FreeChunk(salmon_dead_sound);
-	if (salmon_eat_sound != nullptr)
-		Mix_FreeChunk(salmon_eat_sound);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -72,7 +63,7 @@ GLFWwindow* WorldSystem::create_window() {
 	glfwWindowHint(GLFW_RESIZABLE, 0);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
-	window = glfwCreateWindow(window_width_px, window_height_px, "Salmon Game Assignment", nullptr, nullptr);
+	window = glfwCreateWindow(window_width_px, window_height_px, "Aria", nullptr, nullptr);
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
@@ -99,22 +90,23 @@ GLFWwindow* WorldSystem::create_window() {
 	}
 
 	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
-	salmon_dead_sound = Mix_LoadWAV(audio_path("salmon_dead.wav").c_str());
-	salmon_eat_sound = Mix_LoadWAV(audio_path("salmon_eat.wav").c_str());
+	//salmon_dead_sound = Mix_LoadWAV(audio_path("salmon_dead.wav").c_str()); // keeping one so we know how to load future wavs
 
-	if (background_music == nullptr || salmon_dead_sound == nullptr || salmon_eat_sound == nullptr) {
+	if (background_music == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
-			audio_path("music.wav").c_str(),
-			audio_path("salmon_dead.wav").c_str(),
-			audio_path("salmon_eat.wav").c_str());
+			audio_path("music.wav").c_str());
 		return nullptr;
 	}
 
 	return window;
 }
 
-void WorldSystem::init(RenderSystem* renderer_arg) {
+void WorldSystem::init(RenderSystem* renderer_arg, GameLevel level) {
 	this->renderer = renderer_arg;
+	this->player_starting_pos = level.getPlayerStartingPos();
+	this->exit_door_pos = level.getExitDoorPos();
+	this->terrains_attrs = level.getTerrains();
+	this->enemies_attrs = level.getEnemies();
 	// Playing background music indefinitely
 	Mix_PlayMusic(background_music, -1);
 	fprintf(stderr, "Loaded music\n");
@@ -127,79 +119,44 @@ void WorldSystem::init(RenderSystem* renderer_arg) {
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	// Updating window title with points
 	std::stringstream title_ss;
-	title_ss << "Points: " << points;
+	title_ss << "Aria: Whispers of Darkness";
 	glfwSetWindowTitle(window, title_ss.str().c_str());
 
 	// Remove debug info from the last step
 	while (registry.debugComponents.entities.size() > 0)
 	    registry.remove_all_components_of(registry.debugComponents.entities.back());
 
-	// Removing out of screen entities
-	auto& motion_container = registry.motions;
-
-	// Remove entities that leave the screen on the left side
-	// Iterate backwards to be able to remove without unterfering with the next object to visit
-	// (the containers exchange the last element with the current)
-	for (int i = (int)motion_container.components.size()-1; i>=0; --i) {
-	    Motion& motion = motion_container.components[i];
-		if (motion.position.x + abs(motion.scale.x) < 0.f) {
-			if(!registry.players.has(motion_container.entities[i])) // don't remove the player
-				registry.remove_all_components_of(motion_container.entities[i]);
-		}
-	}
-
-	// Spawning new turtles
-	next_turtle_spawn -= elapsed_ms_since_last_update * current_speed;
-	if (registry.hardShells.components.size() <= MAX_TURTLES && next_turtle_spawn < 0.f) {
-		// Reset timer
-		next_turtle_spawn = (TURTLE_DELAY_MS / 2) + uniform_dist(rng) * (TURTLE_DELAY_MS / 2);
-		// Create turtle
-		Entity entity = createTurtle(renderer, {0,0});
-		// Setting random initial position and constant velocity
-		Motion& motion = registry.motions.get(entity);
-		motion.position =
-			vec2(window_width_px -200.f,
-				 50.f + uniform_dist(rng) * (window_height_px - 100.f));
-		motion.velocity = vec2(-100.f, 0.f);
-	}
-
-	// Spawning new fish
-	next_fish_spawn -= elapsed_ms_since_last_update * current_speed;
-	if (registry.softShells.components.size() <= MAX_FISH && next_fish_spawn < 0.f) {
-		// !!!  TODO A1: Create new fish with createFish({0,0}), as for the Turtles above
-	}
-
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// TODO A2: HANDLE PEBBLE SPAWN HERE
-	// DON'T WORRY ABOUT THIS UNTIL ASSIGNMENT 2
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	// Processing the salmon state
 	assert(registry.screenStates.components.size() <= 1);
     ScreenState &screen = registry.screenStates.components[0];
+
+	for (Entity entity : registry.invulnerableTimers.entities) {
+		// progress timer
+		InvulnerableTimer& timer = registry.invulnerableTimers.get(entity);
+		timer.timer_ms -= elapsed_ms_since_last_update;
+		if (timer.timer_ms <= 0) {
+			registry.invulnerableTimers.remove(entity);
+		}
+	}
 
     float min_timer_ms = 3000.f;
 	for (Entity entity : registry.deathTimers.entities) {
 		// progress timer
 		DeathTimer& timer = registry.deathTimers.get(entity);
 		timer.timer_ms -= elapsed_ms_since_last_update;
-		if(timer.timer_ms < min_timer_ms){
+		if (timer.timer_ms < min_timer_ms) {
 			min_timer_ms = timer.timer_ms;
 		}
-
 		// restart the game once the death timer expired
 		if (timer.timer_ms < 0) {
 			registry.deathTimers.remove(entity);
 			screen.screen_darken_factor = 0;
-            restart_game();
+			restart_game();
 			return true;
 		}
 	}
-	// reduce window brightness if any of the present salmons is dying
 	screen.screen_darken_factor = 1 - min_timer_ms / 3000;
-
-	// !!! TODO A1: update LightUp timers and remove if time drops below zero, similar to the death timer
-
 	return true;
 }
 
@@ -209,24 +166,41 @@ void WorldSystem::restart_game() {
 	registry.list_all_components();
 	printf("Restarting\n");
 
-	// Reset the game speed
-	current_speed = 1.f;
-
+	// !!!
 	// Remove all entities that we created
-	// All that have a motion, we could also iterate over all fish, turtles, ... but that would be more cumbersome
-	while (registry.motions.entities.size() > 0)
-	    registry.remove_all_components_of(registry.motions.entities.back());
+	while (registry.positions.entities.size() > 0)
+	    registry.remove_all_components_of(registry.positions.entities.back());
+	while (registry.velocities.entities.size() > 0)
+		registry.remove_all_components_of(registry.velocities.entities.back());
+	while (registry.resources.entities.size() > 0)
+		registry.remove_all_components_of(registry.resources.entities.back());
 
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
-	// Create a new salmon
-	player_salmon = createSalmon(renderer, { 100, 200 });
+	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
+	player = createTestSalmon(renderer, this->player_starting_pos);
+
+	createExitDoor(this->exit_door_pos);
+
+	for (uint i = 0; i < this->terrains_attrs.size(); i++) {
+		vec4 terrain_i = this->terrains_attrs[i];
+		createTerrain(vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]));
+	}
+
+	for (uint i = 0; i < this->enemies_attrs.size(); i++) {
+		std::array<float, 6> enemy_i = this->enemies_attrs[i];
+		createEnemy(renderer, vec2(enemy_i[0], enemy_i[1]));
+	}
+
+
+	//registry.colors.insert(player, { 1, 0.8f, 0.8f });
+
+	/*
+	// Create a new player component
+	player = createPlayer(renderer, { 100, 200 });
 	registry.colors.insert(player_salmon, {1, 0.8f, 0.8f});
 
-	// !! TODO A2: Enable static pebbles on the ground, for reference
-	// Create pebbles on the floor, use this for reference
-	/*
 	for (uint i = 0; i < 20; i++) {
 		int w, h;
 		glfwGetWindowSize(window, &w, &h);
@@ -241,6 +215,7 @@ void WorldSystem::restart_game() {
 
 // Compute collisions between entities
 void WorldSystem::handle_collisions() {
+	if (registry.deathTimers.has(player)) { return; }
 	// Loop over all collisions detected by the physics system
 	auto& collisionsRegistry = registry.collisions;
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
@@ -248,37 +223,42 @@ void WorldSystem::handle_collisions() {
 		Entity entity = collisionsRegistry.entities[i];
 		Entity entity_other = collisionsRegistry.components[i].other_entity;
 
-		// For now, we are only interested in collisions that involve the salmon
-		if (registry.players.has(entity)) {
-			//Player& player = registry.players.get(entity);
-
-			// Checking Player - HardShell collisions
-			if (registry.hardShells.has(entity_other)) {
-				// initiate death unless already dying
-				if (!registry.deathTimers.has(entity)) {
-					// Scream, reset timer, and make the salmon sink
+		// Checking Player - Enemy collisions
+		if (registry.enemies.has(entity_other)) {
+			if (!registry.invulnerableTimers.has(entity)) {
+				Resources& player_resource = registry.resources.get(entity);
+				player_resource.health -= registry.enemies.get(entity_other).damage;
+				printf("player hp: %f\n", player_resource.health);
+				registry.invulnerableTimers.emplace(entity);
+				if (player_resource.health <= 0) {
 					registry.deathTimers.emplace(entity);
-					Mix_PlayChannel(-1, salmon_dead_sound, 0);
-
-					// !!! TODO A1: change the salmon orientation and color on death
-				}
-			}
-			// Checking Player - SoftShell collisions
-			else if (registry.softShells.has(entity_other)) {
-				if (!registry.deathTimers.has(entity)) {
-					// chew, count points, and set the LightUp timer
-					registry.remove_all_components_of(entity_other);
-					Mix_PlayChannel(-1, salmon_eat_sound, 0);
-					++points;
-
-					// !!! TODO A1: create a new struct called LightUp in components.hpp and add an instance to the salmon entity by modifying the ECS registry
+					registry.velocities.get(player).velocity = vec2(0.f, 0.f);
+					// TODO: play death sound here
 				}
 			}
 		}
 	}
-
-	// Remove all collisions from this simulation step
 	registry.collisions.clear();
+			//if (registry.hardShells.has(entity_other)) {
+	//			// initiate death unless already dying
+	//			if (!registry.deathTimers.has(entity)) {
+	//				// Scream, reset timer, and make the salmon sink
+	//				registry.deathTimers.emplace(entity);
+
+	//				// !!! TODO A1: change the salmon orientation and color on death
+	//			}
+	//		}
+	//		// Checking Player - SoftShell collisions
+	//		else if (registry.softShells.has(entity_other)) {
+	//			if (!registry.deathTimers.has(entity)) {
+	//				// chew, count points, and set the LightUp timer
+	//				registry.remove_all_components_of(entity_other);
+	//				Mix_PlayChannel(-1, salmon_eat_sound, 0);
+	//				++points;
+	//			}
+	//		}
+	//	}
+
 }
 
 // Should the game be over ?
@@ -288,46 +268,84 @@ bool WorldSystem::is_over() const {
 
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// TODO A1: HANDLE SALMON MOVEMENT HERE
-	// key is of 'type' GLFW_KEY_
-	// action can be GLFW_PRESS GLFW_RELEASE GLFW_REPEAT
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	if (registry.deathTimers.has(player)) { return; }
+	// TODO: solve issue where player is faster on the diagonals
+	Velocity& player_velocity = registry.velocities.get(player);
+	Direction& player_direction = registry.directions.get(player);
 
-	// Resetting game
-	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
-		int w, h;
-		glfwGetWindowSize(window, &w, &h);
+	// get states of each arrow key
+	int state_up = glfwGetKey(window, GLFW_KEY_UP);
+	int state_down = glfwGetKey(window, GLFW_KEY_DOWN);
+	int state_left = glfwGetKey(window, GLFW_KEY_LEFT);
+	int state_right = glfwGetKey(window, GLFW_KEY_RIGHT);
 
-        restart_game();
+	DIRECTION new_direction = DIRECTION::NONE;
+
+	// up
+	if ((state_up == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_RELEASE && state_right == GLFW_RELEASE) ||
+		(state_up == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_PRESS && state_right == GLFW_PRESS)) {
+		new_direction = DIRECTION::N;
 	}
+	// down
+	else if ((state_down == GLFW_PRESS && state_up == GLFW_RELEASE && state_left == GLFW_RELEASE && state_right == GLFW_RELEASE) ||
+		(state_down == GLFW_PRESS && state_up == GLFW_RELEASE && state_left == GLFW_PRESS && state_right == GLFW_PRESS)) {
+		new_direction = DIRECTION::S;
+	}
+	// left
+	else if ((state_left == GLFW_PRESS && state_down == GLFW_RELEASE && state_up == GLFW_RELEASE && state_right == GLFW_RELEASE) ||
+		(state_left == GLFW_PRESS && state_down == GLFW_PRESS && state_up == GLFW_PRESS && state_right == GLFW_RELEASE)) {
+		new_direction = DIRECTION::W;
+	}
+	// right
+	else if ((state_right == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_RELEASE && state_up == GLFW_RELEASE) ||
+		(state_right == GLFW_PRESS && state_down == GLFW_PRESS && state_left == GLFW_RELEASE && state_up == GLFW_PRESS)) {
+		new_direction = DIRECTION::E;
+	}
+	// up and left
+	else if ((state_up == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_PRESS && state_right == GLFW_RELEASE)) {
+		new_direction = DIRECTION::NW;
+	}
+	// up and right
+	else if ((state_up == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_RELEASE && state_right == GLFW_PRESS)) {
+		new_direction = DIRECTION::NE;
+	}
+	// down and right
+	else if ((state_up == GLFW_RELEASE && state_down == GLFW_PRESS && state_left == GLFW_PRESS && state_right == GLFW_RELEASE)) {
+		new_direction = DIRECTION::SW;
+	}
+	// down and left
+	else if ((state_up == GLFW_RELEASE && state_down == GLFW_PRESS && state_left == GLFW_RELEASE && state_right == GLFW_PRESS)) {
+		new_direction = DIRECTION::SE;
+	}
+
+	// set the player velocity based on the new_direction
+	if (new_direction != DIRECTION::NONE) {
+		player_direction.direction = new_direction;
+		player_velocity = computeVelocity(PLAYER_SPEED, player_direction);
+	}
+	else {
+		player_velocity = computeVelocity(0.0, player_direction);
+	}
+
+	// Resetting game (currently disabled, think about adding this back in later)
+	//if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
+	//	int w, h;
+	//	glfwGetWindowSize(window, &w, &h);
+
+	//  restart_game();
+	//}
 
 	// Debugging
-	if (key == GLFW_KEY_D) {
-		if (action == GLFW_RELEASE)
-			debugging.in_debug_mode = false;
-		else
-			debugging.in_debug_mode = true;
-	}
-
-	// Control the current speed with `<` `>`
-	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_COMMA) {
-		current_speed -= 0.1f;
-		printf("Current speed = %f\n", current_speed);
-	}
-	if (action == GLFW_RELEASE && (mod & GLFW_MOD_SHIFT) && key == GLFW_KEY_PERIOD) {
-		current_speed += 0.1f;
-		printf("Current speed = %f\n", current_speed);
-	}
-	current_speed = fmax(0.f, current_speed);
+	//if (key == GLFW_KEY_D) {
+	//	if (action == GLFW_RELEASE)
+	//		debugging.in_debug_mode = false;
+	//	else
+	//		debugging.in_debug_mode = true;
+	//}
 }
 
 void WorldSystem::on_mouse_move(vec2 mouse_position) {
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	// TODO A1: HANDLE SALMON ROTATION HERE
-	// xpos and ypos are relative to the top-left of the window, the salmon's
-	// default facing direction is (1, 0)
-	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// We are probably not going to need this on_mouse_move
 
 	(vec2)mouse_position; // dummy to avoid compiler warning
 }

@@ -1,4 +1,3 @@
-
 #define GL3W_IMPLEMENTATION
 #include <gl3w.h>
 
@@ -28,10 +27,17 @@ int main()
 		getchar();
 		return EXIT_FAILURE;
 	}
+	// Add a main menu thing here? 
+	
+
+	// Set the game level then initialize the main systems
+	GameLevel level;
+	level.init(1);
+
 
 	// initialize the main systems
 	render_system.init(window);
-	world_system.init(&render_system);
+	world_system.init(&render_system, level);
 
 	// variable timestep loop
 	auto t = Clock::now();

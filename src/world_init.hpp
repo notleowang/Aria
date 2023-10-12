@@ -11,14 +11,20 @@ const float TURTLE_BB_WIDTH = 0.4f * 300.f;
 const float TURTLE_BB_HEIGHT = 0.4f * 202.f;
 
 // the player
-Entity createSalmon(RenderSystem* renderer, vec2 pos);
-// the prey
-Entity createFish(RenderSystem* renderer, vec2 position);
-// the enemy
-Entity createTurtle(RenderSystem* renderer, vec2 position);
+Entity createAria(RenderSystem* renderer, vec2 pos);
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);
-// a pebble
-Entity createPebble(vec2 pos, vec2 size);
 
+// creates a terrain with fixed size
+Entity createTerrain(vec2 pos, vec2 size);
+
+// creates an exit door
+Entity createExitDoor(vec2 pos);
+
+// mock enemy TODO: change enemy implementation
+Entity createEnemy(RenderSystem* renderer, vec2 pos);
+
+// test
+Entity createTestSalmon(RenderSystem* renderer, vec2 pos);
+Entity createTestStationaryTexture(RenderSystem* renderer, vec2 pos);
 
