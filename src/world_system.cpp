@@ -25,6 +25,12 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeMusic(background_music);
 	if (projectile_sound != nullptr)
 		Mix_FreeChunk(projectile_sound);
+	if (aria_death_sound != nullptr)
+		Mix_FreeChunk(aria_death_sound);
+	if (enemy_death_sound != nullptr)
+		Mix_FreeChunk(enemy_death_sound);
+	if (damage_tick_sound != nullptr)
+		Mix_FreeChunk(damage_tick_sound);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -92,13 +98,16 @@ GLFWwindow* WorldSystem::create_window() {
 		return nullptr;
 	}
 
-	background_music = Mix_LoadMUS(audio_path("music.wav").c_str());
+	background_music = Mix_LoadMUS(audio_path("eerie_ambience.wav").c_str());
 	projectile_sound = Mix_LoadWAV(audio_path("projectile.wav").c_str());
+	aria_death_sound = Mix_LoadWAV(audio_path("aria_death.wav").c_str());
+	enemy_death_sound = Mix_LoadWAV(audio_path("enemy_death.wav").c_str());
+	damage_tick_sound = Mix_LoadWAV(audio_path("damage_tick.wav").c_str());
 	//salmon_dead_sound = Mix_LoadWAv(audio_path("salmon_dead.wav").c_str()); // keeping one so we know how to load future wavs
 
 	if (background_music == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
-			audio_path("music.wav").c_str());
+			audio_path("eerie_ambience.wav").c_str());
 		return nullptr;
 	}
 
@@ -230,6 +239,7 @@ void WorldSystem::handle_collisions() {
 		// Checking Player - Enemy collisions
 		if (registry.enemies.has(entity_other) && registry.players.has(entity)) {
 			if (!registry.invulnerableTimers.has(entity)) {
+				Mix_PlayChannel(-1, damage_tick_sound, 0);
 				Resources& player_resource = registry.resources.get(entity);
 				player_resource.health -= registry.enemies.get(entity_other).damage;
 				printf("player hp: %f\n", player_resource.health);
@@ -238,26 +248,26 @@ void WorldSystem::handle_collisions() {
 					registry.deathTimers.emplace(entity);
 					registry.velocities.get(player).velocity = vec2(0.f, 0.f);
 					// TODO: play death sound here
+					Mix_PlayChannel(-1, aria_death_sound, 0);
 				}
 			}
 		}
 
 		// Checking Projectile - Enemy collisions
 		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity)) {
-			// TODO: Enemies should take damage when hit by projectile
+			Mix_PlayChannel(-1, damage_tick_sound, 0);
 			Resources& enemy_resource = registry.resources.get(entity_other);
 			enemy_resource.health -= registry.projectiles.get(entity).damage;
 			printf("enemy hp: %f\n", enemy_resource.health);
 			if (enemy_resource.health <= 0) {
 				registry.remove_all_components_of(entity_other);
-				// TODO: play death sound here
+				Mix_PlayChannel(-1, enemy_death_sound, 0);
 			}
 			registry.remove_all_components_of(entity);
 		}
 
 		// Checking Projectile - Wall collisions
 		if (registry.terrain.has(entity_other) && registry.projectiles.has(entity)) {
-			// TODO: Enemies should take damage when hit by projectile
 			registry.remove_all_components_of(entity);
 		}
 
