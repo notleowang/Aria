@@ -1,6 +1,7 @@
 // Header
 #include "world_system.hpp"
 #include "world_init.hpp"
+#include "utils.hpp"
 
 // stlib
 #include <cassert>
@@ -220,7 +221,7 @@ void WorldSystem::handle_collisions() {
 		Entity entity_other = collisionsRegistry.components[i].other_entity;
 
 		// Checking Player - Enemy collisions
-		if (registry.enemies.has(entity_other)) {
+		if (registry.enemies.has(entity_other) && registry.players.has(entity)) {
 			if (!registry.invulnerableTimers.has(entity)) {
 				Resources& player_resource = registry.resources.get(entity);
 				player_resource.health -= registry.enemies.get(entity_other).damage;
@@ -233,6 +234,26 @@ void WorldSystem::handle_collisions() {
 				}
 			}
 		}
+
+		// Checking Projectile - Enemy collisions
+		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity)) {
+			// TODO: Enemies should take damage when hit by projectile
+			Resources& enemy_resource = registry.resources.get(entity_other);
+			enemy_resource.health -= registry.projectiles.get(entity).damage;
+			printf("enemy hp: %f\n", enemy_resource.health);
+			if (enemy_resource.health <= 0) {
+				registry.remove_all_components_of(entity_other);
+				// TODO: play death sound here
+			}
+			registry.remove_all_components_of(entity);
+		}
+
+		// Checking Projectile - Wall collisions
+		if (registry.terrain.has(entity_other) && registry.projectiles.has(entity)) {
+			// TODO: Enemies should take damage when hit by projectile
+			registry.remove_all_components_of(entity);
+		}
+
 	}
 	registry.collisions.clear();
 			//if (registry.hardShells.has(entity_other)) {
@@ -268,48 +289,66 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// TODO: solve issue where player is faster on the diagonals
 	Velocity& player_velocity = registry.velocities.get(player);
 	Position& player_position = registry.positions.get(player);
+	Direction& player_direction = registry.directions.get(player);
 
-	if (action == GLFW_PRESS) {
-		
-		if (key == GLFW_KEY_SPACE) {
-			Entity projectile = createProjectile(renderer, { 0.f,0.f }, { 0.f,0.f });
-			Mix_PlayChannel(-1, projectile_sound, 0);
+	// get states of each arrow key
+	int state_up = glfwGetKey(window, GLFW_KEY_UP);
+	int state_down = glfwGetKey(window, GLFW_KEY_DOWN);
+	int state_left = glfwGetKey(window, GLFW_KEY_LEFT);
+	int state_right = glfwGetKey(window, GLFW_KEY_RIGHT);
 
-			Position& projectile_position = registry.positions.get(projectile);
-			projectile_position.position = player_position.position; // change to player pos
+	DIRECTION new_direction = DIRECTION::NONE;
 
-			Velocity& projectile_velocity = registry.velocities.get(projectile);
-			// Get player direction
-			projectile_velocity.velocity = { PROJECTILE_SPEED,0.f }; //TODO: Compute velocity from direction and PROJECTILE_SPEED
-
-		}
-
-		if (key == GLFW_KEY_UP) {
-			player_velocity.velocity.y -= PLAYER_SPEED;
-		}
-		else if (key == GLFW_KEY_DOWN) {
-			player_velocity.velocity.y += PLAYER_SPEED;
-		}
-		else if (key == GLFW_KEY_LEFT) {
-			player_velocity.velocity.x -= PLAYER_SPEED;
-		}
-		else if (key == GLFW_KEY_RIGHT) {
-			player_velocity.velocity.x += PLAYER_SPEED;
-		}
+	// up
+	if ((state_up == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_RELEASE && state_right == GLFW_RELEASE) ||
+		(state_up == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_PRESS && state_right == GLFW_PRESS)) {
+		new_direction = DIRECTION::N;
 	}
-	if (action == GLFW_RELEASE) {
-		if (key == GLFW_KEY_UP) {
-			player_velocity.velocity.y += PLAYER_SPEED;
-		}
-		else if (key == GLFW_KEY_DOWN) {
-			player_velocity.velocity.y -= PLAYER_SPEED;
-		}
-		else if (key == GLFW_KEY_LEFT) {
-			player_velocity.velocity.x += PLAYER_SPEED;
-		}
-		else if (key == GLFW_KEY_RIGHT) {
-			player_velocity.velocity.x -= PLAYER_SPEED;
-		}
+	// down
+	else if ((state_down == GLFW_PRESS && state_up == GLFW_RELEASE && state_left == GLFW_RELEASE && state_right == GLFW_RELEASE) ||
+		(state_down == GLFW_PRESS && state_up == GLFW_RELEASE && state_left == GLFW_PRESS && state_right == GLFW_PRESS)) {
+		new_direction = DIRECTION::S;
+	}
+	// left
+	else if ((state_left == GLFW_PRESS && state_down == GLFW_RELEASE && state_up == GLFW_RELEASE && state_right == GLFW_RELEASE) ||
+		(state_left == GLFW_PRESS && state_down == GLFW_PRESS && state_up == GLFW_PRESS && state_right == GLFW_RELEASE)) {
+		new_direction = DIRECTION::W;
+	}
+	// right
+	else if ((state_right == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_RELEASE && state_up == GLFW_RELEASE) ||
+		(state_right == GLFW_PRESS && state_down == GLFW_PRESS && state_left == GLFW_RELEASE && state_up == GLFW_PRESS)) {
+		new_direction = DIRECTION::E;
+	}
+	// up and left
+	else if ((state_up == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_PRESS && state_right == GLFW_RELEASE)) {
+		new_direction = DIRECTION::NW;
+	}
+	// up and right
+	else if ((state_up == GLFW_PRESS && state_down == GLFW_RELEASE && state_left == GLFW_RELEASE && state_right == GLFW_PRESS)) {
+		new_direction = DIRECTION::NE;
+	}
+	// down and right
+	else if ((state_up == GLFW_RELEASE && state_down == GLFW_PRESS && state_left == GLFW_PRESS && state_right == GLFW_RELEASE)) {
+		new_direction = DIRECTION::SW;
+	}
+	// down and left
+	else if ((state_up == GLFW_RELEASE && state_down == GLFW_PRESS && state_left == GLFW_RELEASE && state_right == GLFW_PRESS)) {
+		new_direction = DIRECTION::SE;
+	}
+
+	// set the player velocity based on the new_direction
+	if (new_direction != DIRECTION::NONE) {
+		player_direction.direction = new_direction;
+		player_velocity = computeVelocity(PLAYER_SPEED, player_direction);
+	}
+	else {
+		player_velocity = computeVelocity(0.0, player_direction);
+	}
+
+	if (action == GLFW_PRESS && key == GLFW_KEY_SPACE) {
+		Velocity vel = computeVelocity(PROJECTILE_SPEED, player_direction);
+		Entity projectile = createProjectile(renderer,player_position.position, vel.velocity);
+		Mix_PlayChannel(-1, projectile_sound, 0);
 	}
 
 	// Resetting game (currently disabled, think about adding this back in later)

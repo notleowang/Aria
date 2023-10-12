@@ -13,7 +13,7 @@ Velocity computeVelocity(double speed, Direction direction) {
     Velocity velocity_component;
     double angle = directionToRadians(direction.direction);
     velocity_component.velocity.x = speed * cos(angle);
-    velocity_component.velocity.y = speed * sin(angle);
+    velocity_component.velocity.y = speed * -sin(angle);
 
     return velocity_component;
 }
