@@ -181,6 +181,23 @@ void RenderSystem::initializeGlGeometryBuffers()
 	meshes[geom_index].vertex_indices = terrain_indices;
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::TERRAIN, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
 
+	// Initializing exit door
+	std::vector<ColoredVertex> exit_door_vertices(4);
+	std::vector<uint16_t> exit_door_indices;
+	exit_door_vertices[0].position = { -0.5, -0.5, -0.1 };
+	exit_door_vertices[1].position = { -0.5, 0.5, -0.1 };
+	exit_door_vertices[2].position = { 0.5, -0.5, -0.1 };
+	exit_door_vertices[3].position = { 0.5, 0.5, -0.1 };
+	exit_door_indices.push_back(0);
+	exit_door_indices.push_back(1);
+	exit_door_indices.push_back(2);
+	exit_door_indices.push_back(1);
+	exit_door_indices.push_back(3);
+	exit_door_indices.push_back(2);
+	int geom_index_door = (int)GEOMETRY_BUFFER_ID::EXIT_DOOR;
+	meshes[geom_index_door].vertices = exit_door_vertices;
+	meshes[geom_index_door].vertex_indices = exit_door_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::EXIT_DOOR, meshes[geom_index_door].vertices, meshes[geom_index_door].vertex_indices);
 
 	////////////////////////
 	// Initialize pebble

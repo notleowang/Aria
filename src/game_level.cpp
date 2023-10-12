@@ -12,7 +12,7 @@ bool GameLevel::init(uint level) {
 		case 1:
 		{
 			this->player_starting_pos = vec2(200, 700);
-			this->exit_door_pos = vec2(1525, 900);
+			this->exit_door_pos = vec2(1500, 950);
 
 			terrains.push_back(vec4(900, 0, 1800, 100));
 			terrains.push_back(vec4(50, 500, 100, 900));
