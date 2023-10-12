@@ -196,7 +196,16 @@ void RenderSystem::draw()
 	// and alpha blending, one would have to sort
 	// sprites back to front
 	gl_has_errors();
-	mat3 projection_2D = createProjectionMatrix();
+
+	// get to players position
+	assert(registry.players.size() >= 1);
+	Entity entity = registry.players.entities[0];
+	Position& player_pos = registry.positions.get(entity);
+
+	// center the camera on the player
+	Camera camera;
+	camera.centerAt(player_pos.position);
+
 	// Draw all textured meshes that have a position and size component
 	for (Entity entity : registry.renderRequests.entities)
 	{
@@ -204,7 +213,7 @@ void RenderSystem::draw()
 			continue;
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize
-		drawTexturedMesh(entity, projection_2D);
+		drawTexturedMesh(entity, camera.projectionMat);
 	}
 
 	// Truely render to the screen
@@ -213,21 +222,4 @@ void RenderSystem::draw()
 	// flicker-free display with a double buffer
 	glfwSwapBuffers(window);
 	gl_has_errors();
-}
-
-mat3 RenderSystem::createProjectionMatrix()
-{
-	// Fake projection matrix, scales with respect to window coordinates
-	float left = 0.f;
-	float top = 0.f;
-
-	gl_has_errors();
-	float right = (float)window_width_px;
-	float bottom = (float)window_height_px;
-
-	float sx = 2.f / (right - left);
-	float sy = 2.f / (top - bottom);
-	float tx = -(right + left) / (right - left);
-	float ty = -(top + bottom) / (top - bottom);
-	return { {sx, 0.f, 0.f}, {0.f, sy, 0.f}, {tx, ty, 1.f} };
 }
