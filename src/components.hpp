@@ -29,10 +29,10 @@ struct Resources
 	float mana = 100.f;
 };
 
-// Structure to store entities that can shoot projectiles
+// Structure to store projectile entities
 struct Projectiles
 {
-
+	float damage = 10.f;
 };
 
 // All data relevant to the position of entities

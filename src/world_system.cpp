@@ -221,7 +221,7 @@ void WorldSystem::handle_collisions() {
 		Entity entity_other = collisionsRegistry.components[i].other_entity;
 
 		// Checking Player - Enemy collisions
-		if (registry.enemies.has(entity_other)) {
+		if (registry.enemies.has(entity_other) && registry.players.has(entity)) {
 			if (!registry.invulnerableTimers.has(entity)) {
 				Resources& player_resource = registry.resources.get(entity);
 				player_resource.health -= registry.enemies.get(entity_other).damage;
@@ -234,6 +234,26 @@ void WorldSystem::handle_collisions() {
 				}
 			}
 		}
+
+		// Checking Projectile - Enemy collisions
+		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity)) {
+			// TODO: Enemies should take damage when hit by projectile
+			Resources& enemy_resource = registry.resources.get(entity_other);
+			enemy_resource.health -= registry.projectiles.get(entity).damage;
+			printf("enemy hp: %f\n", enemy_resource.health);
+			if (enemy_resource.health <= 0) {
+				registry.remove_all_components_of(entity_other);
+				// TODO: play death sound here
+			}
+			registry.remove_all_components_of(entity);
+		}
+
+		// Checking Projectile - Wall collisions
+		if (registry.terrain.has(entity_other) && registry.projectiles.has(entity)) {
+			// TODO: Enemies should take damage when hit by projectile
+			registry.remove_all_components_of(entity);
+		}
+
 	}
 	registry.collisions.clear();
 			//if (registry.hardShells.has(entity_other)) {

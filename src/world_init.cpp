@@ -38,6 +38,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 
 	position.scale = vec2({ 150, 100 });
 
+
 	// Create and (empty) Turtle component to be able to refer to all turtles
 	registry.enemies.emplace(entity);
 	registry.renderRequests.insert(
@@ -45,6 +46,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 		{ TEXTURE_ASSET_ID::TURTLE,
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
+	registry.resources.emplace(entity);
 
 	return entity;
 
@@ -95,7 +97,6 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel) {
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 	//position.scale = ??
-
 
 	registry.projectiles.emplace(entity);
 

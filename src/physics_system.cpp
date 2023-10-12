@@ -91,7 +91,6 @@ void PhysicsSystem::step(float elapsed_ms)
 				Entity& entity_j = position_container.entities[j];
 				rectCollides(position_i, position_j, entity_i, entity_j);
 			}
-
 		}
 	}
 
