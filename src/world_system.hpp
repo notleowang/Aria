@@ -12,6 +12,7 @@
 #include <SDL_mixer.h>
 
 #include "render_system.hpp"
+#include "game_level.hpp"
 
 // Container for all our entities and game logic. Individual rendering / update is
 // deferred to the relative update() methods
@@ -24,7 +25,7 @@ public:
 	GLFWwindow* create_window();
 
 	// starts the game
-	void init(RenderSystem* renderer);
+	void init(RenderSystem* renderer, GameLevel level);
 
 	// Releases all associated resources
 	~WorldSystem();
@@ -52,8 +53,10 @@ private:
 	RenderSystem* renderer;
 	Entity player;
 	
-	std::vector<Entity> terrains;
-	std::vector<Entity> enemies;
+	vec2 player_starting_pos;
+	vec2 exit_door_pos;
+	std::vector<vec4> terrains_attrs;
+	std::vector<std::array<float, ENEMY_ATTRIBUTES>> enemies_attrs;
 
 	// music references
 	Mix_Music* background_music; // TODO: change background music for our game

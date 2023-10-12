@@ -27,6 +27,7 @@ Entity createTerrain(vec2 pos, vec2 size)
 
 Entity createEnemy(RenderSystem* renderer, vec2 pos)
 {
+	// TODO: change enemy implementation to include different enemy types
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
@@ -45,6 +46,23 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 		{ TEXTURE_ASSET_ID::TURTLE,
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity createExitDoor(vec2 pos) {
+	auto entity = Entity();
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	position.scale = vec2(100.f, 100.f);
+
+	registry.exitDoors.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
+			EFFECT_ASSET_ID::TERRAIN,
+			GEOMETRY_BUFFER_ID::TERRAIN });
 
 	return entity;
 }
