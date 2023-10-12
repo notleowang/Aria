@@ -31,6 +31,7 @@ class RenderSystem {
 	// Make sure these paths remain in sync with the associated enumerators.
 	const std::array<std::string, texture_count> texture_paths = {
 			textures_path("fish.png"),   // Currently keeping this so we know how to import our textures
+			textures_path("landscape.png"),
 			textures_path("turtle.png") 
 	};
 
@@ -74,8 +75,6 @@ public:
 
 	// Draw all entities
 	void draw();
-
-	mat3 createProjectionMatrix();
 
 private:
 	// Internal drawing functions for each entity type
