@@ -8,3 +8,4 @@ In the eerie village of Grimhaven, shrouded in perpetual mist and shadows, Aria'
 ### Your submission should align with your proposed development plan: Provide a write-up explaining how your milestone aligns with the plan. Explain all discrepancies and submit an updated proposal when such discrepancies occur.
 
 ### Game Design Documentation: Document the ECS design pattern used in your game. Enumerate the game entities and actionable components used. Draw a diagram of the interaction between entities and components.
+![ECS diagram](docu\images\M1_ECS_diagram.png)
