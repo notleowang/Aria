@@ -14,6 +14,8 @@ struct Player
 struct Enemy
 {
 	float damage = 10.f;
+	float movementTimer = 3000.f;
+	float stamina = 0.5f;
 };
 
 // Terrain
