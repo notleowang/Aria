@@ -194,18 +194,17 @@ void WorldSystem::restart_game() {
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
 	player = createTestSalmon(renderer, this->player_starting_pos);
 
-	createExitDoor(this->exit_door_pos);
-
 	for (uint i = 0; i < this->terrains_attrs.size(); i++) {
 		vec4 terrain_i = this->terrains_attrs[i];
 		createTerrain(vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]));
 	}
 
 	for (uint i = 0; i < this->enemies_attrs.size(); i++) {
-		std::array<float, 6> enemy_i = this->enemies_attrs[i];
+		std::array<float, ENEMY_ATTRIBUTES> enemy_i = this->enemies_attrs[i];
 		createEnemy(renderer, vec2(enemy_i[0], enemy_i[1]));
 	}
 
+	createExitDoor(this->exit_door_pos);
 
 	//registry.colors.insert(player, { 1, 0.8f, 0.8f });
 
@@ -224,6 +223,11 @@ void WorldSystem::restart_game() {
 		registry.colors.insert(pebble, { brightness, brightness, brightness});
 	}
 	*/
+}
+
+void WorldSystem::win_level() {
+	printf("hooray you won the level\n");
+	this->levelDone = true;
 }
 
 // Compute collisions between entities
@@ -271,6 +275,9 @@ void WorldSystem::handle_collisions() {
 			registry.remove_all_components_of(entity);
 		}
 
+		if (registry.players.has(entity) && registry.exitDoors.has(entity_other)) {
+			win_level();
+		}
 	}
 	registry.collisions.clear();
 			//if (registry.hardShells.has(entity_other)) {
