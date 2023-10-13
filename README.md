@@ -15,7 +15,19 @@ Below is the documentation for our `README.md` submission for Milestone 1.
 - [Projectile Controls](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/1abb653a8c08b16c6a2b29b3be8313c48e31a219/src/world_system.cpp#L364)
 
 ## Development Plan
-- Your submission should align with your proposed development plan: Provide a write-up explaining how your milestone aligns with the plan. Explain all discrepancies and submit an updated proposal when such discrepancies occur.
+Most of the work in this milestone aligned with our development plan for this milestone.
+
+### Aligned with the proposal:
+- Drafting sprite assets.
+- Getting the ECS design pattern implemented.
+- Getting movement inputs implemented.
+- Collision properties (with walls and enemies).
+- Bug fixing and game stability checking.
+
+### Discreprancies:
+- Solidified the decisions for our creative components for this milestone to be `Camera Control` and `Audio Feedback`.
+- Gray-box-implementation was "changed" to salmon-box-implementation (we used the A1 assets instead of creating "gray-box" assets).
+- Replaced Key-frame/state interpolation task with an Enemy Decision Tree feature.
 
 ## ECS Design Pattern
 The ECS design pattern we are using is the one provided by A1 which is a dense component and entity vector with a map.
