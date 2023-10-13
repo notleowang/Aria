@@ -103,7 +103,6 @@ GLFWwindow* WorldSystem::create_window() {
 	aria_death_sound = Mix_LoadWAV(audio_path("aria_death.wav").c_str());
 	enemy_death_sound = Mix_LoadWAV(audio_path("enemy_death.wav").c_str());
 	damage_tick_sound = Mix_LoadWAV(audio_path("damage_tick.wav").c_str());
-	//salmon_dead_sound = Mix_LoadWAv(audio_path("salmon_dead.wav").c_str()); // keeping one so we know how to load future wavs
 
 	if (background_music == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
@@ -130,7 +129,6 @@ void WorldSystem::init(RenderSystem* renderer_arg, GameLevel level) {
 
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
-	// Updating window title with points
 	std::stringstream title_ss;
 	title_ss << "Aria: Whispers of Darkness";
 	glfwSetWindowTitle(window, title_ss.str().c_str());
@@ -140,12 +138,10 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		registry.remove_all_components_of(registry.debugComponents.entities.back());
 
 
-	// Processing the salmon state
 	assert(registry.screenStates.components.size() <= 1);
 	ScreenState& screen = registry.screenStates.components[0];
 
 	for (Entity entity : registry.invulnerableTimers.entities) {
-		// progress timer
 		InvulnerableTimer& timer = registry.invulnerableTimers.get(entity);
 		timer.timer_ms -= elapsed_ms_since_last_update;
 		if (timer.timer_ms <= 0) {
@@ -155,7 +151,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
     float min_timer_ms = 3000.f;
 	for (Entity entity : registry.deathTimers.entities) {
-		// progress timer
 		DeathTimer& timer = registry.deathTimers.get(entity);
 		timer.timer_ms -= elapsed_ms_since_last_update;
 		if (timer.timer_ms < min_timer_ms) {
@@ -205,24 +200,6 @@ void WorldSystem::restart_game() {
 	}
 
 	createExitDoor(this->exit_door_pos);
-
-	//registry.colors.insert(player, { 1, 0.8f, 0.8f });
-
-	/*
-	// Create a new player component
-	player = createPlayer(renderer, { 100, 200 });
-	registry.colors.insert(player_salmon, {1, 0.8f, 0.8f});
-
-	for (uint i = 0; i < 20; i++) {
-		int w, h;
-		glfwGetWindowSize(window, &w, &h);
-		float radius = 30 * (uniform_dist(rng) + 0.3f); // range 0.3 .. 1.3
-		Entity pebble = createPebble({ uniform_dist(rng) * w, h - uniform_dist(rng) * 20 },
-					 { radius, radius });
-		float brightness = uniform_dist(rng) * 0.5 + 0.5;
-		registry.colors.insert(pebble, { brightness, brightness, brightness});
-	}
-	*/
 }
 
 void WorldSystem::win_level() {
@@ -251,7 +228,6 @@ void WorldSystem::handle_collisions() {
 				if (player_resource.health <= 0) {
 					registry.deathTimers.emplace(entity);
 					registry.velocities.get(player).velocity = vec2(0.f, 0.f);
-					// TODO: play death sound here
 					Mix_PlayChannel(-1, aria_death_sound, 0);
 				}
 			}
@@ -280,26 +256,6 @@ void WorldSystem::handle_collisions() {
 		}
 	}
 	registry.collisions.clear();
-			//if (registry.hardShells.has(entity_other)) {
-	//			// initiate death unless already dying
-	//			if (!registry.deathTimers.has(entity)) {
-	//				// Scream, reset timer, and make the salmon sink
-	//				registry.deathTimers.emplace(entity);
-
-	//				// !!! TODO A1: change the salmon orientation and color on death
-	//			}
-	//		}
-	//		// Checking Player - SoftShell collisions
-	//		else if (registry.softShells.has(entity_other)) {
-	//			if (!registry.deathTimers.has(entity)) {
-	//				// chew, count points, and set the LightUp timer
-	//				registry.remove_all_components_of(entity_other);
-	//				Mix_PlayChannel(-1, salmon_eat_sound, 0);
-	//				++points;
-	//			}
-	//		}
-	//	}
-
 }
 
 // Should the game be over ?
@@ -396,7 +352,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		Mix_PlayChannel(-1, projectile_sound, 0);
 	}
 
-	// Resetting game (currently disabled, think about adding this back in later)
+	// Resetting game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
 		int w, h;
 		glfwGetWindowSize(window, &w, &h);
