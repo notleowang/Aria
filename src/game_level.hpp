@@ -5,16 +5,6 @@
 // This includes things like the player's starting position, the enemies, the terrain, etc.
 // We don't have access to the renderer until the renderer system runs so we should only be defining
 // the attributes of the enemies and terrain
-
-//enum class ENTITY_ATTRIBUTES {
-//	POS_X = 0,
-//	POS_Y = POS_X + 1,
-//	SCALE_X = POS_Y + 1,
-//	SCALE_Y = SCALE_X + 1,
-//	VEL_X = SCALE_Y + 1,
-//	VEL_Y = VEL_X + 1
-//};
-
 const int TERRAIN_ATTRIBUTES = 4;
 const int ENEMY_ATTRIBUTES = 6;
 
