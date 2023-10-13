@@ -29,7 +29,7 @@ The ECS design pattern we used was the one provided by A1 which is..
 - Position
 - Collision
 - Direction
-- Invulnerable Death Timer
+- Invulnerable Timer
 - Death Timer
 - Resource
 - Mesh
