@@ -115,16 +115,13 @@ void PhysicsSystem::step(float elapsed_ms)
 			if (collision.direction == 0) {
 				position.position.x = other_position.position.x - abs(other_position.scale.x / 2) - abs(position.scale.x/2);
 				position.position.y += velocity.velocity.y * step_seconds;
-			}
-			if (collision.direction == 1) {
+			} else if (collision.direction == 1) {
 				position.position.x = other_position.position.x + abs(other_position.scale.x / 2) + abs(position.scale.x / 2);
 				position.position.y += velocity.velocity.y * step_seconds;
-			}
-			if (collision.direction == 2) {
+			} else if (collision.direction == 2) {
 				position.position.x += velocity.velocity.x * step_seconds;
 				position.position.y = other_position.position.y - abs(other_position.scale.y / 2) - abs(position.scale.y / 2);
-			}
-			if (collision.direction == 3) {
+			} else if (collision.direction == 3) {
 				position.position.x += velocity.velocity.x * step_seconds;
 				position.position.y = other_position.position.y + abs(other_position.scale.y / 2) + abs(position.scale.y / 2);;
 			}
