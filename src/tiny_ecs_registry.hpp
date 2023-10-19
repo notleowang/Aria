@@ -13,6 +13,7 @@ public:
 	// Manually created list of all components this game has
 	ComponentContainer<DeathTimer> deathTimers;
 	ComponentContainer<Resources> resources;
+	ComponentContainer<HealthBar> healthBars;
 	ComponentContainer<Projectiles> projectiles;
 	ComponentContainer<InvulnerableTimer> invulnerableTimers;
 	ComponentContainer<Position> positions;
@@ -36,6 +37,7 @@ public:
 		registry_list.push_back(&deathTimers);
 		registry_list.push_back(&projectiles);
 		registry_list.push_back(&resources);
+		registry_list.push_back(&healthBars);
 		registry_list.push_back(&invulnerableTimers);
 		registry_list.push_back(&positions);
 		registry_list.push_back(&velocities);

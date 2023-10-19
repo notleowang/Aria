@@ -19,7 +19,9 @@ Entity createExitDoor(vec2 pos);
 // mock enemy TODO: change enemy implementation
 Entity createEnemy(RenderSystem* renderer, vec2 pos);
 
+// creates a health bar associated with an owner entity
+Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity);
+
 // test
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos);
-Entity createTestStationaryTexture(RenderSystem* renderer, vec2 pos);
 

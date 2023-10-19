@@ -54,6 +54,26 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
+Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity)
+{
+	auto entity = Entity();
+
+	HealthBar& healthBar = registry.healthBars.emplace(entity);
+	healthBar.owner = owner_entity;
+	healthBar.y_offset = -50.f;
+
+	Position& position = registry.positions.emplace(entity);
+	position.scale = vec2(80.f, 20.f);
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::HEALTH_BAR, // TEXTURE_COUNT indicates that no txture is needed
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
 Entity createExitDoor(vec2 pos) {
 	auto entity = Entity();
 
@@ -101,6 +121,8 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
 			EFFECT_ASSET_ID::SALMON,
 			GEOMETRY_BUFFER_ID::SALMON });
+
+	createHealthBar(renderer, entity);
 
 	return entity;
 }

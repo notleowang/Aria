@@ -37,6 +37,12 @@ struct Resources
 	float mana = 100.f;
 };
 
+struct HealthBar
+{
+	Entity owner;
+	float y_offset = 50.f;
+};
+
 // Structure to store projectile entities
 struct Projectiles
 {
@@ -167,7 +173,8 @@ enum class TEXTURE_ASSET_ID {
 	FISH = 0,
 	LANDSCAPE = FISH + 1,
 	TURTLE = LANDSCAPE + 1,
-	TEXTURE_COUNT = TURTLE + 1
+	HEALTH_BAR = TURTLE + 1,
+	TEXTURE_COUNT = HEALTH_BAR + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -178,7 +185,8 @@ enum class EFFECT_ASSET_ID {
 	WATER = TEXTURED + 1,
 	TERRAIN = WATER + 1,
 	EXIT_DOOR = TERRAIN + 1,
-	EFFECT_COUNT = EXIT_DOOR + 1
+	HEALTH_BAR = EXIT_DOOR + 1,
+	EFFECT_COUNT = HEALTH_BAR + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
