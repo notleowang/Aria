@@ -51,6 +51,8 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 	auto& velocity = registry.velocities.emplace(entity);
 	velocity.velocity.x = 50;
 
+	createHealthBar(renderer, entity);
+
 	return entity;
 }
 
