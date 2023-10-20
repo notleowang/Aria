@@ -85,6 +85,13 @@ struct Collision
 	};
 };
 
+// Component container that marks an entity as being collidable
+// Will be: players, enemies, terrain, projectiles, etc.
+struct Collidable
+{
+
+};
+
 // Data structure for toggling debug mode
 struct Debug {
 	bool in_debug_mode = 0;

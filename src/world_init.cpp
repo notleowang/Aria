@@ -16,6 +16,7 @@ Entity createTerrain(vec2 pos, vec2 size)
 	position.scale = size;
 
 	registry.terrain.emplace(entity);
+	registry.collidables.emplace(entity); // Marking terrain as collidable
 	registry.renderRequests.insert(
 		entity, 
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
@@ -40,8 +41,8 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 	position.scale = vec2({ 75, 50 });
 
 
-	// Create and (empty) Turtle component to be able to refer to all turtles
 	registry.enemies.emplace(entity);
+	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::TURTLE,
@@ -62,6 +63,7 @@ Entity createExitDoor(vec2 pos) {
 	position.scale = vec2(100.f, 100.f);
 
 	registry.exitDoors.emplace(entity);
+	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
@@ -94,8 +96,8 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
 
-	// Create and (empty) Salmon component to be able to refer to all turtles
 	registry.players.emplace(entity);
+	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
@@ -118,7 +120,7 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel) {
 	//position.scale = ??
 
 	registry.projectiles.emplace(entity);
-
+	registry.collidables.emplace(entity);
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = vel;
 
