@@ -7,7 +7,7 @@
 // Aria component
 struct Player
 {
-
+	
 };
 
 // Enemy component
@@ -33,7 +33,8 @@ struct ExitDoor
 // All data relevant to the resources of entities
 struct Resources
 {
-	float health = 100.f;
+	float maxHealth = 100.f;
+	float currentHealth = 100.f;
 	float mana = 100.f;
 };
 

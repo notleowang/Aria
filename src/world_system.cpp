@@ -222,10 +222,10 @@ void WorldSystem::handle_collisions() {
 			if (!registry.invulnerableTimers.has(entity)) {
 				Mix_PlayChannel(-1, damage_tick_sound, 0);
 				Resources& player_resource = registry.resources.get(entity);
-				player_resource.health -= registry.enemies.get(entity_other).damage;
-				printf("player hp: %f\n", player_resource.health);
+				player_resource.currentHealth -= registry.enemies.get(entity_other).damage;
+				printf("player hp: %f\n", player_resource.currentHealth);
 				registry.invulnerableTimers.emplace(entity);
-				if (player_resource.health <= 0) {
+				if (player_resource.currentHealth <= 0) {
 					registry.deathTimers.emplace(entity);
 					registry.velocities.get(player).velocity = vec2(0.f, 0.f);
 					Mix_PlayChannel(-1, aria_death_sound, 0);
@@ -237,9 +237,9 @@ void WorldSystem::handle_collisions() {
 		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity)) {
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
 			Resources& enemy_resource = registry.resources.get(entity_other);
-			enemy_resource.health -= registry.projectiles.get(entity).damage;
-			printf("enemy hp: %f\n", enemy_resource.health);
-			if (enemy_resource.health <= 0) {
+			enemy_resource.currentHealth -= registry.projectiles.get(entity).damage;
+			printf("enemy hp: %f\n", enemy_resource.currentHealth);
+			if (enemy_resource.currentHealth <= 0) {
 				registry.remove_all_components_of(entity_other);
 				Mix_PlayChannel(-1, enemy_death_sound, 0);
 			}

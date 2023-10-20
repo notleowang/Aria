@@ -7,6 +7,8 @@ in vec2 texcoord;
 uniform sampler2D emptyBarTexture;
 uniform sampler2D fullBarTexture;
 uniform vec3 fcolor;
+uniform float currHealth;
+uniform float maxHealth;
 
 // Output color
 layout(location = 0) out  vec4 color;
@@ -18,7 +20,7 @@ vec4 getTextureFromHP(float hp, vec2 uv, vec4 fullTexture, vec4 emptyTexture) {
 
 void main()
 {
-	float hp = 0.8;
+	float hp = currHealth/maxHealth;
 
 	vec4 emptyTexture = texture(emptyBarTexture, vec2(texcoord.x, texcoord.y));
 	vec4 fullTexture = texture(fullBarTexture, vec2(texcoord.x, texcoord.y));

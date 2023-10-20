@@ -97,6 +97,15 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glBindTexture(GL_TEXTURE_2D, full_bar_handle);
 		glUniform1i(glGetUniformLocation(program, "fullBarTexture"), 1);
 		gl_has_errors();
+
+		assert(registry.healthBars.has(entity));
+		HealthBar& healthBar = registry.healthBars.get(entity);
+		assert(registry.resources.has(healthBar.owner));
+		Resources& resources = registry.resources.get(healthBar.owner);
+
+		glUniform1f(glGetUniformLocation(program, "currHealth"), resources.currentHealth);
+		glUniform1f(glGetUniformLocation(program, "maxHealth"), resources.maxHealth);
+		gl_has_errors();
 	}
 	else if (render_request.used_effect == EFFECT_ASSET_ID::SALMON || 
 		render_request.used_effect == EFFECT_ASSET_ID::TERRAIN || render_request.used_effect == EFFECT_ASSET_ID::EXIT_DOOR)
