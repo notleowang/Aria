@@ -4,13 +4,25 @@
 in vec2 texcoord;
 
 // Application data
-uniform sampler2D sampler0;
+uniform sampler2D emptyBarTexture;
+uniform sampler2D fullBarTexture;
 uniform vec3 fcolor;
 
 // Output color
 layout(location = 0) out  vec4 color;
 
+vec4 getTextureFromHP(float hp, vec2 uv, vec4 fullTexture, vec4 emptyTexture) {
+	if (uv.x < hp) return fullTexture;
+	return emptyTexture;
+}
+
 void main()
 {
-	color = vec4(fcolor, 1.0) * texture(sampler0, vec2(texcoord.x, texcoord.y));
+	float hp = 0.8;
+
+	vec4 emptyTexture = texture(emptyBarTexture, vec2(texcoord.x, texcoord.y));
+	vec4 fullTexture = texture(fullBarTexture, vec2(texcoord.x, texcoord.y));
+	vec4 texture = getTextureFromHP(hp, texcoord, fullTexture, emptyTexture);
+
+	color = vec4(fcolor, 1.0) * texture;
 }

@@ -4,6 +4,10 @@
 #include "tiny_ecs.hpp"
 #include "render_system.hpp"
 
+// hard coded to the textures
+const float HEALTH_BAR_HEIGHT = 0.3f * 33.f;
+const float HEALTH_BAR_WIDTH = 0.3f * 369.f;
+
 // the player
 Entity createAria(RenderSystem* renderer, vec2 pos);
 Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel);

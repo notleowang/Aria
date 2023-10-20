@@ -33,7 +33,8 @@ class RenderSystem {
 			textures_path("fish.png"),   // Currently keeping this so we know how to import our textures
 			textures_path("landscape.png"),
 			textures_path("turtle.png"),
-			textures_path("health_bar.png")
+			textures_path("health_bar_empty.png"),
+			textures_path("health_bar_full.png")
 	};
 
 	std::array<GLuint, effect_count> effects;

@@ -65,12 +65,12 @@ Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity)
 	healthBar.y_offset = -50.f;
 
 	Position& position = registry.positions.emplace(entity);
-	position.scale = vec2(80.f, 20.f);
+	position.scale = vec2(HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
 
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::HEALTH_BAR, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::TEXTURED,
+		{ TEXTURE_ASSET_ID::HEALTH_BAR_EMPTY, // !!! This technically does nothing
+			EFFECT_ASSET_ID::HEALTH_BAR,
 			GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
