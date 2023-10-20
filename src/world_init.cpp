@@ -34,11 +34,16 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	auto& position = registry.positions.emplace(entity);
+	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 
 	position.scale = vec2({ 75, 50 });
 
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity.x = 50;
+
+	Resources& resources = registry.resources.emplace(entity);
+	resources.healthBar = createHealthBar(renderer, entity);
 
 	// Create and (empty) Turtle component to be able to refer to all turtles
 	registry.enemies.emplace(entity);
@@ -47,11 +52,6 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 		{ TEXTURE_ASSET_ID::TURTLE,
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
-	registry.resources.emplace(entity);
-	auto& velocity = registry.velocities.emplace(entity);
-	velocity.velocity.x = 50;
-
-	createHealthBar(renderer, entity);
 
 	return entity;
 }
@@ -112,6 +112,7 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
+	resources.healthBar = createHealthBar(renderer, entity);
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
@@ -123,8 +124,6 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
 			EFFECT_ASSET_ID::SALMON,
 			GEOMETRY_BUFFER_ID::SALMON });
-
-	createHealthBar(renderer, entity);
 
 	return entity;
 }

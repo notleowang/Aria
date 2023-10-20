@@ -240,6 +240,7 @@ void WorldSystem::handle_collisions() {
 			enemy_resource.currentHealth -= registry.projectiles.get(entity).damage;
 			printf("enemy hp: %f\n", enemy_resource.currentHealth);
 			if (enemy_resource.currentHealth <= 0) {
+				registry.remove_all_components_of(enemy_resource.healthBar);
 				registry.remove_all_components_of(entity_other);
 				Mix_PlayChannel(-1, enemy_death_sound, 0);
 			}

@@ -7,7 +7,7 @@
 // Aria component
 struct Player
 {
-	
+
 };
 
 // Enemy component
@@ -36,6 +36,7 @@ struct Resources
 	float maxHealth = 100.f;
 	float currentHealth = 100.f;
 	float mana = 100.f;
+	Entity healthBar;
 };
 
 struct HealthBar
