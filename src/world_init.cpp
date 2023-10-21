@@ -7,9 +7,12 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
-Entity createTerrain(vec2 pos, vec2 size)
+Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size)
 {
 	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::TERRAIN);
+	registry.meshPtrs.emplace(entity, &mesh);
 
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
@@ -55,8 +58,11 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
-Entity createExitDoor(vec2 pos) {
+Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::EXIT_DOOR);
+	registry.meshPtrs.emplace(entity, &mesh);
 
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
@@ -117,7 +123,7 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel) {
 	// Set initial position and velocity for the projectile
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
-	//position.scale = ??
+	position.scale = vec2(10.f, 10.f);
 
 	registry.projectiles.emplace(entity);
 	registry.collidables.emplace(entity);

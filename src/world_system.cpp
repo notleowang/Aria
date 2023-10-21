@@ -176,12 +176,17 @@ void WorldSystem::restart_game() {
 
 	// !!!
 	// Remove all entities that we created
+	// This might be overkill. Everything that has velocity should already have a position, etc.
+	// Just being safe
 	while (registry.positions.entities.size() > 0)
 	    registry.remove_all_components_of(registry.positions.entities.back());
 	while (registry.velocities.entities.size() > 0)
 		registry.remove_all_components_of(registry.velocities.entities.back());
 	while (registry.resources.entities.size() > 0)
 		registry.remove_all_components_of(registry.resources.entities.back());
+	while(registry.collidables.entities.size() > 0)
+		registry.remove_all_components_of(registry.collidables.entities.back());
+
 
 	// Debugging for memory/component leaks
 	registry.list_all_components();
@@ -191,7 +196,7 @@ void WorldSystem::restart_game() {
 
 	for (uint i = 0; i < this->terrains_attrs.size(); i++) {
 		vec4 terrain_i = this->terrains_attrs[i];
-		createTerrain(vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]));
+		createTerrain(renderer, vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]));
 	}
 
 	for (uint i = 0; i < this->enemies_attrs.size(); i++) {
@@ -199,7 +204,7 @@ void WorldSystem::restart_game() {
 		createEnemy(renderer, vec2(enemy_i[0], enemy_i[1]));
 	}
 
-	createExitDoor(this->exit_door_pos);
+	createExitDoor(renderer, this->exit_door_pos);
 }
 
 void WorldSystem::win_level() {

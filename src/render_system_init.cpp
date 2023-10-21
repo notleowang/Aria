@@ -161,21 +161,18 @@ void RenderSystem::initializeGlGeometryBuffers()
 
 	// Counterclockwise as it's the default opengl front winding direction.
 	const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
+	//int sprite_index = (int)GEOMETRY_BUFFER_ID::SPRITE;
+	//meshes[sprite_index].vertices = textured_vertices;
+	//meshes[sprite_index].vertex_indices = textured_indices;
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::SPRITE, textured_vertices, textured_indices);
 
 	// Initializing terrain
 	std::vector<ColoredVertex> terrain_vertices(4);
-	std::vector<uint16_t> terrain_indices;
 	terrain_vertices[0].position = {-0.5, -0.5, -0.1};
 	terrain_vertices[1].position = {-0.5, 0.5, -0.1};
 	terrain_vertices[2].position = {0.5, -0.5, -0.1};
 	terrain_vertices[3].position  = {0.5, 0.5, -0.1};
-	terrain_indices.push_back(0);
-	terrain_indices.push_back(1);
-	terrain_indices.push_back(2);
-	terrain_indices.push_back(1);
-	terrain_indices.push_back(3);
-	terrain_indices.push_back(2);
+	const std::vector<uint16_t> terrain_indices = { 0, 1, 2, 1, 2, 3 };
 	int geom_index = (int)GEOMETRY_BUFFER_ID::TERRAIN;
 	meshes[geom_index].vertices = terrain_vertices;
 	meshes[geom_index].vertex_indices = terrain_indices;
@@ -184,17 +181,11 @@ void RenderSystem::initializeGlGeometryBuffers()
 	// Initializing exit door
 	// TODO: change exit door sprite
 	std::vector<ColoredVertex> exit_door_vertices(4);
-	std::vector<uint16_t> exit_door_indices;
 	exit_door_vertices[0].position = { -0.5, -0.5, -0.1 };
 	exit_door_vertices[1].position = { -0.5, 0.5, -0.1 };
 	exit_door_vertices[2].position = { 0.5, -0.5, -0.1 };
 	exit_door_vertices[3].position = { 0.5, 0.5, -0.1 };
-	exit_door_indices.push_back(0);
-	exit_door_indices.push_back(1);
-	exit_door_indices.push_back(2);
-	exit_door_indices.push_back(1);
-	exit_door_indices.push_back(3);
-	exit_door_indices.push_back(2);
+	const std::vector<uint16_t> exit_door_indices = { 0, 1, 2, 1, 2, 3 };
 	int geom_index_door = (int)GEOMETRY_BUFFER_ID::EXIT_DOOR;
 	meshes[geom_index_door].vertices = exit_door_vertices;
 	meshes[geom_index_door].vertex_indices = exit_door_indices;
