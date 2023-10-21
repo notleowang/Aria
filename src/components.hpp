@@ -47,6 +47,7 @@ struct Projectiles
 struct Position {
 	vec2 position = { 0.f, 0.f };
 	vec2 scale = { 10.f, 10.f };
+	vec2 prev_position = { 0.f, 0.f };
 };
 
 // Data relevant to velocity of entities

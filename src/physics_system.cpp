@@ -38,14 +38,11 @@ bool diagonalCollides(Entity& ent_i, Entity& ent_j)
 	Entity* entity_i = &ent_i;
 	Entity* entity_j = &ent_j;
 
-	//bool flag = false;
-
 	for (int obj = 0; obj < 2; obj++) {
 		if (obj == 1) {
 			entity_i = &ent_j;
 			entity_j = &ent_i;
 		}
-
 		std::vector<ColoredVertex> i_vertices = registry.meshPtrs.get(*entity_i)->vertices;
 		std::vector<ColoredVertex> j_vertices = registry.meshPtrs.get(*entity_j)->vertices;
 		// figure how to get vertices of things also made for textures
@@ -59,8 +56,6 @@ bool diagonalCollides(Entity& ent_i, Entity& ent_j)
 			// Will need to add rotation into transformation as well
 			vec2 i_line_end = worldTransform(vec2(i_vertices[i].position.x, i_vertices[i].position.y), position_i);
 
-			//vec2 displacement = vec2(0, 0);
-
 			for (uint j = 0; j < j_vertices.size(); j++) {
 				uint next_point = (j + 1) % j_vertices.size();		
 				vec2 j_line_start = worldTransform(vec2(j_vertices[j].position.x, j_vertices[j].position.y), position_j);
@@ -73,23 +68,9 @@ bool diagonalCollides(Entity& ent_i, Entity& ent_j)
 
 				if (t >= 0.0f && t < 1.0f && r >= 0.0f && r < 1.0f) 
 				{
-					//displacement.x += (1.0f - t) * (i_line_end.x - i_line_start.x);
-					//displacement.y += (1.0f - t) * (i_line_end.y - i_line_start.y);
 					return true;
-					//flag = true;
 				}
 			}
-
-			//// player_i was penetrating j so we need to pull it back (-)
-			//if (registry.players.has(*entity_i)) {
-			//	position_i.position.x -= displacement.x;
-			//	position_i.position.y -= displacement.y;
-			//}
-			//// player_j was being penetrated so it gets pushed back (+)
-			//else if (registry.players.has(*entity_j)) {
-			//	position_j.position.x += displacement.x;
-			//	position_j.position.y += displacement.y;
-			//}
 		}
 	}
 	return false;
@@ -140,6 +121,7 @@ void PhysicsSystem::step(float elapsed_ms)
 		Entity entity = velocity_container.entities[i];
 		Position& position = registry.positions.get(entity);
 		float step_seconds = elapsed_ms / 1000.f;
+		position.prev_position = position.position;
 		position.position[0] += step_seconds * velocity.velocity[0];
 		position.position[1] += step_seconds * velocity.velocity[1];
 	}

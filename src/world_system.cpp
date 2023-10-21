@@ -241,8 +241,9 @@ void WorldSystem::handle_collisions() {
 
 		// Checking Player - Terrain Collisions
 		if (registry.players.has(entity) && registry.terrain.has(entity_other)) {
-			// handle player - terrain collision
-			printf("player - terrain collision\n");
+			// Figure out how to resolve x and y separately so we can continue moving parallel to the wall
+			Position& player_position = registry.positions.get(entity);
+			player_position.position = player_position.prev_position;
 		}
 
 		// Checking Projectile - Enemy collisions
