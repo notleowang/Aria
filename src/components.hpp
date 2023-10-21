@@ -176,7 +176,8 @@ enum class TEXTURE_ASSET_ID {
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
 enum class EFFECT_ASSET_ID {
-	COLOURED = 0,
+	ARIA = 0,
+	COLOURED = ARIA + 1,
 	SALMON = COLOURED + 1,
 	TEXTURED = SALMON + 1,
 	WATER = TEXTURED + 1,
@@ -187,7 +188,8 @@ enum class EFFECT_ASSET_ID {
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
 enum class GEOMETRY_BUFFER_ID {
-	SALMON = 0,
+	ARIA = 0,
+	SALMON = ARIA + 1,
 	SPRITE = SALMON + 1,
 	DEBUG_LINE = SPRITE + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,

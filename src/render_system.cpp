@@ -66,7 +66,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
 	}
-	else if (render_request.used_effect == EFFECT_ASSET_ID::SALMON || 
+	else if (render_request.used_effect == EFFECT_ASSET_ID::SALMON || render_request.used_effect == EFFECT_ASSET_ID::ARIA ||
 		render_request.used_effect == EFFECT_ASSET_ID::TERRAIN || render_request.used_effect == EFFECT_ASSET_ID::EXIT_DOOR)
 	{
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");

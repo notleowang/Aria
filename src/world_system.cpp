@@ -192,7 +192,8 @@ void WorldSystem::restart_game() {
 	registry.list_all_components();
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
-	player = createTestSalmon(renderer, this->player_starting_pos);
+	//player = createTestSalmon(renderer, this->player_starting_pos);
+	player = createAria(renderer, this->player_starting_pos);
 
 	for (uint i = 0; i < this->terrains_attrs.size(); i++) {
 		vec4 terrain_i = this->terrains_attrs[i];

@@ -39,13 +39,14 @@ bool diagonalCollides(Entity& ent_i, Entity& ent_j)
 
 		std::vector<ColoredVertex> i_vertices = registry.meshPtrs.get(entity_i)->vertices;
 		std::vector<ColoredVertex> j_vertices = registry.meshPtrs.get(entity_j)->vertices;
+		// get vertices of things also made for textures
 		Position& position_i = registry.positions.get(entity_i);
 		Position& position_j = registry.positions.get(entity_j);
 
 		for (uint i = 0; i < i_vertices.size(); i++) {
 			vec2 i_line_start = position_i.position;
 			vec2 i_line_end = vec2(i_vertices[i].position.x * position_i.scale.x + position_i.position.x,
-				i_vertices[i].position[1] * position_i.scale.y + position_i.position.y);
+				i_vertices[i].position.y * position_i.scale.y + position_i.position.y);
 
 			for (uint j = 0; j < j_vertices.size(); j++) {
 				uint next_point = (j + 1) % j_vertices.size();
@@ -58,7 +59,7 @@ bool diagonalCollides(Entity& ent_i, Entity& ent_j)
 				// Line segment intersection
 				float h = (j_line_end.x - j_line_start.x) * (i_line_start.y - i_line_end.y) - (i_line_start.x - i_line_end.x) * (j_line_end.y - j_line_start.y);
 				float t = ((j_line_start.y - j_line_end.y) * (i_line_start.x - j_line_start.x) + (j_line_end.x - j_line_start.x) * (i_line_start.y - j_line_start.y)) / h;
-				float r = ((i_line_start.y - i_line_end.y) * (i_line_start.x - j_line_start.x) + (i_line_end.x - i_line_start.x) * (i_line_start.x - j_line_start.y)) / h;
+				float r = ((i_line_start.y - i_line_end.y) * (i_line_start.x - j_line_start.x) + (i_line_end.x - i_line_start.x) * (i_line_start.y - j_line_start.y)) / h;
 
 				if (t >= 0.0f && t < 1.0f && r >= 0.0f && r < 1.0f) {
 					return true;
@@ -124,7 +125,8 @@ void PhysicsSystem::step(float elapsed_ms)
 		Entity entity_i = collidables_container.entities[i];
 		for (uint j = i+1; j < collidables_container.size(); j++) {
 			Entity entity_j = collidables_container.entities[j];
-			if (shouldIgnoreCollision(entity_i, entity_j)) continue; // Ignore terrain-terrain collision
+			// Ignore terrain-terrain and terrain-exitDoor collision
+			if (shouldIgnoreCollision(entity_i, entity_j)) continue; 
 			// Broad phase of collision check
 			if (AABBCollides(entity_i, entity_j)) {
 				// Narrow phase of collision check (Get vertices from mesh)

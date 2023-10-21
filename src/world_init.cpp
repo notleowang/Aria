@@ -4,6 +4,32 @@
 Entity createAria(RenderSystem* renderer, vec2 pos)
 {
 	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::ARIA);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// set initial component values
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	position.scale = vec2(100.f, 100.f);
+
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity = { 0.f, 0.f };
+
+	Resources& resources = registry.resources.emplace(entity);
+
+	Direction& direction = registry.directions.emplace(entity);
+	direction.direction = DIRECTION::E;
+
+	registry.players.emplace(entity);
+	registry.collidables.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TODO: CHANGE TEXTURE OF ARIA
+			EFFECT_ASSET_ID::ARIA,
+			GEOMETRY_BUFFER_ID::ARIA});
+
 	return entity;
 }
 

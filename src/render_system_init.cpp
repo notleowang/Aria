@@ -161,18 +161,30 @@ void RenderSystem::initializeGlGeometryBuffers()
 
 	// Counterclockwise as it's the default opengl front winding direction.
 	const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
-	//int sprite_index = (int)GEOMETRY_BUFFER_ID::SPRITE;
-	//meshes[sprite_index].vertices = textured_vertices;
-	//meshes[sprite_index].vertex_indices = textured_indices;
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::SPRITE, textured_vertices, textured_indices);
+
+
+	// Initializing aria
+	int geom_aria_index = (int)GEOMETRY_BUFFER_ID::ARIA;
+	std::vector<ColoredVertex> aria_vertices(3);
+	aria_vertices[0].position = {0.f, -0.5f, 0.f};
+	aria_vertices[1].position = {-0.5f, 0.5f, 0.f};
+	aria_vertices[2].position = {0.5f, 0.5f, 0.f};
+	meshes[geom_aria_index].vertices = aria_vertices;
+	const std::vector<uint16_t> aria_indices = { 0, 1, 2 };
+	meshes[geom_aria_index].vertex_indices = aria_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::ARIA, meshes[geom_aria_index].vertices, meshes[geom_aria_index].vertex_indices);
+
+
+;	// !!! TODO: INITIALIZE MESH BASED ON ENEMY DESIGN
 
 	// Initializing terrain
 	std::vector<ColoredVertex> terrain_vertices(4);
 	terrain_vertices[0].position = {-0.5, -0.5, -0.1};
 	terrain_vertices[1].position = {-0.5, 0.5, -0.1};
-	terrain_vertices[2].position = {0.5, -0.5, -0.1};
-	terrain_vertices[3].position  = {0.5, 0.5, -0.1};
-	const std::vector<uint16_t> terrain_indices = { 0, 1, 2, 1, 2, 3 };
+	terrain_vertices[2].position  = {0.5, 0.5, -0.1};
+	terrain_vertices[3].position = {0.5, -0.5, -0.1};
+	const std::vector<uint16_t> terrain_indices = { 0, 1, 2, 0, 2, 3 };
 	int geom_index = (int)GEOMETRY_BUFFER_ID::TERRAIN;
 	meshes[geom_index].vertices = terrain_vertices;
 	meshes[geom_index].vertex_indices = terrain_indices;
@@ -183,9 +195,9 @@ void RenderSystem::initializeGlGeometryBuffers()
 	std::vector<ColoredVertex> exit_door_vertices(4);
 	exit_door_vertices[0].position = { -0.5, -0.5, -0.1 };
 	exit_door_vertices[1].position = { -0.5, 0.5, -0.1 };
-	exit_door_vertices[2].position = { 0.5, -0.5, -0.1 };
-	exit_door_vertices[3].position = { 0.5, 0.5, -0.1 };
-	const std::vector<uint16_t> exit_door_indices = { 0, 1, 2, 1, 2, 3 };
+	exit_door_vertices[2].position = { 0.5, 0.5, -0.1 };
+	exit_door_vertices[3].position = { 0.5, -0.5, -0.1 };
+	const std::vector<uint16_t> exit_door_indices = { 0, 1, 2, 0, 2, 3 };
 	int geom_index_door = (int)GEOMETRY_BUFFER_ID::EXIT_DOOR;
 	meshes[geom_index_door].vertices = exit_door_vertices;
 	meshes[geom_index_door].vertex_indices = exit_door_indices;
