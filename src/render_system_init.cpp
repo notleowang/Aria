@@ -162,21 +162,43 @@ void RenderSystem::initializeGlGeometryBuffers()
 	// Counterclockwise as it's the default opengl front winding direction.
 	const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::SPRITE, textured_vertices, textured_indices);
+	
+	// Note: This is just a copy of vertices from textured_vertices
+	// We should change the vertices based on our design of individual sprites
+	int geom_sprite_index = (int)GEOMETRY_BUFFER_ID::SPRITE;
+	std::vector<ColoredVertex> sprite_vertices(4);
+	sprite_vertices[0].position = { -1.f/2, +1.f/2, 0.f };
+	sprite_vertices[1].position = { +1.f/2, +1.f/2, 0.f };
+	sprite_vertices[2].position = { +1.f/2, -1.f/2, 0.f };
+	sprite_vertices[3].position = { -1.f/2, -1.f/2, 0.f };
+	meshes[geom_sprite_index].vertices = sprite_vertices;
+	meshes[geom_sprite_index].vertex_indices = textured_indices;
 
 
 	// Initializing aria
 	int geom_aria_index = (int)GEOMETRY_BUFFER_ID::ARIA;
+	// Triangle
 	std::vector<ColoredVertex> aria_vertices(3);
 	aria_vertices[0].position = {0.f, -0.5f, 0.f};
 	aria_vertices[1].position = {-0.5f, 0.5f, 0.f};
 	aria_vertices[2].position = {0.5f, 0.5f, 0.f};
 	meshes[geom_aria_index].vertices = aria_vertices;
 	const std::vector<uint16_t> aria_indices = { 0, 1, 2 };
+	
+	// Square
+	//std::vector<ColoredVertex> aria_vertices(4);
+	//aria_vertices[0].position = {-0.5f, -0.5f, 0.f};
+	//aria_vertices[1].position = {-0.5f, 0.5f, 0.f};
+	//aria_vertices[2].position = {0.5f, 0.5f, 0.f};
+	//aria_vertices[3].position = {0.5f, -0.5f, 0.f};
+	//meshes[geom_aria_index].vertices = aria_vertices;
+	//const std::vector<uint16_t> aria_indices = { 0, 1, 2, 0, 2, 3};
+
 	meshes[geom_aria_index].vertex_indices = aria_indices;
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::ARIA, meshes[geom_aria_index].vertices, meshes[geom_aria_index].vertex_indices);
 
 
-;	// !!! TODO: INITIALIZE MESH BASED ON ENEMY DESIGN
+;	// !!! TODO: INITIALIZE MESH BASED ON ENEMY DESIGN (Currently just a square; see above in GEOM.::SPRITE)
 
 	// Initializing terrain
 	std::vector<ColoredVertex> terrain_vertices(4);

@@ -239,6 +239,12 @@ void WorldSystem::handle_collisions() {
 			}
 		}
 
+		// Checking Player - Terrain Collisions
+		if (registry.players.has(entity) && registry.terrain.has(entity_other)) {
+			// handle player - terrain collision
+			printf("player - terrain collision\n");
+		}
+
 		// Checking Projectile - Enemy collisions
 		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity)) {
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
@@ -257,6 +263,7 @@ void WorldSystem::handle_collisions() {
 			registry.remove_all_components_of(entity);
 		}
 
+		// Checking Player - Exit Door collision
 		if (registry.players.has(entity) && registry.exitDoors.has(entity_other)) {
 			win_level();
 		}
