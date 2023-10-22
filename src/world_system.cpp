@@ -208,6 +208,30 @@ void WorldSystem::restart_game() {
 	createExitDoor(renderer, this->exit_door_pos);
 }
 
+bool collidedLeft(Position& pos_i, Position& pos_j) 
+{
+	return (((pos_i.prev_position.x + abs(pos_i.scale.x / 2)) < (pos_j.position.x - abs(pos_j.scale.x / 2))) &&
+		((pos_i.position.x + abs(pos_i.scale.x / 2)) >= (pos_j.position.x - abs(pos_j.scale.x/2))));
+}
+
+bool collidedRight(Position& pos_i, Position& pos_j) 
+{
+	return (((pos_i.prev_position.x - abs(pos_i.scale.x / 2)) >= (pos_j.position.x + abs(pos_j.scale.x / 2))) &&
+		((pos_i.position.x - abs(pos_i.scale.x / 2)) < (pos_j.position.x + abs(pos_j.scale.x/2))));
+}
+
+bool collidedTop(Position& pos_i, Position& pos_j) 
+{
+	return (((pos_i.prev_position.y + abs(pos_i.scale.y / 2)) < (pos_j.position.y - abs(pos_j.scale.y / 2))) &&
+		((pos_i.position.y + abs(pos_i.scale.y / 2)) >= (pos_j.position.y - abs(pos_j.scale.y/2))));
+}
+
+bool collidedBottom(Position& pos_i, Position& pos_j) 
+{
+	return (((pos_i.prev_position.y - abs(pos_i.scale.y / 2)) >= (pos_j.position.y + abs(pos_j.scale.y / 2))) &&
+		((pos_i.position.y - abs(pos_i.scale.x / 2)) < (pos_j.position.x + abs(pos_j.scale.x/2))));
+}
+
 void WorldSystem::win_level() {
 	printf("hooray you won the level\n");
 	this->levelDone = true;
@@ -241,9 +265,31 @@ void WorldSystem::handle_collisions() {
 
 		// Checking Player - Terrain Collisions
 		if (registry.players.has(entity) && registry.terrain.has(entity_other)) {
-			// Figure out how to resolve x and y separately so we can continue moving parallel to the wall
 			Position& player_position = registry.positions.get(entity);
-			player_position.position = player_position.prev_position;
+			Position& terrain_position = registry.positions.get(entity_other);
+			if (collidedLeft(player_position, terrain_position) || collidedRight(player_position, terrain_position)) {
+				player_position.position.x = player_position.prev_position.x;
+			} else if (collidedTop(player_position, terrain_position) || collidedBottom(player_position, terrain_position)) {
+				player_position.position.y = player_position.prev_position.y;
+			}
+			else { // Collided on diagonal, displace based on vector
+				player_position.position += collisionsRegistry.components[i].displacement;
+			}
+		}
+		
+		// Checking Enemy - Terrain Collisions
+		if (registry.enemies.has(entity) && registry.terrain.has(entity_other)) {
+			Position& enemy_position = registry.positions.get(entity);
+			Position& terrain_position = registry.positions.get(entity_other);
+			if (collidedLeft(enemy_position, terrain_position) || collidedRight(enemy_position, terrain_position)) {
+				enemy_position.position.x = enemy_position.prev_position.x;
+			}
+			else if (collidedTop(enemy_position, terrain_position) || collidedBottom(enemy_position, terrain_position)) {
+				enemy_position.position.y = enemy_position.prev_position.y;
+			}
+			else { // Collided on diagonal, displace based on vector
+				enemy_position.position += collisionsRegistry.components[i].displacement;
+			}
 		}
 
 		// Checking Projectile - Enemy collisions

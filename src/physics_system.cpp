@@ -33,10 +33,11 @@ vec2 worldTransform(vec2 coords, Position& position) {
 
 // Reference: 
 // https://github.com/OneLoneCoder/Javidx9/blob/master/PixelGameEngine/SmallerProjects/OneLoneCoder_PGE_PolygonCollisions1.cpp?fbclid=IwAR1e0EyRPtFFGmg1EuiiKU9JxBwOAFN42YA3LIvfm0GHspBbE1df43ZeCz8
-bool diagonalCollides(Entity& ent_i, Entity& ent_j) 
+void diagonalCollides(Entity& ent_i, Entity& ent_j) 
 {
 	Entity* entity_i = &ent_i;
 	Entity* entity_j = &ent_j;
+	bool flag = false;
 
 	for (int obj = 0; obj < 2; obj++) {
 		if (obj == 1) {
@@ -55,6 +56,7 @@ bool diagonalCollides(Entity& ent_i, Entity& ent_j)
 			vec2 i_line_start = position_i.position;
 			// Will need to add rotation into transformation as well
 			vec2 i_line_end = worldTransform(vec2(i_vertices[i].position.x, i_vertices[i].position.y), position_i);
+			vec2 displacement = { 0, 0 };
 
 			for (uint j = 0; j < j_vertices.size(); j++) {
 				uint next_point = (j + 1) % j_vertices.size();		
@@ -68,12 +70,21 @@ bool diagonalCollides(Entity& ent_i, Entity& ent_j)
 
 				if (t >= 0.0f && t < 1.0f && r >= 0.0f && r < 1.0f) 
 				{
-					return true;
+					displacement.x += (1.0f - t) * (i_line_end.x - i_line_start.x);
+					displacement.y += (1.0f - t) * (i_line_end.y - i_line_start.y);
+					flag = true;
 				}
+			}
+			if (flag) {
+				// ent_i is obj = 0 meaning it penetrated ent_j, so displacement is negative so we pull back ent_i's position
+				registry.collisions.emplace_with_duplicates(ent_i, ent_j, (obj == 0) ? -displacement : displacement);
+				// ent_j is obj = 0 meaning it penetrated ent_i, so displacement is positive to push away ent_i
+				registry.collisions.emplace_with_duplicates(ent_j, ent_i, (obj == 0) ? displacement : -displacement);
+				return;
 			}
 		}
 	}
-	return false;
+	return;
 }
 
 // Function that checks if two entities collides using an axis-aligned bounding-box implementation.
@@ -136,12 +147,8 @@ void PhysicsSystem::step(float elapsed_ms)
 			if (shouldIgnoreCollision(entity_i, entity_j)) continue; 
 			// Broad phase of collision check
 			if (AABBCollides(entity_i, entity_j)) {
-				// Narrow phase of collision check (Get vertices from mesh)
-				if (diagonalCollides(entity_i, entity_j)) {
-					// Add to collisions container
-					registry.collisions.emplace_with_duplicates(entity_i, entity_j);
-					registry.collisions.emplace_with_duplicates(entity_j, entity_i);
-				}
+				// Narrow phase of collision check
+				diagonalCollides(entity_i, entity_j);
 			}
 
 		}

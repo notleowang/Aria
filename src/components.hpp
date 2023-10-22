@@ -78,8 +78,10 @@ struct Collision
 {
 	// Note, the first object is stored in the ECS container.entities
 	Entity other_entity; // the second object involved in the collision
-	Collision(Entity& other_entity) { 
+	vec2 displacement;
+	Collision(Entity& other_entity, vec2 displacement) { 
 		this->other_entity = other_entity;
+		this->displacement = displacement;
 	};
 };
 
