@@ -271,10 +271,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	Direction& player_direction = registry.directions.get(player);
 
 	// get states of each arrow key
-	int state_up = glfwGetKey(window, GLFW_KEY_UP);
-	int state_down = glfwGetKey(window, GLFW_KEY_DOWN);
-	int state_left = glfwGetKey(window, GLFW_KEY_LEFT);
-	int state_right = glfwGetKey(window, GLFW_KEY_RIGHT);
+	int state_up = glfwGetKey(window, GLFW_KEY_W);
+	int state_down = glfwGetKey(window, GLFW_KEY_S);
+	int state_left = glfwGetKey(window, GLFW_KEY_A);
+	int state_right = glfwGetKey(window, GLFW_KEY_D);
 
 	DIRECTION new_direction = DIRECTION::NONE;
 
