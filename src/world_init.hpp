@@ -15,10 +15,10 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel);
 Entity createLine(vec2 position, vec2 size);
 
 // creates a terrain with fixed size
-Entity createTerrain(vec2 pos, vec2 size);
+Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size);
 
 // creates an exit door
-Entity createExitDoor(vec2 pos);
+Entity createExitDoor(RenderSystem* renderer, vec2 pos);
 
 // mock enemy TODO: change enemy implementation
 Entity createEnemy(RenderSystem* renderer, vec2 pos);

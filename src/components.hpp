@@ -55,6 +55,7 @@ struct Projectiles
 struct Position {
 	vec2 position = { 0.f, 0.f };
 	vec2 scale = { 10.f, 10.f };
+	vec2 prev_position = { 0.f, 0.f };
 };
 
 // Data relevant to velocity of entities
@@ -85,12 +86,18 @@ struct Collision
 {
 	// Note, the first object is stored in the ECS container.entities
 	Entity other_entity; // the second object involved in the collision
-	int direction; // 0 = left, 1 = right, 2 = up, 3 = down
-	               // The object collides to the <direction> of the other entity
-	Collision(Entity& other_entity, int direction) { 
-		this->other_entity = other_entity; 
-		this->direction = direction;
+	vec2 displacement;
+	Collision(Entity& other_entity, vec2 displacement) { 
+		this->other_entity = other_entity;
+		this->displacement = displacement;
 	};
+};
+
+// Component container that marks an entity as being collidable
+// Will be: players, enemies, terrain, projectiles, etc.
+struct Collidable
+{
+
 };
 
 // Data structure for toggling debug mode
@@ -182,7 +189,8 @@ enum class TEXTURE_ASSET_ID {
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
 enum class EFFECT_ASSET_ID {
-	COLOURED = 0,
+	ARIA = 0,
+	COLOURED = ARIA + 1,
 	SALMON = COLOURED + 1,
 	TEXTURED = SALMON + 1,
 	WATER = TEXTURED + 1,
@@ -194,8 +202,10 @@ enum class EFFECT_ASSET_ID {
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
 enum class GEOMETRY_BUFFER_ID {
-	SALMON = 0,
+	ARIA = 0,
+	SALMON = ARIA + 1,
 	SPRITE = SALMON + 1,
+	TURTLE = SPRITE + 1,
 	DEBUG_LINE = SPRITE + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,
 	TERRAIN = SCREEN_TRIANGLE + 1,
