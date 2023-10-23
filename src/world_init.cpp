@@ -18,6 +18,10 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
+	resources.healthBar = createHealthBar(renderer, entity);
+	
+	HealthBar& healthBar = registry.healthBars.get(resources.healthBar);
+	healthBar.y_offset = -60.f;
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
@@ -92,7 +96,6 @@ Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity)
 
 	HealthBar& healthBar = registry.healthBars.emplace(entity);
 	healthBar.owner = owner_entity;
-	healthBar.y_offset = -50.f;
 
 	Position& position = registry.positions.emplace(entity);
 	position.scale = vec2(HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);

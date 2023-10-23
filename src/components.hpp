@@ -42,7 +42,7 @@ struct Resources
 struct HealthBar
 {
 	Entity owner;
-	float y_offset = 50.f;
+	float y_offset = -50.f;
 };
 
 // Structure to store projectile entities
