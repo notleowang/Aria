@@ -176,22 +176,28 @@ void WorldSystem::restart_game() {
 
 	// !!!
 	// Remove all entities that we created
+	// This might be overkill. Everything that has velocity should already have a position, etc.
+	// Just being safe
 	while (registry.positions.entities.size() > 0)
 	    registry.remove_all_components_of(registry.positions.entities.back());
 	while (registry.velocities.entities.size() > 0)
 		registry.remove_all_components_of(registry.velocities.entities.back());
 	while (registry.resources.entities.size() > 0)
 		registry.remove_all_components_of(registry.resources.entities.back());
+	while(registry.collidables.entities.size() > 0)
+		registry.remove_all_components_of(registry.collidables.entities.back());
+
 
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
-	player = createTestSalmon(renderer, this->player_starting_pos);
+	//player = createTestSalmon(renderer, this->player_starting_pos);
+	player = createAria(renderer, this->player_starting_pos);
 
 	for (uint i = 0; i < this->terrains_attrs.size(); i++) {
 		vec4 terrain_i = this->terrains_attrs[i];
-		createTerrain(vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]));
+		createTerrain(renderer, vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]));
 	}
 
 	for (uint i = 0; i < this->enemies_attrs.size(); i++) {
@@ -199,7 +205,31 @@ void WorldSystem::restart_game() {
 		createEnemy(renderer, vec2(enemy_i[0], enemy_i[1]));
 	}
 
-	createExitDoor(this->exit_door_pos);
+	createExitDoor(renderer, this->exit_door_pos);
+}
+
+bool collidedLeft(Position& pos_i, Position& pos_j) 
+{
+	return (((pos_i.prev_position.x + abs(pos_i.scale.x / 2)) < (pos_j.position.x - abs(pos_j.scale.x / 2))) &&
+		((pos_i.position.x + abs(pos_i.scale.x / 2)) >= (pos_j.position.x - abs(pos_j.scale.x/2))));
+}
+
+bool collidedRight(Position& pos_i, Position& pos_j) 
+{
+	return (((pos_i.prev_position.x - abs(pos_i.scale.x / 2)) >= (pos_j.position.x + abs(pos_j.scale.x / 2))) &&
+		((pos_i.position.x - abs(pos_i.scale.x / 2)) < (pos_j.position.x + abs(pos_j.scale.x/2))));
+}
+
+bool collidedTop(Position& pos_i, Position& pos_j) 
+{
+	return (((pos_i.prev_position.y + abs(pos_i.scale.y / 2)) < (pos_j.position.y - abs(pos_j.scale.y / 2))) &&
+		((pos_i.position.y + abs(pos_i.scale.y / 2)) >= (pos_j.position.y - abs(pos_j.scale.y/2))));
+}
+
+bool collidedBottom(Position& pos_i, Position& pos_j) 
+{
+	return (((pos_i.prev_position.y - abs(pos_i.scale.y / 2)) >= (pos_j.position.y + abs(pos_j.scale.y / 2))) &&
+		((pos_i.position.y - abs(pos_i.scale.x / 2)) < (pos_j.position.x + abs(pos_j.scale.x/2))));
 }
 
 void WorldSystem::win_level() {
@@ -233,6 +263,35 @@ void WorldSystem::handle_collisions() {
 			}
 		}
 
+		// Checking Player - Terrain Collisions
+		if (registry.players.has(entity) && registry.terrain.has(entity_other)) {
+			Position& player_position = registry.positions.get(entity);
+			Position& terrain_position = registry.positions.get(entity_other);
+			if (collidedLeft(player_position, terrain_position) || collidedRight(player_position, terrain_position)) {
+				player_position.position.x = player_position.prev_position.x;
+			} else if (collidedTop(player_position, terrain_position) || collidedBottom(player_position, terrain_position)) {
+				player_position.position.y = player_position.prev_position.y;
+			}
+			else { // Collided on diagonal, displace based on vector
+				player_position.position += collisionsRegistry.components[i].displacement;
+			}
+		}
+		
+		// Checking Enemy - Terrain Collisions
+		if (registry.enemies.has(entity) && registry.terrain.has(entity_other)) {
+			Position& enemy_position = registry.positions.get(entity);
+			Position& terrain_position = registry.positions.get(entity_other);
+			if (collidedLeft(enemy_position, terrain_position) || collidedRight(enemy_position, terrain_position)) {
+				enemy_position.position.x = enemy_position.prev_position.x;
+			}
+			else if (collidedTop(enemy_position, terrain_position) || collidedBottom(enemy_position, terrain_position)) {
+				enemy_position.position.y = enemy_position.prev_position.y;
+			}
+			else { // Collided on diagonal, displace based on vector
+				enemy_position.position += collisionsRegistry.components[i].displacement;
+			}
+		}
+
 		// Checking Projectile - Enemy collisions
 		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity)) {
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
@@ -251,6 +310,7 @@ void WorldSystem::handle_collisions() {
 			registry.remove_all_components_of(entity);
 		}
 
+		// Checking Player - Exit Door collision
 		if (registry.players.has(entity) && registry.exitDoors.has(entity_other)) {
 			win_level();
 		}

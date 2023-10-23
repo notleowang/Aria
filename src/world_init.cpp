@@ -4,18 +4,48 @@
 Entity createAria(RenderSystem* renderer, vec2 pos)
 {
 	auto entity = Entity();
+
+	// Store a reference to the potentially re-used mesh object
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::ARIA);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	// set initial component values
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	position.scale = vec2(100.f, 100.f);
+
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity = { 0.f, 0.f };
+
+	Resources& resources = registry.resources.emplace(entity);
+
+	Direction& direction = registry.directions.emplace(entity);
+	direction.direction = DIRECTION::E;
+
+	registry.players.emplace(entity);
+	registry.collidables.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TODO: CHANGE TEXTURE OF ARIA
+			EFFECT_ASSET_ID::ARIA,
+			GEOMETRY_BUFFER_ID::ARIA});
+
 	return entity;
 }
 
-Entity createTerrain(vec2 pos, vec2 size)
+Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size)
 {
 	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::TERRAIN);
+	registry.meshPtrs.emplace(entity, &mesh);
 
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 	position.scale = size;
 
 	registry.terrain.emplace(entity);
+	registry.collidables.emplace(entity); // Marking terrain as collidable
 	registry.renderRequests.insert(
 		entity, 
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
@@ -40,8 +70,8 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 	position.scale = vec2({ 75, 50 });
 
 
-	// Create and (empty) Turtle component to be able to refer to all turtles
 	registry.enemies.emplace(entity);
+	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::TURTLE,
@@ -54,14 +84,18 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
-Entity createExitDoor(vec2 pos) {
+Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::EXIT_DOOR);
+	registry.meshPtrs.emplace(entity, &mesh);
 
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 	position.scale = vec2(100.f, 100.f);
 
 	registry.exitDoors.emplace(entity);
+	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
@@ -94,8 +128,8 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
 
-	// Create and (empty) Salmon component to be able to refer to all turtles
 	registry.players.emplace(entity);
+	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
@@ -115,10 +149,10 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel) {
 	// Set initial position and velocity for the projectile
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
-	//position.scale = ??
+	position.scale = vec2(10.f, 10.f);
 
 	registry.projectiles.emplace(entity);
-
+	registry.collidables.emplace(entity);
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = vel;
 

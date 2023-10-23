@@ -19,6 +19,7 @@ public:
 	ComponentContainer<Velocity> velocities;
 	ComponentContainer<Direction> directions;
 	ComponentContainer<Collision> collisions;
+	ComponentContainer<Collidable> collidables;
 	ComponentContainer<Player> players;
 	ComponentContainer<Enemy> enemies;
 	ComponentContainer<Terrain> terrain;
@@ -41,6 +42,7 @@ public:
 		registry_list.push_back(&velocities);
 		registry_list.push_back(&directions);
 		registry_list.push_back(&collisions);
+		registry_list.push_back(&collidables);
 		registry_list.push_back(&players);
 		registry_list.push_back(&enemies);
 		registry_list.push_back(&terrain);
