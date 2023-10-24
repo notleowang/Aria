@@ -277,15 +277,12 @@ void WorldSystem::handle_collisions() {
 
 			if (collidedLeft(player_position, terrain_position) || collidedRight(player_position, terrain_position)) {
 				player_position.position.x = player_position.prev_position.x;
-				//health_bar_position.position.x = player_position.position.x;
 
 			} else if (collidedTop(player_position, terrain_position) || collidedBottom(player_position, terrain_position)) {
 				player_position.position.y = player_position.prev_position.y;
-				//health_bar_position.position.y = player_position.position.y;
 			}
 			else { // Collided on diagonal, displace based on vector
 				player_position.position += collisionsRegistry.components[i].displacement;
-				//health_bar_position.position = player_position.position;
 			}
 			// update health bar position to remove jitter
 			health_bar_position.position = player_position.position;
@@ -296,7 +293,7 @@ void WorldSystem::handle_collisions() {
 		if (registry.enemies.has(entity) && registry.terrain.has(entity_other)) {
 			Position& enemy_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
-
+      
 			// TODO: make sure enemy has all this stuff and this wont be awful
 			// TODO: REFACTOR
 			Resources& resources = registry.resources.get(entity);
@@ -313,6 +310,7 @@ void WorldSystem::handle_collisions() {
 			else { // Collided on diagonal, displace based on vector
 				enemy_position.position += collisionsRegistry.components[i].displacement;
 			}
+
 			// update health bar position to remove jitter
 			health_bar_position.position = enemy_position.position;
 			health_bar_position.position.y += health_bar.y_offset;
