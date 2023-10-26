@@ -193,6 +193,16 @@ void WorldSystem::restart_game() {
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
 	//player = createTestSalmon(renderer, this->player_starting_pos);
+
+	for (uint i = 0; i < 6; i++) {
+		for (uint j = 0; j < 4; j++) {
+			createFloor(renderer, vec2(225 + i*250, 175 + j * 250));
+		}
+	}
+	for (uint i = 0; i < 4; i++) {
+		createFloor(renderer, vec2(1600, 175 + i * 250));
+	}
+
 	player = createAria(renderer, this->player_starting_pos);
 
 	for (uint i = 0; i < this->terrains_attrs.size(); i++) {
