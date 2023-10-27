@@ -33,8 +33,16 @@ struct ExitDoor
 // All data relevant to the resources of entities
 struct Resources
 {
-	float health = 100.f;
+	float maxHealth = 100.f;
+	float currentHealth = 100.f;
 	float mana = 100.f;
+	Entity healthBar;
+};
+
+struct HealthBar
+{
+	Entity owner;
+	float y_offset = -50.f;
 };
 
 // Structure to store projectile entities
@@ -175,7 +183,9 @@ enum class TEXTURE_ASSET_ID {
 	LANDSCAPE = FISH + 1,
 	TURTLE = LANDSCAPE + 1,
 	FLOOR = TURTLE + 1,
-	TEXTURE_COUNT = FLOOR + 1,
+  HEALTH_BAR_EMPTY = FLOOR + 1,
+	HEALTH_BAR_FULL = HEALTH_BAR_EMPTY + 1,
+	TEXTURE_COUNT = HEALTH_BAR_FULL + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -187,7 +197,8 @@ enum class EFFECT_ASSET_ID {
 	WATER = TEXTURED + 1,
 	TERRAIN = WATER + 1,
 	EXIT_DOOR = TERRAIN + 1,
-	EFFECT_COUNT = EXIT_DOOR + 1
+	HEALTH_BAR = EXIT_DOOR + 1,
+	EFFECT_COUNT = HEALTH_BAR + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 

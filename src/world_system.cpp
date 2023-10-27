@@ -260,10 +260,10 @@ void WorldSystem::handle_collisions() {
 			if (!registry.invulnerableTimers.has(entity)) {
 				Mix_PlayChannel(-1, damage_tick_sound, 0);
 				Resources& player_resource = registry.resources.get(entity);
-				player_resource.health -= registry.enemies.get(entity_other).damage;
-				printf("player hp: %f\n", player_resource.health);
+				player_resource.currentHealth -= registry.enemies.get(entity_other).damage;
+				printf("player hp: %f\n", player_resource.currentHealth);
 				registry.invulnerableTimers.emplace(entity);
-				if (player_resource.health <= 0) {
+				if (player_resource.currentHealth <= 0) {
 					registry.deathTimers.emplace(entity);
 					registry.velocities.get(player).velocity = vec2(0.f, 0.f);
 					Mix_PlayChannel(-1, aria_death_sound, 0);
@@ -275,20 +275,40 @@ void WorldSystem::handle_collisions() {
 		if (registry.players.has(entity) && registry.terrain.has(entity_other)) {
 			Position& player_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
+
+			// TODO: make sure player has all this stuff and this wont be awful
+			// TODO: REFACTOR
+			Resources& resources = registry.resources.get(entity);
+			Entity health_bar_entity = resources.healthBar;
+			HealthBar& health_bar = registry.healthBars.get(health_bar_entity);
+			Position& health_bar_position = registry.positions.get(health_bar_entity);
+
 			if (collidedLeft(player_position, terrain_position) || collidedRight(player_position, terrain_position)) {
 				player_position.position.x = player_position.prev_position.x;
+
 			} else if (collidedTop(player_position, terrain_position) || collidedBottom(player_position, terrain_position)) {
 				player_position.position.y = player_position.prev_position.y;
 			}
 			else { // Collided on diagonal, displace based on vector
 				player_position.position += collisionsRegistry.components[i].displacement;
 			}
+			// update health bar position to remove jitter
+			health_bar_position.position = player_position.position;
+			health_bar_position.position.y += health_bar.y_offset;
 		}
 		
 		// Checking Enemy - Terrain Collisions
 		if (registry.enemies.has(entity) && registry.terrain.has(entity_other)) {
 			Position& enemy_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
+      
+			// TODO: make sure enemy has all this stuff and this wont be awful
+			// TODO: REFACTOR
+			Resources& resources = registry.resources.get(entity);
+			Entity health_bar_entity = resources.healthBar;
+			HealthBar& health_bar = registry.healthBars.get(health_bar_entity);
+			Position& health_bar_position = registry.positions.get(health_bar_entity);
+
 			if (collidedLeft(enemy_position, terrain_position) || collidedRight(enemy_position, terrain_position)) {
 				enemy_position.position.x = enemy_position.prev_position.x;
 			}
@@ -298,15 +318,20 @@ void WorldSystem::handle_collisions() {
 			else { // Collided on diagonal, displace based on vector
 				enemy_position.position += collisionsRegistry.components[i].displacement;
 			}
+
+			// update health bar position to remove jitter
+			health_bar_position.position = enemy_position.position;
+			health_bar_position.position.y += health_bar.y_offset;
 		}
 
 		// Checking Projectile - Enemy collisions
 		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity)) {
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
 			Resources& enemy_resource = registry.resources.get(entity_other);
-			enemy_resource.health -= registry.projectiles.get(entity).damage;
-			printf("enemy hp: %f\n", enemy_resource.health);
-			if (enemy_resource.health <= 0) {
+			enemy_resource.currentHealth -= registry.projectiles.get(entity).damage;
+			printf("enemy hp: %f\n", enemy_resource.currentHealth);
+			if (enemy_resource.currentHealth <= 0) {
+				registry.remove_all_components_of(enemy_resource.healthBar);
 				registry.remove_all_components_of(entity_other);
 				Mix_PlayChannel(-1, enemy_death_sound, 0);
 			}

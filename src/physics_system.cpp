@@ -153,4 +153,17 @@ void PhysicsSystem::step(float elapsed_ms)
 
 		}
 	}
+
+	// Position the health bars
+	auto& healthBarContainer = registry.healthBars;
+	for (int i = 0; i < healthBarContainer.size(); i++) {
+		HealthBar& healthBar = healthBarContainer.components[i];
+		Entity entity = healthBarContainer.entities[i];
+
+		Position& position = registry.positions.get(entity);
+		Position& ownerPosition = registry.positions.get(healthBar.owner);
+
+		position.position.x = ownerPosition.position.x;
+		position.position.y = ownerPosition.position.y + healthBar.y_offset;
+	}
 }

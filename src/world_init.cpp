@@ -18,6 +18,10 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
+	resources.healthBar = createHealthBar(renderer, entity);
+	
+	HealthBar& healthBar = registry.healthBars.get(resources.healthBar);
+	healthBar.y_offset = -60.f;
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
@@ -82,11 +86,16 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	auto& position = registry.positions.emplace(entity);
+	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 
 	position.scale = vec2({ 75, 50 });
 
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity.x = 50;
+
+	Resources& resources = registry.resources.emplace(entity);
+	resources.healthBar = createHealthBar(renderer, entity);
 
 	registry.enemies.emplace(entity);
 	registry.collidables.emplace(entity);
@@ -95,9 +104,25 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 		{ TEXTURE_ASSET_ID::TURTLE,
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
-	registry.resources.emplace(entity);
-	auto& velocity = registry.velocities.emplace(entity);
-	velocity.velocity.x = 50;
+
+	return entity;
+}
+
+Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity)
+{
+	auto entity = Entity();
+
+	HealthBar& healthBar = registry.healthBars.emplace(entity);
+	healthBar.owner = owner_entity;
+
+	Position& position = registry.positions.emplace(entity);
+	position.scale = vec2(HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::HEALTH_BAR_EMPTY, // !!! This technically does nothing
+			EFFECT_ASSET_ID::HEALTH_BAR,
+			GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
 }
@@ -142,6 +167,7 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
+	resources.healthBar = createHealthBar(renderer, entity);
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
