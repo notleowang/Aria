@@ -18,6 +18,15 @@ Velocity computeVelocity(double speed, Direction direction) {
     return velocity_component;
 }
 
+// Function to compute the the x and y components of the normalized velocity given speed + angle
+Velocity computeVelocity(double speed, double angle) {
+    Velocity velocity_component;
+    velocity_component.velocity.x = speed * cos(angle);
+    velocity_component.velocity.y = speed * sin(angle);
+
+    return velocity_component;
+}
+
 
 // Function to convert a direction to an angle in radians
 double directionToRadians(DIRECTION direction) {

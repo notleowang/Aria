@@ -83,8 +83,10 @@ GLFWwindow* WorldSystem::create_window() {
 	// http://www.glfw.org/docs/latest/input_guide.html
 	glfwSetWindowUserPointer(window, this);
 	auto key_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2, int _3) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_key(_0, _1, _2, _3); };
+	auto mouse_button_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_mouse_button(_0, _1, _2); };
 	auto cursor_pos_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_mouse_move({ _0, _1 }); };
 	glfwSetKeyCallback(window, key_redirect);
+	glfwSetMouseButtonCallback(window, mouse_button_redirect);
 	glfwSetCursorPosCallback(window, cursor_pos_redirect);
 
 	//////////////////////////////////////
@@ -416,7 +418,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
 		int w, h;
 		glfwGetWindowSize(window, &w, &h);
-	  restart_game();
+		restart_game();
 	}
 
 	// Debugging
@@ -428,8 +430,31 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	//}
 }
 
+void WorldSystem::on_mouse_button(int button, int action, int mod) {
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		double xpos, ypos;
+		//getting cursor position
+		glfwGetCursorPos(window, &xpos, &ypos);
+		printf("Cursor Position at (%f, %f)\n", xpos, ypos);
+
+		Position& position = registry.positions.get(player);
+
+		// calculate angle
+		float deltaX = xpos - (window_width_px / 2);
+		float deltaY = ypos - (window_height_px / 2);
+		float angle = atan2(deltaY, deltaX);
+
+
+		printf("angle: %f\n", angle);
+		Velocity vel = computeVelocity(PROJECTILE_SPEED, angle);
+		vec2 proj_position = position.position;
+		Entity projectile = createProjectile(renderer, proj_position, vel.velocity);
+		Mix_PlayChannel(-1, projectile_sound, 0);
+	}
+}
+
 void WorldSystem::on_mouse_move(vec2 mouse_position) {
 	// We are probably not going to need this on_mouse_move
-
+	
 	(vec2)mouse_position; // dummy to avoid compiler warning
 }
