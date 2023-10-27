@@ -83,8 +83,10 @@ GLFWwindow* WorldSystem::create_window() {
 	// http://www.glfw.org/docs/latest/input_guide.html
 	glfwSetWindowUserPointer(window, this);
 	auto key_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2, int _3) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_key(_0, _1, _2, _3); };
+	auto mouse_button_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_mouse_button(_0, _1, _2); };
 	auto cursor_pos_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_mouse_move({ _0, _1 }); };
 	glfwSetKeyCallback(window, key_redirect);
+	glfwSetMouseButtonCallback(window, mouse_button_redirect);
 	glfwSetCursorPosCallback(window, cursor_pos_redirect);
 
 	//////////////////////////////////////
@@ -115,6 +117,7 @@ GLFWwindow* WorldSystem::create_window() {
 
 void WorldSystem::init(RenderSystem* renderer_arg, GameLevel level) {
 	this->renderer = renderer_arg;
+	this->floor_pos = level.getFloorPos();
 	this->player_starting_pos = level.getPlayerStartingPos();
 	this->exit_door_pos = level.getExitDoorPos();
 	this->terrains_attrs = level.getTerrains();
@@ -193,6 +196,11 @@ void WorldSystem::restart_game() {
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
 	//player = createTestSalmon(renderer, this->player_starting_pos);
+
+	for (uint i = 0; i < this->floor_pos.size(); i++) {
+		createFloor(renderer, floor_pos[i]);
+	}
+
 	player = createAria(renderer, this->player_starting_pos);
 
 	for (uint i = 0; i < this->terrains_attrs.size(); i++) {
@@ -409,39 +417,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		player_velocity = computeVelocity(0.0, player_direction);
 	}
 
-	if (action == GLFW_PRESS && key == GLFW_KEY_SPACE) {
-		Velocity vel = computeVelocity(PROJECTILE_SPEED, player_direction);
-		vec2 proj_position = player_position.position;
-		// TODO: need to figure out the most consistent way to find the middle of the sprites.
-		switch (player_direction.direction) {
-		case DIRECTION::N:
-			proj_position = vec2(player_position.position.x, player_position.position.y - abs(player_position.scale.y / 2));
-			break;
-		case DIRECTION::NE:
-		case DIRECTION::E:
-		case DIRECTION::SE:
-			proj_position = vec2(player_position.position.x + abs(player_position.scale.x / 2), player_position.position.y);
-			break;
-		case DIRECTION::S:
-			proj_position = vec2(player_position.position.x , player_position.position.y + abs(player_position.scale.y/2));
-			break;
-		case DIRECTION::NW:
-		case DIRECTION::W:
-		case DIRECTION::SW:
-			proj_position = vec2(player_position.position.x - abs(player_position.scale.x / 2), player_position.position.y);
-			break;
-		default:
-			break;
-		}
-		Entity projectile = createProjectile(renderer, proj_position, vel.velocity);
-		Mix_PlayChannel(-1, projectile_sound, 0);
-	}
-
 	// Resetting game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
 		int w, h;
 		glfwGetWindowSize(window, &w, &h);
-	  restart_game();
+		restart_game();
 	}
 
 	// Debugging
@@ -453,8 +433,28 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	//}
 }
 
+void WorldSystem::on_mouse_button(int button, int action, int mod) {
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		// get cursor position
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
+
+		// calculate angle
+		float deltaX = xpos - (window_width_px / 2);
+		float deltaY = ypos - (window_height_px / 2);
+		float angle = atan2(deltaY, deltaX);
+
+		// create projectile
+		Position& position = registry.positions.get(player);
+		Velocity vel = computeVelocity(PROJECTILE_SPEED, angle);
+		vec2 proj_position = position.position;
+		Entity projectile = createProjectile(renderer, proj_position, vel.velocity);
+		Mix_PlayChannel(-1, projectile_sound, 0);
+	}
+}
+
 void WorldSystem::on_mouse_move(vec2 mouse_position) {
 	// We are probably not going to need this on_mouse_move
-
+	
 	(vec2)mouse_position; // dummy to avoid compiler warning
 }

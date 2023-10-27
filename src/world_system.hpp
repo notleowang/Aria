@@ -43,6 +43,7 @@ public:
 private:
 	// Input callback functions
 	void on_key(int key, int, int action, int mod);
+	void on_mouse_button(int button, int action, int mod);
 	void on_mouse_move(vec2 pos);
 
 	// restart level
@@ -59,6 +60,7 @@ private:
 	
 	vec2 player_starting_pos;
 	vec2 exit_door_pos;
+	std::vector<vec2> floor_pos;
 	std::vector<vec4> terrains_attrs;
 	std::vector<std::array<float, ENEMY_ATTRIBUTES>> enemies_attrs;
 

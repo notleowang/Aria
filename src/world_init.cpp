@@ -37,6 +37,24 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
+Entity createFloor(RenderSystem* renderer, vec2 pos)
+{
+	auto entity = Entity();
+
+	// set initial component values
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	position.scale = vec2(250.f, 250.f);
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::FLOOR,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
 Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size)
 {
 	auto entity = Entity();

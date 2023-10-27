@@ -32,8 +32,9 @@ class RenderSystem {
 	const std::array<std::string, texture_count> texture_paths = {
 			textures_path("fish.png"),   // Currently keeping this so we know how to import our textures
 			textures_path("landscape.png"),
-			textures_path("turtle.png"),
-			textures_path("health_bar_empty.png"),
+			textures_path("turtle.png") ,
+			textures_path("dungeon_tile.png"),
+      textures_path("health_bar_empty.png"),
 			textures_path("health_bar_full.png")
 	};
 

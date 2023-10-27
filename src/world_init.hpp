@@ -26,6 +26,8 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos);
 // creates a health bar associated with an owner entity
 Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity);
 
+Entity createFloor(RenderSystem* renderer, vec2 pos);
+
 // test
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos);
 
