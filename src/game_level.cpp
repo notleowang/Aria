@@ -5,12 +5,22 @@ bool GameLevel::init(uint level) {
 	if (level <= 0) {	
 		return false;
 	}
+	std::vector<vec2>& floors = this->floor_pos;
 	std::vector<vec4>& terrains = this->terrains_attr;
 	std::vector<std::array<float, ENEMY_ATTRIBUTES>>& enemies = this->enemies_attr;
 
 	switch (level) {
 		case 1:
 		{
+			for (uint i = 0; i < 6; i++) {
+				for (uint j = 0; j < 4; j++) {
+					floors.push_back(vec2(225 + i * 250, 175 + j * 250));
+				}
+			}
+			for (uint i = 0; i < 4; i++) {
+				floors.push_back(vec2(1600, 175 + i * 250));
+			}
+
 			this->player_starting_pos = vec2(200, 700);
 			this->exit_door_pos = vec2(1500, 950);
 

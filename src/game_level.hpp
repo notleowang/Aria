@@ -13,6 +13,10 @@ class GameLevel
 public:
 	vec2 player_starting_pos;
 	vec2 exit_door_pos;
+
+	// pos_x, pos_y
+	std::vector<vec2> floor_pos;
+
 	// pos_x, pos_y, scale_x, scale_y
 	std::vector<vec4> terrains_attr;
 	
@@ -27,6 +31,10 @@ public:
 
 	vec2& getExitDoorPos() {
 		return exit_door_pos;
+	}
+
+	std::vector<vec2>& getFloorPos() {
+		return floor_pos;
 	}
 
 	std::vector<vec4>& getTerrains() {

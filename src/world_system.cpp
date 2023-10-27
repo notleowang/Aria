@@ -117,6 +117,7 @@ GLFWwindow* WorldSystem::create_window() {
 
 void WorldSystem::init(RenderSystem* renderer_arg, GameLevel level) {
 	this->renderer = renderer_arg;
+	this->floor_pos = level.getFloorPos();
 	this->player_starting_pos = level.getPlayerStartingPos();
 	this->exit_door_pos = level.getExitDoorPos();
 	this->terrains_attrs = level.getTerrains();
@@ -195,6 +196,11 @@ void WorldSystem::restart_game() {
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
 	//player = createTestSalmon(renderer, this->player_starting_pos);
+
+	for (uint i = 0; i < this->floor_pos.size(); i++) {
+		createFloor(renderer, floor_pos[i]);
+	}
+
 	player = createAria(renderer, this->player_starting_pos);
 
 	for (uint i = 0; i < this->terrains_attrs.size(); i++) {
