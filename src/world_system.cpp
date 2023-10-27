@@ -386,34 +386,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		player_velocity = computeVelocity(0.0, player_direction);
 	}
 
-	if (action == GLFW_PRESS && key == GLFW_KEY_SPACE) {
-		Velocity vel = computeVelocity(PROJECTILE_SPEED, player_direction);
-		vec2 proj_position = player_position.position;
-		// TODO: need to figure out the most consistent way to find the middle of the sprites.
-		switch (player_direction.direction) {
-		case DIRECTION::N:
-			proj_position = vec2(player_position.position.x, player_position.position.y - abs(player_position.scale.y / 2));
-			break;
-		case DIRECTION::NE:
-		case DIRECTION::E:
-		case DIRECTION::SE:
-			proj_position = vec2(player_position.position.x + abs(player_position.scale.x / 2), player_position.position.y);
-			break;
-		case DIRECTION::S:
-			proj_position = vec2(player_position.position.x , player_position.position.y + abs(player_position.scale.y/2));
-			break;
-		case DIRECTION::NW:
-		case DIRECTION::W:
-		case DIRECTION::SW:
-			proj_position = vec2(player_position.position.x - abs(player_position.scale.x / 2), player_position.position.y);
-			break;
-		default:
-			break;
-		}
-		Entity projectile = createProjectile(renderer, proj_position, vel.velocity);
-		Mix_PlayChannel(-1, projectile_sound, 0);
-	}
-
 	// Resetting game
 	if (action == GLFW_RELEASE && key == GLFW_KEY_R) {
 		int w, h;
@@ -432,20 +404,17 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 void WorldSystem::on_mouse_button(int button, int action, int mod) {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		// get cursor position
 		double xpos, ypos;
-		//getting cursor position
 		glfwGetCursorPos(window, &xpos, &ypos);
-		printf("Cursor Position at (%f, %f)\n", xpos, ypos);
-
-		Position& position = registry.positions.get(player);
 
 		// calculate angle
 		float deltaX = xpos - (window_width_px / 2);
 		float deltaY = ypos - (window_height_px / 2);
 		float angle = atan2(deltaY, deltaX);
 
-
-		printf("angle: %f\n", angle);
+		// create projectile
+		Position& position = registry.positions.get(player);
 		Velocity vel = computeVelocity(PROJECTILE_SPEED, angle);
 		vec2 proj_position = position.position;
 		Entity projectile = createProjectile(renderer, proj_position, vel.velocity);
