@@ -34,7 +34,7 @@ class RenderSystem {
 			textures_path("landscape.png"),
 			textures_path("turtle.png") ,
 			textures_path("dungeon_tile.png"),
-      textures_path("health_bar_empty.png"),
+			textures_path("health_bar_empty.png"),
 			textures_path("health_bar_full.png")
 	};
 
