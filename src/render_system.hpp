@@ -7,6 +7,14 @@
 #include "components.hpp"
 #include "tiny_ecs.hpp"
 
+// Holds all state information relevant to a character as loaded using FreeType
+struct Character {
+	unsigned int TextureID; // ID handle of the glyph texture
+	ivec2   Size;      // Size of glyph
+	ivec2   Bearing;   // Offset from baseline to left/top of glyph
+	unsigned int Advance;   // Horizontal offset to advance to next glyph
+};
+
 // System responsible for setting up OpenGL and for rendering all the
 // visual entities in the game
 class RenderSystem {
@@ -35,7 +43,8 @@ class RenderSystem {
 			textures_path("turtle.png") ,
 			textures_path("dungeon_tile.png"),
 			textures_path("health_bar_empty.png"),
-			textures_path("health_bar_full.png")
+			textures_path("health_bar_full.png"),
+			textures_path("fonts/PixeloidSans.ttf") // KEEP THIS LAST
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -48,12 +57,17 @@ class RenderSystem {
 		shader_path("water"),
 		shader_path("terrain"),
 		shader_path("exit_door"),
-		shader_path("health_bar")
+		shader_path("health_bar"),
+		shader_path("text_2d")
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
 	std::array<GLuint, geometry_count> index_buffers;
 	std::array<Mesh, geometry_count> meshes;
+
+	GLuint vao;
+	std::unordered_map<GLchar, Character> Characters;
+	mat4 text_projection = ortho(0.0f, static_cast<float>(window_width_px), 0.0f, static_cast<float>(window_height_px));
 
 public:
 	// Initialize the window
@@ -74,6 +88,8 @@ public:
 	// The draw loop first renders to this texture, then it is used for the water
 	// shader
 	bool initScreenTexture();
+
+	void initializeFreeType();
 
 	// Destroy resources associated to one or all entities created by the system
 	~RenderSystem();

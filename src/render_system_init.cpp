@@ -13,16 +13,6 @@
 #include <iostream>
 #include <sstream>
 
-/// Holds all state information relevant to a character as loaded using FreeType
-struct Character {
-	unsigned int TextureID; // ID handle of the glyph texture
-	ivec2   Size;      // Size of glyph
-	ivec2   Bearing;   // Offset from baseline to left/top of glyph
-	unsigned int Advance;   // Horizontal offset to advance to next glyph
-};
-
-std::unordered_map<GLchar, Character> Characters;
-
 // World initialization
 bool RenderSystem::init(GLFWwindow* window_arg)
 {
@@ -60,7 +50,6 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 
 	// We are not really using VAO's but without at least one bound we will crash in
 	// some systems.
-	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	gl_has_errors();
@@ -69,15 +58,87 @@ bool RenderSystem::init(GLFWwindow* window_arg)
     initializeGlTextures();
 	initializeGlEffects();
 	initializeGlGeometryBuffers();
+	//initializeFreeType();
 
 	return true;
 }
+
+//// FreeType reference: https://learnopengl.com/In-Practice/Text-Rendering
+//void RenderSystem::initializeFreeType() {
+//	// FreeType
+//	// --------
+//	FT_Library ft;
+//	// All functions return a value different than 0 whenever an error occurred
+//	if (FT_Init_FreeType(&ft))
+//	{
+//		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+//		return;
+//	}
+//
+//	// load font as face
+//	FT_Face face;
+//	if (FT_New_Face(ft, "../data/fonts/PixeloidSans.ttf", 0, &face)) {
+//		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+//		return;
+//	}
+//	else {
+//		// set size to load glyphs as
+//		FT_Set_Pixel_Sizes(face, 0, 48);
+//
+//		// disable byte-alignment restriction
+//		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+//
+//		// load first 128 characters of ASCII set
+//		for (unsigned char c = 0; c < 128; c++)
+//		{
+//			// Load character glyph 
+//			if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+//			{
+//				std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+//				continue;
+//			}
+//			// generate texture
+//			unsigned int texture = texture_gl_handles.size();
+//			printf("texture value: %i\n", texture);
+//			glGenTextures(1, &texture);
+//			glBindTexture(GL_TEXTURE_2D, texture);
+//			glTexImage2D(
+//				GL_TEXTURE_2D,
+//				0,
+//				GL_RED,
+//				face->glyph->bitmap.width,
+//				face->glyph->bitmap.rows,
+//				0,
+//				GL_RED,
+//				GL_UNSIGNED_BYTE,
+//				face->glyph->bitmap.buffer
+//			);
+//			// set texture options
+//			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//			// now store character for later use
+//			Character character = {
+//				texture,
+//				glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+//				glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+//				static_cast<unsigned int>(face->glyph->advance.x)
+//			};
+//			Characters.insert(std::pair<char, Character>(c, character));
+//		}
+//		glBindTexture(GL_TEXTURE_2D, 0);
+//	}
+//	// destroy FreeType once we're finished
+//	FT_Done_Face(face);
+//	FT_Done_FreeType(ft);
+//}
 
 void RenderSystem::initializeGlTextures()
 {
     glGenTextures((GLsizei)texture_gl_handles.size(), texture_gl_handles.data());
 
-    for(uint i = 0; i < texture_paths.size(); i++)
+    for(uint i = 0; i < texture_paths.size() - 1; i++) // -1 to avoid the fonts file
     {
 		const std::string& path = texture_paths[i];
 		ivec2& dimensions = texture_dimensions[i];
@@ -98,6 +159,73 @@ void RenderSystem::initializeGlTextures()
 		gl_has_errors();
 		stbi_image_free(data);
     }
+
+	// FreeType
+	// --------
+	FT_Library ft;
+	// All functions return a value different than 0 whenever an error occurred
+	if (FT_Init_FreeType(&ft))
+	{
+		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+		return;
+	}
+
+	// load font as face
+	FT_Face face;
+	if (FT_New_Face(ft, "../data/fonts/PixeloidSans.ttf", 0, &face)) {
+		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+		return;
+	}
+	else {
+		// set size to load glyphs as
+		FT_Set_Pixel_Sizes(face, 0, 48);
+
+		// disable byte-alignment restriction
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+		// load first 128 characters of ASCII set
+		for (unsigned char c = 0; c < 128; c++)
+		{
+			// Load character glyph 
+			if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+			{
+				std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+				continue;
+			}
+			// generate texture
+			unsigned int texture = texture_gl_handles[texture_gl_handles.size()-1];
+			glBindTexture(GL_TEXTURE_2D, texture);
+			glTexImage2D(
+				GL_TEXTURE_2D,
+				0,
+				GL_RED,
+				face->glyph->bitmap.width,
+				face->glyph->bitmap.rows,
+				0,
+				GL_RED,
+				GL_UNSIGNED_BYTE,
+				face->glyph->bitmap.buffer
+			);
+			// set texture options
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			// now store character for later use
+			Character character = {
+				texture,
+				glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+				glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+				static_cast<unsigned int>(face->glyph->advance.x)
+			};
+			Characters.insert(std::pair<char, Character>(c, character));
+		}
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+	// destroy FreeType once we're finished
+	FT_Done_Face(face);
+	FT_Done_FreeType(ft);
+
 	gl_has_errors();
 }
 
@@ -207,6 +335,11 @@ void RenderSystem::initializeGlGeometryBuffers()
 	meshes[geom_aria_index].vertex_indices = aria_indices;
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::ARIA, meshes[geom_aria_index].vertices, meshes[geom_aria_index].vertex_indices);
 
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffers[(uint)GEOMETRY_BUFFER_ID::TEXT_2D]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glBindVertexArray(vao);
 
 ;	// !!! TODO: INITIALIZE MESH BASED ON ENEMY DESIGN (Currently just a square; see above in GEOM.::SPRITE)
 

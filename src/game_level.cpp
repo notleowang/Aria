@@ -10,24 +10,7 @@ bool GameLevel::init(uint level) {
 	std::vector<std::array<float, ENEMY_ATTRIBUTES>>& enemies = this->enemies_attr;
 
 	switch (level) {
-	case 0: // Tutorial
-
-		// Reference for FreeType: https://learnopengl.com/In-Practice/Text-Rendering
-		FT_Library ft;
-		if (FT_Init_FreeType(&ft)) {
-			printf("error");
-		}
-
-		FT_Face face;
-		if (FT_New_Face(ft, "../data/fonts/PixeloidSans.ttf", 0, &face))
-		{
-			printf("ERROR::FREETYPE: Failed to load font\n");
-		}
-
-		FT_Set_Pixel_Sizes(face, 0, 48);
-
-
-
+	case 0:
 		floors.clear();
 		for (uint i = 0; i < 6; i++) {
 			for (uint j = 0; j < 4; j++) {
