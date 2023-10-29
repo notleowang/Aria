@@ -8,6 +8,7 @@
 #include <sstream>
 
 #include "physics_system.hpp"
+using namespace std;
 
 // Game configuration
 const float PLAYER_SPEED = 300.f;
@@ -252,6 +253,38 @@ void WorldSystem::win_level() {
 	printf("hooray you won the level\n");
 	this->curr_level.init(this->curr_level.getCurrLevel() + 1);
 	restart_game();
+	power_up_menu();
+}
+
+void WorldSystem::power_up_menu() {
+	PowerUp& powerUp = registry.powerUps.get(player);
+
+	// figure out what power ups are available
+	vector<pair<string, bool>> availPowerUps;
+
+	if (!powerUp.fasterMovement) availPowerUps.push_back(make_pair("Faster Movement Speed", &powerUp.fasterMovement));
+
+	for (int element = ElementType::WATER; element <= ElementType::LIGHTNING; element++) {
+		string elementName;
+		if (element == ElementType::WATER) elementName = "Water";
+		if (element == ElementType::FIRE) elementName = "Fire";
+		if (element == ElementType::EARTH) elementName = "Earth";
+		if (element == ElementType::LIGHTNING) elementName = "Lightning";
+
+		if (!powerUp.increasedDamage[element]) availPowerUps.push_back(make_pair("Increase " + elementName + " Damage", &powerUp.increasedDamage[element]));
+		if (!powerUp.tripleShot[element]) availPowerUps.push_back(make_pair("Triple " + elementName + " Shot", &powerUp.tripleShot[element]));
+		if (!powerUp.bounceOffWalls[element]) availPowerUps.push_back(make_pair("Bouncy " + elementName + " Shot", &powerUp.bounceOffWalls[element]));
+	}
+
+	assert(availPowerUps.size() >= 3);
+
+	shuffle(availPowerUps.begin(), availPowerUps.end(), rng);
+
+	for (int i = 0; i < availPowerUps.size(); i++) {
+		printf("%s\n", availPowerUps[i].first.c_str());
+	}
+
+
 }
 
 // Compute collisions between entities
