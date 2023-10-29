@@ -12,6 +12,7 @@ const int TEXT_ATTRIBUTES = 6;
 class GameLevel
 {
 public:
+	uint curr_level;
 	vec2 player_starting_pos;
 	vec2 exit_door_pos;
 
@@ -30,6 +31,10 @@ public:
 	std::vector<std::array<float, ENEMY_ATTRIBUTES>> enemies_attr;
 
 	bool init(uint level);
+
+	uint getCurrLevel() {
+		return curr_level;
+	}
 
 	vec2& getPlayerStartingPos() {
 		return player_starting_pos;

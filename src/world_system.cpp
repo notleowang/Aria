@@ -117,13 +117,7 @@ GLFWwindow* WorldSystem::create_window() {
 
 void WorldSystem::init(RenderSystem* renderer_arg, GameLevel level) {
 	this->renderer = renderer_arg;
-	this->floor_pos = level.getFloorPos();
-	this->player_starting_pos = level.getPlayerStartingPos();
-	this->exit_door_pos = level.getExitDoorPos();
-	this->texts = level.getTexts();
-	this->text_attrs = level.getTextAttrs();
-	this->terrains_attrs = level.getTerrains();
-	this->enemies_attrs = level.getEnemies();
+	this->curr_level = level;
 	// Playing background music indefinitely
 	Mix_PlayMusic(background_music, -1);
 	fprintf(stderr, "Loaded music\n");
@@ -196,31 +190,38 @@ void WorldSystem::restart_game() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 
-	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
-	//player = createTestSalmon(renderer, this->player_starting_pos);
+	GameLevel current_level = this->curr_level;
+	vec2 player_starting_pos = current_level.getPlayerStartingPos();
+	vec2 exit_door_pos = current_level.getExitDoorPos();
+	std::vector<vec2> floor_pos = current_level.getFloorPos();
+	std::vector<vec4> terrains_attrs = current_level.getTerrains();
+	std::vector<std::string> texts = current_level.getTexts();
+	std::vector<std::array<float, TEXT_ATTRIBUTES>> text_attrs = current_level.getTextAttrs();
+	std::vector<std::array<float, ENEMY_ATTRIBUTES>> enemies_attrs = current_level.getEnemies();
 
-	for (uint i = 0; i < this->floor_pos.size(); i++) {
+	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
+	for (uint i = 0; i < floor_pos.size(); i++) {
 		createFloor(renderer, floor_pos[i]);
 	}
 
-	for (uint i = 0; i < this->terrains_attrs.size(); i++) {
-		vec4 terrain_i = this->terrains_attrs[i];
+	player = createAria(renderer, player_starting_pos);
+
+	for (uint i = 0; i < terrains_attrs.size(); i++) {
+		vec4 terrain_i = terrains_attrs[i];
 		createTerrain(renderer, vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]));
 	}
 
-	for (uint i = 0; i < this->texts.size(); i++) {
-		std::array<float, TEXT_ATTRIBUTES> text_i = this->text_attrs[i];
-		createText(this->texts[i], vec2(text_i[0], text_i[1]), text_i[2], vec3(text_i[3], text_i[4], text_i[5]));
+	for (uint i = 0; i < texts.size(); i++) {
+		std::array<float, TEXT_ATTRIBUTES> text_i = text_attrs[i];
+		createText(texts[i], vec2(text_i[0], text_i[1]), text_i[2], vec3(text_i[3], text_i[4], text_i[5]));
 	}
 
-	player = createAria(renderer, this->player_starting_pos);
-
-	for (uint i = 0; i < this->enemies_attrs.size(); i++) {
-		std::array<float, ENEMY_ATTRIBUTES> enemy_i = this->enemies_attrs[i];
-		createEnemy(renderer, vec2(enemy_i[0], enemy_i[1]),ElementType::FIRE); //TODO: pass the type as an enemy attribute
+	for (uint i = 0; i < enemies_attrs.size(); i++) {
+		std::array<float, ENEMY_ATTRIBUTES> enemy_i = enemies_attrs[i];
+		createEnemy(renderer, vec2(enemy_i[0], enemy_i[1]), ElementType::FIRE); //TODO: pass the type as an enemy attribute
 	}
 
-	createExitDoor(renderer, this->exit_door_pos);
+	createExitDoor(renderer, exit_door_pos);
 }
 
 bool collidedLeft(Position& pos_i, Position& pos_j) 
@@ -249,7 +250,8 @@ bool collidedBottom(Position& pos_i, Position& pos_j)
 
 void WorldSystem::win_level() {
 	printf("hooray you won the level\n");
-	this->levelDone = true;
+	this->curr_level.init(this->curr_level.getCurrLevel() + 1);
+	restart_game();
 }
 
 // Compute collisions between entities
