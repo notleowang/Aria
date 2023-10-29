@@ -41,6 +41,11 @@ class RenderSystem {
 			textures_path("fish.png"),   // Currently keeping this so we know how to import our textures
 			textures_path("landscape.png"),
 			textures_path("turtle.png") ,
+			textures_path("fire_enemy.png") ,
+			textures_path("water_projectile.png"),
+			textures_path("fire_projectile.png"),
+			textures_path("earth_projectile.png"),
+			textures_path("lightning_projectile.png"),
 			textures_path("dungeon_tile.png"),
 			textures_path("health_bar_empty.png"),
 			textures_path("health_bar_full.png")

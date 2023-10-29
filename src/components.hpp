@@ -9,6 +9,13 @@ struct Player
 {
 
 };
+// All data relevant to elements and weaknesses
+enum class ElementType {
+	WATER=0,
+	FIRE=1,
+	EARTH= 2,
+	LIGHTNING = 3
+};
 
 // Enemy component
 struct Enemy
@@ -16,6 +23,7 @@ struct Enemy
 	float damage = 10.f;
 	float movementTimer = 3000.f;
 	float stamina = 0.5f;
+	ElementType type = ElementType::FIRE; // By default, an enemy is of fire type
 };
 
 // Terrain
@@ -56,6 +64,12 @@ struct HealthBar
 struct Projectiles
 {
 	float damage = 10.f;
+	ElementType type;
+};
+
+struct CharacterProjectileType
+{
+	ElementType projectileType = ElementType::WATER; //By default, the characters projectile type is water
 };
 
 // All data relevant to the position of entities
@@ -189,7 +203,12 @@ enum class TEXTURE_ASSET_ID {
 	FISH = 0,
 	LANDSCAPE = FISH + 1,
 	TURTLE = LANDSCAPE + 1,
-	FLOOR = TURTLE + 1,
+	FIRE_ENEMY= TURTLE+1,
+	WATER_PROJECTILE = FIRE_ENEMY +1,
+	FIRE_PROJECTILE = WATER_PROJECTILE +1,
+	EARTH_PROJECTILE = FIRE_PROJECTILE +1,
+	LIGHTNING_PROJECTILE = EARTH_PROJECTILE +1,
+	FLOOR = LIGHTNING_PROJECTILE + 1,
 	HEALTH_BAR_EMPTY = FLOOR + 1,
 	HEALTH_BAR_FULL = HEALTH_BAR_EMPTY + 1,
 	TEXTURE_COUNT = HEALTH_BAR_FULL + 1

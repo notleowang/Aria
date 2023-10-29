@@ -10,7 +10,7 @@ const float HEALTH_BAR_WIDTH = 0.3f * 369.f;
 
 // the player
 Entity createAria(RenderSystem* renderer, vec2 pos);
-Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel);
+Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType);
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);
 
@@ -23,7 +23,7 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos);
 Entity createText(std::string in_text, vec2 pos, float scale, vec3 color);
 
 // mock enemy TODO: change enemy implementation
-Entity createEnemy(RenderSystem* renderer, vec2 pos);
+Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType);
 
 // creates a health bar associated with an owner entity
 Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity);
