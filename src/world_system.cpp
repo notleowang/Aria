@@ -201,6 +201,8 @@ void WorldSystem::restart_game() {
 		createFloor(renderer, floor_pos[i]);
 	}
 
+	createText("hello", vec2(100, 100), 10, vec3(1.0, 1.0, 0.0));
+
 	player = createAria(renderer, this->player_starting_pos);
 
 	for (uint i = 0; i < this->terrains_attrs.size(); i++) {
