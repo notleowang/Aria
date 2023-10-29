@@ -1,7 +1,7 @@
 #include "game_level.hpp"
 
 #include <ft2build.h>
-#include FT_FREETYPE_H  
+#include FT_FREETYPE_H
 
 bool GameLevel::init(uint level) {
 	printf("Initializing game for level: %i\n", level);
@@ -13,18 +13,24 @@ bool GameLevel::init(uint level) {
 	std::vector<std::array<float, ENEMY_ATTRIBUTES>>& enemies = this->enemies_attr;
 
 	switch (level) {
-	case 0: // Tutorial
-
+	case 0: 
+	{
 		// Reference for FreeType: https://learnopengl.com/In-Practice/Text-Rendering
-		FT_Library ft;
-		if (FT_Init_FreeType(&ft)) {
-			printf("error");
+		int error;
+		FT_Library library;
+		error = FT_Init_FreeType(&library);
+		if (error) {
+			printf("Error: Couldn't to create FreeType Library\n");
 		}
 
+		const char* font_path = "../../../data/fonts/PixeloidSans.ttf";
 		FT_Face face;
-		if (FT_New_Face(ft, "../data/fonts/PixeloidSans.ttf", 0, &face))
-		{
-			printf("ERROR::FREETYPE: Failed to load font\n");
+		error = FT_New_Face(library, font_path, 0, &face);
+		if (error == FT_Err_Unknown_File_Format) {
+			printf("Error: Font file format not supported\n");
+		}
+		else if (error) {
+			printf("Error: Font file could not be opened");
 		}
 
 		FT_Set_Pixel_Sizes(face, 0, 48);
@@ -54,6 +60,7 @@ bool GameLevel::init(uint level) {
 		//enemies.push_back({ 800, 700, 100, 100, 0, 0 });
 		//enemies.push_back({ 1200, 300, 100, 100, 0, 0 });
 		break;
+	}
 	case 1:
 		floors.clear();
 		for (uint i = 0; i < 6; i++) {
