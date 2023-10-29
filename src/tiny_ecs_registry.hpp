@@ -14,7 +14,7 @@ public:
 	ComponentContainer<DeathTimer> deathTimers;
 	ComponentContainer<Resources> resources;
 	ComponentContainer<HealthBar> healthBars;
-	ComponentContainer<Projectiles> projectiles;
+	ComponentContainer<Projectile> projectiles;
 	ComponentContainer<CharacterProjectileType> characterProjectileTypes;
 	ComponentContainer<InvulnerableTimer> invulnerableTimers;
 	ComponentContainer<Position> positions;
@@ -24,6 +24,7 @@ public:
 	ComponentContainer<Collidable> collidables;
 	ComponentContainer<Player> players;
 	ComponentContainer<Enemy> enemies;
+	ComponentContainer<PowerUp> powerUps;
 	ComponentContainer<Terrain> terrain;
 	ComponentContainer<ExitDoor> exitDoors;
 	ComponentContainer<Mesh*> meshPtrs;
@@ -49,6 +50,7 @@ public:
 		registry_list.push_back(&collidables);
 		registry_list.push_back(&players);
 		registry_list.push_back(&enemies);
+		registry_list.push_back(&powerUps);
 		registry_list.push_back(&terrain);
 		registry_list.push_back(&exitDoors);
 		registry_list.push_back(&meshPtrs);
