@@ -26,6 +26,7 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
 
+	registry.characterProjectileTypes.emplace(entity);
 	registry.players.emplace(entity);
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
@@ -77,7 +78,7 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size)
 	return entity;
 }
 
-Entity createEnemy(RenderSystem* renderer, vec2 pos)
+Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
 {
 	// TODO: change enemy implementation to include different enemy types
 	auto entity = Entity();
@@ -89,7 +90,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 
-	position.scale = vec2({ 75, 50 });
+	position.scale = vec2({ 125, 100 });
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity.x = 50;
@@ -97,11 +98,33 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos)
 	Resources& resources = registry.resources.emplace(entity);
 	resources.healthBar = createHealthBar(renderer, entity);
 
-	registry.enemies.emplace(entity);
+	Enemy& enemy = registry.enemies.emplace(entity);
+	enemy.type = enemyType;
+	
+	TEXTURE_ASSET_ID textureAsset;
+	switch (enemy.type) {
+	case ElementType::WATER:
+		textureAsset = TEXTURE_ASSET_ID::TURTLE;
+		break;
+
+	case ElementType::FIRE:
+		textureAsset = TEXTURE_ASSET_ID::FIRE_ENEMY;
+		break;
+	//case ElementType::Earth:
+	//	textureAsset = TEXTURE_ASSET_ID::EARTH_ENEMY;
+	//	break;
+	//case ElementType::Lightning:
+	//	textureAsset = TEXTURE_ASSET_ID::LIGHTNING_ENEMY;
+	//	break;
+	default:
+		textureAsset = TEXTURE_ASSET_ID::TURTLE;
+		break;
+	}
+
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::TURTLE,
+		{textureAsset,
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 
@@ -183,7 +206,7 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
-Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel) {
+Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType) {
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
@@ -193,16 +216,38 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel) {
 	// Set initial position and velocity for the projectile
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
-	position.scale = vec2(10.f, 10.f);
+	position.scale = vec2(30.f, 30.f);
 
-	registry.projectiles.emplace(entity);
+	Projectiles& projectile = registry.projectiles.emplace(entity);
+	projectile.type = elementType;
+	TEXTURE_ASSET_ID textureAsset;
+	switch (projectile.type) {
+		case ElementType::WATER:
+			textureAsset = TEXTURE_ASSET_ID::WATER_PROJECTILE;
+			break;
+		
+		case ElementType::FIRE:
+			textureAsset = TEXTURE_ASSET_ID::FIRE_PROJECTILE;
+			break;
+		case ElementType::EARTH:
+			textureAsset = TEXTURE_ASSET_ID::EARTH_PROJECTILE;
+			break;
+		case ElementType::LIGHTNING:
+			textureAsset = TEXTURE_ASSET_ID::LIGHTNING_PROJECTILE;
+			break;
+		default:
+			textureAsset = TEXTURE_ASSET_ID::WATER_PROJECTILE;
+			break;
+	}
+
 	registry.collidables.emplace(entity);
+
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = vel;
 
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::TURTLE, //TODO: Change texture asset- the projectiles are currently turtles
+		{	textureAsset, //TODO: Change texture asset- the projectiles are currently turtles
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE });
 	return entity;

@@ -210,7 +210,7 @@ void WorldSystem::restart_game() {
 
 	for (uint i = 0; i < this->enemies_attrs.size(); i++) {
 		std::array<float, ENEMY_ATTRIBUTES> enemy_i = this->enemies_attrs[i];
-		createEnemy(renderer, vec2(enemy_i[0], enemy_i[1]));
+		createEnemy(renderer, vec2(enemy_i[0], enemy_i[1]),ElementType::FIRE); //TODO: pass the type as an enemy attribute
 	}
 
 	createExitDoor(renderer, this->exit_door_pos);
@@ -328,7 +328,11 @@ void WorldSystem::handle_collisions() {
 		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity)) {
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
 			Resources& enemy_resource = registry.resources.get(entity_other);
-			enemy_resource.currentHealth -= registry.projectiles.get(entity).damage;
+			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
+			if (isWeakTo(registry.enemies.get(entity_other).type, registry.projectiles.get(entity).type)) {
+				damage_dealt *= 2;
+			}
+			enemy_resource.currentHealth -= damage_dealt;
 			printf("enemy hp: %f\n", enemy_resource.currentHealth);
 			if (enemy_resource.currentHealth <= 0) {
 				registry.remove_all_components_of(enemy_resource.healthBar);
@@ -407,6 +411,26 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	else if ((state_up == GLFW_RELEASE && state_down == GLFW_PRESS && state_left == GLFW_RELEASE && state_right == GLFW_PRESS)) {
 		new_direction = DIRECTION::SE;
 	}
+	
+	// Handle key presses for changing projectile type
+	if (action == GLFW_PRESS) {
+		CharacterProjectileType& characterProjectileType = registry.characterProjectileTypes.get(player);
+
+		switch (key) {
+		case GLFW_KEY_1:
+			characterProjectileType.projectileType = ElementType::WATER;
+			break;
+		case GLFW_KEY_2:
+			characterProjectileType.projectileType = ElementType::FIRE;
+			break;
+		case GLFW_KEY_3:
+			characterProjectileType.projectileType = ElementType::EARTH;
+			break;
+		case GLFW_KEY_4:
+			characterProjectileType.projectileType = ElementType::LIGHTNING;
+			break;
+		}
+	}
 
 	// set the player velocity based on the new_direction
 	if (new_direction != DIRECTION::NONE) {
@@ -448,7 +472,11 @@ void WorldSystem::on_mouse_button(int button, int action, int mod) {
 		Position& position = registry.positions.get(player);
 		Velocity vel = computeVelocity(PROJECTILE_SPEED, angle);
 		vec2 proj_position = position.position;
-		Entity projectile = createProjectile(renderer, proj_position, vel.velocity);
+
+		// Get current player projectile type
+		ElementType elementType = registry.characterProjectileTypes.get(player).projectileType;
+
+		Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType);
 		Mix_PlayChannel(-1, projectile_sound, 0);
 	}
 }
