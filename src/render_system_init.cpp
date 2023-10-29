@@ -131,7 +131,6 @@ void RenderSystem::initializeFreeType() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffers[(uint)GEOMETRY_BUFFER_ID::TEXT_2D]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
-	gl_has_errors();
 
 	gl_has_errors();
 }

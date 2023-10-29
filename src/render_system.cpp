@@ -130,7 +130,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
 
 			float w = ch.Size.x * scale;
-			float h = ch.Size.y * -scale;
+			float h = ch.Size.y * scale;
+
 			// update VBO for each character
 			float vertices[6][4] = {
 				{ xpos,     ypos + h,   0.0f, 0.0f },
@@ -153,10 +154,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		}
 		GLint currProgram;
 		glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-		GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
-		glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
-		GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
-		glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+		mat4 text_projection = ortho(0.0f, static_cast<float>(window_width_px), 0.0f, static_cast<float>(window_height_px));
+		glUniformMatrix4fv(glGetUniformLocation(currProgram, "projection"), 1, GL_FALSE, (float*)&text_projection);
 		gl_has_errors();
 		return;
 	}
