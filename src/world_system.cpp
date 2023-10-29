@@ -120,6 +120,8 @@ void WorldSystem::init(RenderSystem* renderer_arg, GameLevel level) {
 	this->floor_pos = level.getFloorPos();
 	this->player_starting_pos = level.getPlayerStartingPos();
 	this->exit_door_pos = level.getExitDoorPos();
+	this->texts = level.getTexts();
+	this->text_attrs = level.getTextAttrs();
 	this->terrains_attrs = level.getTerrains();
 	this->enemies_attrs = level.getEnemies();
 	// Playing background music indefinitely
@@ -201,14 +203,17 @@ void WorldSystem::restart_game() {
 		createFloor(renderer, floor_pos[i]);
 	}
 
-	createText("hello", vec2(100, 100), 10, vec3(1.0, 1.0, 0.0));
-
-	player = createAria(renderer, this->player_starting_pos);
-
 	for (uint i = 0; i < this->terrains_attrs.size(); i++) {
 		vec4 terrain_i = this->terrains_attrs[i];
 		createTerrain(renderer, vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]));
 	}
+
+	for (uint i = 0; i < this->texts.size(); i++) {
+		std::array<float, TEXT_ATTRIBUTES> text_i = this->text_attrs[i];
+		createText(this->texts[i], vec2(text_i[0], text_i[1]), text_i[2], vec3(text_i[3], text_i[4], text_i[5]));
+	}
+
+	player = createAria(renderer, this->player_starting_pos);
 
 	for (uint i = 0; i < this->enemies_attrs.size(); i++) {
 		std::array<float, ENEMY_ATTRIBUTES> enemy_i = this->enemies_attrs[i];

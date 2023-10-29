@@ -1,31 +1,21 @@
 #include "game_level.hpp"
 
+#include <ft2build.h>
+#include FT_FREETYPE_H  
+
 bool GameLevel::init(uint level) {
 	printf("Initializing game for level: %i\n", level);
 	if (level < 0) {
 		return false;
 	}
+	std::vector<std::string>& texts = this->texts;
+	std::vector<std::array<float, TEXT_ATTRIBUTES>>& text_attrs = this->text_attrs;
 	std::vector<vec2>& floors = this->floor_pos;
 	std::vector<vec4>& terrains = this->terrains_attr;
 	std::vector<std::array<float, ENEMY_ATTRIBUTES>>& enemies = this->enemies_attr;
 
 	switch (level) {
-	case 0: // Tutorial
-
-		// Reference for FreeType: https://learnopengl.com/In-Practice/Text-Rendering
-		FT_Library ft;
-		if (FT_Init_FreeType(&ft)) {
-			printf("error");
-		}
-
-		FT_Face face;
-		if (FT_New_Face(ft, "../data/fonts/PixeloidSans.ttf", 0, &face))
-		{
-			printf("ERROR::FREETYPE: Failed to load font\n");
-		}
-
-		FT_Set_Pixel_Sizes(face, 0, 48);
-
+	case 0:
 		floors.clear();
 		for (uint i = 0; i < 5; i++) {
 			for (uint j = 0; j < 3; j++) {
@@ -34,7 +24,13 @@ bool GameLevel::init(uint level) {
 		}
 
 		this->player_starting_pos = vec2(500, 500);
-		this->exit_door_pos = vec2(1500, 950);
+		this->exit_door_pos = vec2(1200, 800);
+
+		texts.push_back("Use WASD to move around");
+		text_attrs.push_back({100.f,100.f,1.0f,1.0f,1.0f,0.f});
+		texts.push_back("Use M1 button to shoot");
+		text_attrs.push_back({100.f,500.f,1.0f,1.0f,1.0f,0.f});
+		// TODO: WHY IS IT WRITING IN THE SAME AREA
 
 		terrains.clear();
 
@@ -42,10 +38,6 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(vec4(25, 550, 100, 800));
 		terrains.push_back(vec4(675, 900, 1400, 100));
 		terrains.push_back(vec4(1325, 550, 100, 800));
-		//terrains.push_back(vec4(400, 700, 100, 600));
-		//terrains.push_back(vec4(800, 300, 100, 600));
-		//terrains.push_back(vec4(1200, 700, 100, 600));
-
 		enemies.clear();
 
 		//enemies.push_back({ 800, 700, 100, 100, 0, 0 });
