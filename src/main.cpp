@@ -9,6 +9,7 @@
 #include "render_system.hpp"
 #include "world_system.hpp"
 #include "ai_system.hpp"
+#include "main_menu.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -30,12 +31,12 @@ int main()
 		return EXIT_FAILURE;
 	}
 	// Add a main menu thing here? 
-	
+	MainMenu main_menu;
+	main_menu.init();
 
 	// Set the game level then initialize the main systems
 	GameLevel level;
 	level.init(1);
-
 
 	// initialize the main systems
 	render_system.init(window);
