@@ -1,7 +1,4 @@
-#include "game_level.hpp"
-
-#include <ft2build.h>
-#include FT_FREETYPE_H  
+#include "game_level.hpp" 
 
 bool GameLevel::init(uint level) {
 	printf("Initializing game for level: %i\n", level);
@@ -15,7 +12,7 @@ bool GameLevel::init(uint level) {
 	std::vector<std::array<float, ENEMY_ATTRIBUTES>>& enemies = this->enemies_attr;
 
 	switch (level) {
-	case 0:
+	case 0: // Tutorial
 		floors.clear();
 		for (uint i = 0; i < 5; i++) {
 			for (uint j = 0; j < 3; j++) {
