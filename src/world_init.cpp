@@ -26,6 +26,10 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
 
+	PowerUp& powerUp = registry.powerUps.emplace(entity);
+	//powerUp.fasterMovement = false;
+	//powerUp.bounceOffWalls[ElementType::EARTH] = true;
+
 	registry.characterProjectileTypes.emplace(entity);
 	registry.players.emplace(entity);
 	registry.collidables.emplace(entity);
@@ -206,7 +210,7 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
-Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType) {
+Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType, Entity& player) {
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
@@ -218,7 +222,7 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 	position.position = pos;
 	position.scale = vec2(30.f, 30.f);
 
-	Projectiles& projectile = registry.projectiles.emplace(entity);
+	Projectile& projectile = registry.projectiles.emplace(entity);
 	projectile.type = elementType;
 	TEXTURE_ASSET_ID textureAsset;
 	switch (projectile.type) {
@@ -244,6 +248,10 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = vel;
+
+	PowerUp& powerUp = registry.powerUps.get(player);
+	if (powerUp.increasedDamage[elementType]) projectile.damage *= 1.5; // increase damage by factor of 1.5
+	if (powerUp.bounceOffWalls[elementType]) projectile.bounces = 2; // allow 2 bounces off walls
 
 	registry.renderRequests.insert(
 		entity,

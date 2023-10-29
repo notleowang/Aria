@@ -353,7 +353,24 @@ void WorldSystem::handle_collisions() {
 
 		// Checking Projectile - Wall collisions
 		if (registry.terrain.has(entity_other) && registry.projectiles.has(entity)) {
-			registry.remove_all_components_of(entity);
+			Projectile& projectile = registry.projectiles.get(entity);
+
+			if (projectile.bounces-- > 0) {
+				// bounce the projectile off the wall
+				Position& projectile_position = registry.positions.get(entity);
+				Velocity& projectile_velocity = registry.velocities.get(entity);
+				Position& terrain_position = registry.positions.get(entity_other);
+
+				if (collidedLeft(projectile_position, terrain_position) || collidedRight(projectile_position, terrain_position)) {
+					projectile_velocity.velocity.x *= -1;
+				}
+				else if (collidedTop(projectile_position, terrain_position) || collidedBottom(projectile_position, terrain_position)) {
+					projectile_velocity.velocity.y *= -1;
+				}
+			}
+			else {
+				registry.remove_all_components_of(entity);
+			}
 		}
 
 		// Checking Player - Exit Door collision
@@ -444,7 +461,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// set the player velocity based on the new_direction
 	if (new_direction != DIRECTION::NONE) {
 		player_direction.direction = new_direction;
-		player_velocity = computeVelocity(PLAYER_SPEED, player_direction);
+		PowerUp& player_powerUp = registry.powerUps.get(player);
+		player_velocity = computeVelocity(player_powerUp.fasterMovement ? PLAYER_SPEED * 1.5 : PLAYER_SPEED, player_direction);
 	}
 	else {
 		player_velocity = computeVelocity(0.0, player_direction);
@@ -479,13 +497,29 @@ void WorldSystem::on_mouse_button(int button, int action, int mod) {
 
 		// create projectile
 		Position& position = registry.positions.get(player);
-		Velocity vel = computeVelocity(PROJECTILE_SPEED, angle);
 		vec2 proj_position = position.position;
+		ElementType elementType = registry.characterProjectileTypes.get(player).projectileType; // Get current player projectile type
 
-		// Get current player projectile type
-		ElementType elementType = registry.characterProjectileTypes.get(player).projectileType;
+		// apply power ups
+		PowerUp& powerUp = registry.powerUps.get(player);
+		
+		if (powerUp.tripleShot[elementType]) {
+			Velocity vel1 = computeVelocity(PROJECTILE_SPEED, angle - 0.25);
+			Velocity vel2 = computeVelocity(PROJECTILE_SPEED, angle);
+			Velocity vel3 = computeVelocity(PROJECTILE_SPEED, angle + 0.25);
 
-		Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType);
+			Entity projectile1 = createProjectile(renderer, proj_position, vel1.velocity, elementType, player);
+			Entity projectile2 = createProjectile(renderer, proj_position, vel2.velocity, elementType, player);
+			Entity projectile3 = createProjectile(renderer, proj_position, vel3.velocity, elementType, player);
+		}
+		else {
+			Velocity vel = computeVelocity(PROJECTILE_SPEED, angle);
+			Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType, player);
+		}
+
+		Velocity vel = computeVelocity(PROJECTILE_SPEED, angle);
+
+
 		Mix_PlayChannel(-1, projectile_sound, 0);
 	}
 }
