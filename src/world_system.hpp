@@ -46,10 +46,8 @@ private:
 	void on_mouse_button(int button, int action, int mod);
 	void on_mouse_move(vec2 pos);
 
-	// restart level
+	// restart game
 	void restart_game();
-
-	bool levelDone;
 
 	// OpenGL window handle
 	GLFWwindow* window;
@@ -58,11 +56,7 @@ private:
 	RenderSystem* renderer;
 	Entity player;
 	
-	vec2 player_starting_pos;
-	vec2 exit_door_pos;
-	std::vector<vec2> floor_pos;
-	std::vector<vec4> terrains_attrs;
-	std::vector<std::array<float, ENEMY_ATTRIBUTES>> enemies_attrs;
+	GameLevel curr_level;
 
 	// music references
 	Mix_Music* background_music; // TODO: change background music for our game
