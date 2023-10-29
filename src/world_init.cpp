@@ -28,7 +28,8 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 
 	PowerUp& powerUp = registry.powerUps.emplace(entity);
 	//powerUp.fasterMovement = false;
-	//powerUp.bounceOffWalls[ElementType::EARTH] = true;
+	powerUp.bounceOffWalls[ElementType::EARTH] = true;
+	powerUp.tripleShot[ElementType::EARTH] = true;
 
 	registry.characterProjectileTypes.emplace(entity);
 	registry.players.emplace(entity);
@@ -171,6 +172,27 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
 			EFFECT_ASSET_ID::EXIT_DOOR,
 			GEOMETRY_BUFFER_ID::EXIT_DOOR});
+
+	return entity;
+}
+
+Entity createPowerUpSelectionMenu(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::EXIT_DOOR);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	position.scale = vec2(100.f, 100.f);
+
+	registry.exitDoors.emplace(entity);
+	registry.collidables.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
+			EFFECT_ASSET_ID::EXIT_DOOR,
+			GEOMETRY_BUFFER_ID::EXIT_DOOR });
 
 	return entity;
 }

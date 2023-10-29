@@ -20,6 +20,9 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size);
 // creates an exit door
 Entity createExitDoor(RenderSystem* renderer, vec2 pos);
 
+// creates a power up selection menu
+Entity createPowerUpSelectionMenu(RenderSystem* renderer, vec2 pos);
+
 // mock enemy TODO: change enemy implementation
 Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType);
 
