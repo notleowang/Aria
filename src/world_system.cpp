@@ -252,7 +252,7 @@ bool collidedBottom(Position& pos_i, Position& pos_j)
 void WorldSystem::win_level() {
 	printf("hooray you won the level\n");
 	this->curr_level.init(this->curr_level.getCurrLevel() + 1);
-	//restart_game();
+	restart_game();
 	power_up_menu();
 }
 
@@ -549,9 +549,6 @@ void WorldSystem::on_mouse_button(int button, int action, int mod) {
 			Velocity vel = computeVelocity(PROJECTILE_SPEED, angle);
 			Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType, player);
 		}
-
-		Velocity vel = computeVelocity(PROJECTILE_SPEED, angle);
-
 
 		Mix_PlayChannel(-1, projectile_sound, 0);
 	}
