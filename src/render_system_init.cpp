@@ -226,6 +226,8 @@ void RenderSystem::initializePlayerGeometryBuffers()
 
 void RenderSystem::initializeSpriteGeometryBuffers()
 {
+	int geom_index = (int)GEOMETRY_BUFFER_ID::SPRITE;
+
 	std::vector<TexturedVertex> textured_vertices(4);
 	textured_vertices[0].position = { -1.f / 2, +1.f / 2, 0.f };
 	textured_vertices[1].position = { +1.f / 2, +1.f / 2, 0.f };
@@ -239,6 +241,14 @@ void RenderSystem::initializeSpriteGeometryBuffers()
 	// Counterclockwise as it's the default opengl front winding direction.
 	const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
 
+	std::vector<ColoredVertex> vertices(4);
+	vertices[0].position = textured_vertices[0].position;
+	vertices[1].position = textured_vertices[1].position;
+	vertices[2].position = textured_vertices[2].position;
+	vertices[3].position = textured_vertices[3].position;
+
+	meshes[geom_index].vertices = vertices;
+	meshes[geom_index].vertex_indices = textured_indices;
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::SPRITE, textured_vertices, textured_indices);
 }
 
@@ -278,6 +288,7 @@ void RenderSystem::initializeScreenTriangleGeometryBuffers()
 	// Counterclockwise as it's the default opengl front winding direction.
 	const std::vector<uint16_t> vertex_indices = { 0, 1, 2 };
 
+	// No mesh for the screen triangle
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE, vertices, vertex_indices);
 }
 
@@ -317,6 +328,8 @@ void RenderSystem::initializeExitDoorGeometryBuffers()
 
 void RenderSystem::initializeProjectileGeometryBuffers()
 {
+	int geom_index = (int)GEOMETRY_BUFFER_ID::WATER_PROJECTILE_SHEET;
+
 	std::vector<TexturedVertex> textured_vertices(4);
 	textured_vertices[0].position = { -1.f / 2, +1.f / 2, 0.f };
 	textured_vertices[1].position = { +1.f / 2, +1.f / 2, 0.f };
@@ -329,6 +342,14 @@ void RenderSystem::initializeProjectileGeometryBuffers()
 
 	const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
 
+	std::vector<ColoredVertex> vertices(4);
+	vertices[0].position = textured_vertices[0].position;
+	vertices[1].position = textured_vertices[1].position;
+	vertices[2].position = textured_vertices[2].position;
+	vertices[3].position = textured_vertices[3].position;
+
+	meshes[geom_index].vertices = vertices;
+	meshes[geom_index].vertex_indices = textured_indices;
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::WATER_PROJECTILE_SHEET, textured_vertices, textured_indices);
 }
 
