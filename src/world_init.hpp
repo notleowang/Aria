@@ -15,7 +15,7 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 Entity createLine(vec2 position, vec2 size);
 
 // creates a terrain with fixed size
-Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size);
+Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, bool moveable);
 
 // creates an exit door
 Entity createExitDoor(RenderSystem* renderer, vec2 pos);

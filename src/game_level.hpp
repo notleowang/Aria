@@ -24,8 +24,8 @@ public:
 	// pos_x, pos_y
 	std::vector<vec2> floor_pos;
 
-	// pos_x, pos_y, scale_x, scale_y
-	std::vector<vec4> terrains_attr;
+	// pos_x, pos_y, scale_x, scale_y, moveable?
+	std::vector<std::pair<vec4, bool>> terrains_attr;
 
 	// pos_x, pos_y, vel_x, vel_y, scale_x, scale_y
 	std::vector<std::array<float, ENEMY_ATTRIBUTES>> enemies_attr;
@@ -56,7 +56,7 @@ public:
 		return floor_pos;
 	}
 
-	std::vector<vec4>& getTerrains() {
+	std::vector<std::pair<vec4, bool>>& getTerrains() {
 		return terrains_attr;
 	}
 
