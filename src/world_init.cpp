@@ -253,6 +253,27 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 	return entity;
 }
 
+Entity createText(std::string in_text, vec2 pos, float scale, vec3 color)
+{
+	Entity entity = Entity();
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	position.scale = vec2(scale, scale);
+
+	Text& text = registry.texts.emplace(entity);
+	text.text = in_text;
+	text.color = color;
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
+			EFFECT_ASSET_ID::TEXT_2D,
+			GEOMETRY_BUFFER_ID::TEXT_2D });
+
+	return entity;
+}
+
 Entity createLine(vec2 position, vec2 scale)
 {
 	Entity entity = Entity();

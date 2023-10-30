@@ -195,6 +195,8 @@ void WorldSystem::restart_game() {
 	vec2 exit_door_pos = current_level.getExitDoorPos();
 	std::vector<vec2> floor_pos = current_level.getFloorPos();
 	std::vector<vec4> terrains_attrs = current_level.getTerrains();
+	std::vector<std::string> texts = current_level.getTexts();
+	std::vector<std::array<float, TEXT_ATTRIBUTES>> text_attrs = current_level.getTextAttrs();
 	std::vector<std::array<float, ENEMY_ATTRIBUTES>> enemies_attrs = current_level.getEnemies();
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
@@ -207,6 +209,11 @@ void WorldSystem::restart_game() {
 	for (uint i = 0; i < terrains_attrs.size(); i++) {
 		vec4 terrain_i = terrains_attrs[i];
 		createTerrain(renderer, vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]));
+	}
+
+	for (uint i = 0; i < texts.size(); i++) {
+		std::array<float, TEXT_ATTRIBUTES> text_i = text_attrs[i];
+		createText(texts[i], vec2(text_i[0], text_i[1]), text_i[2], vec3(text_i[3], text_i[4], text_i[5]));
 	}
 
 	for (uint i = 0; i < enemies_attrs.size(); i++) {

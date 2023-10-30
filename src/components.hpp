@@ -38,6 +38,13 @@ struct ExitDoor
 
 };
 
+// Text component
+struct Text
+{
+	std::string text;
+	vec3 color;
+};
+
 // All data relevant to the resources of entities
 struct Resources
 {
@@ -217,7 +224,8 @@ enum class EFFECT_ASSET_ID {
 	TERRAIN = WATER + 1,
 	EXIT_DOOR = TERRAIN + 1,
 	HEALTH_BAR = EXIT_DOOR + 1,
-	EFFECT_COUNT = HEALTH_BAR + 1
+	TEXT_2D = HEALTH_BAR + 1,
+	EFFECT_COUNT = TEXT_2D + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
@@ -226,11 +234,12 @@ enum class GEOMETRY_BUFFER_ID {
 	SALMON = ARIA + 1,
 	SPRITE = SALMON + 1,
 	TURTLE = SPRITE + 1,
-	DEBUG_LINE = SPRITE + 1,
+	DEBUG_LINE = TURTLE + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,
 	TERRAIN = SCREEN_TRIANGLE + 1,
 	EXIT_DOOR = TERRAIN + 1,
-	GEOMETRY_COUNT = EXIT_DOOR + 1
+	TEXT_2D = EXIT_DOOR + 1,
+	GEOMETRY_COUNT = TEXT_2D + 1
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 
