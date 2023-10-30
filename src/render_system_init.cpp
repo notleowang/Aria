@@ -329,6 +329,7 @@ void RenderSystem::initializeExitDoorGeometryBuffers()
 void RenderSystem::initializeProjectileGeometryBuffers()
 {
 	int geom_index = (int)GEOMETRY_BUFFER_ID::PROJECTILE;
+	// Eli TODO: how can you query num cols and num rows?
 	int num_cols = 4;
 	int num_rows = 1;
 
@@ -337,7 +338,6 @@ void RenderSystem::initializeProjectileGeometryBuffers()
 	textured_vertices[1].position = { +1.f / 2, +1.f / 2, 0.f };
 	textured_vertices[2].position = { +1.f / 2, -1.f / 2, 0.f };
 	textured_vertices[3].position = { -1.f / 2, -1.f / 2, 0.f };
-	// Eli TODO: dont hard code the texcoords
 	textured_vertices[0].texcoord = { 0.f,				1.f / num_rows };
 	textured_vertices[1].texcoord = { 1.f / num_cols,	1.f / num_rows };
 	textured_vertices[2].texcoord = { 1.f / num_cols,	0.f };
