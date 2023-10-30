@@ -327,14 +327,13 @@ void WorldSystem::handle_collisions() {
 
 		// Checking Moveable Terrain - Terrain Collisions
 		if (registry.terrain.has(entity) && registry.terrain.has(entity_other)) {
-			printf("test\n");
 			Terrain& terrain_1 = registry.terrain.get(entity);
-			Velocity& terrain_1_velocity = registry.velocities.get(entity);
-			Position& terrain_1_position = registry.positions.get(entity);
-			Position& terrain_2_position = registry.positions.get(entity_other);
-
 			// Checking if the the terrain is moveable
 			if (terrain_1.moveable) {
+				Velocity& terrain_1_velocity = registry.velocities.get(entity);
+				Position& terrain_1_position = registry.positions.get(entity);
+				Position& terrain_2_position = registry.positions.get(entity_other);
+
 				if (collidedLeft(terrain_1_position, terrain_2_position) || collidedRight(terrain_1_position, terrain_2_position)) {
 					terrain_1_velocity.velocity[0] = -terrain_1_velocity.velocity[0]; // switch x direction
 				}
