@@ -37,7 +37,7 @@ struct PowerUp {
 // Terrain
 struct Terrain
 {
-
+	bool moveable = false;
 };
 
 // Exit door
@@ -184,6 +184,22 @@ struct Mesh
 	std::vector<uint16_t> vertex_indices;
 };
 
+struct Animation
+{
+	int frame = 0;
+	int num_rows;
+	int num_cols;
+	vec2 getFrameSizeInTexcoords();
+	int getNumFrames();
+	int getColumn(int frame);
+	int getRow(int frame);
+
+	Animation(int num_rows, int num_cols) {
+		this->num_rows = num_rows;
+		this->num_cols = num_cols;
+	}
+};
+
 /**
  * The following enumerators represent global identifiers refering to graphic
  * assets. For example TEXTURE_ASSET_ID are the identifiers of each texture
@@ -212,15 +228,16 @@ enum class TEXTURE_ASSET_ID {
 	FISH = 0,
 	LANDSCAPE = FISH + 1,
 	TURTLE = LANDSCAPE + 1,
-	FIRE_ENEMY= TURTLE+1,
-	WATER_PROJECTILE = FIRE_ENEMY +1,
-	FIRE_PROJECTILE = WATER_PROJECTILE +1,
-	EARTH_PROJECTILE = FIRE_PROJECTILE +1,
-	LIGHTNING_PROJECTILE = EARTH_PROJECTILE +1,
-	FLOOR = LIGHTNING_PROJECTILE + 1,
-	HEALTH_BAR_EMPTY = FLOOR + 1,
-	HEALTH_BAR_FULL = HEALTH_BAR_EMPTY + 1,
-	TEXTURE_COUNT = HEALTH_BAR_FULL + 1
+	FIRE_ENEMY = TURTLE + 1,
+	WATER_PROJECTILE = FIRE_ENEMY + 1,
+	FIRE_PROJECTILE = WATER_PROJECTILE + 1,
+	EARTH_PROJECTILE = FIRE_PROJECTILE + 1,
+	LIGHTNING_PROJECTILE = EARTH_PROJECTILE + 1,
+	WATER_PROJECTILE_SHEET = LIGHTNING_PROJECTILE + 1,
+	FIRE_PROJECTILE_SHEET = WATER_PROJECTILE_SHEET + 1,
+	FLOOR = FIRE_PROJECTILE_SHEET + 1,
+	HEALTH_BAR = FLOOR + 1,
+	TEXTURE_COUNT = HEALTH_BAR + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -234,7 +251,8 @@ enum class EFFECT_ASSET_ID {
 	EXIT_DOOR = TERRAIN + 1,
 	HEALTH_BAR = EXIT_DOOR + 1,
 	TEXT_2D = HEALTH_BAR + 1,
-	EFFECT_COUNT = TEXT_2D + 1
+	ANIMATED = TEXT_2D + 1,
+	EFFECT_COUNT = ANIMATED + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
@@ -242,13 +260,14 @@ enum class GEOMETRY_BUFFER_ID {
 	ARIA = 0,
 	SALMON = ARIA + 1,
 	SPRITE = SALMON + 1,
-	TURTLE = SPRITE + 1,
-	DEBUG_LINE = TURTLE + 1,
+	DEBUG_LINE = SPRITE + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,
 	TERRAIN = SCREEN_TRIANGLE + 1,
 	EXIT_DOOR = TERRAIN + 1,
 	TEXT_2D = EXIT_DOOR + 1,
-	GEOMETRY_COUNT = TEXT_2D + 1
+	HEALTH_BAR = TEXT_2D + 1,
+	PROJECTILE = HEALTH_BAR + 1,
+	GEOMETRY_COUNT = PROJECTILE + 1
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 

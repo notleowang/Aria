@@ -144,7 +144,7 @@ void PhysicsSystem::step(float elapsed_ms)
 		for (uint j = i+1; j < collidables_container.size(); j++) {
 			Entity& entity_j = collidables_container.entities[j];
 			// Ignore terrain-terrain and terrain-exitDoor collision
-			if (shouldIgnoreCollision(entity_i, entity_j)) continue; 
+			//if (shouldIgnoreCollision(entity_i, entity_j)) continue;
 			// Broad phase of collision check
 			if (AABBCollides(entity_i, entity_j)) {
 				// Narrow phase of collision check
