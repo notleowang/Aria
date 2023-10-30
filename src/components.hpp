@@ -168,6 +168,25 @@ struct Mesh
 	std::vector<uint16_t> vertex_indices;
 };
 
+struct Animation
+{
+	int frame = 0;
+	float texture_width;
+	float texture_height;
+	int num_rows;
+	int num_cols;
+	vec2 getFrameSize();
+	vec2 getFrameSizeInTexcoords();
+	int getNumFrames();
+
+	Animation(float texture_width, float texture_height, int num_rows, int num_cols) {
+		this->texture_width = texture_width;
+		this->texture_height = texture_height;
+		this->num_rows = num_rows;
+		this->num_cols = num_cols;
+	}
+};
+
 /**
  * The following enumerators represent global identifiers refering to graphic
  * assets. For example TEXTURE_ASSET_ID are the identifiers of each texture
@@ -204,7 +223,8 @@ enum class TEXTURE_ASSET_ID {
 	FLOOR = LIGHTNING_PROJECTILE + 1,
 	HEALTH_BAR_EMPTY = FLOOR + 1,
 	HEALTH_BAR_FULL = HEALTH_BAR_EMPTY + 1,
-	TEXTURE_COUNT = HEALTH_BAR_FULL + 1
+	WATER_PROJECTILE_SHEET = HEALTH_BAR_FULL + 1,
+	TEXTURE_COUNT = WATER_PROJECTILE_SHEET + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -217,7 +237,8 @@ enum class EFFECT_ASSET_ID {
 	TERRAIN = WATER + 1,
 	EXIT_DOOR = TERRAIN + 1,
 	HEALTH_BAR = EXIT_DOOR + 1,
-	EFFECT_COUNT = HEALTH_BAR + 1
+	ANIMATED = HEALTH_BAR + 1,
+	EFFECT_COUNT = ANIMATED + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
@@ -225,12 +246,12 @@ enum class GEOMETRY_BUFFER_ID {
 	ARIA = 0,
 	SALMON = ARIA + 1,
 	SPRITE = SALMON + 1,
-	TURTLE = SPRITE + 1,
 	DEBUG_LINE = SPRITE + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,
 	TERRAIN = SCREEN_TRIANGLE + 1,
 	EXIT_DOOR = TERRAIN + 1,
-	GEOMETRY_COUNT = EXIT_DOOR + 1
+	WATER_PROJECTILE_SHEET = EXIT_DOOR + 1,
+	GEOMETRY_COUNT = WATER_PROJECTILE_SHEET + 1
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 

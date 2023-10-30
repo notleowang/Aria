@@ -7,6 +7,9 @@
 // hard coded to the textures
 const float HEALTH_BAR_HEIGHT = 0.3f * 33.f;
 const float HEALTH_BAR_WIDTH = 0.3f * 369.f;
+// SS!!!
+const float TEST_SPRITESHEET_WIDTH = 128.f;
+const float TEST_SPRITESHEET_HEIGHT = 32.f;
 
 // the player
 Entity createAria(RenderSystem* renderer, vec2 pos);
@@ -29,5 +32,6 @@ Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity);
 Entity createFloor(RenderSystem* renderer, vec2 pos);
 
 // test
+Entity createTestEntity(RenderSystem* renderer, vec2 pos);
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos);
 

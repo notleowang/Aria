@@ -171,6 +171,28 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
+Entity createTestEntity(RenderSystem* renderer, vec2 pos)
+{
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	position.scale = vec2(32.f, 32.f);
+
+	registry.animations.insert(entity, Animation(128.f, 32.f, 1, 4));
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::WATER_PROJECTILE_SHEET,
+			EFFECT_ASSET_ID::ANIMATED,
+			GEOMETRY_BUFFER_ID::WATER_PROJECTILE_SHEET });
+
+	return entity;
+}
+
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 {
 	auto entity = Entity();

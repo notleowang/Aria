@@ -27,6 +27,7 @@ public:
 	ComponentContainer<Terrain> terrain;
 	ComponentContainer<ExitDoor> exitDoors;
 	ComponentContainer<Mesh*> meshPtrs;
+	ComponentContainer<Animation> animations;
 	ComponentContainer<RenderRequest> renderRequests;
 	ComponentContainer<ScreenState> screenStates;
 	ComponentContainer<DebugComponent> debugComponents;
@@ -52,6 +53,7 @@ public:
 		registry_list.push_back(&terrain);
 		registry_list.push_back(&exitDoors);
 		registry_list.push_back(&meshPtrs);
+		registry_list.push_back(&animations);
 		registry_list.push_back(&renderRequests);
 		registry_list.push_back(&screenStates);
 		registry_list.push_back(&debugComponents);

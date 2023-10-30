@@ -203,6 +203,7 @@ void WorldSystem::restart_game() {
 	}
 
 	player = createAria(renderer, player_starting_pos);
+	//Entity testEntity = createTestEntity(renderer, vec2(player_starting_pos.x, player_starting_pos.y - 50.f));
 
 	for (uint i = 0; i < terrains_attrs.size(); i++) {
 		vec4 terrain_i = terrains_attrs[i];

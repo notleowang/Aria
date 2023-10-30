@@ -37,7 +37,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	gl_has_errors();
 
 	// Input data location as in the vertex buffer
-	if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED)
+	if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED || render_request.used_effect == EFFECT_ASSET_ID::ANIMATED)
 	{
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
@@ -65,6 +65,14 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
+
+		if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATED) {
+			assert(registry.animations.has(entity));
+			Animation& animation = registry.animations.get(entity);
+			glUniform1i(glGetUniformLocation(program, "frame"), animation.frame);
+			glUniform1f(glGetUniformLocation(program, "frame_width"), animation.getFrameSizeInTexcoords().x);
+			gl_has_errors();
+		}
 	}
 	else if (render_request.used_effect == EFFECT_ASSET_ID::HEALTH_BAR) {
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
@@ -263,4 +271,17 @@ void RenderSystem::draw()
 	// flicker-free display with a double buffer
 	glfwSwapBuffers(window);
 	gl_has_errors();
+}
+
+void RenderSystem::animation_step(float elapsed_ms)
+{
+	elapsed_time += elapsed_ms;
+	if (elapsed_time > ANIMATION_SPEED) {
+		elapsed_time = 0.f;
+		auto& animation_container = registry.animations;
+		for (uint i = 0; i < animation_container.size(); i++) {
+			Animation& animation = animation_container.components[i];
+			animation.frame = (animation.frame + 1) % animation.getNumFrames();
+		}
+	}
 }
