@@ -176,28 +176,6 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
-Entity createTestEntity(RenderSystem* renderer, vec2 pos)
-{
-	auto entity = Entity();
-
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(entity, &mesh);
-
-	Position& position = registry.positions.emplace(entity);
-	position.position = pos;
-	position.scale = vec2(32.f, 32.f);
-
-	registry.animations.insert(entity, Animation(128.f, 32.f, 1, 4));
-
-	registry.renderRequests.insert(
-		entity,
-		{ TEXTURE_ASSET_ID::WATER_PROJECTILE_SHEET,
-			EFFECT_ASSET_ID::ANIMATED,
-			GEOMETRY_BUFFER_ID::WATER_PROJECTILE_SHEET });
-
-	return entity;
-}
-
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 {
 	auto entity = Entity();
@@ -237,46 +215,64 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::PROJECTILE);
 	registry.meshPtrs.emplace(entity, &mesh);
+
+	registry.animations.insert(
+		entity, 
+		Animation(PROJECTILE_SPRITESHEET_WIDTH, PROJECTILE_SPRITESHEET_HEIGHT, PROJECTILE_SPRITESHEET_NUM_ROWS, PROJECTILE_SPRITESHEET_NUM_COLS));
+
+	Projectiles& projectile = registry.projectiles.emplace(entity);
+	projectile.type = elementType;
+
+	TEXTURE_ASSET_ID textureAsset;
+	EFFECT_ASSET_ID effectAsset;
+	GEOMETRY_BUFFER_ID geometryBuffer;
+	switch (projectile.type) {
+		case ElementType::WATER:
+			textureAsset = TEXTURE_ASSET_ID::WATER_PROJECTILE_SHEET;
+			effectAsset = EFFECT_ASSET_ID::ANIMATED;
+			geometryBuffer = GEOMETRY_BUFFER_ID::PROJECTILE;
+			break;
+		case ElementType::FIRE:
+			textureAsset = TEXTURE_ASSET_ID::FIRE_PROJECTILE;
+			effectAsset = EFFECT_ASSET_ID::TEXTURED;
+			geometryBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+			break;
+		case ElementType::EARTH:
+			textureAsset = TEXTURE_ASSET_ID::EARTH_PROJECTILE;
+			effectAsset = EFFECT_ASSET_ID::TEXTURED;
+			geometryBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+			break;
+		case ElementType::LIGHTNING:
+			textureAsset = TEXTURE_ASSET_ID::LIGHTNING_PROJECTILE;
+			effectAsset = EFFECT_ASSET_ID::TEXTURED;
+			geometryBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+			break;
+		default:
+			textureAsset = TEXTURE_ASSET_ID::WATER_PROJECTILE_SHEET;
+			effectAsset = EFFECT_ASSET_ID::ANIMATED;
+			geometryBuffer = GEOMETRY_BUFFER_ID::PROJECTILE;
+			break;
+	}
 
 	// Set initial position and velocity for the projectile
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 	position.scale = vec2(30.f, 30.f);
 
-	Projectiles& projectile = registry.projectiles.emplace(entity);
-	projectile.type = elementType;
-	TEXTURE_ASSET_ID textureAsset;
-	switch (projectile.type) {
-		case ElementType::WATER:
-			textureAsset = TEXTURE_ASSET_ID::WATER_PROJECTILE;
-			break;
-		
-		case ElementType::FIRE:
-			textureAsset = TEXTURE_ASSET_ID::FIRE_PROJECTILE;
-			break;
-		case ElementType::EARTH:
-			textureAsset = TEXTURE_ASSET_ID::EARTH_PROJECTILE;
-			break;
-		case ElementType::LIGHTNING:
-			textureAsset = TEXTURE_ASSET_ID::LIGHTNING_PROJECTILE;
-			break;
-		default:
-			textureAsset = TEXTURE_ASSET_ID::WATER_PROJECTILE;
-			break;
-	}
-
 	registry.collidables.emplace(entity);
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = vel;
 
+	// Eli TODO: correctly orient the sprite according to the angle of its motion
+
 	registry.renderRequests.insert(
 		entity,
-		{	textureAsset, //TODO: Change texture asset- the projectiles are currently turtles
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE });
+		{	textureAsset,
+			effectAsset,
+			geometryBuffer });
 	return entity;
 }
 

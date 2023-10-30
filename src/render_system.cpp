@@ -75,6 +75,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		}
 	}
 	else if (render_request.used_effect == EFFECT_ASSET_ID::HEALTH_BAR) {
+		// Eli TODO: remove some of the repeated code and refactor so health bar is a single texture
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
 		gl_has_errors();

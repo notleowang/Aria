@@ -328,13 +328,14 @@ void RenderSystem::initializeExitDoorGeometryBuffers()
 
 void RenderSystem::initializeProjectileGeometryBuffers()
 {
-	int geom_index = (int)GEOMETRY_BUFFER_ID::WATER_PROJECTILE_SHEET;
+	int geom_index = (int)GEOMETRY_BUFFER_ID::PROJECTILE;
 
 	std::vector<TexturedVertex> textured_vertices(4);
 	textured_vertices[0].position = { -1.f / 2, +1.f / 2, 0.f };
 	textured_vertices[1].position = { +1.f / 2, +1.f / 2, 0.f };
 	textured_vertices[2].position = { +1.f / 2, -1.f / 2, 0.f };
 	textured_vertices[3].position = { -1.f / 2, -1.f / 2, 0.f };
+	// Eli TODO: dont hard code the texcoords
 	textured_vertices[0].texcoord = { 0.f, 1.f };
 	textured_vertices[1].texcoord = { 1 / 4.f, 1.f };
 	textured_vertices[2].texcoord = { 1 / 4.f, 0.f };
@@ -350,7 +351,7 @@ void RenderSystem::initializeProjectileGeometryBuffers()
 
 	meshes[geom_index].vertices = vertices;
 	meshes[geom_index].vertex_indices = textured_indices;
-	bindVBOandIBO(GEOMETRY_BUFFER_ID::WATER_PROJECTILE_SHEET, textured_vertices, textured_indices);
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::PROJECTILE, textured_vertices, textured_indices);
 }
 
 void RenderSystem::initializeGlGeometryBuffers()

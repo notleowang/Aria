@@ -13,22 +13,9 @@ uniform float frame_width;
 // Output color
 layout(location = 0) out  vec4 color;
 
-vec3 colorByFrame(int frame) {
-	if (frame == 0) {
-		return vec3(1.0, 0.0, 0.0);
-	} else if (frame == 1) {
-		return vec3(0.0, 1.0, 0.0);
-	} else if (frame == 2) {
-		return vec3(0.0, 0.0, 1.0);
-	} else if (frame == 3) {
-		return vec3(0.0, 0.5, 0.5);
-	} else {
-		return vec3(0.0, 0.0, 0.0);
-	}
-}
-
 void main()
 {
+	// Eli TODO: implement spritesheets with multiple rows
 	vec2 uv = texcoord;
 	uv.x += frame_width * frame;
 	color = vec4(fcolor, 1.0) * texture(sampler0, uv);

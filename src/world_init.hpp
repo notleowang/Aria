@@ -4,12 +4,14 @@
 #include "tiny_ecs.hpp"
 #include "render_system.hpp"
 
-// hard coded to the textures
+// Eli TODO: better way to get this info?
+// Hard coded to the textures
 const float HEALTH_BAR_HEIGHT = 0.3f * 33.f;
 const float HEALTH_BAR_WIDTH = 0.3f * 369.f;
-// SS!!!
-const float TEST_SPRITESHEET_WIDTH = 128.f;
-const float TEST_SPRITESHEET_HEIGHT = 32.f;
+const float PROJECTILE_SPRITESHEET_WIDTH = 128.f;
+const float PROJECTILE_SPRITESHEET_HEIGHT = 32.f;
+const int PROJECTILE_SPRITESHEET_NUM_ROWS = 1;
+const int PROJECTILE_SPRITESHEET_NUM_COLS = 4;
 
 // the player
 Entity createAria(RenderSystem* renderer, vec2 pos);
@@ -34,6 +36,5 @@ Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity);
 Entity createFloor(RenderSystem* renderer, vec2 pos);
 
 // test
-Entity createTestEntity(RenderSystem* renderer, vec2 pos);
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos);
 

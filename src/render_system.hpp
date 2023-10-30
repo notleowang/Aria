@@ -46,10 +46,10 @@ class RenderSystem {
 			textures_path("fire_projectile.png"),
 			textures_path("earth_projectile.png"),
 			textures_path("lightning_projectile.png"),
+			textures_path("water_projectile_spritesheet.png"),
 			textures_path("dungeon_tile.png"),
 			textures_path("health_bar_empty.png"),
-			textures_path("health_bar_full.png"),
-			textures_path("water_projectile_spritesheet.png")
+			textures_path("health_bar_full.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -128,7 +128,7 @@ private:
 
 	Entity screen_state_entity;
 
-	const float ANIMATION_SPEED = 500.f; // in ms
+	const float ANIMATION_SPEED = 100.f; // in ms
 	float elapsed_time = 0.f;
 };
 
