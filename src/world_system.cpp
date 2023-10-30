@@ -194,7 +194,7 @@ void WorldSystem::restart_game() {
 	vec2 player_starting_pos = current_level.getPlayerStartingPos();
 	vec2 exit_door_pos = current_level.getExitDoorPos();
 	std::vector<vec2> floor_pos = current_level.getFloorPos();
-	std::vector<vec4> terrains_attrs = current_level.getTerrains();
+	std::vector<std::pair<vec4, bool>> terrains_attrs = current_level.getTerrains();
 	std::vector<std::string> texts = current_level.getTexts();
 	std::vector<std::array<float, TEXT_ATTRIBUTES>> text_attrs = current_level.getTextAttrs();
 	std::vector<std::array<float, ENEMY_ATTRIBUTES>> enemies_attrs = current_level.getEnemies();
@@ -206,9 +206,9 @@ void WorldSystem::restart_game() {
 
 	player = createAria(renderer, player_starting_pos);
 
-	for (uint i = 0; i < this->terrains_attrs.size(); i++) {
-		vec4 terrain_i = this->terrains_attrs[i].first;
-		bool moveable = this->terrains_attrs[i].second;
+	for (uint i = 0; i < terrains_attrs.size(); i++) {
+		vec4 terrain_i = terrains_attrs[i].first;
+		bool moveable = terrains_attrs[i].second;
 		createTerrain(renderer, vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]), moveable);
 	}
 
