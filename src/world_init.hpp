@@ -20,12 +20,10 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size);
 // creates an exit door
 Entity createExitDoor(RenderSystem* renderer, vec2 pos);
 
-<<<<<<< HEAD
 Entity createText(std::string in_text, vec2 pos, float scale, vec3 color);
-=======
+
 // creates a power up selection menu
 Entity createPowerUpSelectionMenu(RenderSystem* renderer, vec2 pos);
->>>>>>> 0a3257f (trigger random generation of available power ups on level completion)
 
 // mock enemy TODO: change enemy implementation
 Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType);
