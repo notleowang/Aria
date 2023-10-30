@@ -59,6 +59,7 @@ int main()
 
 		world_system.handle_collisions();
 
+		render_system.animation_step(elapsed_ms);
 		render_system.draw();
 	}
 
