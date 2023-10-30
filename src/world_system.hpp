@@ -55,7 +55,7 @@ private:
 	// Game state
 	RenderSystem* renderer;
 	Entity player;
-	
+
 	GameLevel curr_level;
 
 	// music references

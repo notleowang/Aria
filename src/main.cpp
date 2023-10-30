@@ -34,7 +34,7 @@ int main()
 
 	// Set the game level then initialize the main systems
 	GameLevel level;
-	level.init(1);
+	level.init(0);
 
 
 	// initialize the main systems

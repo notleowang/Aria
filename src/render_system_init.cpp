@@ -50,7 +50,6 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 
 	// We are not really using VAO's but without at least one bound we will crash in
 	// some systems.
-	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	gl_has_errors();
@@ -59,8 +58,81 @@ bool RenderSystem::init(GLFWwindow* window_arg)
     initializeGlTextures();
 	initializeGlEffects();
 	initializeGlGeometryBuffers();
+	initializeFreeType();
 
 	return true;
+}
+
+void RenderSystem::initializeFreeType() {
+	// FreeType Reference: https://learnopengl.com/In-Practice/Text-Rendering
+	FT_Library ft;
+	// All functions return a value different than 0 whenever an error occurred
+	if (FT_Init_FreeType(&ft))
+	{
+		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+		return;
+	}
+
+	// load font as face
+	FT_Face face;
+	if (FT_New_Face(ft, "../../../data/fonts/PixeloidSans.ttf", 0, &face)) {
+		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+		return;
+	}
+	else {
+		// set size to load glyphs as
+		FT_Set_Pixel_Sizes(face, 0, 48);
+
+		// disable byte-alignment restriction
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+		// load first 128 characters of ASCII set
+		for (unsigned char c = 0; c < 128; c++)
+		{
+			// Load character glyph 
+			if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+			{
+				std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+				continue;
+			}
+			// generate texture
+			GLuint texture;
+			glGenTextures(1, &texture);
+			glBindTexture(GL_TEXTURE_2D, texture);
+			glTexImage2D(
+				GL_TEXTURE_2D,
+				0,
+				GL_RED,
+				face->glyph->bitmap.width,
+				face->glyph->bitmap.rows,
+				0,
+				GL_RED,
+				GL_UNSIGNED_BYTE,
+				face->glyph->bitmap.buffer
+			);
+			// set texture options
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			// now store character for later use
+			Character character = {
+				texture,
+				glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+				glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+				static_cast<unsigned int>(face->glyph->advance.x)
+			};
+			Characters.insert(std::pair<char, Character>(c, character));
+		}
+	}
+	// destroy FreeType once we're finished
+	FT_Done_Face(face);
+	FT_Done_FreeType(ft);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffers[(uint)GEOMETRY_BUFFER_ID::TEXT_2D]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+
+	gl_has_errors();
 }
 
 void RenderSystem::initializeGlTextures()
@@ -88,7 +160,6 @@ void RenderSystem::initializeGlTextures()
 		gl_has_errors();
 		stbi_image_free(data);
     }
-	gl_has_errors();
 }
 
 void RenderSystem::initializeGlEffects()
@@ -278,7 +349,109 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeExitDoorGeometryBuffers();
 	initializeProjectileGeometryBuffers();
 
+<<<<<<< HEAD
 	// !!! TODO: INITIALIZE MESH BASED ON ENEMY DESIGN (Currently just a square; see above in GEOM::SPRITE)
+=======
+	// Counterclockwise as it's the default opengl front winding direction.
+	const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::SPRITE, textured_vertices, textured_indices);
+	
+	// Note: This is just a copy of vertices from textured_vertices
+	// We should change the vertices based on our design of individual sprites
+	int geom_sprite_index = (int)GEOMETRY_BUFFER_ID::SPRITE;
+	std::vector<ColoredVertex> sprite_vertices(4);
+	sprite_vertices[0].position = { -1.f/2, +1.f/2, 0.f };
+	sprite_vertices[1].position = { +1.f/2, +1.f/2, 0.f };
+	sprite_vertices[2].position = { +1.f/2, -1.f/2, 0.f };
+	sprite_vertices[3].position = { -1.f/2, -1.f/2, 0.f };
+	meshes[geom_sprite_index].vertices = sprite_vertices;
+	meshes[geom_sprite_index].vertex_indices = textured_indices;
+
+
+	// Initializing aria
+	int geom_aria_index = (int)GEOMETRY_BUFFER_ID::ARIA;
+	// Triangle
+	std::vector<ColoredVertex> aria_vertices(3);
+	aria_vertices[0].position = {0.f, -0.5f, 0.f};
+	aria_vertices[1].position = {-0.5f, 0.5f, 0.f};
+	aria_vertices[2].position = {0.5f, 0.5f, 0.f};
+	meshes[geom_aria_index].vertices = aria_vertices;
+	const std::vector<uint16_t> aria_indices = { 0, 1, 2 };
+	
+	// Square
+	//std::vector<ColoredVertex> aria_vertices(4);
+	//aria_vertices[0].position = {-0.5f, -0.5f, 0.f};
+	//aria_vertices[1].position = {-0.5f, 0.5f, 0.f};
+	//aria_vertices[2].position = {0.5f, 0.5f, 0.f};
+	//aria_vertices[3].position = {0.5f, -0.5f, 0.f};
+	//meshes[geom_aria_index].vertices = aria_vertices;
+	//const std::vector<uint16_t> aria_indices = { 0, 1, 2, 0, 2, 3};
+
+	meshes[geom_aria_index].vertex_indices = aria_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::ARIA, meshes[geom_aria_index].vertices, meshes[geom_aria_index].vertex_indices);
+
+;	// !!! TODO: INITIALIZE MESH BASED ON ENEMY DESIGN (Currently just a square; see above in GEOM.::SPRITE)
+
+	// Initializing terrain
+	std::vector<ColoredVertex> terrain_vertices(4);
+	terrain_vertices[0].position = {-0.5, -0.5, -0.1};
+	terrain_vertices[1].position = {-0.5, 0.5, -0.1};
+	terrain_vertices[2].position  = {0.5, 0.5, -0.1};
+	terrain_vertices[3].position = {0.5, -0.5, -0.1};
+	const std::vector<uint16_t> terrain_indices = { 0, 1, 2, 0, 2, 3 };
+	int geom_index = (int)GEOMETRY_BUFFER_ID::TERRAIN;
+	meshes[geom_index].vertices = terrain_vertices;
+	meshes[geom_index].vertex_indices = terrain_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::TERRAIN, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
+
+	// Initializing exit door
+	// TODO: change exit door sprite
+	std::vector<ColoredVertex> exit_door_vertices(4);
+	exit_door_vertices[0].position = { -0.5, -0.5, -0.1 };
+	exit_door_vertices[1].position = { -0.5, 0.5, -0.1 };
+	exit_door_vertices[2].position = { 0.5, 0.5, -0.1 };
+	exit_door_vertices[3].position = { 0.5, -0.5, -0.1 };
+	const std::vector<uint16_t> exit_door_indices = { 0, 1, 2, 0, 2, 3 };
+	int geom_index_door = (int)GEOMETRY_BUFFER_ID::EXIT_DOOR;
+	meshes[geom_index_door].vertices = exit_door_vertices;
+	meshes[geom_index_door].vertex_indices = exit_door_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::EXIT_DOOR, meshes[geom_index_door].vertices, meshes[geom_index_door].vertex_indices);
+
+	//////////////////////////////////
+	// Initialize debug line
+	std::vector<ColoredVertex> line_vertices;
+	std::vector<uint16_t> line_indices;
+
+	constexpr float depth = 0.5f;
+	constexpr vec3 red = { 0.8,0.1,0.1 };
+
+	// Corner points
+	line_vertices = {
+		{{-0.5,-0.5, depth}, red},
+		{{-0.5, 0.5, depth}, red},
+		{{ 0.5, 0.5, depth}, red},
+		{{ 0.5,-0.5, depth}, red},
+	};
+
+	// Two triangles
+	line_indices = {0, 1, 3, 1, 2, 3};
+	
+	geom_index = (int)GEOMETRY_BUFFER_ID::DEBUG_LINE;
+	meshes[geom_index].vertices = line_vertices;
+	meshes[geom_index].vertex_indices = line_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::DEBUG_LINE, line_vertices, line_indices);
+
+	///////////////////////////////////////////////////////
+	// Initialize screen triangle (yes, triangle, not quad; its more efficient).
+	std::vector<vec3> screen_vertices(3);
+	screen_vertices[0] = { -1, -6, 0.f };
+	screen_vertices[1] = { 6, -1, 0.f };
+	screen_vertices[2] = { -1, 6, 0.f };
+
+	// Counterclockwise as it's the default opengl front winding direction.
+	const std::vector<uint16_t> screen_indices = { 0, 1, 2 };
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE, screen_vertices, screen_indices);
+>>>>>>> main
 }
 
 RenderSystem::~RenderSystem()

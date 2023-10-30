@@ -56,7 +56,7 @@ Entity createFloor(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
-Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size)
+Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, bool moveable)
 {
 	auto entity = Entity();
 
@@ -67,7 +67,12 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size)
 	position.position = pos;
 	position.scale = size;
 
-	registry.terrain.emplace(entity);
+	Terrain& terrain = registry.terrain.emplace(entity);
+	if (moveable) {
+		terrain.moveable = true;
+		Velocity& velocity = registry.velocities.emplace(entity);
+		velocity.velocity = { 200.f, 0.f };
+	}
 	registry.collidables.emplace(entity); // Marking terrain as collidable
 	registry.renderRequests.insert(
 		entity, 
@@ -272,6 +277,27 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 		{	textureAsset, //TODO: Change texture asset- the projectiles are currently turtles
 			EFFECT_ASSET_ID::TEXTURED,
 			GEOMETRY_BUFFER_ID::SPRITE });
+	return entity;
+}
+
+Entity createText(std::string in_text, vec2 pos, float scale, vec3 color)
+{
+	Entity entity = Entity();
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	position.scale = vec2(scale, scale);
+
+	Text& text = registry.texts.emplace(entity);
+	text.text = in_text;
+	text.color = color;
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
+			EFFECT_ASSET_ID::TEXT_2D,
+			GEOMETRY_BUFFER_ID::TEXT_2D });
+
 	return entity;
 }
 

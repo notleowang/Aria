@@ -18,10 +18,12 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 Entity createLine(vec2 position, vec2 size);
 
 // creates a terrain with fixed size
-Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size);
+Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, bool moveable);
 
 // creates an exit door
 Entity createExitDoor(RenderSystem* renderer, vec2 pos);
+
+Entity createText(std::string in_text, vec2 pos, float scale, vec3 color);
 
 // mock enemy TODO: change enemy implementation
 Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType);

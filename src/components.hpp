@@ -29,13 +29,20 @@ struct Enemy
 // Terrain
 struct Terrain
 {
-
+	bool moveable = false;
 };
 
 // Exit door
 struct ExitDoor
 {
 
+};
+
+// Text component
+struct Text
+{
+	std::string text;
+	vec3 color;
 };
 
 // All data relevant to the resources of entities
@@ -237,8 +244,9 @@ enum class EFFECT_ASSET_ID {
 	TERRAIN = WATER + 1,
 	EXIT_DOOR = TERRAIN + 1,
 	HEALTH_BAR = EXIT_DOOR + 1,
-	ANIMATED = HEALTH_BAR + 1,
-	EFFECT_COUNT = ANIMATED + 1
+	TEXT_2D = HEALTH_BAR + 1,
+	ANIMATED = TEXT_2D + 1,
+	EFFECT_COUNT = HEALTH_BAR + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 

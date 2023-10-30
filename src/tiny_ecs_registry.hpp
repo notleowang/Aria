@@ -16,6 +16,7 @@ public:
 	ComponentContainer<HealthBar> healthBars;
 	ComponentContainer<Projectiles> projectiles;
 	ComponentContainer<CharacterProjectileType> characterProjectileTypes;
+	ComponentContainer<Text> texts;
 	ComponentContainer<InvulnerableTimer> invulnerableTimers;
 	ComponentContainer<Position> positions;
 	ComponentContainer<Velocity> velocities;
@@ -39,6 +40,7 @@ public:
 	{
 		registry_list.push_back(&deathTimers);
 		registry_list.push_back(&projectiles);
+		registry_list.push_back(&texts);
 		registry_list.push_back(&resources);
 		registry_list.push_back(&healthBars);
 		registry_list.push_back(&characterProjectileTypes);

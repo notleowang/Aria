@@ -194,7 +194,9 @@ void WorldSystem::restart_game() {
 	vec2 player_starting_pos = current_level.getPlayerStartingPos();
 	vec2 exit_door_pos = current_level.getExitDoorPos();
 	std::vector<vec2> floor_pos = current_level.getFloorPos();
-	std::vector<vec4> terrains_attrs = current_level.getTerrains();
+	std::vector<std::pair<vec4, bool>> terrains_attrs = current_level.getTerrains();
+	std::vector<std::string> texts = current_level.getTexts();
+	std::vector<std::array<float, TEXT_ATTRIBUTES>> text_attrs = current_level.getTextAttrs();
 	std::vector<std::array<float, ENEMY_ATTRIBUTES>> enemies_attrs = current_level.getEnemies();
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
@@ -206,8 +208,14 @@ void WorldSystem::restart_game() {
 	//Entity testEntity = createTestEntity(renderer, vec2(player_starting_pos.x, player_starting_pos.y - 50.f));
 
 	for (uint i = 0; i < terrains_attrs.size(); i++) {
-		vec4 terrain_i = terrains_attrs[i];
-		createTerrain(renderer, vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]));
+		vec4 terrain_i = terrains_attrs[i].first;
+		bool moveable = terrains_attrs[i].second;
+		createTerrain(renderer, vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]), moveable);
+	}
+
+	for (uint i = 0; i < texts.size(); i++) {
+		std::array<float, TEXT_ATTRIBUTES> text_i = text_attrs[i];
+		createText(texts[i], vec2(text_i[0], text_i[1]), text_i[2], vec3(text_i[3], text_i[4], text_i[5]));
 	}
 
 	for (uint i = 0; i < enemies_attrs.size(); i++) {
@@ -325,6 +333,24 @@ void WorldSystem::handle_collisions() {
 			// update health bar position to remove jitter
 			health_bar_position.position = enemy_position.position;
 			health_bar_position.position.y += health_bar.y_offset;
+		}
+
+		// Checking Moveable Terrain - Terrain Collisions
+		if (registry.terrain.has(entity) && registry.terrain.has(entity_other)) {
+			Terrain& terrain_1 = registry.terrain.get(entity);
+			// Checking if the the terrain is moveable
+			if (terrain_1.moveable) {
+				Velocity& terrain_1_velocity = registry.velocities.get(entity);
+				Position& terrain_1_position = registry.positions.get(entity);
+				Position& terrain_2_position = registry.positions.get(entity_other);
+
+				if (collidedLeft(terrain_1_position, terrain_2_position) || collidedRight(terrain_1_position, terrain_2_position)) {
+					terrain_1_velocity.velocity[0] = -terrain_1_velocity.velocity[0]; // switch x direction
+				}
+				if (collidedTop(terrain_1_position, terrain_2_position) || collidedBottom(terrain_1_position, terrain_2_position)) {
+					terrain_1_velocity.velocity[1] = -terrain_1_velocity.velocity[1]; // switch y direction
+				}
+			}
 		}
 
 		// Checking Projectile - Enemy collisions
