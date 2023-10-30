@@ -75,7 +75,7 @@ void RenderSystem::initializeFreeType() {
 
 	// load font as face
 	FT_Face face;
-	if (FT_New_Face(ft, "../data/fonts/PixeloidSans.ttf", 0, &face)) {
+	if (FT_New_Face(ft, "../../../data/fonts/PixeloidSans.ttf", 0, &face)) {
 		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
 		return;
 	}
