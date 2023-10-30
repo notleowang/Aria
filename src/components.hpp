@@ -29,7 +29,7 @@ struct Enemy
 // Terrain
 struct Terrain
 {
-
+	bool moveable = false;
 };
 
 // Exit door
