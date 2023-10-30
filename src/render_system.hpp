@@ -49,8 +49,7 @@ class RenderSystem {
 			textures_path("water_projectile_spritesheet.png"),
 			textures_path("fire_projectile_spritesheet.png"),
 			textures_path("dungeon_tile.png"),
-			textures_path("health_bar_empty.png"),
-			textures_path("health_bar_full.png")
+			textures_path("health_bar.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -111,13 +110,14 @@ private:
 	void drawToScreen();
 
 	// Helper functions for initalizeGlGeometryBuffers()
-	void initializePlayerGeometryBuffers();
-	void initializeSpriteGeometryBuffers();
-	void initializeDebugLineGeometryBuffers();
-	void initializeScreenTriangleGeometryBuffers();
-	void initializeTerrainGeometryBuffers();
-	void initializeExitDoorGeometryBuffers();
-	void initializeProjectileGeometryBuffers();
+	void initializePlayerGeometryBuffer();
+	void initializeSpriteGeometryBuffer();
+	void initializeDebugLineGeometryBuffer();
+	void initializeScreenTriangleGeometryBuffer();
+	void initializeTerrainGeometryBuffer();
+	void initializeExitDoorGeometryBuffer();
+	void initializeProjectileGeometryBuffer();
+	void initializeHealthBarGeometryBuffer();
 
 	// Window handle
 	GLFWwindow* window;

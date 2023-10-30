@@ -148,9 +148,9 @@ Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity)
 
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::HEALTH_BAR_EMPTY, // !!! This technically does nothing
+		{ TEXTURE_ASSET_ID::HEALTH_BAR,
 			EFFECT_ASSET_ID::HEALTH_BAR,
-			GEOMETRY_BUFFER_ID::SPRITE });
+			GEOMETRY_BUFFER_ID::HEALTH_BAR });
 
 	return entity;
 }

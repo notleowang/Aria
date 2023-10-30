@@ -208,7 +208,7 @@ void RenderSystem::initializeGlMeshes()
 }
 
 // Helper functions for initializing Gl Geometry Buffers
-void RenderSystem::initializePlayerGeometryBuffers()
+void RenderSystem::initializePlayerGeometryBuffer()
 {
 	int geom_index = (int)GEOMETRY_BUFFER_ID::ARIA;
 	
@@ -224,7 +224,7 @@ void RenderSystem::initializePlayerGeometryBuffers()
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::ARIA, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
 }
 
-void RenderSystem::initializeSpriteGeometryBuffers()
+void RenderSystem::initializeSpriteGeometryBuffer()
 {
 	int geom_index = (int)GEOMETRY_BUFFER_ID::SPRITE;
 
@@ -252,7 +252,7 @@ void RenderSystem::initializeSpriteGeometryBuffers()
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::SPRITE, textured_vertices, textured_indices);
 }
 
-void RenderSystem::initializeDebugLineGeometryBuffers()
+void RenderSystem::initializeDebugLineGeometryBuffer()
 {
 	int geom_index = (int)GEOMETRY_BUFFER_ID::DEBUG_LINE;
 
@@ -278,7 +278,7 @@ void RenderSystem::initializeDebugLineGeometryBuffers()
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::DEBUG_LINE, vertices, vertex_indices);
 }
 
-void RenderSystem::initializeScreenTriangleGeometryBuffers()
+void RenderSystem::initializeScreenTriangleGeometryBuffer()
 {
 	std::vector<vec3> vertices(3);
 	vertices[0] = { -1, -6, 0.f };
@@ -292,7 +292,7 @@ void RenderSystem::initializeScreenTriangleGeometryBuffers()
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE, vertices, vertex_indices);
 }
 
-void RenderSystem::initializeTerrainGeometryBuffers()
+void RenderSystem::initializeTerrainGeometryBuffer()
 {
 	int geom_index = (int)GEOMETRY_BUFFER_ID::TERRAIN;
 
@@ -309,7 +309,7 @@ void RenderSystem::initializeTerrainGeometryBuffers()
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::TERRAIN, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
 }
 
-void RenderSystem::initializeExitDoorGeometryBuffers()
+void RenderSystem::initializeExitDoorGeometryBuffer()
 {
 	int geom_index = (int)GEOMETRY_BUFFER_ID::EXIT_DOOR;
 
@@ -326,7 +326,7 @@ void RenderSystem::initializeExitDoorGeometryBuffers()
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::EXIT_DOOR, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
 }
 
-void RenderSystem::initializeProjectileGeometryBuffers()
+void RenderSystem::initializeProjectileGeometryBuffer()
 {
 	int geom_index = (int)GEOMETRY_BUFFER_ID::PROJECTILE;
 	// Eli TODO: how can you query num cols and num rows?
@@ -356,6 +356,35 @@ void RenderSystem::initializeProjectileGeometryBuffers()
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::PROJECTILE, textured_vertices, textured_indices);
 }
 
+void RenderSystem::initializeHealthBarGeometryBuffer()
+{
+	int geom_index = (int)GEOMETRY_BUFFER_ID::HEALTH_BAR;
+
+	// Initial texture coords are centered on empty health bar
+	std::vector<TexturedVertex> textured_vertices(4);
+	textured_vertices[0].position = { -1.f / 2, +1.f / 2, 0.f };
+	textured_vertices[1].position = { +1.f / 2, +1.f / 2, 0.f };
+	textured_vertices[2].position = { +1.f / 2, -1.f / 2, 0.f };
+	textured_vertices[3].position = { -1.f / 2, -1.f / 2, 0.f };
+	textured_vertices[0].texcoord = { 0.f, 1.f / 2 };
+	textured_vertices[1].texcoord = { 1.f, 1.f / 2 };
+	textured_vertices[2].texcoord = { 1.f, 0.f };
+	textured_vertices[3].texcoord = { 0.f, 0.f };
+
+	// Counterclockwise as it's the default opengl front winding direction.
+	const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
+
+	std::vector<ColoredVertex> vertices(4);
+	vertices[0].position = textured_vertices[0].position;
+	vertices[1].position = textured_vertices[1].position;
+	vertices[2].position = textured_vertices[2].position;
+	vertices[3].position = textured_vertices[3].position;
+
+	meshes[geom_index].vertices = vertices;
+	meshes[geom_index].vertex_indices = textured_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::HEALTH_BAR, textured_vertices, textured_indices);
+}
+
 void RenderSystem::initializeGlGeometryBuffers()
 {
 	// Vertex Buffer creation.
@@ -366,13 +395,14 @@ void RenderSystem::initializeGlGeometryBuffers()
 	// Index and Vertex buffer data initialization.
 	initializeGlMeshes();
 
-	initializePlayerGeometryBuffers();
-	initializeSpriteGeometryBuffers();
-	initializeDebugLineGeometryBuffers();
-	initializeScreenTriangleGeometryBuffers();
-	initializeTerrainGeometryBuffers();
-	initializeExitDoorGeometryBuffers();
-	initializeProjectileGeometryBuffers();
+	initializePlayerGeometryBuffer();
+	initializeSpriteGeometryBuffer();
+	initializeDebugLineGeometryBuffer();
+	initializeScreenTriangleGeometryBuffer();
+	initializeTerrainGeometryBuffer();
+	initializeExitDoorGeometryBuffer();
+	initializeProjectileGeometryBuffer();
+	initializeHealthBarGeometryBuffer();
 }
 
 RenderSystem::~RenderSystem()
