@@ -182,6 +182,8 @@ struct Animation
 	int num_cols;
 	vec2 getFrameSizeInTexcoords();
 	int getNumFrames();
+	int getColumn(int frame);
+	int getRow(int frame);
 
 	Animation(int num_rows, int num_cols) {
 		this->num_rows = num_rows;

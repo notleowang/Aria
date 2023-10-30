@@ -126,3 +126,13 @@ int Animation::getNumFrames()
 {
 	return num_cols * num_rows;
 }
+
+int Animation::getColumn(int frame)
+{
+	return frame % num_cols;
+}
+
+int Animation::getRow(int frame)
+{
+	return floor((float)frame / num_cols);
+}

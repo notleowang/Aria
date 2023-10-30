@@ -15,8 +15,8 @@ layout(location = 0) out  vec4 color;
 
 void main()
 {
-	// Eli TODO: implement spritesheets with multiple rows
 	vec2 uv = texcoord;
+	// animation frame slides to the next on the same row
 	uv.x += frame_width * frame;
 	color = vec4(fcolor, 1.0) * texture(sampler0, uv);
 }
