@@ -131,10 +131,6 @@ private:
 
 	float elapsed_time = 0.f;
 	const float ANIMATION_SPEED = 100.f;
-	const float HEALTH_BAR_HEIGHT = 0.3f * 33.f;
-	const float HEALTH_BAR_WIDTH = 0.3f * 369.f;
-	const int PROJECTILE_SPRITESHEET_NUM_ROWS = 1;
-	const int PROJECTILE_SPRITESHEET_NUM_COLS = 4;
 };
 
 bool loadEffectFromFile(

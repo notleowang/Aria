@@ -4,6 +4,11 @@
 #include "tiny_ecs.hpp"
 #include "render_system.hpp"
 
+const float HEALTH_BAR_HEIGHT = 0.3f * 33.f;
+const float HEALTH_BAR_WIDTH = 0.3f * 369.f;
+const int PROJECTILE_SPRITESHEET_NUM_ROWS = 1;
+const int PROJECTILE_SPRITESHEET_NUM_COLS = 4;
+
 // the player
 Entity createAria(RenderSystem* renderer, vec2 pos);
 Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType);

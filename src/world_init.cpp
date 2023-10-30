@@ -1,5 +1,6 @@
 #include "world_init.hpp"
 #include "tiny_ecs_registry.hpp"
+#include "render_system.hpp"
 
 Entity createAria(RenderSystem* renderer, vec2 pos)
 {

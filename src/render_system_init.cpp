@@ -329,8 +329,9 @@ void RenderSystem::initializeExitDoorGeometryBuffer()
 void RenderSystem::initializeProjectileGeometryBuffer()
 {
 	int geom_index = (int)GEOMETRY_BUFFER_ID::PROJECTILE;
-	int num_cols = PROJECTILE_SPRITESHEET_NUM_COLS;
-	int num_rows = PROJECTILE_SPRITESHEET_NUM_ROWS;
+	// TODO: actually query these from somewhere
+	int num_cols = 4;
+	int num_rows = 1;
 
 	std::vector<TexturedVertex> textured_vertices(4);
 	textured_vertices[0].position = { -1.f / 2, +1.f / 2, 0.f };
