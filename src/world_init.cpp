@@ -220,7 +220,7 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 
 	registry.animations.insert(
 		entity, 
-		Animation(PROJECTILE_SPRITESHEET_WIDTH, PROJECTILE_SPRITESHEET_HEIGHT, PROJECTILE_SPRITESHEET_NUM_ROWS, PROJECTILE_SPRITESHEET_NUM_COLS));
+		Animation(PROJECTILE_SPRITESHEET_NUM_ROWS, PROJECTILE_SPRITESHEET_NUM_COLS));
 
 	Projectiles& projectile = registry.projectiles.emplace(entity);
 	projectile.type = elementType;
@@ -235,9 +235,9 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 			geometryBuffer = GEOMETRY_BUFFER_ID::PROJECTILE;
 			break;
 		case ElementType::FIRE:
-			textureAsset = TEXTURE_ASSET_ID::FIRE_PROJECTILE;
-			effectAsset = EFFECT_ASSET_ID::TEXTURED;
-			geometryBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+			textureAsset = TEXTURE_ASSET_ID::FIRE_PROJECTILE_SHEET;
+			effectAsset = EFFECT_ASSET_ID::ANIMATED;
+			geometryBuffer = GEOMETRY_BUFFER_ID::PROJECTILE;
 			break;
 		case ElementType::EARTH:
 			textureAsset = TEXTURE_ASSET_ID::EARTH_PROJECTILE;

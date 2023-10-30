@@ -8,8 +8,6 @@
 // Hard coded to the textures
 const float HEALTH_BAR_HEIGHT = 0.3f * 33.f;
 const float HEALTH_BAR_WIDTH = 0.3f * 369.f;
-const float PROJECTILE_SPRITESHEET_WIDTH = 128.f;
-const float PROJECTILE_SPRITESHEET_HEIGHT = 32.f;
 const int PROJECTILE_SPRITESHEET_NUM_ROWS = 1;
 const int PROJECTILE_SPRITESHEET_NUM_COLS = 4;
 

@@ -178,17 +178,12 @@ struct Mesh
 struct Animation
 {
 	int frame = 0;
-	float texture_width;
-	float texture_height;
 	int num_rows;
 	int num_cols;
-	vec2 getFrameSize();
 	vec2 getFrameSizeInTexcoords();
 	int getNumFrames();
 
-	Animation(float texture_width, float texture_height, int num_rows, int num_cols) {
-		this->texture_width = texture_width;
-		this->texture_height = texture_height;
+	Animation(int num_rows, int num_cols) {
 		this->num_rows = num_rows;
 		this->num_cols = num_cols;
 	}
@@ -228,7 +223,8 @@ enum class TEXTURE_ASSET_ID {
 	EARTH_PROJECTILE = FIRE_PROJECTILE + 1,
 	LIGHTNING_PROJECTILE = EARTH_PROJECTILE + 1,
 	WATER_PROJECTILE_SHEET = LIGHTNING_PROJECTILE + 1,
-	FLOOR = WATER_PROJECTILE_SHEET + 1,
+	FIRE_PROJECTILE_SHEET = WATER_PROJECTILE_SHEET + 1,
+	FLOOR = FIRE_PROJECTILE_SHEET + 1,
 	HEALTH_BAR_EMPTY = FLOOR + 1,
 	HEALTH_BAR_FULL = HEALTH_BAR_EMPTY + 1,
 	TEXTURE_COUNT = HEALTH_BAR_FULL + 1
