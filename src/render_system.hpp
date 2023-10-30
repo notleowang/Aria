@@ -7,6 +7,14 @@
 #include "components.hpp"
 #include "tiny_ecs.hpp"
 
+// Holds all state information relevant to a character as loaded using FreeType
+struct Character {
+	GLuint TextureID;  // ID handle of the glyph texture
+	ivec2   Size;      // Size of glyph
+	ivec2   Bearing;   // Offset from baseline to left/top of glyph
+	unsigned int Advance;   // Horizontal offset to advance to next glyph
+};
+
 // System responsible for setting up OpenGL and for rendering all the
 // visual entities in the game
 class RenderSystem {
@@ -53,12 +61,16 @@ class RenderSystem {
 		shader_path("water"),
 		shader_path("terrain"),
 		shader_path("exit_door"),
-		shader_path("health_bar")
+		shader_path("health_bar"),
+		shader_path("text_2d")
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
 	std::array<GLuint, geometry_count> index_buffers;
 	std::array<Mesh, geometry_count> meshes;
+
+	GLuint vao;
+	std::unordered_map<GLchar, Character> Characters;
 
 public:
 	// Initialize the window
@@ -79,6 +91,8 @@ public:
 	// The draw loop first renders to this texture, then it is used for the water
 	// shader
 	bool initScreenTexture();
+
+	void initializeFreeType();
 
 	// Destroy resources associated to one or all entities created by the system
 	~RenderSystem();
