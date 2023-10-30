@@ -3,6 +3,7 @@
 #include "common.hpp"
 #include "tiny_ecs.hpp"
 #include "render_system.hpp"
+using namespace std;
 
 // hard coded to the textures
 const float HEALTH_BAR_HEIGHT = 0.3f * 33.f;
@@ -23,7 +24,7 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos);
 Entity createText(std::string in_text, vec2 pos, float scale, vec3 color);
 
 // creates a power up selection menu
-Entity createPowerUpSelectionMenu(RenderSystem* renderer, vec2 pos);
+Entity createPowerUpSelectionMenu(RenderSystem* renderer, vector<pair<string, bool>> powerUps);
 
 // mock enemy TODO: change enemy implementation
 Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType);

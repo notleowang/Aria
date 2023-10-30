@@ -20,7 +20,7 @@ bool circleCollides(const Position& position1, const Position& position2)
 	const float other_r_squared = dot(other_bonding_box, other_bonding_box);
 	const vec2 my_bonding_box = get_bounding_box(position2) / 2.f;
 	const float my_r_squared = dot(my_bonding_box, my_bonding_box);
-	const float r_squared = max(other_r_squared, my_r_squared);
+	const float r_squared = std::max(other_r_squared, my_r_squared);
 	if (dist_squared < r_squared)
 		return true;
 	return false;

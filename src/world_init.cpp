@@ -176,14 +176,14 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
-Entity createPowerUpSelectionMenu(RenderSystem* renderer, vec2 pos) {
+Entity createPowerUpSelectionMenu(RenderSystem* renderer, vector<pair<string, bool>> powerUps) {
 	auto entity = Entity();
 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::EXIT_DOOR);
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	Position& position = registry.positions.emplace(entity);
-	position.position = pos;
+	position.position = vec2(window_width_px / 2, window_height_px / 3);
 	position.scale = vec2(100.f, 100.f);
 
 	registry.exitDoors.emplace(entity);
