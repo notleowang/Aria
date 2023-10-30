@@ -204,8 +204,9 @@ void WorldSystem::restart_game() {
 	player = createAria(renderer, this->player_starting_pos);
 
 	for (uint i = 0; i < this->terrains_attrs.size(); i++) {
-		vec4 terrain_i = this->terrains_attrs[i];
-		createTerrain(renderer, vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]));
+		vec4 terrain_i = this->terrains_attrs[i].first;
+		bool moveable = this->terrains_attrs[i].second;
+		createTerrain(renderer, vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]), moveable);
 	}
 
 	for (uint i = 0; i < this->enemies_attrs.size(); i++) {
@@ -322,6 +323,25 @@ void WorldSystem::handle_collisions() {
 			// update health bar position to remove jitter
 			health_bar_position.position = enemy_position.position;
 			health_bar_position.position.y += health_bar.y_offset;
+		}
+
+		// Checking Moveable Terrain - Terrain Collisions
+		if (registry.terrain.has(entity) && registry.terrain.has(entity_other)) {
+			printf("test\n");
+			Terrain& terrain_1 = registry.terrain.get(entity);
+			Velocity& terrain_1_velocity = registry.velocities.get(entity);
+			Position& terrain_1_position = registry.positions.get(entity);
+			Position& terrain_2_position = registry.positions.get(entity_other);
+
+			// Checking if the the terrain is moveable
+			if (terrain_1.moveable) {
+				if (collidedLeft(terrain_1_position, terrain_2_position) || collidedRight(terrain_1_position, terrain_2_position)) {
+					terrain_1_velocity.velocity[0] = -terrain_1_velocity.velocity[0]; // switch x direction
+				}
+				if (collidedTop(terrain_1_position, terrain_2_position) || collidedBottom(terrain_1_position, terrain_2_position)) {
+					terrain_1_velocity.velocity[1] = -terrain_1_velocity.velocity[1]; // switch y direction
+				}
+			}
 		}
 
 		// Checking Projectile - Enemy collisions
