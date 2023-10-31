@@ -166,4 +166,17 @@ void PhysicsSystem::step(float elapsed_ms)
 		position.position.x = ownerPosition.position.x;
 		position.position.y = ownerPosition.position.y + healthBar.y_offset;
 	}
+	
+	// Position the mana bars
+	auto& manaBarContainer = registry.manaBars;
+	for (int i = 0; i < manaBarContainer.size(); i++) {
+		ManaBar& manaBar = manaBarContainer.components[i];
+		Entity entity = manaBarContainer.entities[i];
+
+		Position& position = registry.positions.get(entity);
+		Position& ownerPosition = registry.positions.get(manaBar.owner);
+
+		position.position.x = ownerPosition.position.x;
+		position.position.y = ownerPosition.position.y + manaBar.y_offset;
+	}
 }

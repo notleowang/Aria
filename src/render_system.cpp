@@ -38,7 +38,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 
 	// Input data location as in the vertex buffer
 	if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED || 
-		render_request.used_effect == EFFECT_ASSET_ID::HEALTH_BAR || 
+		render_request.used_effect == EFFECT_ASSET_ID::RESOURCE_BAR || 
 		render_request.used_effect == EFFECT_ASSET_ID::ANIMATED)
 	{
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
@@ -68,16 +68,23 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		gl_has_errors();
 
-		if (render_request.used_effect == EFFECT_ASSET_ID::HEALTH_BAR) {
-			assert(registry.healthBars.has(entity));
-			HealthBar& healthBar = registry.healthBars.get(entity);
-			assert(registry.resources.has(healthBar.owner));
-			Resources& resources = registry.resources.get(healthBar.owner);
-			if (healthBar.isManaBar) {
-				glUniform1f(glGetUniformLocation(program, "hp"), (resources.currentMana / resources.maxMana));
-			} else {
-				glUniform1f(glGetUniformLocation(program, "hp"), (resources.currentHealth / resources.maxHealth));
+		if (render_request.used_effect == EFFECT_ASSET_ID::RESOURCE_BAR) {
+			float filled = 0.0;
+			if (render_request.used_texture == TEXTURE_ASSET_ID::HEALTH_BAR) {
+				assert(registry.healthBars.has(entity));
+				HealthBar& healthBar = registry.healthBars.get(entity);
+				assert(registry.resources.has(healthBar.owner));
+				Resources& resources = registry.resources.get(healthBar.owner);
+				filled = resources.currentHealth / resources.maxHealth;
 			}
+			else if (render_request.used_texture == TEXTURE_ASSET_ID::MANA_BAR) {
+				assert(registry.manaBars.has(entity));
+				ManaBar& manaBar = registry.manaBars.get(entity);
+				assert(registry.resources.has(manaBar.owner));
+				Resources& resources = registry.resources.get(manaBar.owner);
+				filled = resources.currentMana / resources.maxMana;
+			}
+			glUniform1f(glGetUniformLocation(program, "filled"), filled);
 			gl_has_errors();
 		}
 		else if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATED) {

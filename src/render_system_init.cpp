@@ -356,9 +356,9 @@ void RenderSystem::initializeProjectileGeometryBuffer()
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::PROJECTILE, textured_vertices, textured_indices);
 }
 
-void RenderSystem::initializeHealthBarGeometryBuffer()
+void RenderSystem::initializeResourceBarGeometryBuffer()
 {
-	int geom_index = (int)GEOMETRY_BUFFER_ID::HEALTH_BAR;
+	int geom_index = (int)GEOMETRY_BUFFER_ID::RESOURCE_BAR;
 
 	// Initial texture coords are centered on empty health bar
 	std::vector<TexturedVertex> textured_vertices(4);
@@ -382,7 +382,7 @@ void RenderSystem::initializeHealthBarGeometryBuffer()
 
 	meshes[geom_index].vertices = vertices;
 	meshes[geom_index].vertex_indices = textured_indices;
-	bindVBOandIBO(GEOMETRY_BUFFER_ID::HEALTH_BAR, textured_vertices, textured_indices);
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::RESOURCE_BAR, textured_vertices, textured_indices);
 }
 
 void RenderSystem::initializeGlGeometryBuffers()
@@ -402,7 +402,7 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeTerrainGeometryBuffer();
 	initializeExitDoorGeometryBuffer();
 	initializeProjectileGeometryBuffer();
-	initializeHealthBarGeometryBuffer();
+	initializeResourceBarGeometryBuffer();
 }
 
 RenderSystem::~RenderSystem()

@@ -15,6 +15,7 @@ public:
 	ComponentContainer<WinTimer> winTimers;
 	ComponentContainer<Resources> resources;
 	ComponentContainer<HealthBar> healthBars;
+	ComponentContainer<ManaBar> manaBars;
 	ComponentContainer<Projectile> projectiles;
 	ComponentContainer<CharacterProjectileType> characterProjectileTypes;
 	ComponentContainer<Text> texts;
@@ -46,6 +47,7 @@ public:
 		registry_list.push_back(&texts);
 		registry_list.push_back(&resources);
 		registry_list.push_back(&healthBars);
+		registry_list.push_back(&manaBars);
 		registry_list.push_back(&characterProjectileTypes);
 		registry_list.push_back(&invulnerableTimers);
 		registry_list.push_back(&positions);

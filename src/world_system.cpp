@@ -377,7 +377,7 @@ void WorldSystem::handle_collisions() {
 			// TODO: REFACTOR
 			Resources& resources = registry.resources.get(entity);
 			HealthBar& health_bar = registry.healthBars.get(resources.healthBar);
-			HealthBar& mana_bar = registry.healthBars.get(resources.manaBar);
+			ManaBar& mana_bar = registry.manaBars.get(resources.manaBar);
 			Position& health_bar_position = registry.positions.get(resources.healthBar);
 			Position& mana_bar_position = registry.positions.get(resources.manaBar);
 

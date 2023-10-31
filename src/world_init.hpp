@@ -5,8 +5,8 @@
 #include "render_system.hpp"
 using namespace std;
 
-const float HEALTH_BAR_HEIGHT = 0.3f * 33.f;
-const float HEALTH_BAR_WIDTH = 0.3f * 369.f;
+const float RESOURCE_BAR_HEIGHT = 0.3f * 33.f;
+const float RESOURCE_BAR_WIDTH = 0.3f * 369.f;
 const int PROJECTILE_SPRITESHEET_NUM_ROWS = 1;
 const int PROJECTILE_SPRITESHEET_NUM_COLS = 4;
 
@@ -32,6 +32,9 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType);
 
 // creates a health bar associated with an owner entity
 Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity);
+
+// creates a mana bar associated with an owner entity
+Entity createManaBar(RenderSystem* renderer, Entity& owner_entity);
 
 Entity createFloor(RenderSystem* renderer, vec2 pos);
 
