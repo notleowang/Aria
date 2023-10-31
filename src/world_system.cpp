@@ -295,7 +295,7 @@ bool collidedBottom(Position& pos_i, Position& pos_j)
 }
 
 void WorldSystem::win_level() {
-  if (registry.winTimers.has(player)) return;
+	if (registry.winTimers.has(player)) return;
 
 	printf("hooray you won the level\n"); 
 	registry.velocities.get(player).velocity = { 0.f,0.f };
@@ -604,7 +604,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 }
 
 void WorldSystem::on_mouse_button(int button, int action, int mod) {
-	if (registry.deathTimers.has(player)) { return; }
+	//Disables mouse when death or win timer happening
+	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; }
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		// get cursor position
