@@ -1,3 +1,0 @@
-/home/l/liupiye/cs427/aria/CMakeFiles/Aria.dir
-/home/l/liupiye/cs427/aria/CMakeFiles/edit_cache.dir
-/home/l/liupiye/cs427/aria/CMakeFiles/rebuild_cache.dir
