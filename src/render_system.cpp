@@ -243,9 +243,13 @@ void RenderSystem::drawToScreen()
 	GLuint time_uloc = glGetUniformLocation(water_program, "time");
 	GLuint dead_timer_uloc = glGetUniformLocation(water_program, "screen_darken_factor");
 	GLuint radius_uloc = glGetUniformLocation(water_program, "radius");
-	glUniform1f(radius_uloc, 0.3f);
-	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
+	GLuint apply_spotlight_bool = glGetUniformLocation(water_program, "apply_spotlight");
+	
 	ScreenState& screen = registry.screenStates.get(screen_state_entity);
+
+	glUniform1f(radius_uloc, screen.spotlight_radius);
+	glUniform1f(apply_spotlight_bool, screen.apply_spotlight);
+	glUniform1f(time_uloc, (float)(glfwGetTime() * 10.0f));
 	glUniform1f(dead_timer_uloc, screen.screen_darken_factor);
 	gl_has_errors();
 	// Set the vertex position and vertex texture coordinates (both stored in the

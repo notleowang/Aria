@@ -132,6 +132,8 @@ extern Debug debugging;
 struct ScreenState
 {
 	float screen_darken_factor = -1;
+	bool apply_spotlight = false;
+	float spotlight_radius = 0.0f;
 };
 
 // A struct to refer to debugging graphics in the ECS
@@ -151,6 +153,15 @@ struct DeathTimer
 {
 	float timer_ms = 3000.f;
 };
+
+// Timer that signifies level change
+struct WinTimer
+{
+	float timer_ms = 3000.f;
+	bool changedLevel = false;
+};
+
+
 
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & salmon.vs.glsl)
 struct ColoredVertex

@@ -148,12 +148,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-    float min_timer_ms = 3000.f;
+    float min_death_timer_ms = 3000.f;
 	for (Entity entity : registry.deathTimers.entities) {
 		DeathTimer& timer = registry.deathTimers.get(entity);
 		timer.timer_ms -= elapsed_ms_since_last_update;
-		if (timer.timer_ms < min_timer_ms) {
-			min_timer_ms = timer.timer_ms;
+		if (timer.timer_ms < min_death_timer_ms) {
+			min_death_timer_ms = timer.timer_ms;
 		}
 		// restart the game once the death timer expired
 		if (timer.timer_ms < 0) {
@@ -163,7 +163,33 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			return true;
 		}
 	}
-	screen.screen_darken_factor = 1 - min_timer_ms / 3000;
+	screen.screen_darken_factor = 1 - min_death_timer_ms / 3000;
+	float min_win_timer_ms = 3000.f;
+	for (Entity entity : registry.winTimers.entities) {
+		WinTimer& timer = registry.winTimers.get(entity);
+		timer.timer_ms -= elapsed_ms_since_last_update;
+		if (0< timer.timer_ms < min_win_timer_ms) {
+			min_win_timer_ms = timer.timer_ms;
+			screen.apply_spotlight = true;
+			screen.spotlight_radius = min_win_timer_ms/2000.f;
+		}
+		if (timer.timer_ms <= 0.f) {
+			min_win_timer_ms = timer.timer_ms;
+			screen.apply_spotlight = true;
+			screen.spotlight_radius = - min_win_timer_ms / 2000.f;
+			if (!timer.changedLevel) {
+				this->curr_level.init(this->curr_level.getCurrLevel() + 1);
+				timer.changedLevel = true;
+				restart_game();
+			}
+		}
+		if (timer.timer_ms <= -4000.f) {
+			registry.winTimers.remove(entity);
+			screen.apply_spotlight = false;
+		}
+	}
+
+
 	return true;
 }
 
@@ -250,14 +276,16 @@ bool collidedBottom(Position& pos_i, Position& pos_j)
 }
 
 void WorldSystem::win_level() {
-	printf("hooray you won the level\n");
-	this->curr_level.init(this->curr_level.getCurrLevel() + 1);
-	restart_game();
+	if (!registry.winTimers.has(player)) {
+		printf("hooray you won the level\n"); 
+		registry.velocities.get(player).velocity = { 0.f,0.f };
+		registry.winTimers.emplace(player);
+	}
 }
 
 // Compute collisions between entities
 void WorldSystem::handle_collisions() {
-	if (registry.deathTimers.has(player)) { return; }
+	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; } 
 	// Loop over all collisions detected by the physics system
 	auto& collisionsRegistry = registry.collisions;
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
@@ -390,7 +418,7 @@ bool WorldSystem::is_over() const {
 
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
-	if (registry.deathTimers.has(player)) { return; }
+	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; } //TODO: Add win timer
 	Velocity& player_velocity = registry.velocities.get(player);
 	Position& player_position = registry.positions.get(player);
 	Direction& player_direction = registry.directions.get(player);
