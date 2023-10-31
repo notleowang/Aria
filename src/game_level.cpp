@@ -89,20 +89,23 @@ bool GameLevel::init(uint level) {
 		break;
 	case LEVEL_2:
 		// Temporary level 2
-		this->player_starting_pos = vec2(400, 400);
+		this->player_starting_pos = vec2(200, 200);
 		terrains.push_back(std::make_pair(vec4(600, 400, 100, 100), true));
+		terrains.push_back(std::make_pair(vec4(400, 400, 100, 100), true));
 		terrains.push_back(std::make_pair(vec4(600, 50, 1000, 100), false));
 		terrains.push_back(std::make_pair(vec4(50, 400, 100, 800), false));
 		terrains.push_back(std::make_pair(vec4(600, 750, 1000, 100), false));
 		terrains.push_back(std::make_pair(vec4(1150, 400, 100, 800), false));
 
-		enemies.push_back({ 300, 600, 100, 100, 0, 0 });
+		enemies.push_back({ 900, 600, 100, 100, 0, 0 });
 
-		for (uint i = 0; i < 4; i++) {
-			floors.push_back(vec2(1600, 175 + i * 250));
+		for (uint i = 0; i < 5; i++) {
+			for (uint j = 0; j < 3; j++) {
+				floors.push_back(vec2(125 + i * 250, 175 + j * 250));
+			}
 		}
 
-		this->exit_door_pos = vec2(1500, 950);
+		this->exit_door_pos = vec2(900, 700);
 		break;
 	default:
 		printf("no level provided\n");
