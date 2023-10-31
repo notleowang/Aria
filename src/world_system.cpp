@@ -470,6 +470,7 @@ bool WorldSystem::is_over() const {
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (registry.deathTimers.has(player)) { return; }
+
 	Velocity& player_velocity = registry.velocities.get(player);
 	Position& player_position = registry.positions.get(player);
 	Direction& player_direction = registry.directions.get(player);
@@ -566,6 +567,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 }
 
 void WorldSystem::on_mouse_button(int button, int action, int mod) {
+	if (registry.deathTimers.has(player)) { return; }
+
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		// get cursor position
 		double xpos, ypos;
