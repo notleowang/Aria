@@ -34,8 +34,19 @@ Below is the documentation for our `README.md` submission for Milestone 2.
 Most of the work in this milestone aligned with our development plan for this milestone.
 
 ### Aligned with the proposal:
+- Implemented new levels.
+- Enhanced enemy ai.
+- New sprites for enemeies.
+- UI sprites (health bar).
+- Projectile sprite animations.
+- Finished basic tutorial concept level.
+- Added power-ups.
+- Added weaknesses to enemies.
+- Incorporated mana.
+- Added additional audio feedback.
 
 ### Discreprancies:
+- No sprite animations for player yet.
 
 ## ECS Design Pattern
 The ECS design pattern has not been changed since Milestone 1.
