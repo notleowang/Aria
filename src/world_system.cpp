@@ -559,6 +559,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		restart_game();
 	}
 
+	// Close program
+	if (action == GLFW_RELEASE && key == GLFW_KEY_BACKSPACE) {
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	}
+
 	// Debugging
 	//if (key == GLFW_KEY_D) {
 	//	if (action == GLFW_RELEASE)
