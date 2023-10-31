@@ -148,10 +148,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	if (player.mana < 5.f) {
+	Player& playerEnt = registry.players.get(player);
+	if (playerEnt.mana < 5.f) {
 		// replenish 0.5 stamina per second
-		player.mana += elapsed_ms / 1000 * 0.5;
-		player.mana = min(player.mana, 5.f);
+		playerEnt.mana += elapsed_ms_since_last_update / 1000 * 0.5;
+		playerEnt.mana = min(playerEnt.mana, 5.f);
 	}
 
     float min_timer_ms = 3000.f;
