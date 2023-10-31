@@ -10,7 +10,8 @@ Below is the documentation for our `README.md` submission for Milestone 2.
 [Animation Component](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/src/components.hpp#L196),
 [Handling Effect](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/src/render_system.cpp#L79),
 [Advancing Frames](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/src/render_system.cpp#L309),
-[Shader](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/shaders/animated.fs.glsl)
+[Shader](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/shaders/animated.fs.glsl),
+[Animation Sequences](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/14e8f386b75c6a21ea42ea23c1cf00e87eade535/src/world_init.cpp#L274) (the projectiles with the ANIMATED effect asset id are animation sequences using different textures)
 - New integrated assets: 
 [Health/Mana bar texture](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/data/textures/health_bar.png), 
 [New Projectile Textures](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/data/textures/water_projectile_spritesheet.png) (the link takes you to one of the new projectile textures, the rest are in the textures folder)
