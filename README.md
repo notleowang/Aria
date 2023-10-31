@@ -20,7 +20,7 @@ Below is the documentation for our `README.md` submission for Milestone 2.
     intersection. (Draw a line from entity's mid point to each vertex and check if it collides with the edge of another entity and vice versa for other entity)
 - Basic User Tutorial/Help
   - Text is provided in the very first level (tutorial level) to inform the user what can be done in the game.
-- Consistent Game Resolution: TODO
+- [Consistent Game Resolution](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/a02a00206804e162dfe492ea22aa1a741ab3b5fd/src/world_system.cpp#L75): Consistent resolution is set on line 83
 - Simple Rendering Effects: TODO
 - External Integration of FreeType Library
   - [Modified CMake](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/CMakeLists.txt#L70)
