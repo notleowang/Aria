@@ -178,10 +178,19 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			min_win_timer_ms = timer.timer_ms;
 			screen.apply_spotlight = true;
 			screen.spotlight_radius = - min_win_timer_ms / 2000.f;
+			// Change level here
 			if (!timer.changedLevel) {
-				this->curr_level.init(this->curr_level.getCurrLevel() + 1);
 				timer.changedLevel = true;
-				restart_game();
+				if (this->curr_level.getCurrLevel() != POWER_UP) {
+					this->next_level = this->curr_level.getCurrLevel() + 1;
+					this->curr_level.init(POWER_UP);
+					restart_game();
+					power_up_menu();
+				}
+				else {
+					this->curr_level.init(this->next_level);
+					restart_game();
+				}
 			}
 		}
 		if (timer.timer_ms <= -4000.f) {
@@ -288,17 +297,6 @@ void WorldSystem::win_level() {
 	printf("hooray you won the level\n"); 
 	registry.velocities.get(player).velocity = { 0.f,0.f };
 	registry.winTimers.emplace(player);
-
-	if (this->curr_level.getCurrLevel() != POWER_UP) {
-		this->next_level = this->curr_level.getCurrLevel() + 1;
-		this->curr_level.init(POWER_UP);
-		restart_game();
-		power_up_menu();
-	}
-	else {
-		this->curr_level.init(this->next_level);
-		restart_game();
-	}
 }
 
 void WorldSystem::power_up_menu() {
