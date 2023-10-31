@@ -47,6 +47,8 @@ The ECS design pattern has not been changed since Milestone 1.
 - Projectile
 - Text
 - Health Bar
+- Floor
+- PowerUpBlock
 
 ## Actionable Components
 - Velocity
@@ -63,9 +65,12 @@ The ECS design pattern has not been changed since Milestone 1.
 
 ### New Actionable Components
 - Projectile
-- ElementType
+- Text
 - CharacterProjectileType
 - Collidable
+- Win Timer
+- Animation
+- Power Up
 
 ## Entity Component Diagram
 Highlight any changes versus the previous milestone.
