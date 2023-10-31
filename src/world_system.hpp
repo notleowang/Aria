@@ -58,6 +58,7 @@ private:
 	Entity player;
 
 	GameLevel curr_level;
+	uint next_level;
 
 	// music references
 	Mix_Music* background_music; // TODO: change background music for our game

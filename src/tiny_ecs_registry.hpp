@@ -26,6 +26,7 @@ public:
 	ComponentContainer<Player> players;
 	ComponentContainer<Enemy> enemies;
 	ComponentContainer<PowerUp> powerUps;
+	ComponentContainer<PowerUpBlock> powerUpBlock;
 	ComponentContainer<Terrain> terrain;
 	ComponentContainer<ExitDoor> exitDoors;
 	ComponentContainer<Mesh*> meshPtrs;
@@ -54,6 +55,7 @@ public:
 		registry_list.push_back(&players);
 		registry_list.push_back(&enemies);
 		registry_list.push_back(&powerUps);
+		registry_list.push_back(&powerUpBlock);
 		registry_list.push_back(&terrain);
 		registry_list.push_back(&exitDoors);
 		registry_list.push_back(&meshPtrs);

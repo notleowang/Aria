@@ -252,16 +252,24 @@ bool collidedBottom(Position& pos_i, Position& pos_j)
 
 void WorldSystem::win_level() {
 	printf("hooray you won the level\n");
-	this->curr_level.init(this->curr_level.getCurrLevel() + 1);
-	restart_game();
-	power_up_menu();
+
+	if (this->curr_level.getCurrLevel() != POWER_UP) {
+		this->next_level = this->curr_level.getCurrLevel() + 1;
+		this->curr_level.init(POWER_UP);
+		restart_game();
+		power_up_menu();
+	}
+	else {
+		this->curr_level.init(this->next_level);
+		restart_game();
+	}
 }
 
 void WorldSystem::power_up_menu() {
 	PowerUp& powerUp = registry.powerUps.get(player);
 
 	// figure out what power ups are available
-	vector<pair<string, bool>> availPowerUps;
+	vector<pair<string, bool*>> availPowerUps;
 
 	if (!powerUp.fasterMovement) availPowerUps.push_back(make_pair("Faster Movement Speed", &powerUp.fasterMovement));
 
@@ -277,15 +285,15 @@ void WorldSystem::power_up_menu() {
 		if (!powerUp.bounceOffWalls[element]) availPowerUps.push_back(make_pair("Bouncy " + elementName + " Shot", &powerUp.bounceOffWalls[element]));
 	}
 
-	assert(availPowerUps.size() >= 3);
+	assert(availPowerUps.size() >= 1); // will always be true but keeping this assertion here just in case
 
 	shuffle(availPowerUps.begin(), availPowerUps.end(), rng);
 
-	for (int i = 0; i < availPowerUps.size(); i++) {
+	/*for (int i = 0; i < availPowerUps.size(); i++) {
 		printf("%s\n", availPowerUps[i].first.c_str());
-	}
+	}*/
 
-
+	createPowerUpBlock(renderer, &availPowerUps[0]); // take top element after shuffling list (randomness!)
 }
 
 // Compute collisions between entities
@@ -423,6 +431,19 @@ void WorldSystem::handle_collisions() {
 			else {
 				registry.remove_all_components_of(entity);
 			}
+		}
+
+		// Checking Projectile - Power Up Block collisions
+		if (registry.powerUpBlock.has(entity_other) && registry.projectiles.has(entity)) {
+			PowerUpBlock& powerUpBlock = registry.powerUpBlock.get(entity_other);
+			Position& blockPos = registry.positions.get(entity_other);
+
+			*(powerUpBlock.powerUpToggle) = true;
+			printf("%s\n", powerUpBlock.powerUpText.c_str());
+
+			createText("You unlocked: " + powerUpBlock.powerUpText, vec2(0.f, 50.f), 1.f, vec3(0.f, 1.f, 0.f));
+
+			registry.remove_all_components_of(entity);
 		}
 
 		// Checking Player - Exit Door collision

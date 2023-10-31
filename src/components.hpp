@@ -1,8 +1,10 @@
 #pragma once
 #include "common.hpp"
 #include <vector>
+#include <map>
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
+using namespace std;
 
 // Aria component
 struct Player
@@ -32,6 +34,12 @@ struct PowerUp {
 	bool increasedDamage[4]; // array size == number of element types
 	bool tripleShot[4];
 	bool bounceOffWalls[4];
+};
+
+// all data related to power up block in the power up level
+struct PowerUpBlock {
+	string powerUpText;
+	bool* powerUpToggle;
 };
 
 // Terrain

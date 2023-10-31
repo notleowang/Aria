@@ -24,8 +24,8 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos);
 
 Entity createText(std::string in_text, vec2 pos, float scale, vec3 color);
 
-// creates a power up selection menu
-Entity createPowerUpSelectionMenu(RenderSystem* renderer, vector<pair<string, bool>> powerUps);
+// creates a power up block
+Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp);
 
 // mock enemy TODO: change enemy implementation
 Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType);
