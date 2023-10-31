@@ -28,22 +28,20 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	direction.direction = DIRECTION::E;
 
 	PowerUp& powerUp = registry.powerUps.emplace(entity);
-	// TOGGLE THESE TO TEST OR GO GOD MODE BUT ONLY TOGGLE A HANDFUL AT A TIME 
-	// OTHERWISE THERES NO MORE AVAILABLE POWER UPS TO RANDOMLY CHOOSE FROM (game crashes)
-	// enjoy! :)
-	// powerUp.fasterMovement = true;
-	// powerUp.increasedDamage[ElementType::WATER] = true;
-	// powerUp.increasedDamage[ElementType::FIRE] = true;
-	// powerUp.increasedDamage[ElementType::EARTH] = true;
-	// powerUp.increasedDamage[ElementType::LIGHTNING] = true;
-	// powerUp.tripleShot[ElementType::WATER] = true;
-	// powerUp.tripleShot[ElementType::FIRE] = true;
-	// powerUp.tripleShot[ElementType::EARTH] = true;
-	// powerUp.tripleShot[ElementType::LIGHTNING] = true;
-	// powerUp.bounceOffWalls[ElementType::WATER] = true;
-	// powerUp.bounceOffWalls[ElementType::FIRE] = true;
-	// powerUp.bounceOffWalls[ElementType::EARTH] = true;
-	// powerUp.bounceOffWalls[ElementType::LIGHTNING] = true;
+	// TOGGLE THESE TO TEST OR GO GOD MODE - enjoy! :)
+	//powerUp.fasterMovement = true;
+	//powerUp.increasedDamage[ElementType::WATER] = true;
+	//powerUp.increasedDamage[ElementType::FIRE] = true;
+	//powerUp.increasedDamage[ElementType::EARTH] = true;
+	//powerUp.increasedDamage[ElementType::LIGHTNING] = true;
+	//powerUp.tripleShot[ElementType::WATER] = true;
+	//powerUp.tripleShot[ElementType::FIRE] = true;
+	//powerUp.tripleShot[ElementType::EARTH] = true;
+	//powerUp.tripleShot[ElementType::LIGHTNING] = true;
+	//powerUp.bounceOffWalls[ElementType::WATER] = true;
+	//powerUp.bounceOffWalls[ElementType::FIRE] = true;
+	//powerUp.bounceOffWalls[ElementType::EARTH] = true;
+	//powerUp.bounceOffWalls[ElementType::LIGHTNING] = true;
 
 	registry.characterProjectileTypes.emplace(entity);
 	registry.players.emplace(entity);

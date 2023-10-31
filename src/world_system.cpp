@@ -291,10 +291,12 @@ void WorldSystem::power_up_menu() {
 		if (!powerUp.bounceOffWalls[element]) availPowerUps.push_back(make_pair("Bouncy " + elementName + " Shot", &powerUp.bounceOffWalls[element]));
 	}
 
-	assert(availPowerUps.size() >= 1); // will always be true but keeping this assertion here just in case
+	if (availPowerUps.size() == 0) {
+		printf("No available power ups - DO NOTHING\n");
+		return;
+	}
 
 	shuffle(availPowerUps.begin(), availPowerUps.end(), rng);
-
 	/*for (int i = 0; i < availPowerUps.size(); i++) {
 		printf("%s\n", availPowerUps[i].first.c_str());
 	}*/
