@@ -27,6 +27,22 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
 
+	PowerUp& powerUp = registry.powerUps.emplace(entity);
+	// TOGGLE THESE TO TEST OR GO GOD MODE - enjoy! :)
+	//powerUp.fasterMovement = true;
+	//powerUp.increasedDamage[ElementType::WATER] = true;
+	//powerUp.increasedDamage[ElementType::FIRE] = true;
+	//powerUp.increasedDamage[ElementType::EARTH] = true;
+	//powerUp.increasedDamage[ElementType::LIGHTNING] = true;
+	//powerUp.tripleShot[ElementType::WATER] = true;
+	//powerUp.tripleShot[ElementType::FIRE] = true;
+	//powerUp.tripleShot[ElementType::EARTH] = true;
+	//powerUp.tripleShot[ElementType::LIGHTNING] = true;
+	//powerUp.bounceOffWalls[ElementType::WATER] = true;
+	//powerUp.bounceOffWalls[ElementType::FIRE] = true;
+	//powerUp.bounceOffWalls[ElementType::EARTH] = true;
+	//powerUp.bounceOffWalls[ElementType::LIGHTNING] = true;
+
 	registry.characterProjectileTypes.emplace(entity);
 	registry.players.emplace(entity);
 	registry.collidables.emplace(entity);
@@ -177,6 +193,30 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
+Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::EXIT_DOOR);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = vec2(window_width_px / 2, window_height_px / 2);
+	position.scale = vec2(100.f, 100.f);
+
+	PowerUpBlock& powerUpBlock = registry.powerUpBlock.emplace(entity);
+	powerUpBlock.powerUpText = powerUp->first;
+	powerUpBlock.powerUpToggle = powerUp->second;
+
+	registry.collidables.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
+			EFFECT_ASSET_ID::EXIT_DOOR,
+			GEOMETRY_BUFFER_ID::EXIT_DOOR });
+
+	return entity;
+}
+
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 {
 	auto entity = Entity();
@@ -212,7 +252,7 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
-Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType) {
+Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType, Entity& player) {
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
@@ -223,7 +263,7 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 		entity, 
 		Animation(PROJECTILE_SPRITESHEET_NUM_ROWS, PROJECTILE_SPRITESHEET_NUM_COLS));
 
-	Projectiles& projectile = registry.projectiles.emplace(entity);
+	Projectile& projectile = registry.projectiles.emplace(entity);
 	projectile.type = elementType;
 
 	TEXTURE_ASSET_ID textureAsset;
@@ -267,6 +307,10 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 	position.scale = vec2(30.f, 30.f);
 
 	registry.collidables.emplace(entity);
+
+	PowerUp& powerUp = registry.powerUps.get(player);
+	if (powerUp.increasedDamage[elementType]) projectile.damage *= 1.5; // increase damage by factor of 1.5
+	if (powerUp.bounceOffWalls[elementType]) projectile.bounces = 2; // allow 2 bounces off walls
 
 	registry.renderRequests.insert(
 		entity,
