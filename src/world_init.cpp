@@ -297,21 +297,20 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 			break;
 	}
 
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity = vel;
+
 	// Set initial position and velocity for the projectile
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
+	position.angle = atan2(vel.y, vel.x);
 	position.scale = vec2(30.f, 30.f);
 
 	registry.collidables.emplace(entity);
 
-	Velocity& velocity = registry.velocities.emplace(entity);
-	velocity.velocity = vel;
-
 	PowerUp& powerUp = registry.powerUps.get(player);
 	if (powerUp.increasedDamage[elementType]) projectile.damage *= 1.5; // increase damage by factor of 1.5
 	if (powerUp.bounceOffWalls[elementType]) projectile.bounces = 2; // allow 2 bounces off walls
-
-	// Eli TODO: correctly orient the sprite according to the angle of its motion
 
 	registry.renderRequests.insert(
 		entity,
