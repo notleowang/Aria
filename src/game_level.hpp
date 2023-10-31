@@ -9,6 +9,14 @@ const int TERRAIN_ATTRIBUTES = 4;
 const int ENEMY_ATTRIBUTES = 6;
 const int TEXT_ATTRIBUTES = 6;
 
+// enum for each level type
+enum Level {
+	TUTORIAL = 0,
+	LEVEL_1 = TUTORIAL + 1,
+	LEVEL_2 = LEVEL_1 + 1,
+	POWER_UP = LEVEL_2 + 1,
+};
+
 class GameLevel
 {
 public:

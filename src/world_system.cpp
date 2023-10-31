@@ -8,6 +8,7 @@
 #include <sstream>
 
 #include "physics_system.hpp"
+using namespace std;
 
 // Game configuration
 const float PLAYER_SPEED = 300.f;
@@ -181,6 +182,11 @@ void WorldSystem::restart_game() {
 	registry.list_all_components();
 	printf("Restarting\n");
 
+	// hacky solution to persist player attributes after restart
+	bool persistPowerUps = registry.powerUps.has(player);
+	PowerUp persistedPowerUps;
+	if (persistPowerUps) persistedPowerUps = registry.powerUps.get(player);
+
 	// !!!
 	// Remove all entities that we created
 	// This might be overkill. Everything that has velocity should already have a position, etc.
@@ -213,6 +219,7 @@ void WorldSystem::restart_game() {
 	}
 
 	player = createAria(renderer, player_starting_pos);
+	if (persistPowerUps) registry.powerUps.get(player) = persistedPowerUps;
 
 	for (uint i = 0; i < terrains_attrs.size(); i++) {
 		vec4 terrain_i = terrains_attrs[i].first;
@@ -259,8 +266,50 @@ bool collidedBottom(Position& pos_i, Position& pos_j)
 
 void WorldSystem::win_level() {
 	printf("hooray you won the level\n");
-	this->curr_level.init(this->curr_level.getCurrLevel() + 1);
-	restart_game();
+
+	if (this->curr_level.getCurrLevel() != POWER_UP) {
+		this->next_level = this->curr_level.getCurrLevel() + 1;
+		this->curr_level.init(POWER_UP);
+		restart_game();
+		power_up_menu();
+	}
+	else {
+		this->curr_level.init(this->next_level);
+		restart_game();
+	}
+}
+
+void WorldSystem::power_up_menu() {
+	PowerUp& powerUp = registry.powerUps.get(player);
+
+	// figure out what power ups are available
+	vector<pair<string, bool*>> availPowerUps;
+
+	if (!powerUp.fasterMovement) availPowerUps.push_back(make_pair("Faster Movement Speed", &powerUp.fasterMovement));
+
+	for (int element = ElementType::WATER; element <= ElementType::LIGHTNING; element++) {
+		string elementName;
+		if (element == ElementType::WATER) elementName = "Water";
+		if (element == ElementType::FIRE) elementName = "Fire";
+		if (element == ElementType::EARTH) elementName = "Earth";
+		if (element == ElementType::LIGHTNING) elementName = "Lightning";
+
+		if (!powerUp.increasedDamage[element]) availPowerUps.push_back(make_pair("Increase " + elementName + " Damage", &powerUp.increasedDamage[element]));
+		if (!powerUp.tripleShot[element]) availPowerUps.push_back(make_pair("Triple " + elementName + " Shot", &powerUp.tripleShot[element]));
+		if (!powerUp.bounceOffWalls[element]) availPowerUps.push_back(make_pair("Bouncy " + elementName + " Shot", &powerUp.bounceOffWalls[element]));
+	}
+
+	if (availPowerUps.size() == 0) {
+		printf("No available power ups - DO NOTHING\n");
+		return;
+	}
+
+	shuffle(availPowerUps.begin(), availPowerUps.end(), rng);
+	/*for (int i = 0; i < availPowerUps.size(); i++) {
+		printf("%s\n", availPowerUps[i].first.c_str());
+	}*/
+
+	createPowerUpBlock(renderer, &availPowerUps[0]); // take top element after shuffling list (randomness!)
 }
 
 // Compute collisions between entities
@@ -399,6 +448,36 @@ void WorldSystem::handle_collisions() {
 
 		// Checking Projectile - Player collisions
 		if (registry.terrain.has(entity_other) && registry.projectiles.has(entity)) {
+			Projectile& projectile = registry.projectiles.get(entity);
+
+			if (projectile.bounces-- > 0) {
+				// bounce the projectile off the wall
+				Position& projectile_position = registry.positions.get(entity);
+				Velocity& projectile_velocity = registry.velocities.get(entity);
+				Position& terrain_position = registry.positions.get(entity_other);
+
+				if (collidedLeft(projectile_position, terrain_position) || collidedRight(projectile_position, terrain_position)) {
+					projectile_velocity.velocity.x *= -1;
+				}
+				else if (collidedTop(projectile_position, terrain_position) || collidedBottom(projectile_position, terrain_position)) {
+					projectile_velocity.velocity.y *= -1;
+				}
+			}
+			else {
+				registry.remove_all_components_of(entity);
+			}
+		}
+
+		// Checking Projectile - Power Up Block collisions
+		if (registry.powerUpBlock.has(entity_other) && registry.projectiles.has(entity)) {
+			PowerUpBlock& powerUpBlock = registry.powerUpBlock.get(entity_other);
+			Position& blockPos = registry.positions.get(entity_other);
+
+			*(powerUpBlock.powerUpToggle) = true;
+			printf("%s\n", powerUpBlock.powerUpText.c_str());
+
+			createText("You unlocked: " + powerUpBlock.powerUpText, vec2(0.f, 50.f), 1.f, vec3(0.f, 1.f, 0.f));
+
 			registry.remove_all_components_of(entity);
 		}
 
@@ -490,7 +569,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// set the player velocity based on the new_direction
 	if (new_direction != DIRECTION::NONE) {
 		player_direction.direction = new_direction;
-		player_velocity = computeVelocity(PLAYER_SPEED, player_direction);
+		PowerUp& player_powerUp = registry.powerUps.get(player);
+		player_velocity = computeVelocity(player_powerUp.fasterMovement ? PLAYER_SPEED * 1.5 : PLAYER_SPEED, player_direction);
 	}
 	else {
 		player_velocity = computeVelocity(0.0, player_direction);
@@ -532,13 +612,25 @@ void WorldSystem::on_mouse_button(int button, int action, int mod) {
 
 		// create projectile
 		Position& position = registry.positions.get(player);
-		Velocity vel = computeVelocity(PROJECTILE_SPEED, angle);
 		vec2 proj_position = position.position;
+		ElementType elementType = registry.characterProjectileTypes.get(player).projectileType; // Get current player projectile type
 
-		// Get current player projectile type
-		ElementType elementType = registry.characterProjectileTypes.get(player).projectileType;
+		// apply power ups
+		PowerUp& powerUp = registry.powerUps.get(player);
+		
+		if (powerUp.tripleShot[elementType]) {
+			Velocity vel1 = computeVelocity(PROJECTILE_SPEED, angle - 0.25);
+			Velocity vel2 = computeVelocity(PROJECTILE_SPEED, angle);
+			Velocity vel3 = computeVelocity(PROJECTILE_SPEED, angle + 0.25);
 
-		Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType, false);
+			Entity projectile1 = createProjectile(renderer, proj_position, vel1.velocity, elementType, false, player);
+			Entity projectile2 = createProjectile(renderer, proj_position, vel2.velocity, elementType, false, player);
+			Entity projectile3 = createProjectile(renderer, proj_position, vel3.velocity, elementType, false, player);
+		}
+		else {
+			Velocity vel = computeVelocity(PROJECTILE_SPEED, angle);
+			Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType, player);
+		}
 		Mix_PlayChannel(-1, projectile_sound, 0);
 	}
 }

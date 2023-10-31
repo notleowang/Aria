@@ -1,15 +1,17 @@
 #pragma once
 #include "common.hpp"
 #include <vector>
+#include <map>
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
+using namespace std;
 
 // Aria component
 struct Player
 {
 };
 // All data relevant to elements and weaknesses
-enum class ElementType {
+enum ElementType {
 	WATER=0,
 	FIRE=1,
 	EARTH= 2,
@@ -24,6 +26,20 @@ struct Enemy
 	float stamina = 0.5f;
 	float mana = 1.f;
 	ElementType type = ElementType::FIRE; // By default, an enemy is of fire type
+};
+
+// all data relevant to the player's power ups
+struct PowerUp {
+	bool fasterMovement;
+	bool increasedDamage[4]; // array size == number of element types
+	bool tripleShot[4];
+	bool bounceOffWalls[4];
+};
+
+// all data related to power up block in the power up level
+struct PowerUpBlock {
+	string powerUpText;
+	bool* powerUpToggle;
 };
 
 // Terrain
@@ -64,11 +80,12 @@ struct HealthBar
 };
 
 // Structure to store projectile entities
-struct Projectiles
+struct Projectile
 {
 	float damage = 10.f;
 	ElementType type;
 	bool hostile = false;
+	int bounces;
 };
 
 struct CharacterProjectileType
@@ -79,6 +96,7 @@ struct CharacterProjectileType
 // All data relevant to the position of entities
 struct Position {
 	vec2 position = { 0.f, 0.f };
+	float angle = 0.f;
 	vec2 scale = { 10.f, 10.f };
 	vec2 prev_position = { 0.f, 0.f };
 };
