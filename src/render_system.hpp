@@ -58,7 +58,7 @@ class RenderSystem {
 		shader_path("coloured"),
 		shader_path("salmon"),
 		shader_path("textured"),
-		shader_path("water"),
+		shader_path("screen_darken"),
 		shader_path("terrain"),
 		shader_path("exit_door"),
 		shader_path("health_bar"),
@@ -112,7 +112,7 @@ private:
 	GLuint frame_buffer;
 	GLuint off_screen_render_buffer_color;
 	GLuint off_screen_render_buffer_depth;
-	
+
 	Entity screen_state_entity;
 };
 

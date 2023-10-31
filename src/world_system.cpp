@@ -418,7 +418,8 @@ bool WorldSystem::is_over() const {
 
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
-	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; } //TODO: Add win timer
+	//Disables keys when death or win timer happening
+	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; }
 	Velocity& player_velocity = registry.velocities.get(player);
 	Position& player_position = registry.positions.get(player);
 	Direction& player_direction = registry.directions.get(player);
