@@ -32,6 +32,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(enemy_death_sound);
 	if (damage_tick_sound != nullptr)
 		Mix_FreeChunk(damage_tick_sound);
+	if (end_level_sound != nullptr)
+		Mix_FreeChunk(end_level_sound);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -109,6 +111,7 @@ GLFWwindow* WorldSystem::create_window() {
 	aria_death_sound = Mix_LoadWAV(audio_path("aria_death.wav").c_str());
 	enemy_death_sound = Mix_LoadWAV(audio_path("enemy_death.wav").c_str());
 	damage_tick_sound = Mix_LoadWAV(audio_path("damage_tick.wav").c_str());
+	end_level_sound = Mix_LoadWAV(audio_path("end_level.wav").c_str());
 
 	if (background_music == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
@@ -175,7 +178,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 	screen.screen_darken_factor = 1 - min_death_timer_ms / 3000;
-	float min_win_timer_ms = 3000.f;
+	float min_win_timer_ms = 1500.f;
 	for (Entity entity : registry.winTimers.entities) {
 		WinTimer& timer = registry.winTimers.get(entity);
 		timer.timer_ms -= elapsed_ms_since_last_update;
@@ -307,6 +310,7 @@ void WorldSystem::win_level() {
 	printf("hooray you won the level\n"); 
 	registry.velocities.get(player).velocity = { 0.f,0.f };
 	registry.winTimers.emplace(player);
+	Mix_PlayChannel(-1, end_level_sound, 0);
 }
 
 void WorldSystem::display_power_up() {
