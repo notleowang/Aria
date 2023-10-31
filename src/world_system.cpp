@@ -73,11 +73,14 @@ GLFWwindow* WorldSystem::create_window() {
 	glfwWindowHint(GLFW_RESIZABLE, 0);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
-	window = glfwCreateWindow(window_width_px, window_height_px, "Aria", nullptr, nullptr);
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+	window = glfwCreateWindow(mode->width, mode->height, "Aria", monitor, nullptr);
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
 	}
+	glfwSetWindowSize(window, window_width_px, window_height_px); // set the resolution
 
 	// Setting callbacks to member functions (that's why the redirect is needed)
 	// Input is handled using GLFW, for more info see
@@ -585,6 +588,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		restart_game();
 	}
 
+	// Close program
+	if (action == GLFW_RELEASE && key == GLFW_KEY_BACKSPACE) {
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	}
+
 	// Debugging
 	//if (key == GLFW_KEY_D) {
 	//	if (action == GLFW_RELEASE)
@@ -600,9 +608,12 @@ void WorldSystem::on_mouse_button(int button, int action, int mod) {
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
 
+		int width, height;
+		glfwGetWindowSize(window, &width, &height);
+
 		// calculate angle
-		float deltaX = xpos - (window_width_px / 2);
-		float deltaY = ypos - (window_height_px / 2);
+		float deltaX = xpos - (width / 2);
+		float deltaY = ypos - (height / 2);
 		float angle = atan2(deltaY, deltaX);
 
 		// create projectile
