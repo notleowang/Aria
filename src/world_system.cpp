@@ -149,7 +149,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	Player& playerEnt = registry.players.get(player);
 	Resources& player_resource = registry.resources.get(player);
 	if (player_resource.currentMana < 10.f) {
 		// replenish mana
