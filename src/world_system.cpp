@@ -159,7 +159,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (player_resource.currentMana > 10.f) player_resource.currentMana = 10.f;
 	}
 
-    float min_timer_ms = 3000.f;
+    float min_death_timer_ms = 3000.f;
 	for (Entity entity : registry.deathTimers.entities) {
 		DeathTimer& timer = registry.deathTimers.get(entity);
 		timer.timer_ms -= elapsed_ms_since_last_update;
