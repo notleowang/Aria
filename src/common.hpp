@@ -13,10 +13,8 @@
 #include <GLFW/glfw3.h>
 
 // freetype
-/*
 #include <ft2build.h>
 #include FT_FREETYPE_H
-*/
 
 // The glm library provides vector and matrix operations as in GLSL
 #include <glm/vec2.hpp>				// vec2

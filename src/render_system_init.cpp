@@ -58,11 +58,11 @@ bool RenderSystem::init(GLFWwindow* window_arg)
     initializeGlTextures();
 	initializeGlEffects();
 	initializeGlGeometryBuffers();
-	// initializeFreeType();
+	initializeFreeType();
 
 	return true;
 }
-/*
+
 void RenderSystem::initializeFreeType() {
 	// FreeType Reference: https://learnopengl.com/In-Practice/Text-Rendering
 	FT_Library ft;
@@ -134,7 +134,7 @@ void RenderSystem::initializeFreeType() {
 
 	gl_has_errors();
 }
-*/
+
 void RenderSystem::initializeGlTextures()
 {
     glGenTextures((GLsizei)texture_gl_handles.size(), texture_gl_handles.data());

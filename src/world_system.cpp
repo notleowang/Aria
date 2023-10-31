@@ -228,7 +228,7 @@ void WorldSystem::restart_game() {
 
 	for (uint i = 0; i < texts.size(); i++) {
 		std::array<float, TEXT_ATTRIBUTES> text_i = text_attrs[i];
-		// createText(texts[i], vec2(text_i[0], text_i[1]), text_i[2], vec3(text_i[3], text_i[4], text_i[5]));
+		createText(texts[i], vec2(text_i[0], text_i[1]), text_i[2], vec3(text_i[3], text_i[4], text_i[5]));
 	}
 
 	for (uint i = 0; i < enemies_attrs.size(); i++) {
