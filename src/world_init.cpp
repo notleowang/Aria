@@ -21,8 +21,10 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	Resources& resources = registry.resources.emplace(entity);
 	resources.healthBar = createHealthBar(renderer, entity);
 	resources.manaBar = createHealthBar(renderer, entity);
-	registry.healthBars.get(resources.manaBar).y_offset = -75.f;
-	registry.healthBars.get(resources.manaBar).isManaBar = true;
+
+	HealthBar& manaBar = registry.healthBars.get(resources.manaBar);
+	manaBar.y_offset = -75.f;
+	manaBar.isManaBar = true;
 	
 	HealthBar& healthBar = registry.healthBars.get(resources.healthBar);
 	healthBar.y_offset = -60.f;
