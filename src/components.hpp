@@ -66,8 +66,8 @@ struct Resources
 {
 	float maxHealth = 100.f;
 	float currentHealth = 100.f;
-	float currentMana = 10.f;
 	float maxMana = 10.f;
+	float currentMana = 10.f;
 	Entity healthBar;
 	Entity manaBar;
 };
@@ -75,8 +75,13 @@ struct Resources
 struct HealthBar
 {
 	Entity owner;
-	float y_offset = -50.f;
-	bool isManaBar = false;
+	float y_offset = -60.f;
+};
+
+struct ManaBar
+{
+	Entity owner;
+	float y_offset = -75.f;
 };
 
 // Structure to store projectile entities
@@ -259,7 +264,8 @@ enum class TEXTURE_ASSET_ID {
 	FIRE_PROJECTILE_SHEET = WATER_PROJECTILE_SHEET + 1,
 	FLOOR = FIRE_PROJECTILE_SHEET + 1,
 	HEALTH_BAR = FLOOR + 1,
-	TEXTURE_COUNT = HEALTH_BAR + 1
+	MANA_BAR = HEALTH_BAR + 1,
+	TEXTURE_COUNT = MANA_BAR + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -271,8 +277,8 @@ enum class EFFECT_ASSET_ID {
 	WATER = TEXTURED + 1,
 	TERRAIN = WATER + 1,
 	EXIT_DOOR = TERRAIN + 1,
-	HEALTH_BAR = EXIT_DOOR + 1,
-	TEXT_2D = HEALTH_BAR + 1,
+	RESOURCE_BAR = EXIT_DOOR + 1,
+	TEXT_2D = RESOURCE_BAR + 1,
 	ANIMATED = TEXT_2D + 1,
 	EFFECT_COUNT = ANIMATED + 1
 };
@@ -287,8 +293,8 @@ enum class GEOMETRY_BUFFER_ID {
 	TERRAIN = SCREEN_TRIANGLE + 1,
 	EXIT_DOOR = TERRAIN + 1,
 	TEXT_2D = EXIT_DOOR + 1,
-	HEALTH_BAR = TEXT_2D + 1,
-	PROJECTILE = HEALTH_BAR + 1,
+	RESOURCE_BAR = TEXT_2D + 1,
+	PROJECTILE = RESOURCE_BAR + 1,
 	GEOMETRY_COUNT = PROJECTILE + 1
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;

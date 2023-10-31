@@ -20,12 +20,7 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 
 	Resources& resources = registry.resources.emplace(entity);
 	resources.healthBar = createHealthBar(renderer, entity);
-	resources.manaBar = createHealthBar(renderer, entity);
-	registry.healthBars.get(resources.manaBar).y_offset = -75.f;
-	registry.healthBars.get(resources.manaBar).isManaBar = true;
-	
-	HealthBar& healthBar = registry.healthBars.get(resources.healthBar);
-	healthBar.y_offset = -60.f;
+	resources.manaBar = createManaBar(renderer, entity);
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
@@ -122,6 +117,9 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
 
 	Resources& resources = registry.resources.emplace(entity);
 	resources.healthBar = createHealthBar(renderer, entity);
+	
+	HealthBar& healthBar = registry.healthBars.get(resources.healthBar);
+	healthBar.y_offset = -50.f;
 
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy.type = enemyType;
@@ -156,7 +154,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
 	return entity;
 }
 
-Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity)
+Entity createHealthBar(RenderSystem* renderer, Entity& owner_entity)
 {
 	auto entity = Entity();
 
@@ -164,13 +162,32 @@ Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity)
 	healthBar.owner = owner_entity;
 
 	Position& position = registry.positions.emplace(entity);
-	position.scale = vec2(HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
+	position.scale = vec2(RESOURCE_BAR_WIDTH, RESOURCE_BAR_HEIGHT);
 
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::HEALTH_BAR,
-			EFFECT_ASSET_ID::HEALTH_BAR,
-			GEOMETRY_BUFFER_ID::HEALTH_BAR });
+			EFFECT_ASSET_ID::RESOURCE_BAR,
+			GEOMETRY_BUFFER_ID::RESOURCE_BAR });
+
+	return entity;
+}
+
+Entity createManaBar(RenderSystem* renderer, Entity& owner_entity)
+{
+	auto entity = Entity();
+
+	ManaBar& manaBar = registry.manaBars.emplace(entity);
+	manaBar.owner = owner_entity;
+
+	Position& position = registry.positions.emplace(entity);
+	position.scale = vec2(RESOURCE_BAR_WIDTH, RESOURCE_BAR_HEIGHT);
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::MANA_BAR,
+			EFFECT_ASSET_ID::RESOURCE_BAR,
+			GEOMETRY_BUFFER_ID::RESOURCE_BAR });
 
 	return entity;
 }
