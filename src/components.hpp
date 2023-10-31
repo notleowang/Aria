@@ -7,7 +7,7 @@
 // Aria component
 struct Player
 {
-
+	float mana = 5.f;
 };
 // All data relevant to elements and weaknesses
 enum class ElementType {

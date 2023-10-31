@@ -148,6 +148,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	if (player.mana < 5.f) {
+		// replenish 0.5 stamina per second
+		player.mana += elapsed_ms / 1000 * 0.5;
+		player.mana = min(player.mana, 5.f);
+	}
+
     float min_timer_ms = 3000.f;
 	for (Entity entity : registry.deathTimers.entities) {
 		DeathTimer& timer = registry.deathTimers.get(entity);
@@ -487,6 +493,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 void WorldSystem::on_mouse_button(int button, int action, int mod) {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		// check mana
+		if (registry.players.get(player).mana < 1) {
+			return;
+		}
+
 		// get cursor position
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
