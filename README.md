@@ -11,7 +11,9 @@ Below is the documentation for our `README.md` submission for Milestone 2.
 [Handling Effect](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/src/render_system.cpp#L79),
 [Advancing Frames](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/src/render_system.cpp#L309),
 [Shader](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/shaders/animated.fs.glsl)
-- New integrated assets: TODO
+- New integrated assets: 
+[Health/Mana bar texture](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/data/textures/health_bar.png), 
+[New Projectile Textures](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/data/textures/water_projectile_spritesheet.png) (the link takes you to one of the new projectile textures, the rest are in the textures folder)
 - [Mesh Based Collision](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/src/physics_system.cpp#L36)
   - Physics System first goes through a broad phase collision check (AABB Collision Detection) followed by a narrow phase collision check which uses line segment 
     intersection. (Draw a line from entity's mid point to each vertex and check if it collides with the edge of another entity and vice versa for other entity)
