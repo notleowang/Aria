@@ -1,8 +1,10 @@
 #pragma once
 #include "common.hpp"
 #include <vector>
+#include <map>
 #include <unordered_map>
 #include "../ext/stb_image/stb_image.h"
+using namespace std;
 
 // Aria component
 struct Player
@@ -10,7 +12,7 @@ struct Player
 
 };
 // All data relevant to elements and weaknesses
-enum class ElementType {
+enum ElementType {
 	WATER=0,
 	FIRE=1,
 	EARTH= 2,
@@ -24,6 +26,20 @@ struct Enemy
 	float movementTimer = 3000.f;
 	float stamina = 0.5f;
 	ElementType type = ElementType::FIRE; // By default, an enemy is of fire type
+};
+
+// all data relevant to the player's power ups
+struct PowerUp {
+	bool fasterMovement;
+	bool increasedDamage[4]; // array size == number of element types
+	bool tripleShot[4];
+	bool bounceOffWalls[4];
+};
+
+// all data related to power up block in the power up level
+struct PowerUpBlock {
+	string powerUpText;
+	bool* powerUpToggle;
 };
 
 // Terrain
@@ -61,10 +77,11 @@ struct HealthBar
 };
 
 // Structure to store projectile entities
-struct Projectiles
+struct Projectile
 {
 	float damage = 10.f;
 	ElementType type;
+	int bounces;
 };
 
 struct CharacterProjectileType
@@ -75,6 +92,7 @@ struct CharacterProjectileType
 // All data relevant to the position of entities
 struct Position {
 	vec2 position = { 0.f, 0.f };
+	float angle = 0.f;
 	vec2 scale = { 10.f, 10.f };
 	vec2 prev_position = { 0.f, 0.f };
 };
@@ -184,6 +202,22 @@ struct Mesh
 	std::vector<uint16_t> vertex_indices;
 };
 
+struct Animation
+{
+	int frame = 0;
+	int num_rows;
+	int num_cols;
+	vec2 getFrameSizeInTexcoords();
+	int getNumFrames();
+	int getColumn(int frame);
+	int getRow(int frame);
+
+	Animation(int num_rows, int num_cols) {
+		this->num_rows = num_rows;
+		this->num_cols = num_cols;
+	}
+};
+
 /**
  * The following enumerators represent global identifiers refering to graphic
  * assets. For example TEXTURE_ASSET_ID are the identifiers of each texture
@@ -212,15 +246,16 @@ enum class TEXTURE_ASSET_ID {
 	FISH = 0,
 	LANDSCAPE = FISH + 1,
 	TURTLE = LANDSCAPE + 1,
-	FIRE_ENEMY= TURTLE+1,
-	WATER_PROJECTILE = FIRE_ENEMY +1,
-	FIRE_PROJECTILE = WATER_PROJECTILE +1,
-	EARTH_PROJECTILE = FIRE_PROJECTILE +1,
-	LIGHTNING_PROJECTILE = EARTH_PROJECTILE +1,
-	FLOOR = LIGHTNING_PROJECTILE + 1,
-	HEALTH_BAR_EMPTY = FLOOR + 1,
-	HEALTH_BAR_FULL = HEALTH_BAR_EMPTY + 1,
-	TEXTURE_COUNT = HEALTH_BAR_FULL + 1
+	FIRE_ENEMY = TURTLE + 1,
+	WATER_PROJECTILE = FIRE_ENEMY + 1,
+	FIRE_PROJECTILE = WATER_PROJECTILE + 1,
+	EARTH_PROJECTILE = FIRE_PROJECTILE + 1,
+	LIGHTNING_PROJECTILE = EARTH_PROJECTILE + 1,
+	WATER_PROJECTILE_SHEET = LIGHTNING_PROJECTILE + 1,
+	FIRE_PROJECTILE_SHEET = WATER_PROJECTILE_SHEET + 1,
+	FLOOR = FIRE_PROJECTILE_SHEET + 1,
+	HEALTH_BAR = FLOOR + 1,
+	TEXTURE_COUNT = HEALTH_BAR + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -234,7 +269,8 @@ enum class EFFECT_ASSET_ID {
 	EXIT_DOOR = TERRAIN + 1,
 	HEALTH_BAR = EXIT_DOOR + 1,
 	TEXT_2D = HEALTH_BAR + 1,
-	EFFECT_COUNT = TEXT_2D + 1
+	ANIMATED = TEXT_2D + 1,
+	EFFECT_COUNT = ANIMATED + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
@@ -242,13 +278,14 @@ enum class GEOMETRY_BUFFER_ID {
 	ARIA = 0,
 	SALMON = ARIA + 1,
 	SPRITE = SALMON + 1,
-	TURTLE = SPRITE + 1,
-	DEBUG_LINE = TURTLE + 1,
+	DEBUG_LINE = SPRITE + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,
 	TERRAIN = SCREEN_TRIANGLE + 1,
 	EXIT_DOOR = TERRAIN + 1,
 	TEXT_2D = EXIT_DOOR + 1,
-	GEOMETRY_COUNT = TEXT_2D + 1
+	HEALTH_BAR = TEXT_2D + 1,
+	PROJECTILE = HEALTH_BAR + 1,
+	GEOMETRY_COUNT = PROJECTILE + 1
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 

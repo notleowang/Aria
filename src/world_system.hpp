@@ -40,6 +40,7 @@ public:
 	bool is_over()const;
 
 	void win_level();
+	void power_up_menu();
 private:
 	// Input callback functions
 	void on_key(int key, int, int action, int mod);
@@ -57,6 +58,7 @@ private:
 	Entity player;
 
 	GameLevel curr_level;
+	uint next_level;
 
 	// music references
 	Mix_Music* background_music; // TODO: change background music for our game

@@ -34,7 +34,7 @@ int main()
 
 	// Set the game level then initialize the main systems
 	GameLevel level;
-	level.init(0);
+	level.init(TUTORIAL);
 
 
 	// initialize the main systems
@@ -59,6 +59,7 @@ int main()
 
 		world_system.handle_collisions();
 
+		render_system.animation_step(elapsed_ms);
 		render_system.draw();
 	}
 
