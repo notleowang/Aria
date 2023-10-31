@@ -376,9 +376,10 @@ void WorldSystem::handle_collisions() {
 			// TODO: make sure player has all this stuff and this wont be awful
 			// TODO: REFACTOR
 			Resources& resources = registry.resources.get(entity);
-			Entity health_bar_entity = resources.healthBar;
-			HealthBar& health_bar = registry.healthBars.get(health_bar_entity);
-			Position& health_bar_position = registry.positions.get(health_bar_entity);
+			HealthBar& health_bar = registry.healthBars.get(resources.healthBar);
+			HealthBar& mana_bar = registry.healthBars.get(resources.manaBar);
+			Position& health_bar_position = registry.positions.get(resources.healthBar);
+			Position& mana_bar_position = registry.positions.get(resources.manaBar);
 
 			if (collidedLeft(player_position, terrain_position) || collidedRight(player_position, terrain_position)) {
 				player_position.position.x = player_position.prev_position.x;
@@ -392,6 +393,8 @@ void WorldSystem::handle_collisions() {
 			// update health bar position to remove jitter
 			health_bar_position.position = player_position.position;
 			health_bar_position.position.y += health_bar.y_offset;
+			mana_bar_position.position = player_position.position;
+			mana_bar_position.position.y += mana_bar.y_offset;
 		}
 		
 		// Checking Enemy - Terrain Collisions
@@ -402,9 +405,10 @@ void WorldSystem::handle_collisions() {
 			// TODO: make sure enemy has all this stuff and this wont be awful
 			// TODO: REFACTOR
 			Resources& resources = registry.resources.get(entity);
-			Entity health_bar_entity = resources.healthBar;
-			HealthBar& health_bar = registry.healthBars.get(health_bar_entity);
-			Position& health_bar_position = registry.positions.get(health_bar_entity);
+			HealthBar& health_bar = registry.healthBars.get(resources.healthBar);
+			HealthBar& mana_bar = registry.healthBars.get(resources.manaBar);
+			Position& health_bar_position = registry.positions.get(resources.healthBar);
+			Position& mana_bar_position = registry.positions.get(resources.manaBar);
 
 			if (collidedLeft(enemy_position, terrain_position) || collidedRight(enemy_position, terrain_position)) {
 				enemy_position.position.x = enemy_position.prev_position.x;
@@ -419,6 +423,9 @@ void WorldSystem::handle_collisions() {
 			// update health bar position to remove jitter
 			health_bar_position.position = enemy_position.position;
 			health_bar_position.position.y += health_bar.y_offset;
+			mana_bar_position.position = enemy_position.position;
+			mana_bar_position.position.y += mana_bar.y_offset;
+
 		}
 
 		// Checking Moveable Terrain - Terrain Collisions
