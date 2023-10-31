@@ -194,13 +194,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				if (this->curr_level.getCurrLevel() != POWER_UP) {
 					this->next_level = this->curr_level.getCurrLevel() + 1;
 					this->curr_level.init(POWER_UP);
-					restart_game();
-					power_up_menu();
 				}
 				else {
 					this->curr_level.init(this->next_level);
-					restart_game();
 				}
+				restart_game();
 			}
 		}
 		if (timer.timer_ms <= -4000.f) {
@@ -275,6 +273,8 @@ void WorldSystem::restart_game() {
 	}
 
 	createExitDoor(renderer, exit_door_pos);
+
+	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
 }
 
 bool collidedLeft(Position& pos_i, Position& pos_j) 
@@ -309,7 +309,7 @@ void WorldSystem::win_level() {
 	registry.winTimers.emplace(player);
 }
 
-void WorldSystem::power_up_menu() {
+void WorldSystem::display_power_up() {
 	PowerUp& powerUp = registry.powerUps.get(player);
 
 	// figure out what power ups are available
