@@ -189,4 +189,5 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${GLFW_LIBRARIES} ${SDL2_LIBRARIES}
 # Needed to add this
 if(IS_OS_LINUX)
   target_link_libraries(${PROJECT_NAME} PUBLIC glfw ${CMAKE_DL_LIBS})
+  target_link_libraries(${PROJECT_NAME} PUBLIC freetype ${CMAKE_DL_LIBS})
 endif()
