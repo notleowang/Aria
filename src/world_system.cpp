@@ -152,9 +152,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	Player& playerEnt = registry.players.get(player);
 	Resources& player_resource = registry.resources.get(player);
 	if (player_resource.currentMana < 10.f) {
-		// replenish stamina
+		// replenish mana
 		player_resource.currentMana += elapsed_ms_since_last_update / 1000;
-		player_resource.currentMana = min(player_resource.currentMana, 10.f);
+		if (player_resource.currentMana > 10.f) player_resource.currentMana = 10.f;
 	}
 
     float min_timer_ms = 3000.f;
@@ -629,7 +629,7 @@ void WorldSystem::on_mouse_button(int button, int action, int mod) {
 		}
 		else {
 			Velocity vel = computeVelocity(PROJECTILE_SPEED, angle);
-			Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType, player);
+			Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType, false, player);
 		}
 		Mix_PlayChannel(-1, projectile_sound, 0);
 	}

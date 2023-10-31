@@ -29,7 +29,7 @@ void AISystem::step(float elapsed_ms)
 
 		for (uint i = 0; i < registry.projectiles.size(); i++) {
 			Entity entity_p = registry.projectiles.entities[i];
-			Projectiles& projectile = registry.projectiles.get(entity_p);
+			Projectile& projectile = registry.projectiles.get(entity_p);
 			if (projectile.hostile) continue;
 			vec2 projectilePos = registry.positions.get(entity_p).position;
 			if (distance(projectilePos, thisPos) < 300) {
@@ -119,7 +119,8 @@ bool AISystem::enemyFireProjectile(Entity& enemy, vec2 direction) {
 	// Get current player projectile type
 	ElementType elementType = registry.enemies.get(enemy).type;
 
-	createProjectile(renderer, enemyPos, vel, elementType, true);
+	createProjectile(renderer, enemyPos, vel, elementType, true, enemy);
+	//															 ^^^^^ doesnt matter as ignored by the hostile = true
 	// Mix_PlayChannel(-1, projectile_sound, 0);
 	return true;
 }
