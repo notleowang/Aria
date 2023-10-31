@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.1)
 project(Aria)
 
+set(CMAKE_CXX_FLAGS_DEBUG  "-g")
+
 # Set c++11
 # https://stackoverflow.com/questions/10851247/how-to-activate-c-11-in-cmake
 if (POLICY CMP0025)
@@ -175,7 +177,7 @@ if (NOT GLFW_FOUND OR NOT SDL2_FOUND OR NOT FREETYPE_FOUND)
    elseif (NOT SDL2_FOUND)
       message(FATAL_ERROR "Can't find SDL." )
    else ()
-      message(FATAL_ERROR "Can't find freetype.")
+      # message(FATAL_ERROR "Can't find freetype.")
       
    endif()
 endif()
