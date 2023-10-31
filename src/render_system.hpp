@@ -49,7 +49,8 @@ class RenderSystem {
 			textures_path("water_projectile_spritesheet.png"),
 			textures_path("fire_projectile_spritesheet.png"),
 			textures_path("dungeon_tile.png"),
-			textures_path("health_bar.png")
+			textures_path("health_bar.png"),
+			textures_path("mana_bar.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -62,7 +63,7 @@ class RenderSystem {
 		shader_path("screen_darken"),
 		shader_path("terrain"),
 		shader_path("exit_door"),
-		shader_path("health_bar"),
+		shader_path("resource_bar"),
 		shader_path("text_2d"),
 		shader_path("animated")
 	};
@@ -117,7 +118,7 @@ private:
 	void initializeTerrainGeometryBuffer();
 	void initializeExitDoorGeometryBuffer();
 	void initializeProjectileGeometryBuffer();
-	void initializeHealthBarGeometryBuffer();
+	void initializeResourceBarGeometryBuffer();
 
 	// Window handle
 	GLFWwindow* window;
