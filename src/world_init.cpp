@@ -212,7 +212,7 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
-Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType) {
+Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType, bool hostile) {
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
@@ -225,6 +225,7 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 
 	Projectiles& projectile = registry.projectiles.emplace(entity);
 	projectile.type = elementType;
+	projectile.hostile = hostile;
 
 	TEXTURE_ASSET_ID textureAsset;
 	EFFECT_ASSET_ID effectAsset;

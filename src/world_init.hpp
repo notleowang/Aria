@@ -11,7 +11,7 @@ const int PROJECTILE_SPRITESHEET_NUM_COLS = 4;
 
 // the player
 Entity createAria(RenderSystem* renderer, vec2 pos);
-Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType);
+Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType, bool hostile);
 // a red line for debugging purposes
 Entity createLine(vec2 position, vec2 size);
 

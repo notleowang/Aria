@@ -7,7 +7,7 @@
 // Aria component
 struct Player
 {
-	float mana = 5.f;
+	float mana = 10.f;
 };
 // All data relevant to elements and weaknesses
 enum class ElementType {
@@ -23,6 +23,7 @@ struct Enemy
 	float damage = 10.f;
 	float movementTimer = 3000.f;
 	float stamina = 0.5f;
+	float mana = 1.f;
 	ElementType type = ElementType::FIRE; // By default, an enemy is of fire type
 };
 
@@ -65,6 +66,7 @@ struct Projectiles
 {
 	float damage = 10.f;
 	ElementType type;
+	bool hostile = false;
 };
 
 struct CharacterProjectileType

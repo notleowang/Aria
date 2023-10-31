@@ -149,10 +149,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
 	Player& playerEnt = registry.players.get(player);
-	if (playerEnt.mana < 5.f) {
-		// replenish 0.5 stamina per second
-		playerEnt.mana += elapsed_ms_since_last_update / 1000 * 0.5;
-		playerEnt.mana = min(playerEnt.mana, 5.f);
+	if (playerEnt.mana < 10.f) {
+		// replenish stamina
+		playerEnt.mana += elapsed_ms_since_last_update / 1000;
+		playerEnt.mana = min(playerEnt.mana, 10.f);
+		printf("Player mana: %.2f\n", playerEnt.mana);
 	}
 
     float min_timer_ms = 3000.f;
@@ -360,7 +361,7 @@ void WorldSystem::handle_collisions() {
 		}
 
 		// Checking Projectile - Enemy collisions
-		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity)) {
+		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity) && !registry.projectiles.get(entity).hostile) {
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
 			Resources& enemy_resource = registry.resources.get(entity_other);
 			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
@@ -377,7 +378,26 @@ void WorldSystem::handle_collisions() {
 			registry.remove_all_components_of(entity);
 		}
 
-		// Checking Projectile - Wall collisions
+		// Checking Projectile - Player collisions
+		if (registry.players.has(entity_other) && registry.projectiles.has(entity) && registry.projectiles.get(entity).hostile) {
+			Mix_PlayChannel(-1, damage_tick_sound, 0);
+			Resources& player_resource = registry.resources.get(entity_other);
+			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
+			/* TODO: Can the player be weak to any element?
+			if (isWeakTo(registry.players.get(entity_other).type, registry.projectiles.get(entity).type)) {
+				damage_dealt *= 2;
+			}*/
+			player_resource.currentHealth -= damage_dealt;
+			printf("Player hp: %f\n", player_resource.currentHealth);
+			if (player_resource.currentHealth <= 0) {
+				registry.deathTimers.emplace(entity);
+				registry.velocities.get(player).velocity = vec2(0.f, 0.f);
+				Mix_PlayChannel(-1, aria_death_sound, 0);
+			}
+			registry.remove_all_components_of(entity);
+		}
+
+		// Checking Projectile - Player collisions
 		if (registry.terrain.has(entity_other) && registry.projectiles.has(entity)) {
 			registry.remove_all_components_of(entity);
 		}
@@ -497,6 +517,8 @@ void WorldSystem::on_mouse_button(int button, int action, int mod) {
 		// check mana
 		if (registry.players.get(player).mana < 1) {
 			return;
+		} else {
+			registry.players.get(player).mana -= 1;
 		}
 
 		// get cursor position
@@ -516,7 +538,7 @@ void WorldSystem::on_mouse_button(int button, int action, int mod) {
 		// Get current player projectile type
 		ElementType elementType = registry.characterProjectileTypes.get(player).projectileType;
 
-		Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType);
+		Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType, false);
 		Mix_PlayChannel(-1, projectile_sound, 0);
 	}
 }

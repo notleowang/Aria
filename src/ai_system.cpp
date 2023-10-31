@@ -2,6 +2,12 @@
 #include "ai_system.hpp"
 #include <iostream>
 
+#include "world_init.hpp"
+#include "world_system.hpp"
+#include "render_system.hpp"
+
+#define ENEMY_PROJECTILE_SPEED 400
+
 void AISystem::step(float elapsed_ms)
 {
 	auto& enemy_container = registry.enemies;
@@ -22,6 +28,10 @@ void AISystem::step(float elapsed_ms)
 			enemy.stamina += elapsed_ms / 1000;
 		}
 
+		if (enemy.mana < 1.f) {
+			enemy.mana += elapsed_ms / 1000;
+		}
+
 		if (dist <= 350) {
 			bool sprint = enemy.stamina > 0;
 			if (sprint) {
@@ -29,6 +39,7 @@ void AISystem::step(float elapsed_ms)
 			}
 			vec2 direction = playerPos - thisPos;
 			direction /= length(direction);
+			enemyFireProjectile(entity_i, direction);
 			direction *= sprint ? 250 : 50;
 			vel_i.velocity = direction;
 		} else {
@@ -56,4 +67,28 @@ void AISystem::step(float elapsed_ms)
 		//           No -> Continue moving
 	}
 	(void)elapsed_ms; // placeholder to silence unused warning until implemented
+}
+
+void AISystem::enemyFireProjectile(Entity& enemy, vec2 direction) {
+	// check mana
+	if (registry.enemies.get(enemy).mana < 1) {
+		return;
+	} else {
+		registry.enemies.get(enemy).mana -= 1;
+	}
+
+	vec2 enemyPos = registry.positions.get(enemy).position;
+	vec2 vel;
+	vel.x = direction.x * ENEMY_PROJECTILE_SPEED;
+	vel.y = direction.y * ENEMY_PROJECTILE_SPEED;
+
+	// Get current player projectile type
+	ElementType elementType = registry.enemies.get(enemy).type;
+
+	createProjectile(renderer, enemyPos, vel, elementType, true);
+	// Mix_PlayChannel(-1, projectile_sound, 0);
+}
+
+void AISystem::init(RenderSystem* renderer_arg) {
+	this->renderer = renderer_arg;
 }
