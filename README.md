@@ -69,4 +69,4 @@ The ECS design pattern has not been changed since Milestone 1.
 
 ## Entity Component Diagram
 Highlight any changes versus the previous milestone.
-<!-- ![ECS diagram](docu/images/M1_ECS_diagram.png) -->
+![ECS diagram](docu/images/M2_ECS_diagram.png)

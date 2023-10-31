@@ -116,3 +116,23 @@ bool Mesh::loadFromOBJFile(std::string obj_path, std::vector<ColoredVertex>& out
 
 	return true;
 }
+
+vec2 Animation::getFrameSizeInTexcoords()
+{
+	return vec2(1.f / num_cols, 1.f / num_rows);
+}
+
+int Animation::getNumFrames()
+{
+	return num_cols * num_rows;
+}
+
+int Animation::getColumn(int frame)
+{
+	return frame % num_cols;
+}
+
+int Animation::getRow(int frame)
+{
+	return floor((float)frame / num_cols);
+}

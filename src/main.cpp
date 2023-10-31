@@ -34,12 +34,13 @@ int main()
 
 	// Set the game level then initialize the main systems
 	GameLevel level;
-	level.init(0);
+	level.init(TUTORIAL);
 
 
 	// initialize the main systems
 	render_system.init(window);
 	world_system.init(&render_system, level);
+	ai_system.init(&render_system);
 
 	// variable timestep loop
 	auto t = Clock::now();
@@ -59,6 +60,7 @@ int main()
 
 		world_system.handle_collisions();
 
+		render_system.animation_step(elapsed_ms);
 		render_system.draw();
 	}
 

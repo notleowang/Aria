@@ -46,9 +46,10 @@ class RenderSystem {
 			textures_path("fire_projectile.png"),
 			textures_path("earth_projectile.png"),
 			textures_path("lightning_projectile.png"),
+			textures_path("water_projectile_spritesheet.png"),
+			textures_path("fire_projectile_spritesheet.png"),
 			textures_path("dungeon_tile.png"),
-			textures_path("health_bar_empty.png"),
-			textures_path("health_bar_full.png")
+			textures_path("health_bar.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -58,11 +59,12 @@ class RenderSystem {
 		shader_path("coloured"),
 		shader_path("salmon"),
 		shader_path("textured"),
-		shader_path("water"),
+		shader_path("screen_darken"),
 		shader_path("terrain"),
 		shader_path("exit_door"),
 		shader_path("health_bar"),
-		shader_path("text_2d")
+		shader_path("text_2d"),
+		shader_path("animated")
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
@@ -100,10 +102,22 @@ public:
 	// Draw all entities
 	void draw();
 
+	void animation_step(float elapsed_ms);
+
 private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
+
+	// Helper functions for initalizeGlGeometryBuffers()
+	void initializePlayerGeometryBuffer();
+	void initializeSpriteGeometryBuffer();
+	void initializeDebugLineGeometryBuffer();
+	void initializeScreenTriangleGeometryBuffer();
+	void initializeTerrainGeometryBuffer();
+	void initializeExitDoorGeometryBuffer();
+	void initializeProjectileGeometryBuffer();
+	void initializeHealthBarGeometryBuffer();
 
 	// Window handle
 	GLFWwindow* window;
@@ -114,6 +128,9 @@ private:
 	GLuint off_screen_render_buffer_depth;
 
 	Entity screen_state_entity;
+
+	float elapsed_time = 0.f;
+	const float ANIMATION_SPEED = 100.f;
 };
 
 bool loadEffectFromFile(

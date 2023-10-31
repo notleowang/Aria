@@ -8,6 +8,7 @@
 #include <sstream>
 
 #include "physics_system.hpp"
+using namespace std;
 
 // Game configuration
 const float PLAYER_SPEED = 300.f;
@@ -72,11 +73,14 @@ GLFWwindow* WorldSystem::create_window() {
 	glfwWindowHint(GLFW_RESIZABLE, 0);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
-	window = glfwCreateWindow(window_width_px, window_height_px, "Aria", nullptr, nullptr);
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+	window = glfwCreateWindow(mode->width, mode->height, "Aria", monitor, nullptr);
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
 	}
+	glfwSetWindowSize(window, window_width_px, window_height_px); // set the resolution
 
 	// Setting callbacks to member functions (that's why the redirect is needed)
 	// Input is handled using GLFW, for more info see
@@ -148,12 +152,19 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-    float min_timer_ms = 3000.f;
+	Resources& player_resource = registry.resources.get(player);
+	if (player_resource.currentMana < 10.f) {
+		// replenish mana
+		player_resource.currentMana += elapsed_ms_since_last_update / 1000;
+		if (player_resource.currentMana > 10.f) player_resource.currentMana = 10.f;
+	}
+
+    float min_death_timer_ms = 3000.f;
 	for (Entity entity : registry.deathTimers.entities) {
 		DeathTimer& timer = registry.deathTimers.get(entity);
 		timer.timer_ms -= elapsed_ms_since_last_update;
-		if (timer.timer_ms < min_timer_ms) {
-			min_timer_ms = timer.timer_ms;
+		if (timer.timer_ms < min_death_timer_ms) {
+			min_death_timer_ms = timer.timer_ms;
 		}
 		// restart the game once the death timer expired
 		if (timer.timer_ms < 0) {
@@ -163,7 +174,40 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			return true;
 		}
 	}
-	screen.screen_darken_factor = 1 - min_timer_ms / 3000;
+	screen.screen_darken_factor = 1 - min_death_timer_ms / 3000;
+	float min_win_timer_ms = 3000.f;
+	for (Entity entity : registry.winTimers.entities) {
+		WinTimer& timer = registry.winTimers.get(entity);
+		timer.timer_ms -= elapsed_ms_since_last_update;
+		if (0< timer.timer_ms < min_win_timer_ms) {
+			min_win_timer_ms = timer.timer_ms;
+			screen.apply_spotlight = true;
+			screen.spotlight_radius = min_win_timer_ms/2000.f;
+		}
+		if (timer.timer_ms <= 0.f) {
+			min_win_timer_ms = timer.timer_ms;
+			screen.apply_spotlight = true;
+			screen.spotlight_radius = - min_win_timer_ms / 2000.f;
+			// Change level here
+			if (!timer.changedLevel) {
+				timer.changedLevel = true;
+				if (this->curr_level.getCurrLevel() != POWER_UP) {
+					this->next_level = this->curr_level.getCurrLevel() + 1;
+					this->curr_level.init(POWER_UP);
+				}
+				else {
+					this->curr_level.init(this->next_level);
+				}
+				restart_game();
+			}
+		}
+		if (timer.timer_ms <= -4000.f) {
+			registry.winTimers.remove(entity);
+			screen.apply_spotlight = false;
+		}
+	}
+
+
 	return true;
 }
 
@@ -172,6 +216,11 @@ void WorldSystem::restart_game() {
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 	printf("Restarting\n");
+
+	// hacky solution to persist player attributes after restart
+	bool persistPowerUps = registry.powerUps.has(player);
+	PowerUp persistedPowerUps;
+	if (persistPowerUps) persistedPowerUps = registry.powerUps.get(player);
 
 	// !!!
 	// Remove all entities that we created
@@ -205,6 +254,7 @@ void WorldSystem::restart_game() {
 	}
 
 	player = createAria(renderer, player_starting_pos);
+	if (persistPowerUps) registry.powerUps.get(player) = persistedPowerUps;
 
 	for (uint i = 0; i < terrains_attrs.size(); i++) {
 		vec4 terrain_i = terrains_attrs[i].first;
@@ -223,6 +273,8 @@ void WorldSystem::restart_game() {
 	}
 
 	createExitDoor(renderer, exit_door_pos);
+
+	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
 }
 
 bool collidedLeft(Position& pos_i, Position& pos_j) 
@@ -250,14 +302,49 @@ bool collidedBottom(Position& pos_i, Position& pos_j)
 }
 
 void WorldSystem::win_level() {
-	printf("hooray you won the level\n");
-	this->curr_level.init(this->curr_level.getCurrLevel() + 1);
-	restart_game();
+	if (registry.winTimers.has(player)) return;
+
+	printf("hooray you won the level\n"); 
+	registry.velocities.get(player).velocity = { 0.f,0.f };
+	registry.winTimers.emplace(player);
+}
+
+void WorldSystem::display_power_up() {
+	PowerUp& powerUp = registry.powerUps.get(player);
+
+	// figure out what power ups are available
+	vector<pair<string, bool*>> availPowerUps;
+
+	if (!powerUp.fasterMovement) availPowerUps.push_back(make_pair("Faster Movement Speed", &powerUp.fasterMovement));
+
+	for (int element = ElementType::WATER; element <= ElementType::LIGHTNING; element++) {
+		string elementName;
+		if (element == ElementType::WATER) elementName = "Water";
+		if (element == ElementType::FIRE) elementName = "Fire";
+		if (element == ElementType::EARTH) elementName = "Earth";
+		if (element == ElementType::LIGHTNING) elementName = "Lightning";
+
+		if (!powerUp.increasedDamage[element]) availPowerUps.push_back(make_pair("Increase " + elementName + " Damage", &powerUp.increasedDamage[element]));
+		if (!powerUp.tripleShot[element]) availPowerUps.push_back(make_pair("Triple " + elementName + " Shot", &powerUp.tripleShot[element]));
+		if (!powerUp.bounceOffWalls[element]) availPowerUps.push_back(make_pair("Bouncy " + elementName + " Shot", &powerUp.bounceOffWalls[element]));
+	}
+
+	if (availPowerUps.size() == 0) {
+		printf("No available power ups - DO NOTHING\n");
+		return;
+	}
+
+	shuffle(availPowerUps.begin(), availPowerUps.end(), rng);
+	/*for (int i = 0; i < availPowerUps.size(); i++) {
+		printf("%s\n", availPowerUps[i].first.c_str());
+	}*/
+
+	createPowerUpBlock(renderer, &availPowerUps[0]); // take top element after shuffling list (randomness!)
 }
 
 // Compute collisions between entities
 void WorldSystem::handle_collisions() {
-	if (registry.deathTimers.has(player)) { return; }
+	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; } 
 	// Loop over all collisions detected by the physics system
 	auto& collisionsRegistry = registry.collisions;
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
@@ -353,7 +440,7 @@ void WorldSystem::handle_collisions() {
 		}
 
 		// Checking Projectile - Enemy collisions
-		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity)) {
+		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity) && !registry.projectiles.get(entity).hostile) {
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
 			Resources& enemy_resource = registry.resources.get(entity_other);
 			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
@@ -370,8 +457,57 @@ void WorldSystem::handle_collisions() {
 			registry.remove_all_components_of(entity);
 		}
 
-		// Checking Projectile - Wall collisions
+		// Checking Projectile - Player collisions
+		if (registry.players.has(entity_other) && registry.projectiles.has(entity) && registry.projectiles.get(entity).hostile) {
+			Mix_PlayChannel(-1, damage_tick_sound, 0);
+			Resources& player_resource = registry.resources.get(entity_other);
+			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
+			/* TODO: Can the player be weak to any element?
+			if (isWeakTo(registry.players.get(entity_other).type, registry.projectiles.get(entity).type)) {
+				damage_dealt *= 2;
+			}*/
+			player_resource.currentHealth -= damage_dealt;
+			printf("Player hp: %f\n", player_resource.currentHealth);
+			if (player_resource.currentHealth <= 0) {
+				registry.deathTimers.emplace(entity_other);
+				registry.velocities.get(player).velocity = vec2(0.f, 0.f);
+				Mix_PlayChannel(-1, aria_death_sound, 0);
+			}
+			registry.remove_all_components_of(entity);
+		}
+
+		// Checking Projectile - Player collisions
 		if (registry.terrain.has(entity_other) && registry.projectiles.has(entity)) {
+			Projectile& projectile = registry.projectiles.get(entity);
+
+			if (projectile.bounces-- > 0) {
+				// bounce the projectile off the wall
+				Position& projectile_position = registry.positions.get(entity);
+				Velocity& projectile_velocity = registry.velocities.get(entity);
+				Position& terrain_position = registry.positions.get(entity_other);
+
+				if (collidedLeft(projectile_position, terrain_position) || collidedRight(projectile_position, terrain_position)) {
+					projectile_velocity.velocity.x *= -1;
+				}
+				else if (collidedTop(projectile_position, terrain_position) || collidedBottom(projectile_position, terrain_position)) {
+					projectile_velocity.velocity.y *= -1;
+				}
+			}
+			else {
+				registry.remove_all_components_of(entity);
+			}
+		}
+
+		// Checking Projectile - Power Up Block collisions
+		if (registry.powerUpBlock.has(entity_other) && registry.projectiles.has(entity)) {
+			PowerUpBlock& powerUpBlock = registry.powerUpBlock.get(entity_other);
+			Position& blockPos = registry.positions.get(entity_other);
+
+			*(powerUpBlock.powerUpToggle) = true;
+			printf("%s\n", powerUpBlock.powerUpText.c_str());
+
+			createText("You unlocked: " + powerUpBlock.powerUpText, vec2(0.f, 50.f), 1.f, vec3(0.f, 1.f, 0.f));
+
 			registry.remove_all_components_of(entity);
 		}
 
@@ -390,7 +526,9 @@ bool WorldSystem::is_over() const {
 
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
-	if (registry.deathTimers.has(player)) { return; }
+	//Disables keys when death or win timer happening
+	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; }
+
 	Velocity& player_velocity = registry.velocities.get(player);
 	Position& player_position = registry.positions.get(player);
 	Direction& player_direction = registry.directions.get(player);
@@ -463,7 +601,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	// set the player velocity based on the new_direction
 	if (new_direction != DIRECTION::NONE) {
 		player_direction.direction = new_direction;
-		player_velocity = computeVelocity(PLAYER_SPEED, player_direction);
+		PowerUp& player_powerUp = registry.powerUps.get(player);
+		player_velocity = computeVelocity(player_powerUp.fasterMovement ? PLAYER_SPEED * 1.5 : PLAYER_SPEED, player_direction);
 	}
 	else {
 		player_velocity = computeVelocity(0.0, player_direction);
@@ -476,6 +615,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		restart_game();
 	}
 
+	// Close program
+	if (action == GLFW_RELEASE && key == GLFW_KEY_BACKSPACE) {
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	}
+
 	// Debugging
 	//if (key == GLFW_KEY_D) {
 	//	if (action == GLFW_RELEASE)
@@ -486,25 +630,50 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 }
 
 void WorldSystem::on_mouse_button(int button, int action, int mod) {
+	//Disables mouse when death or win timer happening
+	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; }
+
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		// check mana
+		if (registry.resources.get(player).currentMana < 1) {
+			return;
+		} else {
+			registry.resources.get(player).currentMana -= 1;
+		}
+
 		// get cursor position
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
 
+		int width, height;
+		glfwGetWindowSize(window, &width, &height);
+
 		// calculate angle
-		float deltaX = xpos - (window_width_px / 2);
-		float deltaY = ypos - (window_height_px / 2);
+		float deltaX = xpos - (width / 2);
+		float deltaY = ypos - (height / 2);
 		float angle = atan2(deltaY, deltaX);
 
 		// create projectile
 		Position& position = registry.positions.get(player);
-		Velocity vel = computeVelocity(PROJECTILE_SPEED, angle);
 		vec2 proj_position = position.position;
+		ElementType elementType = registry.characterProjectileTypes.get(player).projectileType; // Get current player projectile type
 
-		// Get current player projectile type
-		ElementType elementType = registry.characterProjectileTypes.get(player).projectileType;
+		// apply power ups
+		PowerUp& powerUp = registry.powerUps.get(player);
+		
+		if (powerUp.tripleShot[elementType]) {
+			Velocity vel1 = computeVelocity(PROJECTILE_SPEED, angle - 0.25);
+			Velocity vel2 = computeVelocity(PROJECTILE_SPEED, angle);
+			Velocity vel3 = computeVelocity(PROJECTILE_SPEED, angle + 0.25);
 
-		Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType);
+			Entity projectile1 = createProjectile(renderer, proj_position, vel1.velocity, elementType, false, player);
+			Entity projectile2 = createProjectile(renderer, proj_position, vel2.velocity, elementType, false, player);
+			Entity projectile3 = createProjectile(renderer, proj_position, vel3.velocity, elementType, false, player);
+		}
+		else {
+			Velocity vel = computeVelocity(PROJECTILE_SPEED, angle);
+			Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType, false, player);
+		}
 		Mix_PlayChannel(-1, projectile_sound, 0);
 	}
 }

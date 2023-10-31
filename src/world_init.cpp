@@ -1,5 +1,6 @@
 #include "world_init.hpp"
 #include "tiny_ecs_registry.hpp"
+#include "render_system.hpp"
 
 Entity createAria(RenderSystem* renderer, vec2 pos)
 {
@@ -19,12 +20,31 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 
 	Resources& resources = registry.resources.emplace(entity);
 	resources.healthBar = createHealthBar(renderer, entity);
+	resources.manaBar = createHealthBar(renderer, entity);
+	registry.healthBars.get(resources.manaBar).y_offset = -75.f;
+	registry.healthBars.get(resources.manaBar).isManaBar = true;
 	
 	HealthBar& healthBar = registry.healthBars.get(resources.healthBar);
 	healthBar.y_offset = -60.f;
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
+
+	PowerUp& powerUp = registry.powerUps.emplace(entity);
+	// TOGGLE THESE TO TEST OR GO GOD MODE - enjoy! :)
+	//powerUp.fasterMovement = true;
+	//powerUp.increasedDamage[ElementType::WATER] = true;
+	//powerUp.increasedDamage[ElementType::FIRE] = true;
+	//powerUp.increasedDamage[ElementType::EARTH] = true;
+	//powerUp.increasedDamage[ElementType::LIGHTNING] = true;
+	//powerUp.tripleShot[ElementType::WATER] = true;
+	//powerUp.tripleShot[ElementType::FIRE] = true;
+	//powerUp.tripleShot[ElementType::EARTH] = true;
+	//powerUp.tripleShot[ElementType::LIGHTNING] = true;
+	//powerUp.bounceOffWalls[ElementType::WATER] = true;
+	//powerUp.bounceOffWalls[ElementType::FIRE] = true;
+	//powerUp.bounceOffWalls[ElementType::EARTH] = true;
+	//powerUp.bounceOffWalls[ElementType::LIGHTNING] = true;
 
 	registry.characterProjectileTypes.emplace(entity);
 	registry.players.emplace(entity);
@@ -148,9 +168,9 @@ Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity)
 
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::HEALTH_BAR_EMPTY, // !!! This technically does nothing
+		{ TEXTURE_ASSET_ID::HEALTH_BAR,
 			EFFECT_ASSET_ID::HEALTH_BAR,
-			GEOMETRY_BUFFER_ID::SPRITE });
+			GEOMETRY_BUFFER_ID::HEALTH_BAR });
 
 	return entity;
 }
@@ -172,6 +192,30 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
 			EFFECT_ASSET_ID::EXIT_DOOR,
 			GEOMETRY_BUFFER_ID::EXIT_DOOR});
+
+	return entity;
+}
+
+Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp) {
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::EXIT_DOOR);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = vec2(window_width_px / 2, window_height_px / 2);
+	position.scale = vec2(100.f, 100.f);
+
+	PowerUpBlock& powerUpBlock = registry.powerUpBlock.emplace(entity);
+	powerUpBlock.powerUpText = powerUp->first;
+	powerUpBlock.powerUpToggle = powerUp->second;
+
+	registry.collidables.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
+			EFFECT_ASSET_ID::EXIT_DOOR,
+			GEOMETRY_BUFFER_ID::EXIT_DOOR });
 
 	return entity;
 }
@@ -211,50 +255,73 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
-Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType) {
+Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType, bool hostile, Entity& player) {
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::PROJECTILE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	// Set initial position and velocity for the projectile
-	Position& position = registry.positions.emplace(entity);
-	position.position = pos;
-	position.scale = vec2(30.f, 30.f);
+	registry.animations.insert(
+		entity, 
+		Animation(PROJECTILE_SPRITESHEET_NUM_ROWS, PROJECTILE_SPRITESHEET_NUM_COLS));
 
-	Projectiles& projectile = registry.projectiles.emplace(entity);
+	Projectile& projectile = registry.projectiles.emplace(entity);
 	projectile.type = elementType;
+	projectile.hostile = hostile;
+
 	TEXTURE_ASSET_ID textureAsset;
+	EFFECT_ASSET_ID effectAsset;
+	GEOMETRY_BUFFER_ID geometryBuffer;
 	switch (projectile.type) {
 		case ElementType::WATER:
-			textureAsset = TEXTURE_ASSET_ID::WATER_PROJECTILE;
+			textureAsset = TEXTURE_ASSET_ID::WATER_PROJECTILE_SHEET;
+			effectAsset = EFFECT_ASSET_ID::ANIMATED;
+			geometryBuffer = GEOMETRY_BUFFER_ID::PROJECTILE;
 			break;
-		
 		case ElementType::FIRE:
-			textureAsset = TEXTURE_ASSET_ID::FIRE_PROJECTILE;
+			textureAsset = TEXTURE_ASSET_ID::FIRE_PROJECTILE_SHEET;
+			effectAsset = EFFECT_ASSET_ID::ANIMATED;
+			geometryBuffer = GEOMETRY_BUFFER_ID::PROJECTILE;
 			break;
 		case ElementType::EARTH:
 			textureAsset = TEXTURE_ASSET_ID::EARTH_PROJECTILE;
+			effectAsset = EFFECT_ASSET_ID::TEXTURED;
+			geometryBuffer = GEOMETRY_BUFFER_ID::SPRITE;
 			break;
 		case ElementType::LIGHTNING:
 			textureAsset = TEXTURE_ASSET_ID::LIGHTNING_PROJECTILE;
+			effectAsset = EFFECT_ASSET_ID::TEXTURED;
+			geometryBuffer = GEOMETRY_BUFFER_ID::SPRITE;
 			break;
 		default:
-			textureAsset = TEXTURE_ASSET_ID::WATER_PROJECTILE;
+			textureAsset = TEXTURE_ASSET_ID::WATER_PROJECTILE_SHEET;
+			effectAsset = EFFECT_ASSET_ID::ANIMATED;
+			geometryBuffer = GEOMETRY_BUFFER_ID::PROJECTILE;
 			break;
 	}
-
-	registry.collidables.emplace(entity);
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = vel;
 
+	// Set initial position and velocity for the projectile
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	position.angle = atan2(vel.y, vel.x);
+	position.scale = vec2(30.f, 30.f);
+
+	registry.collidables.emplace(entity);
+  if (!hostile) {
+	  PowerUp& powerUp = registry.powerUps.get(player);
+	  if (powerUp.increasedDamage[elementType]) projectile.damage *= 1.5; // increase damage by factor of 1.5
+	  if (powerUp.bounceOffWalls[elementType]) projectile.bounces = 2; // allow 2 bounces off walls
+  }
+
 	registry.renderRequests.insert(
 		entity,
-		{	textureAsset, //TODO: Change texture asset- the projectiles are currently turtles
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE });
+		{	textureAsset,
+			effectAsset,
+			geometryBuffer });
 	return entity;
 }
 
