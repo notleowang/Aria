@@ -40,7 +40,7 @@ public:
 	bool is_over()const;
 
 	void win_level();
-	void power_up_menu();
+	void display_power_up();
 private:
 	// Input callback functions
 	void on_key(int key, int, int action, int mod);
