@@ -438,7 +438,7 @@ void WorldSystem::handle_collisions() {
 			player_resource.currentHealth -= damage_dealt;
 			printf("Player hp: %f\n", player_resource.currentHealth);
 			if (player_resource.currentHealth <= 0) {
-				registry.deathTimers.emplace(entity);
+				registry.deathTimers.emplace(entity_other);
 				registry.velocities.get(player).velocity = vec2(0.f, 0.f);
 				Mix_PlayChannel(-1, aria_death_sound, 0);
 			}
