@@ -73,11 +73,14 @@ GLFWwindow* WorldSystem::create_window() {
 	glfwWindowHint(GLFW_RESIZABLE, 0);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
-	window = glfwCreateWindow(window_width_px, window_height_px, "Aria", nullptr, nullptr);
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+	window = glfwCreateWindow(mode->width, mode->height, "Aria", monitor, nullptr);
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
 	}
+	glfwSetWindowSize(window, window_width_px, window_height_px); // set the resolution
 
 	// Setting callbacks to member functions (that's why the redirect is needed)
 	// Input is handled using GLFW, for more info see
@@ -149,6 +152,13 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	Resources& player_resource = registry.resources.get(player);
+	if (player_resource.currentMana < 10.f) {
+		// replenish mana
+		player_resource.currentMana += elapsed_ms_since_last_update / 1000;
+		if (player_resource.currentMana > 10.f) player_resource.currentMana = 10.f;
+	}
+
     float min_death_timer_ms = 3000.f;
 	for (Entity entity : registry.deathTimers.entities) {
 		DeathTimer& timer = registry.deathTimers.get(entity);
@@ -184,13 +194,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				if (this->curr_level.getCurrLevel() != POWER_UP) {
 					this->next_level = this->curr_level.getCurrLevel() + 1;
 					this->curr_level.init(POWER_UP);
-					restart_game();
-					power_up_menu();
 				}
 				else {
 					this->curr_level.init(this->next_level);
-					restart_game();
 				}
+				restart_game();
 			}
 		}
 		if (timer.timer_ms <= -4000.f) {
@@ -265,6 +273,8 @@ void WorldSystem::restart_game() {
 	}
 
 	createExitDoor(renderer, exit_door_pos);
+
+	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
 }
 
 bool collidedLeft(Position& pos_i, Position& pos_j) 
@@ -292,14 +302,14 @@ bool collidedBottom(Position& pos_i, Position& pos_j)
 }
 
 void WorldSystem::win_level() {
-  if (registry.winTimers.has(player)) return;
+	if (registry.winTimers.has(player)) return;
 
 	printf("hooray you won the level\n"); 
 	registry.velocities.get(player).velocity = { 0.f,0.f };
 	registry.winTimers.emplace(player);
 }
 
-void WorldSystem::power_up_menu() {
+void WorldSystem::display_power_up() {
 	PowerUp& powerUp = registry.powerUps.get(player);
 
 	// figure out what power ups are available
@@ -430,7 +440,7 @@ void WorldSystem::handle_collisions() {
 		}
 
 		// Checking Projectile - Enemy collisions
-		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity)) {
+		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity) && !registry.projectiles.get(entity).hostile) {
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
 			Resources& enemy_resource = registry.resources.get(entity_other);
 			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
@@ -447,7 +457,26 @@ void WorldSystem::handle_collisions() {
 			registry.remove_all_components_of(entity);
 		}
 
-		// Checking Projectile - Wall collisions
+		// Checking Projectile - Player collisions
+		if (registry.players.has(entity_other) && registry.projectiles.has(entity) && registry.projectiles.get(entity).hostile) {
+			Mix_PlayChannel(-1, damage_tick_sound, 0);
+			Resources& player_resource = registry.resources.get(entity_other);
+			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
+			/* TODO: Can the player be weak to any element?
+			if (isWeakTo(registry.players.get(entity_other).type, registry.projectiles.get(entity).type)) {
+				damage_dealt *= 2;
+			}*/
+			player_resource.currentHealth -= damage_dealt;
+			printf("Player hp: %f\n", player_resource.currentHealth);
+			if (player_resource.currentHealth <= 0) {
+				registry.deathTimers.emplace(entity_other);
+				registry.velocities.get(player).velocity = vec2(0.f, 0.f);
+				Mix_PlayChannel(-1, aria_death_sound, 0);
+			}
+			registry.remove_all_components_of(entity);
+		}
+
+		// Checking Projectile - Player collisions
 		if (registry.terrain.has(entity_other) && registry.projectiles.has(entity)) {
 			Projectile& projectile = registry.projectiles.get(entity);
 
@@ -499,6 +528,7 @@ bool WorldSystem::is_over() const {
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	//Disables keys when death or win timer happening
 	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; }
+
 	Velocity& player_velocity = registry.velocities.get(player);
 	Position& player_position = registry.positions.get(player);
 	Direction& player_direction = registry.directions.get(player);
@@ -585,6 +615,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		restart_game();
 	}
 
+	// Close program
+	if (action == GLFW_RELEASE && key == GLFW_KEY_BACKSPACE) {
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	}
+
 	// Debugging
 	//if (key == GLFW_KEY_D) {
 	//	if (action == GLFW_RELEASE)
@@ -595,14 +630,27 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 }
 
 void WorldSystem::on_mouse_button(int button, int action, int mod) {
+	//Disables mouse when death or win timer happening
+	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; }
+
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		// check mana
+		if (registry.resources.get(player).currentMana < 1) {
+			return;
+		} else {
+			registry.resources.get(player).currentMana -= 1;
+		}
+
 		// get cursor position
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
 
+		int width, height;
+		glfwGetWindowSize(window, &width, &height);
+
 		// calculate angle
-		float deltaX = xpos - (window_width_px / 2);
-		float deltaY = ypos - (window_height_px / 2);
+		float deltaX = xpos - (width / 2);
+		float deltaY = ypos - (height / 2);
 		float angle = atan2(deltaY, deltaX);
 
 		// create projectile
@@ -618,15 +666,14 @@ void WorldSystem::on_mouse_button(int button, int action, int mod) {
 			Velocity vel2 = computeVelocity(PROJECTILE_SPEED, angle);
 			Velocity vel3 = computeVelocity(PROJECTILE_SPEED, angle + 0.25);
 
-			Entity projectile1 = createProjectile(renderer, proj_position, vel1.velocity, elementType, player);
-			Entity projectile2 = createProjectile(renderer, proj_position, vel2.velocity, elementType, player);
-			Entity projectile3 = createProjectile(renderer, proj_position, vel3.velocity, elementType, player);
+			Entity projectile1 = createProjectile(renderer, proj_position, vel1.velocity, elementType, false, player);
+			Entity projectile2 = createProjectile(renderer, proj_position, vel2.velocity, elementType, false, player);
+			Entity projectile3 = createProjectile(renderer, proj_position, vel3.velocity, elementType, false, player);
 		}
 		else {
 			Velocity vel = computeVelocity(PROJECTILE_SPEED, angle);
-			Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType, player);
+			Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType, false, player);
 		}
-
 		Mix_PlayChannel(-1, projectile_sound, 0);
 	}
 }

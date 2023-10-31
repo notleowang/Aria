@@ -40,6 +40,7 @@ int main()
 	// initialize the main systems
 	render_system.init(window);
 	world_system.init(&render_system, level);
+	ai_system.init(&render_system);
 
 	// variable timestep loop
 	auto t = Clock::now();

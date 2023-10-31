@@ -20,6 +20,9 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 
 	Resources& resources = registry.resources.emplace(entity);
 	resources.healthBar = createHealthBar(renderer, entity);
+	resources.manaBar = createHealthBar(renderer, entity);
+	registry.healthBars.get(resources.manaBar).y_offset = -75.f;
+	registry.healthBars.get(resources.manaBar).isManaBar = true;
 	
 	HealthBar& healthBar = registry.healthBars.get(resources.healthBar);
 	healthBar.y_offset = -60.f;
@@ -252,7 +255,7 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
-Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType, Entity& player) {
+Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType, bool hostile, Entity& player) {
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
@@ -265,6 +268,7 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 
 	Projectile& projectile = registry.projectiles.emplace(entity);
 	projectile.type = elementType;
+	projectile.hostile = hostile;
 
 	TEXTURE_ASSET_ID textureAsset;
 	EFFECT_ASSET_ID effectAsset;
@@ -307,10 +311,11 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 	position.scale = vec2(30.f, 30.f);
 
 	registry.collidables.emplace(entity);
-
-	PowerUp& powerUp = registry.powerUps.get(player);
-	if (powerUp.increasedDamage[elementType]) projectile.damage *= 1.5; // increase damage by factor of 1.5
-	if (powerUp.bounceOffWalls[elementType]) projectile.bounces = 2; // allow 2 bounces off walls
+  if (!hostile) {
+	  PowerUp& powerUp = registry.powerUps.get(player);
+	  if (powerUp.increasedDamage[elementType]) projectile.damage *= 1.5; // increase damage by factor of 1.5
+	  if (powerUp.bounceOffWalls[elementType]) projectile.bounces = 2; // allow 2 bounces off walls
+  }
 
 	registry.renderRequests.insert(
 		entity,
