@@ -73,11 +73,14 @@ GLFWwindow* WorldSystem::create_window() {
 	glfwWindowHint(GLFW_RESIZABLE, 0);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
-	window = glfwCreateWindow(window_width_px, window_height_px, "Aria", nullptr, nullptr);
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+	window = glfwCreateWindow(mode->width, mode->height, "Aria", monitor, nullptr);
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
 	}
+	glfwSetWindowSize(window, window_width_px, window_height_px); // set the resolution
 
 	// Setting callbacks to member functions (that's why the redirect is needed)
 	// Input is handled using GLFW, for more info see
@@ -160,8 +163,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	for (Entity entity : registry.deathTimers.entities) {
 		DeathTimer& timer = registry.deathTimers.get(entity);
 		timer.timer_ms -= elapsed_ms_since_last_update;
-		if (timer.timer_ms < min_timer_ms) {
-			min_timer_ms = timer.timer_ms;
+		if (timer.timer_ms < min_death_timer_ms) {
+			min_death_timer_ms = timer.timer_ms;
 		}
 		// restart the game once the death timer expired
 		if (timer.timer_ms < 0) {
@@ -171,7 +174,42 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			return true;
 		}
 	}
-	screen.screen_darken_factor = 1 - min_timer_ms / 3000;
+	screen.screen_darken_factor = 1 - min_death_timer_ms / 3000;
+	float min_win_timer_ms = 3000.f;
+	for (Entity entity : registry.winTimers.entities) {
+		WinTimer& timer = registry.winTimers.get(entity);
+		timer.timer_ms -= elapsed_ms_since_last_update;
+		if (0< timer.timer_ms < min_win_timer_ms) {
+			min_win_timer_ms = timer.timer_ms;
+			screen.apply_spotlight = true;
+			screen.spotlight_radius = min_win_timer_ms/2000.f;
+		}
+		if (timer.timer_ms <= 0.f) {
+			min_win_timer_ms = timer.timer_ms;
+			screen.apply_spotlight = true;
+			screen.spotlight_radius = - min_win_timer_ms / 2000.f;
+			// Change level here
+			if (!timer.changedLevel) {
+				timer.changedLevel = true;
+				if (this->curr_level.getCurrLevel() != POWER_UP) {
+					this->next_level = this->curr_level.getCurrLevel() + 1;
+					this->curr_level.init(POWER_UP);
+					restart_game();
+					power_up_menu();
+				}
+				else {
+					this->curr_level.init(this->next_level);
+					restart_game();
+				}
+			}
+		}
+		if (timer.timer_ms <= -4000.f) {
+			registry.winTimers.remove(entity);
+			screen.apply_spotlight = false;
+		}
+	}
+
+
 	return true;
 }
 
@@ -264,18 +302,11 @@ bool collidedBottom(Position& pos_i, Position& pos_j)
 }
 
 void WorldSystem::win_level() {
-	printf("hooray you won the level\n");
+  if (registry.winTimers.has(player)) return;
 
-	if (this->curr_level.getCurrLevel() != POWER_UP) {
-		this->next_level = this->curr_level.getCurrLevel() + 1;
-		this->curr_level.init(POWER_UP);
-		restart_game();
-		power_up_menu();
-	}
-	else {
-		this->curr_level.init(this->next_level);
-		restart_game();
-	}
+	printf("hooray you won the level\n"); 
+	registry.velocities.get(player).velocity = { 0.f,0.f };
+	registry.winTimers.emplace(player);
 }
 
 void WorldSystem::power_up_menu() {
@@ -313,7 +344,7 @@ void WorldSystem::power_up_menu() {
 
 // Compute collisions between entities
 void WorldSystem::handle_collisions() {
-	if (registry.deathTimers.has(player)) { return; }
+	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; } 
 	// Loop over all collisions detected by the physics system
 	auto& collisionsRegistry = registry.collisions;
 	for (uint i = 0; i < collisionsRegistry.components.size(); i++) {
@@ -495,7 +526,8 @@ bool WorldSystem::is_over() const {
 
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
-	if (registry.deathTimers.has(player)) { return; }
+	//Disables keys when death or win timer happening
+	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; }
 	Velocity& player_velocity = registry.velocities.get(player);
 	Position& player_position = registry.positions.get(player);
 	Direction& player_direction = registry.directions.get(player);
@@ -582,6 +614,11 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		restart_game();
 	}
 
+	// Close program
+	if (action == GLFW_RELEASE && key == GLFW_KEY_BACKSPACE) {
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	}
+
 	// Debugging
 	//if (key == GLFW_KEY_D) {
 	//	if (action == GLFW_RELEASE)
@@ -604,9 +641,12 @@ void WorldSystem::on_mouse_button(int button, int action, int mod) {
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
 
+		int width, height;
+		glfwGetWindowSize(window, &width, &height);
+
 		// calculate angle
-		float deltaX = xpos - (window_width_px / 2);
-		float deltaY = ypos - (window_height_px / 2);
+		float deltaX = xpos - (width / 2);
+		float deltaY = ypos - (height / 2);
 		float angle = atan2(deltaY, deltaX);
 
 		// create projectile
