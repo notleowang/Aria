@@ -9,7 +9,6 @@ using namespace std;
 // Aria component
 struct Player
 {
-
 };
 // All data relevant to elements and weaknesses
 enum ElementType {
@@ -25,6 +24,7 @@ struct Enemy
 	float damage = 10.f;
 	float movementTimer = 3000.f;
 	float stamina = 0.5f;
+	float mana = 1.f;
 	ElementType type = ElementType::FIRE; // By default, an enemy is of fire type
 };
 
@@ -66,14 +66,17 @@ struct Resources
 {
 	float maxHealth = 100.f;
 	float currentHealth = 100.f;
-	float mana = 100.f;
+	float currentMana = 10.f;
+	float maxMana = 10.f;
 	Entity healthBar;
+	Entity manaBar;
 };
 
 struct HealthBar
 {
 	Entity owner;
 	float y_offset = -50.f;
+	bool isManaBar = false;
 };
 
 // Structure to store projectile entities
@@ -81,6 +84,7 @@ struct Projectile
 {
 	float damage = 10.f;
 	ElementType type;
+	bool hostile = false;
 	int bounces;
 };
 

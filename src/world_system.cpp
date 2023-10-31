@@ -152,7 +152,14 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-    float min_death_timer_ms = 3000.f;
+	Resources& player_resource = registry.resources.get(player);
+	if (player_resource.currentMana < 10.f) {
+		// replenish mana
+		player_resource.currentMana += elapsed_ms_since_last_update / 1000;
+		if (player_resource.currentMana > 10.f) player_resource.currentMana = 10.f;
+	}
+
+    float min_timer_ms = 3000.f;
 	for (Entity entity : registry.deathTimers.entities) {
 		DeathTimer& timer = registry.deathTimers.get(entity);
 		timer.timer_ms -= elapsed_ms_since_last_update;
@@ -433,7 +440,7 @@ void WorldSystem::handle_collisions() {
 		}
 
 		// Checking Projectile - Enemy collisions
-		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity)) {
+		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity) && !registry.projectiles.get(entity).hostile) {
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
 			Resources& enemy_resource = registry.resources.get(entity_other);
 			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
@@ -450,7 +457,26 @@ void WorldSystem::handle_collisions() {
 			registry.remove_all_components_of(entity);
 		}
 
-		// Checking Projectile - Wall collisions
+		// Checking Projectile - Player collisions
+		if (registry.players.has(entity_other) && registry.projectiles.has(entity) && registry.projectiles.get(entity).hostile) {
+			Mix_PlayChannel(-1, damage_tick_sound, 0);
+			Resources& player_resource = registry.resources.get(entity_other);
+			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
+			/* TODO: Can the player be weak to any element?
+			if (isWeakTo(registry.players.get(entity_other).type, registry.projectiles.get(entity).type)) {
+				damage_dealt *= 2;
+			}*/
+			player_resource.currentHealth -= damage_dealt;
+			printf("Player hp: %f\n", player_resource.currentHealth);
+			if (player_resource.currentHealth <= 0) {
+				registry.deathTimers.emplace(entity_other);
+				registry.velocities.get(player).velocity = vec2(0.f, 0.f);
+				Mix_PlayChannel(-1, aria_death_sound, 0);
+			}
+			registry.remove_all_components_of(entity);
+		}
+
+		// Checking Projectile - Player collisions
 		if (registry.terrain.has(entity_other) && registry.projectiles.has(entity)) {
 			Projectile& projectile = registry.projectiles.get(entity);
 
@@ -604,6 +630,13 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 void WorldSystem::on_mouse_button(int button, int action, int mod) {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		// check mana
+		if (registry.resources.get(player).currentMana < 1) {
+			return;
+		} else {
+			registry.resources.get(player).currentMana -= 1;
+		}
+
 		// get cursor position
 		double xpos, ypos;
 		glfwGetCursorPos(window, &xpos, &ypos);
@@ -629,15 +662,14 @@ void WorldSystem::on_mouse_button(int button, int action, int mod) {
 			Velocity vel2 = computeVelocity(PROJECTILE_SPEED, angle);
 			Velocity vel3 = computeVelocity(PROJECTILE_SPEED, angle + 0.25);
 
-			Entity projectile1 = createProjectile(renderer, proj_position, vel1.velocity, elementType, player);
-			Entity projectile2 = createProjectile(renderer, proj_position, vel2.velocity, elementType, player);
-			Entity projectile3 = createProjectile(renderer, proj_position, vel3.velocity, elementType, player);
+			Entity projectile1 = createProjectile(renderer, proj_position, vel1.velocity, elementType, false, player);
+			Entity projectile2 = createProjectile(renderer, proj_position, vel2.velocity, elementType, false, player);
+			Entity projectile3 = createProjectile(renderer, proj_position, vel3.velocity, elementType, false, player);
 		}
 		else {
 			Velocity vel = computeVelocity(PROJECTILE_SPEED, angle);
-			Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType, player);
+			Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType, false, player);
 		}
-
 		Mix_PlayChannel(-1, projectile_sound, 0);
 	}
 }

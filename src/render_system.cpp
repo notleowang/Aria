@@ -73,7 +73,11 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			HealthBar& healthBar = registry.healthBars.get(entity);
 			assert(registry.resources.has(healthBar.owner));
 			Resources& resources = registry.resources.get(healthBar.owner);
-			glUniform1f(glGetUniformLocation(program, "hp"), (resources.currentHealth / resources.maxHealth));
+			if (healthBar.isManaBar) {
+				glUniform1f(glGetUniformLocation(program, "hp"), (resources.currentMana / resources.maxMana));
+			} else {
+				glUniform1f(glGetUniformLocation(program, "hp"), (resources.currentHealth / resources.maxHealth));
+			}
 			gl_has_errors();
 		}
 		else if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATED) {
