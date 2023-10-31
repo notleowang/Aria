@@ -59,7 +59,7 @@ class RenderSystem {
 		shader_path("coloured"),
 		shader_path("salmon"),
 		shader_path("textured"),
-		shader_path("water"),
+		shader_path("screen_darken"),
 		shader_path("terrain"),
 		shader_path("exit_door"),
 		shader_path("health_bar"),

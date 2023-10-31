@@ -12,6 +12,7 @@ class ECSRegistry
 public:
 	// Manually created list of all components this game has
 	ComponentContainer<DeathTimer> deathTimers;
+	ComponentContainer<WinTimer> winTimers;
 	ComponentContainer<Resources> resources;
 	ComponentContainer<HealthBar> healthBars;
 	ComponentContainer<Projectile> projectiles;
