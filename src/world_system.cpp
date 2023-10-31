@@ -149,11 +149,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
 	Player& playerEnt = registry.players.get(player);
-	if (playerEnt.mana < 10.f) {
+	Resources& player_resource = registry.resources.get(player);
+	if (player_resource.currentMana < 10.f) {
 		// replenish stamina
-		playerEnt.mana += elapsed_ms_since_last_update / 1000;
-		playerEnt.mana = min(playerEnt.mana, 10.f);
-		// printf("Player mana: %.2f\n", playerEnt.mana);
+		player_resource.currentMana += elapsed_ms_since_last_update / 1000;
+		player_resource.currentMana = min(player_resource.currentMana, 10.f);
 	}
 
     float min_timer_ms = 3000.f;
@@ -515,10 +515,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 void WorldSystem::on_mouse_button(int button, int action, int mod) {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		// check mana
-		if (registry.players.get(player).mana < 1) {
+		if (registry.resources.get(player).currentMana < 1) {
 			return;
 		} else {
-			registry.players.get(player).mana -= 1;
+			registry.resources.get(player).currentMana -= 1;
 		}
 
 		// get cursor position

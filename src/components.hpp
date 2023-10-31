@@ -7,7 +7,6 @@
 // Aria component
 struct Player
 {
-	float mana = 10.f;
 };
 // All data relevant to elements and weaknesses
 enum class ElementType {
@@ -51,14 +50,17 @@ struct Resources
 {
 	float maxHealth = 100.f;
 	float currentHealth = 100.f;
-	float mana = 100.f;
+	float currentMana = 10.f;
+	float maxMana = 10.f;
 	Entity healthBar;
+	Entity manaBar;
 };
 
 struct HealthBar
 {
 	Entity owner;
 	float y_offset = -50.f;
+	bool isManaBar = false;
 };
 
 // Structure to store projectile entities
