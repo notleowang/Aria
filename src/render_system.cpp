@@ -152,6 +152,18 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		glVertexAttribPointer(in_color_loc, 3, GL_FLOAT, GL_FALSE,
 			sizeof(ColoredVertex), (void*)sizeof(vec3));
 		gl_has_errors();
+
+		if (render_request.used_effect == EFFECT_ASSET_ID::ARIA) {
+
+			float time = (float) glfwGetTime();
+			vec3 initial_color = vec3(0.3f, 0.0f, 0.0f);
+			vec3 final_color = vec3(0.8f, 0.0f, 0.0f);
+			vec3 color_change = initial_color + (final_color - initial_color) * sin(time);
+
+			GLuint change_uloc = glGetUniformLocation(program, "change");
+			glUniform3f(change_uloc, color_change.x, color_change.y, color_change.z);
+			gl_has_errors();
+		}
 	}
 	else
 	{
