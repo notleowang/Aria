@@ -66,6 +66,7 @@ private:
 	Mix_Chunk* aria_death_sound;
 	Mix_Chunk* enemy_death_sound;
 	Mix_Chunk* damage_tick_sound;
+	Mix_Chunk* end_level_sound;
 
 	// C++ random number generator
 	std::default_random_engine rng;
