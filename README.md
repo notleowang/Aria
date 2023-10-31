@@ -59,3 +59,37 @@ The ECS design pattern we are using is the one provided by A1 which is a dense c
 
 ## Entity Component Diagram
 ![ECS diagram](docu/images/M1_ECS_diagram.png)
+
+
+# Milestone 1
+Below is the documentation for our `README.md` submission for Milestone 2.
+
+## Entry Points
+-[Simple Rendering Effects (Spotlight)](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/d7719e1b3523724e5169875fb26f12e86c066294/src/world_system.cpp#L178)
+
+## Development Plan
+Most of the work in this milestone aligned with our development plan for this milestone.
+
+### Aligned with the proposal:
+
+
+### Discreprancies:
+
+
+## ECS Design Pattern
+The ECS design pattern we are using is the one provided by A1 which is a dense component and entity vector with a map.
+
+### Implementation:
+
+
+## Game Entities
+
+
+## Actionable Components
+
+
+## Entity Component Diagram
+
+
+
+
