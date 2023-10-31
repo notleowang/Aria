@@ -28,9 +28,6 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	direction.direction = DIRECTION::E;
 
 	PowerUp& powerUp = registry.powerUps.emplace(entity);
-	//powerUp.fasterMovement = false;
-	powerUp.bounceOffWalls[ElementType::EARTH] = true;
-	powerUp.tripleShot[ElementType::EARTH] = true;
 
 	registry.characterProjectileTypes.emplace(entity);
 	registry.players.emplace(entity);

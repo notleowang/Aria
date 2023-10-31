@@ -174,6 +174,11 @@ void WorldSystem::restart_game() {
 	registry.list_all_components();
 	printf("Restarting\n");
 
+	// hacky solution to persist player attributes after restart
+	bool persistPowerUps = registry.powerUps.has(player);
+	PowerUp persistedPowerUps;
+	if (persistPowerUps) persistedPowerUps = registry.powerUps.get(player);
+
 	// !!!
 	// Remove all entities that we created
 	// This might be overkill. Everything that has velocity should already have a position, etc.
@@ -206,6 +211,7 @@ void WorldSystem::restart_game() {
 	}
 
 	player = createAria(renderer, player_starting_pos);
+	if (persistPowerUps) registry.powerUps.get(player) = persistedPowerUps;
 
 	for (uint i = 0; i < terrains_attrs.size(); i++) {
 		vec4 terrain_i = terrains_attrs[i].first;
