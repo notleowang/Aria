@@ -153,7 +153,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		// replenish stamina
 		playerEnt.mana += elapsed_ms_since_last_update / 1000;
 		playerEnt.mana = min(playerEnt.mana, 10.f);
-		printf("Player mana: %.2f\n", playerEnt.mana);
+		// printf("Player mana: %.2f\n", playerEnt.mana);
 	}
 
     float min_timer_ms = 3000.f;

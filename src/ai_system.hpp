@@ -16,6 +16,6 @@ public:
 	void step(float elapsed_ms);
 	void init(RenderSystem* renderer);
 private:
-	void enemyFireProjectile(Entity& enemy, vec2 direction);
+	bool enemyFireProjectile(Entity& enemy, vec2 direction);
 	RenderSystem* renderer;
 };
