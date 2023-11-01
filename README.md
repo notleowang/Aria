@@ -30,6 +30,7 @@ Below is the documentation for our `README.md` submission for Milestone 2.
   - [Character Render](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/src/render_system.cpp#L87)
 - 2 Minutes of Non-Repetitive Gameplay:
 [New Game Levels](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/a02a00206804e162dfe492ea22aa1a741ab3b5fd/src/game_level.cpp), [Power-Ups](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/a02a00206804e162dfe492ea22aa1a741ab3b5fd/src/components.hpp#L32)
+- [Key-frame/State Interpolation](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/src/render_system.cpp#L167)
 
 ## Development Plan
 Most of the work in this milestone aligned with our development plan for this milestone.
