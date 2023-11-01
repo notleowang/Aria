@@ -22,7 +22,7 @@ Below is the documentation for our `README.md` submission for Milestone 2.
   - Text is provided in the very first level (tutorial level) to inform the user what can be done in the game.
   - Text is also provided on each power-up level prompting the player to shoot at the block to receive a power-up.
 - [Consistent Game Resolution](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/a02a00206804e162dfe492ea22aa1a741ab3b5fd/src/world_system.cpp#L75): Consistent resolution is set on line 83
-- Simple Rendering Effects: TODO
+- [Simple Rendering Effects (Spotlight)](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/d7719e1b3523724e5169875fb26f12e86c066294/src/world_system.cpp#L178)
 - External Integration of FreeType Library
   - [Modified CMake](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/CMakeLists.txt#L70)
   - [FreeType Load](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/src/render_system_init.cpp#L66)
