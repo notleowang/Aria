@@ -115,8 +115,13 @@ bool AABBCollides(Entity& entity_i, Entity& entity_j)
 // Shouldn't care if terrain-terrain and exitDoor-terrain collisions happen
 bool shouldIgnoreCollision(Entity& entity_i, Entity& entity_j) 
 {
-	if ((registry.terrain.has(entity_i) && registry.terrain.has(entity_j)) || 
-		(registry.terrain.has(entity_i) && registry.exitDoors.has(entity_j)) ||
+	if (registry.terrain.has(entity_i) && registry.terrain.has(entity_j)) {
+		if (registry.terrain.get(entity_i).moveable || registry.terrain.get(entity_j).moveable) {
+			return false;
+		}
+		return true;
+	}
+	if ((registry.terrain.has(entity_i) && registry.exitDoors.has(entity_j)) ||
 		(registry.exitDoors.has(entity_i) && registry.terrain.has(entity_j))) {
 		return true;
 	}
@@ -144,7 +149,7 @@ void PhysicsSystem::step(float elapsed_ms)
 		for (uint j = i+1; j < collidables_container.size(); j++) {
 			Entity& entity_j = collidables_container.entities[j];
 			// Ignore terrain-terrain and terrain-exitDoor collision
-			//if (shouldIgnoreCollision(entity_i, entity_j)) continue;
+			if (shouldIgnoreCollision(entity_i, entity_j)) continue;
 			// Broad phase of collision check
 			if (AABBCollides(entity_i, entity_j)) {
 				// Narrow phase of collision check
