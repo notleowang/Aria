@@ -1,48 +1,70 @@
 # Aria: Whispers of Darkness
 In the eerie village of Grimhaven, shrouded in perpetual mist and shadows, Aria's journey begins. 
 
-# Milestone 1
-Below is the documentation for our `README.md` submission for Milestone 1.
+# Milestone 2
+Below is the documentation for our `README.md` submission for Milestone 2.
 
 ## Entry Points
-- [Movement Controls](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/0d59974eadc6cf1e6482af4443dfe1ed5fba9fb9/src/world_system.cpp#L270)
-- Camera Controls: [Camera struct](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/d37c69f8169b5c6068eda0682ba48fa821cc33ef/src/common.hpp#L51),  [function call and projection matrix](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/d37c69f8169b5c6068eda0682ba48fa821cc33ef/src/render_system.cpp#L205), [function definition](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/d37c69f8169b5c6068eda0682ba48fa821cc33ef/src/common.cpp#L24)
-- [Collisions World System](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/0d59974eadc6cf1e6482af4443dfe1ed5fba9fb9/src/world_system.cpp#L217)
-- [AI System](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/src/ai_system.cpp#L5)
-- [Collisions Physics System](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/0d59974eadc6cf1e6482af4443dfe1ed5fba9fb9/src/physics_system.cpp#L32)
-  - Collisions also handle the game space boundaries by disallowing players to step out of certain spaces.
-- [Geometry of new assets](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/eac2392bd085313bd47088c7d778549e9295cd7e/src/render_system_init.cpp#L166)
-- Game Level Assets: [hpp](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/eac2392bd085313bd47088c7d778549e9295cd7e/src/game_level.hpp), [cpp](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/eac2392bd085313bd47088c7d778549e9295cd7e/src/game_level.cpp)
-- [Projectile Controls](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/1abb653a8c08b16c6a2b29b3be8313c48e31a219/src/world_system.cpp#L364)
+- Game Logic Response to User Input: [AI System](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/src/ai_system.cpp#L5)
+
+- Sprite Sheet Animation: 
+[Animation Component](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/src/components.hpp#L196),
+[Handling Effect](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/src/render_system.cpp#L79),
+[Advancing Frames](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/src/render_system.cpp#L309),
+[Shader](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/shaders/animated.fs.glsl),
+[Animation Sequences](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/14e8f386b75c6a21ea42ea23c1cf00e87eade535/src/world_init.cpp#L274) (the projectiles with the ANIMATED effect asset id are animation sequences using different textures)
+- New integrated assets: 
+[Health/Mana bar texture](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/data/textures/health_bar.png), 
+[New Projectile Textures](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/data/textures/water_projectile_spritesheet.png) (the link takes you to one of the new projectile textures, the rest are in the textures folder)
+- [Mesh Based Collision](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/src/physics_system.cpp#L36)
+  - Physics System first goes through a broad phase collision check (AABB Collision Detection) followed by a narrow phase collision check which uses line segment 
+    intersection. (Draw a line from entity's mid point to each vertex and check if it collides with the edge of another entity and vice versa for other entity)
+- Basic User Tutorial/Help
+  - Text is provided in the very first level (tutorial level) to inform the user what can be done in the game.
+  - Text is also provided on each power-up level prompting the player to shoot at the block to receive a power-up.
+- [Consistent Game Resolution](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/a02a00206804e162dfe492ea22aa1a741ab3b5fd/src/world_system.cpp#L75): Consistent resolution is set on line 83
+- [Simple Rendering Effects (Spotlight)](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/d7719e1b3523724e5169875fb26f12e86c066294/src/world_system.cpp#L178)
+- External Integration of FreeType Library
+  - [Modified CMake](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/CMakeLists.txt#L70)
+  - [FreeType Load](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/src/render_system_init.cpp#L66)
+  - [Character Render](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/src/render_system.cpp#L87)
+- 2 Minutes of Non-Repetitive Gameplay:
+[New Game Levels](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/a02a00206804e162dfe492ea22aa1a741ab3b5fd/src/game_level.cpp), [Power-Ups](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/a02a00206804e162dfe492ea22aa1a741ab3b5fd/src/components.hpp#L32)
+- [Key-frame/State Interpolation](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/src/render_system.cpp#L167)
 
 ## Development Plan
 Most of the work in this milestone aligned with our development plan for this milestone.
 
 ### Aligned with the proposal:
-- Drafting sprite assets.
-- Getting the ECS design pattern implemented.
-- Getting movement inputs implemented.
-- Collision properties (with walls and enemies).
-- Bug fixing and game stability checking.
+- Implemented new levels.
+- Enhanced enemy ai.
+- New sprites for enemeies.
+- UI sprites (health bar).
+- Projectile sprite animations.
+- Finished basic tutorial concept level.
+- Added power-ups.
+- Added weaknesses to enemies.
+- Incorporated mana.
+- Added additional audio feedback.
 
 ### Discreprancies:
-- Solidified the decisions for our creative components for this milestone to be `Camera Control` and `Audio Feedback`.
-- Gray-box-implementation was "changed" to salmon-box-implementation (we used the A1 assets instead of creating "gray-box" assets).
-- Replaced Key-frame/state interpolation task with an Enemy Decision Tree feature.
+- No sprite animations for player yet.
 
 ## ECS Design Pattern
-The ECS design pattern we are using is the one provided by A1 which is a dense component and entity vector with a map.
-
-### Implementation:
-`std::vector<Entity> entities`\
-`std::vector<Component> components`\
-`std::unorderedmap<unsignedint, unsignedint>`
+The ECS design pattern has not been changed since Milestone 1.
 
 ## Game Entities
 - Player
 - Enemy
 - Terrain
 - Exit Door
+
+### New Game Entities:
+- Projectile
+- Text
+- Health Bar
+- Floor
+- PowerUpBlock
 
 ## Actionable Components
 - Velocity
@@ -51,45 +73,21 @@ The ECS design pattern we are using is the one provided by A1 which is a dense c
 - Direction
 - Invulnerable Timer
 - Death Timer
-- Resource
+- Resources
 - Mesh
 - Render Request
 - Screen State
 - Color
 
-## Entity Component Diagram
-![ECS diagram](docu/images/M1_ECS_diagram.png)
-
-
-# Milestone 1
-Below is the documentation for our `README.md` submission for Milestone 2.
-
-## Entry Points
--[Simple Rendering Effects (Spotlight)](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/d7719e1b3523724e5169875fb26f12e86c066294/src/world_system.cpp#L178)
-
-## Development Plan
-Most of the work in this milestone aligned with our development plan for this milestone.
-
-### Aligned with the proposal:
-
-
-### Discreprancies:
-
-
-## ECS Design Pattern
-The ECS design pattern we are using is the one provided by A1 which is a dense component and entity vector with a map.
-
-### Implementation:
-
-
-## Game Entities
-
-
-## Actionable Components
-
+### New Actionable Components
+- Projectile
+- Text
+- CharacterProjectileType
+- Collidable
+- Win Timer
+- Animation
+- Power Up
 
 ## Entity Component Diagram
-
-
-
-
+Highlight any changes versus the previous milestone.
+![ECS diagram](docu/images/M2_ECS_diagram.png)
