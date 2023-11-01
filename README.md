@@ -5,7 +5,8 @@ In the eerie village of Grimhaven, shrouded in perpetual mist and shadows, Aria'
 Below is the documentation for our `README.md` submission for Milestone 2.
 
 ## Entry Points
-- Game Logic Response to User Input: TODO
+- Game Logic Response to User Input: [AI System](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/src/ai_system.cpp#L5)
+
 - Sprite Sheet Animation: 
 [Animation Component](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/src/components.hpp#L196),
 [Handling Effect](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/src/render_system.cpp#L79),
