@@ -12,18 +12,27 @@ class ECSRegistry
 public:
 	// Manually created list of all components this game has
 	ComponentContainer<DeathTimer> deathTimers;
+	ComponentContainer<WinTimer> winTimers;
 	ComponentContainer<Resources> resources;
-	ComponentContainer<Projectiles> projectiles;
+	ComponentContainer<HealthBar> healthBars;
+	ComponentContainer<ManaBar> manaBars;
+	ComponentContainer<Projectile> projectiles;
+	ComponentContainer<CharacterProjectileType> characterProjectileTypes;
+	ComponentContainer<Text> texts;
 	ComponentContainer<InvulnerableTimer> invulnerableTimers;
 	ComponentContainer<Position> positions;
 	ComponentContainer<Velocity> velocities;
 	ComponentContainer<Direction> directions;
 	ComponentContainer<Collision> collisions;
+	ComponentContainer<Collidable> collidables;
 	ComponentContainer<Player> players;
 	ComponentContainer<Enemy> enemies;
+	ComponentContainer<PowerUp> powerUps;
+	ComponentContainer<PowerUpBlock> powerUpBlock;
 	ComponentContainer<Terrain> terrain;
 	ComponentContainer<ExitDoor> exitDoors;
 	ComponentContainer<Mesh*> meshPtrs;
+	ComponentContainer<Animation> animations;
 	ComponentContainer<RenderRequest> renderRequests;
 	ComponentContainer<ScreenState> screenStates;
 	ComponentContainer<DebugComponent> debugComponents;
@@ -35,17 +44,25 @@ public:
 	{
 		registry_list.push_back(&deathTimers);
 		registry_list.push_back(&projectiles);
+		registry_list.push_back(&texts);
 		registry_list.push_back(&resources);
+		registry_list.push_back(&healthBars);
+		registry_list.push_back(&manaBars);
+		registry_list.push_back(&characterProjectileTypes);
 		registry_list.push_back(&invulnerableTimers);
 		registry_list.push_back(&positions);
 		registry_list.push_back(&velocities);
 		registry_list.push_back(&directions);
 		registry_list.push_back(&collisions);
+		registry_list.push_back(&collidables);
 		registry_list.push_back(&players);
 		registry_list.push_back(&enemies);
+		registry_list.push_back(&powerUps);
+		registry_list.push_back(&powerUpBlock);
 		registry_list.push_back(&terrain);
 		registry_list.push_back(&exitDoors);
 		registry_list.push_back(&meshPtrs);
+		registry_list.push_back(&animations);
 		registry_list.push_back(&renderRequests);
 		registry_list.push_back(&screenStates);
 		registry_list.push_back(&debugComponents);

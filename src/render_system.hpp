@@ -7,6 +7,14 @@
 #include "components.hpp"
 #include "tiny_ecs.hpp"
 
+// Holds all state information relevant to a character as loaded using FreeType
+struct Character {
+	GLuint TextureID;  // ID handle of the glyph texture
+	ivec2   Size;      // Size of glyph
+	ivec2   Bearing;   // Offset from baseline to left/top of glyph
+	unsigned int Advance;   // Horizontal offset to advance to next glyph
+};
+
 // System responsible for setting up OpenGL and for rendering all the
 // visual entities in the game
 class RenderSystem {
@@ -32,23 +40,40 @@ class RenderSystem {
 	const std::array<std::string, texture_count> texture_paths = {
 			textures_path("fish.png"),   // Currently keeping this so we know how to import our textures
 			textures_path("landscape.png"),
-			textures_path("turtle.png") 
+			textures_path("turtle.png") ,
+			textures_path("fire_enemy.png") ,
+			textures_path("water_projectile.png"),
+			textures_path("fire_projectile.png"),
+			textures_path("earth_projectile.png"),
+			textures_path("lightning_projectile.png"),
+			textures_path("water_projectile_spritesheet.png"),
+			textures_path("fire_projectile_spritesheet.png"),
+			textures_path("dungeon_tile.png"),
+			textures_path("health_bar.png"),
+			textures_path("mana_bar.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
 	// Make sure these paths remain in sync with the associated enumerators.
 	const std::array<std::string, effect_count> effect_paths = {
+		shader_path("aria"),
 		shader_path("coloured"),
 		shader_path("salmon"),
 		shader_path("textured"),
-		shader_path("water"),
+		shader_path("screen_darken"),
 		shader_path("terrain"),
-		shader_path("exit_door")
+		shader_path("exit_door"),
+		shader_path("resource_bar"),
+		shader_path("text_2d"),
+		shader_path("animated")
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
 	std::array<GLuint, geometry_count> index_buffers;
 	std::array<Mesh, geometry_count> meshes;
+
+	GLuint vao;
+	std::unordered_map<GLchar, Character> Characters;
 
 public:
 	// Initialize the window
@@ -70,16 +95,30 @@ public:
 	// shader
 	bool initScreenTexture();
 
+	void initializeFreeType();
+
 	// Destroy resources associated to one or all entities created by the system
 	~RenderSystem();
 
 	// Draw all entities
 	void draw();
 
+	void animation_step(float elapsed_ms);
+
 private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
+
+	// Helper functions for initalizeGlGeometryBuffers()
+	void initializePlayerGeometryBuffer();
+	void initializeSpriteGeometryBuffer();
+	void initializeDebugLineGeometryBuffer();
+	void initializeScreenTriangleGeometryBuffer();
+	void initializeTerrainGeometryBuffer();
+	void initializeExitDoorGeometryBuffer();
+	void initializeProjectileGeometryBuffer();
+	void initializeResourceBarGeometryBuffer();
 
 	// Window handle
 	GLFWwindow* window;
@@ -90,6 +129,9 @@ private:
 	GLuint off_screen_render_buffer_depth;
 
 	Entity screen_state_entity;
+
+	float elapsed_time = 0.f;
+	const float ANIMATION_SPEED = 100.f;
 };
 
 bool loadEffectFromFile(

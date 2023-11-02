@@ -18,6 +18,15 @@ Velocity computeVelocity(double speed, Direction direction) {
     return velocity_component;
 }
 
+// Function to compute the the x and y components of the normalized velocity given speed + angle
+Velocity computeVelocity(double speed, double angle) {
+    Velocity velocity_component;
+    velocity_component.velocity.x = speed * cos(angle);
+    velocity_component.velocity.y = speed * sin(angle);
+
+    return velocity_component;
+}
+
 
 // Function to convert a direction to an angle in radians
 double directionToRadians(DIRECTION direction) {
@@ -44,3 +53,22 @@ double directionToRadians(DIRECTION direction) {
     }
 }
 
+// Function that determines elemental weaknesses
+bool isWeakTo(ElementType t1, ElementType t2) {
+    // Elemental Hierarchy:
+        // Water > Fire > Earth > Lightning, where Lightning > Water
+           
+    // If t1 is weaker than t2, return true
+    switch (t1) {
+    case ElementType::WATER:
+        return t2 == ElementType::LIGHTNING;
+    case ElementType::FIRE:
+        return t2 == ElementType::WATER;
+    case ElementType::EARTH:
+        return t2 == ElementType::FIRE;
+    case ElementType::LIGHTNING:
+        return t2 == ElementType::EARTH;
+    default:
+        return false;
+    }
+}

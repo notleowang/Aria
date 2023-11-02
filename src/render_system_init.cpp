@@ -50,7 +50,6 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 
 	// We are not really using VAO's but without at least one bound we will crash in
 	// some systems.
-	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	gl_has_errors();
@@ -59,8 +58,81 @@ bool RenderSystem::init(GLFWwindow* window_arg)
     initializeGlTextures();
 	initializeGlEffects();
 	initializeGlGeometryBuffers();
+	initializeFreeType();
 
 	return true;
+}
+
+void RenderSystem::initializeFreeType() {
+	// FreeType Reference: https://learnopengl.com/In-Practice/Text-Rendering
+	FT_Library ft;
+	// All functions return a value different than 0 whenever an error occurred
+	if (FT_Init_FreeType(&ft))
+	{
+		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+		return;
+	}
+
+	// load font as face
+	FT_Face face;
+	if (FT_New_Face(ft, "../../../data/fonts/PixeloidSans.ttf", 0, &face)) {
+		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+		return;
+	}
+	else {
+		// set size to load glyphs as
+		FT_Set_Pixel_Sizes(face, 0, 48);
+
+		// disable byte-alignment restriction
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+		// load first 128 characters of ASCII set
+		for (unsigned char c = 0; c < 128; c++)
+		{
+			// Load character glyph 
+			if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+			{
+				std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+				continue;
+			}
+			// generate texture
+			GLuint texture;
+			glGenTextures(1, &texture);
+			glBindTexture(GL_TEXTURE_2D, texture);
+			glTexImage2D(
+				GL_TEXTURE_2D,
+				0,
+				GL_RED,
+				face->glyph->bitmap.width,
+				face->glyph->bitmap.rows,
+				0,
+				GL_RED,
+				GL_UNSIGNED_BYTE,
+				face->glyph->bitmap.buffer
+			);
+			// set texture options
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			// now store character for later use
+			Character character = {
+				texture,
+				glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+				glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+				static_cast<unsigned int>(face->glyph->advance.x)
+			};
+			Characters.insert(std::pair<char, Character>(c, character));
+		}
+	}
+	// destroy FreeType once we're finished
+	FT_Done_Face(face);
+	FT_Done_FreeType(ft);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vertex_buffers[(uint)GEOMETRY_BUFFER_ID::TEXT_2D]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+
+	gl_has_errors();
 }
 
 void RenderSystem::initializeGlTextures()
@@ -88,7 +160,6 @@ void RenderSystem::initializeGlTextures()
 		gl_has_errors();
 		stbi_image_free(data);
     }
-	gl_has_errors();
 }
 
 void RenderSystem::initializeGlEffects()
@@ -136,6 +207,184 @@ void RenderSystem::initializeGlMeshes()
 	}
 }
 
+// Helper functions for initializing Gl Geometry Buffers
+void RenderSystem::initializePlayerGeometryBuffer()
+{
+	int geom_index = (int)GEOMETRY_BUFFER_ID::ARIA;
+	
+	std::vector<ColoredVertex> vertices(3);
+	vertices[0].position = { 0.f, -0.5f, 0.f };
+	vertices[1].position = { -0.5f, 0.5f, 0.f };
+	vertices[2].position = { 0.5f, 0.5f, 0.f };
+	
+	const std::vector<uint16_t> vertex_indices = { 0, 1, 2 };
+
+	meshes[geom_index].vertices = vertices;
+	meshes[geom_index].vertex_indices = vertex_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::ARIA, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
+}
+
+void RenderSystem::initializeSpriteGeometryBuffer()
+{
+	int geom_index = (int)GEOMETRY_BUFFER_ID::SPRITE;
+
+	std::vector<TexturedVertex> textured_vertices(4);
+	textured_vertices[0].position = { -1.f / 2, +1.f / 2, 0.f };
+	textured_vertices[1].position = { +1.f / 2, +1.f / 2, 0.f };
+	textured_vertices[2].position = { +1.f / 2, -1.f / 2, 0.f };
+	textured_vertices[3].position = { -1.f / 2, -1.f / 2, 0.f };
+	textured_vertices[0].texcoord = { 0.f, 1.f };
+	textured_vertices[1].texcoord = { 1.f, 1.f };
+	textured_vertices[2].texcoord = { 1.f, 0.f };
+	textured_vertices[3].texcoord = { 0.f, 0.f };
+
+	// Counterclockwise as it's the default opengl front winding direction.
+	const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
+
+	std::vector<ColoredVertex> vertices(4);
+	vertices[0].position = textured_vertices[0].position;
+	vertices[1].position = textured_vertices[1].position;
+	vertices[2].position = textured_vertices[2].position;
+	vertices[3].position = textured_vertices[3].position;
+
+	meshes[geom_index].vertices = vertices;
+	meshes[geom_index].vertex_indices = textured_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::SPRITE, textured_vertices, textured_indices);
+}
+
+void RenderSystem::initializeDebugLineGeometryBuffer()
+{
+	int geom_index = (int)GEOMETRY_BUFFER_ID::DEBUG_LINE;
+
+	std::vector<ColoredVertex> vertices(4);
+	std::vector<uint16_t> vertex_indices;
+
+	constexpr float depth = 0.5f;
+	constexpr vec3 red = { 0.8,0.1,0.1 };
+
+	// Corner points
+	vertices = {
+		{{-0.5,-0.5, depth}, red},
+		{{-0.5, 0.5, depth}, red},
+		{{ 0.5, 0.5, depth}, red},
+		{{ 0.5,-0.5, depth}, red},
+	};
+
+	// Two triangles
+	vertex_indices = { 0, 1, 3, 1, 2, 3 };
+
+	meshes[geom_index].vertices = vertices;
+	meshes[geom_index].vertex_indices = vertex_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::DEBUG_LINE, vertices, vertex_indices);
+}
+
+void RenderSystem::initializeScreenTriangleGeometryBuffer()
+{
+	std::vector<vec3> vertices(3);
+	vertices[0] = { -1, -6, 0.f };
+	vertices[1] = { 6, -1, 0.f };
+	vertices[2] = { -1, 6, 0.f };
+
+	// Counterclockwise as it's the default opengl front winding direction.
+	const std::vector<uint16_t> vertex_indices = { 0, 1, 2 };
+
+	// No mesh for the screen triangle
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE, vertices, vertex_indices);
+}
+
+void RenderSystem::initializeTerrainGeometryBuffer()
+{
+	int geom_index = (int)GEOMETRY_BUFFER_ID::TERRAIN;
+
+	std::vector<ColoredVertex> vertices(4);
+	vertices[0].position = { -0.5, -0.5, -0.1 };
+	vertices[1].position = { -0.5, 0.5, -0.1 };
+	vertices[2].position = { 0.5, 0.5, -0.1 };
+	vertices[3].position = { 0.5, -0.5, -0.1 };
+
+	const std::vector<uint16_t> vertex_indices = { 0, 1, 2, 0, 2, 3 };
+
+	meshes[geom_index].vertices = vertices;
+	meshes[geom_index].vertex_indices = vertex_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::TERRAIN, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
+}
+
+void RenderSystem::initializeExitDoorGeometryBuffer()
+{
+	int geom_index = (int)GEOMETRY_BUFFER_ID::EXIT_DOOR;
+
+	std::vector<ColoredVertex> vertices(4);
+	vertices[0].position = { -0.5, -0.5, -0.1 };
+	vertices[1].position = { -0.5, 0.5, -0.1 };
+	vertices[2].position = { 0.5, 0.5, -0.1 };
+	vertices[3].position = { 0.5, -0.5, -0.1 };
+
+	const std::vector<uint16_t> vertex_indices = { 0, 1, 2, 0, 2, 3 };
+
+	meshes[geom_index].vertices = vertices;
+	meshes[geom_index].vertex_indices = vertex_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::EXIT_DOOR, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
+}
+
+void RenderSystem::initializeProjectileGeometryBuffer()
+{
+	int geom_index = (int)GEOMETRY_BUFFER_ID::PROJECTILE;
+	// TODO: actually query these from somewhere
+	int num_cols = 4;
+	int num_rows = 1;
+
+	std::vector<TexturedVertex> textured_vertices(4);
+	textured_vertices[0].position = { -1.f / 2, +1.f / 2, 0.f };
+	textured_vertices[1].position = { +1.f / 2, +1.f / 2, 0.f };
+	textured_vertices[2].position = { +1.f / 2, -1.f / 2, 0.f };
+	textured_vertices[3].position = { -1.f / 2, -1.f / 2, 0.f };
+	textured_vertices[0].texcoord = { 0.f,				1.f / num_rows };
+	textured_vertices[1].texcoord = { 1.f / num_cols,	1.f / num_rows };
+	textured_vertices[2].texcoord = { 1.f / num_cols,	0.f };
+	textured_vertices[3].texcoord = { 0.f,				0.f };
+
+	const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
+
+	std::vector<ColoredVertex> vertices(4);
+	vertices[0].position = textured_vertices[0].position;
+	vertices[1].position = textured_vertices[1].position;
+	vertices[2].position = textured_vertices[2].position;
+	vertices[3].position = textured_vertices[3].position;
+
+	meshes[geom_index].vertices = vertices;
+	meshes[geom_index].vertex_indices = textured_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::PROJECTILE, textured_vertices, textured_indices);
+}
+
+void RenderSystem::initializeResourceBarGeometryBuffer()
+{
+	int geom_index = (int)GEOMETRY_BUFFER_ID::RESOURCE_BAR;
+
+	// Initial texture coords are centered on empty health bar
+	std::vector<TexturedVertex> textured_vertices(4);
+	textured_vertices[0].position = { -1.f / 2, +1.f / 2, 0.f };
+	textured_vertices[1].position = { +1.f / 2, +1.f / 2, 0.f };
+	textured_vertices[2].position = { +1.f / 2, -1.f / 2, 0.f };
+	textured_vertices[3].position = { -1.f / 2, -1.f / 2, 0.f };
+	textured_vertices[0].texcoord = { 0.f, 1.f / 2 };
+	textured_vertices[1].texcoord = { 1.f, 1.f / 2 };
+	textured_vertices[2].texcoord = { 1.f, 0.f };
+	textured_vertices[3].texcoord = { 0.f, 0.f };
+
+	// Counterclockwise as it's the default opengl front winding direction.
+	const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
+
+	std::vector<ColoredVertex> vertices(4);
+	vertices[0].position = textured_vertices[0].position;
+	vertices[1].position = textured_vertices[1].position;
+	vertices[2].position = textured_vertices[2].position;
+	vertices[3].position = textured_vertices[3].position;
+
+	meshes[geom_index].vertices = vertices;
+	meshes[geom_index].vertex_indices = textured_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::RESOURCE_BAR, textured_vertices, textured_indices);
+}
+
 void RenderSystem::initializeGlGeometryBuffers()
 {
 	// Vertex Buffer creation.
@@ -146,94 +395,14 @@ void RenderSystem::initializeGlGeometryBuffers()
 	// Index and Vertex buffer data initialization.
 	initializeGlMeshes();
 
-	//////////////////////////
-	// Initialize sprite
-	// The position corresponds to the center of the texture.
-	std::vector<TexturedVertex> textured_vertices(4);
-	textured_vertices[0].position = { -1.f/2, +1.f/2, 0.f };
-	textured_vertices[1].position = { +1.f/2, +1.f/2, 0.f };
-	textured_vertices[2].position = { +1.f/2, -1.f/2, 0.f };
-	textured_vertices[3].position = { -1.f/2, -1.f/2, 0.f };
-	textured_vertices[0].texcoord = { 0.f, 1.f };
-	textured_vertices[1].texcoord = { 1.f, 1.f };
-	textured_vertices[2].texcoord = { 1.f, 0.f };
-	textured_vertices[3].texcoord = { 0.f, 0.f };
-
-	// Counterclockwise as it's the default opengl front winding direction.
-	const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
-	bindVBOandIBO(GEOMETRY_BUFFER_ID::SPRITE, textured_vertices, textured_indices);
-
-	// Initializing terrain
-	std::vector<ColoredVertex> terrain_vertices(4);
-	std::vector<uint16_t> terrain_indices;
-	terrain_vertices[0].position = {-0.5, -0.5, -0.1};
-	terrain_vertices[1].position = {-0.5, 0.5, -0.1};
-	terrain_vertices[2].position = {0.5, -0.5, -0.1};
-	terrain_vertices[3].position  = {0.5, 0.5, -0.1};
-	terrain_indices.push_back(0);
-	terrain_indices.push_back(1);
-	terrain_indices.push_back(2);
-	terrain_indices.push_back(1);
-	terrain_indices.push_back(3);
-	terrain_indices.push_back(2);
-	int geom_index = (int)GEOMETRY_BUFFER_ID::TERRAIN;
-	meshes[geom_index].vertices = terrain_vertices;
-	meshes[geom_index].vertex_indices = terrain_indices;
-	bindVBOandIBO(GEOMETRY_BUFFER_ID::TERRAIN, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
-
-	// Initializing exit door
-	// TODO: change exit door sprite
-	std::vector<ColoredVertex> exit_door_vertices(4);
-	std::vector<uint16_t> exit_door_indices;
-	exit_door_vertices[0].position = { -0.5, -0.5, -0.1 };
-	exit_door_vertices[1].position = { -0.5, 0.5, -0.1 };
-	exit_door_vertices[2].position = { 0.5, -0.5, -0.1 };
-	exit_door_vertices[3].position = { 0.5, 0.5, -0.1 };
-	exit_door_indices.push_back(0);
-	exit_door_indices.push_back(1);
-	exit_door_indices.push_back(2);
-	exit_door_indices.push_back(1);
-	exit_door_indices.push_back(3);
-	exit_door_indices.push_back(2);
-	int geom_index_door = (int)GEOMETRY_BUFFER_ID::EXIT_DOOR;
-	meshes[geom_index_door].vertices = exit_door_vertices;
-	meshes[geom_index_door].vertex_indices = exit_door_indices;
-	bindVBOandIBO(GEOMETRY_BUFFER_ID::EXIT_DOOR, meshes[geom_index_door].vertices, meshes[geom_index_door].vertex_indices);
-
-	//////////////////////////////////
-	// Initialize debug line
-	std::vector<ColoredVertex> line_vertices;
-	std::vector<uint16_t> line_indices;
-
-	constexpr float depth = 0.5f;
-	constexpr vec3 red = { 0.8,0.1,0.1 };
-
-	// Corner points
-	line_vertices = {
-		{{-0.5,-0.5, depth}, red},
-		{{-0.5, 0.5, depth}, red},
-		{{ 0.5, 0.5, depth}, red},
-		{{ 0.5,-0.5, depth}, red},
-	};
-
-	// Two triangles
-	line_indices = {0, 1, 3, 1, 2, 3};
-	
-	geom_index = (int)GEOMETRY_BUFFER_ID::DEBUG_LINE;
-	meshes[geom_index].vertices = line_vertices;
-	meshes[geom_index].vertex_indices = line_indices;
-	bindVBOandIBO(GEOMETRY_BUFFER_ID::DEBUG_LINE, line_vertices, line_indices);
-
-	///////////////////////////////////////////////////////
-	// Initialize screen triangle (yes, triangle, not quad; its more efficient).
-	std::vector<vec3> screen_vertices(3);
-	screen_vertices[0] = { -1, -6, 0.f };
-	screen_vertices[1] = { 6, -1, 0.f };
-	screen_vertices[2] = { -1, 6, 0.f };
-
-	// Counterclockwise as it's the default opengl front winding direction.
-	const std::vector<uint16_t> screen_indices = { 0, 1, 2 };
-	bindVBOandIBO(GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE, screen_vertices, screen_indices);
+	initializePlayerGeometryBuffer();
+	initializeSpriteGeometryBuffer();
+	initializeDebugLineGeometryBuffer();
+	initializeScreenTriangleGeometryBuffer();
+	initializeTerrainGeometryBuffer();
+	initializeExitDoorGeometryBuffer();
+	initializeProjectileGeometryBuffer();
+	initializeResourceBarGeometryBuffer();
 }
 
 RenderSystem::~RenderSystem()
