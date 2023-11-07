@@ -51,7 +51,7 @@ class RenderSystem {
 			textures_path("dungeon_tile.png"),
 			textures_path("health_bar.png"),
 			textures_path("mana_bar.png"),
-			textures_path("power_up_block_blue.png")
+			textures_path("power_up_block.png")
 	};
 
 	std::array<GLuint, effect_count> effects;

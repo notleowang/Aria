@@ -216,6 +216,8 @@ struct Animation
 	int frame = 0;
 	int num_rows;
 	int num_cols;
+	bool is_animating = true;
+	bool rainbow_enabled = false;
 	vec2 getFrameSizeInTexcoords();
 	int getNumFrames();
 	int getColumn(int frame);

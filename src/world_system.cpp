@@ -505,6 +505,10 @@ void WorldSystem::handle_collisions() {
 			PowerUpBlock& powerUpBlock = registry.powerUpBlock.get(entity_other);
 			Position& blockPos = registry.positions.get(entity_other);
 
+			Animation& anim = registry.animations.get(entity_other);
+			anim.is_animating = false;
+			anim.rainbow_enabled = false;
+
 			*(powerUpBlock.powerUpToggle) = true;
 			printf("%s\n", powerUpBlock.powerUpText.c_str());
 

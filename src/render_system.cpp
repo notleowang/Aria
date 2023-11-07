@@ -90,8 +90,11 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		else if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATED) {
 			assert(registry.animations.has(entity));
 			Animation& animation = registry.animations.get(entity);
+			glUniform1f(glGetUniformLocation(program, "time"), (float)(glfwGetTime() * 10.0f));
 			glUniform1i(glGetUniformLocation(program, "frame"), animation.frame);
 			glUniform1f(glGetUniformLocation(program, "frame_width"), animation.getFrameSizeInTexcoords().x);
+			glUniform1i(glGetUniformLocation(program, "is_animating"), animation.is_animating);
+			glUniform1i(glGetUniformLocation(program, "rainbow_enabled"), animation.rainbow_enabled);
 			gl_has_errors();
 		}
 	}

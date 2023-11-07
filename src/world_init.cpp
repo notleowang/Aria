@@ -229,7 +229,8 @@ Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp) 
 
 	int num_rows = 1;
 	int num_cols = 15;
-	registry.animations.insert(entity, Animation(num_rows, num_cols));
+	Animation& anim = registry.animations.emplace(entity, num_rows, num_cols);
+	anim.rainbow_enabled = true;
 
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
