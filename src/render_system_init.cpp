@@ -58,6 +58,7 @@ bool RenderSystem::init(GLFWwindow* window_arg)
     initializeGlTextures();
 	initializeGlEffects();
 	initializeGlGeometryBuffers();
+	initializeImGui();
 	initializeFreeType();
 
 	return true;
@@ -133,6 +134,23 @@ void RenderSystem::initializeFreeType() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
 
 	gl_has_errors();
+}
+
+void RenderSystem::initializeImGui()
+{
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	//ImGui::CreateContext();
+	//ImGuiIO& io = ImGui::GetIO();
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+
+	// Setup Dear ImGui style
+	//ImGui::StyleColorsDark();
+	//ImGui::StyleColorsClassic();
+
+	//Setup Platform/Renderer backends
+	//ImGui_ImplGlfw_InitForOpenGL(window, true);
+	//ImGui_ImplOpenGL3_Init("#version 130");
 }
 
 void RenderSystem::initializeGlTextures()

@@ -97,6 +97,8 @@ public:
 
 	void initializeFreeType();
 
+	void initializeImGui();
+
 	// Destroy resources associated to one or all entities created by the system
 	~RenderSystem();
 
