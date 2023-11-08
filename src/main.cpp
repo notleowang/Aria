@@ -30,16 +30,15 @@ int main()
 		getchar();
 		return EXIT_FAILURE;
 	}
-	// Add a main menu thing here? 
-	MainMenu main_menu;
-	main_menu.init();
 
-	// Set the game level then initialize the main systems
+	// initialize the main systems below
+	// initialize the render system
+	render_system.init(window);
+
+	// Initialize the level for the world system
 	GameLevel level;
 	level.init(TUTORIAL);
 
-	// initialize the main systems
-	render_system.init(window);
 	world_system.init(&render_system, level);
 	ai_system.init(&render_system);
 
@@ -55,6 +54,7 @@ int main()
 			(float)(std::chrono::duration_cast<std::chrono::microseconds>(now - t)).count() / 1000;
 		t = now;
 
+		// !!! Add logic for main menu
 		world_system.step(elapsed_ms);
 		physics_system.step(elapsed_ms);
 		ai_system.step(elapsed_ms);
