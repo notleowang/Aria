@@ -354,36 +354,6 @@ void RenderSystem::initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID geom_b
 	bindVBOandIBO(geom_buffer_id, textured_vertices, textured_indices);
 }
 
-//void RenderSystem::initializeProjectileGeometryBuffer()
-//{
-//	int geom_index = (int)GEOMETRY_BUFFER_ID::PROJECTILE;
-//	// TODO: actually query these from somewhere
-//	int num_cols = 4;
-//	int num_rows = 1;
-//
-//	std::vector<TexturedVertex> textured_vertices(4);
-//	textured_vertices[0].position = { -1.f / 2, +1.f / 2, 0.f };
-//	textured_vertices[1].position = { +1.f / 2, +1.f / 2, 0.f };
-//	textured_vertices[2].position = { +1.f / 2, -1.f / 2, 0.f };
-//	textured_vertices[3].position = { -1.f / 2, -1.f / 2, 0.f };
-//	textured_vertices[0].texcoord = { 0.f,				1.f / num_rows };
-//	textured_vertices[1].texcoord = { 1.f / num_cols,	1.f / num_rows };
-//	textured_vertices[2].texcoord = { 1.f / num_cols,	0.f };
-//	textured_vertices[3].texcoord = { 0.f,				0.f };
-//
-//	const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
-//
-//	std::vector<ColoredVertex> vertices(4);
-//	vertices[0].position = textured_vertices[0].position;
-//	vertices[1].position = textured_vertices[1].position;
-//	vertices[2].position = textured_vertices[2].position;
-//	vertices[3].position = textured_vertices[3].position;
-//
-//	meshes[geom_index].vertices = vertices;
-//	meshes[geom_index].vertex_indices = textured_indices;
-//	bindVBOandIBO(GEOMETRY_BUFFER_ID::PROJECTILE, textured_vertices, textured_indices);
-//}
-
 void RenderSystem::initializeResourceBarGeometryBuffer()
 {
 	int geom_index = (int)GEOMETRY_BUFFER_ID::RESOURCE_BAR;
