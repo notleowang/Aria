@@ -31,8 +31,10 @@ bool GameLevel::init(uint level) {
 		this->exit_door_pos = vec2(1200, 800);
 
 		texts.push_back("Use WASD to move around");
-		text_attrs.push_back({0.f,125.f,1.0f,1.0f,1.0f,0.f});
+		text_attrs.push_back({0.f,175.f,1.0f,1.0f,1.0f,0.f});
 		texts.push_back("Use M1 button to shoot");
+		text_attrs.push_back({0.f,125.f,1.0f,1.0f,1.0f,0.f});
+		texts.push_back("Use 1,2,3,4 to cycle through elements");
 		text_attrs.push_back({0.f,75.f,1.0f,1.0f,1.0f,0.f});		
 		texts.push_back("Move to the exit door when ready");
 		text_attrs.push_back({0.f,25.f,1.0f,1.0f,1.0f,0.f});
