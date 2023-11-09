@@ -50,7 +50,8 @@ class RenderSystem {
 			textures_path("fire_projectile_spritesheet.png"),
 			textures_path("dungeon_tile.png"),
 			textures_path("health_bar.png"),
-			textures_path("mana_bar.png")
+			textures_path("mana_bar.png"),
+			textures_path("power_up_block.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -117,8 +118,8 @@ private:
 	void initializeScreenTriangleGeometryBuffer();
 	void initializeTerrainGeometryBuffer();
 	void initializeExitDoorGeometryBuffer();
-	void initializeProjectileGeometryBuffer();
 	void initializeResourceBarGeometryBuffer();
+	void initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID goem_buffer_id, int num_rows, int num_cols);
 
 	// Window handle
 	GLFWwindow* window;

@@ -216,6 +216,8 @@ struct Animation
 	int frame = 0;
 	int num_rows;
 	int num_cols;
+	bool is_animating = true;
+	bool rainbow_enabled = false;
 	vec2 getFrameSizeInTexcoords();
 	int getNumFrames();
 	int getColumn(int frame);
@@ -265,7 +267,8 @@ enum class TEXTURE_ASSET_ID {
 	FLOOR = FIRE_PROJECTILE_SHEET + 1,
 	HEALTH_BAR = FLOOR + 1,
 	MANA_BAR = HEALTH_BAR + 1,
-	TEXTURE_COUNT = MANA_BAR + 1
+	POWER_UP_BLOCK = MANA_BAR + 1,
+	TEXTURE_COUNT = POWER_UP_BLOCK + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -295,7 +298,8 @@ enum class GEOMETRY_BUFFER_ID {
 	TEXT_2D = EXIT_DOOR + 1,
 	RESOURCE_BAR = TEXT_2D + 1,
 	PROJECTILE = RESOURCE_BAR + 1,
-	GEOMETRY_COUNT = PROJECTILE + 1
+	POWER_UP_BLOCK = PROJECTILE + 1,
+	GEOMETRY_COUNT = POWER_UP_BLOCK + 1
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 

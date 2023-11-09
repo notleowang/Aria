@@ -227,12 +227,17 @@ Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp) 
 	powerUpBlock.powerUpText = powerUp->first;
 	powerUpBlock.powerUpToggle = powerUp->second;
 
+	int num_rows = 1;
+	int num_cols = 15;
+	Animation& anim = registry.animations.emplace(entity, num_rows, num_cols);
+	anim.rainbow_enabled = true;
+
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
-			EFFECT_ASSET_ID::EXIT_DOOR,
-			GEOMETRY_BUFFER_ID::EXIT_DOOR });
+		{ TEXTURE_ASSET_ID::POWER_UP_BLOCK,
+			EFFECT_ASSET_ID::ANIMATED,
+			GEOMETRY_BUFFER_ID::POWER_UP_BLOCK });
 
 	return entity;
 }
