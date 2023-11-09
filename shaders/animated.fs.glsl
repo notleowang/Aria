@@ -74,7 +74,7 @@ vec4 rainbow_shift(vec4 in_rgb_color)
     float luminance = in_hsl_color.z == 0.0 ? 0.0 : in_hsl_color.z * 0.6 + 0.40;
     vec3 out_hsl_color = vec3(hue, saturation, luminance);
     vec3 out_rgb_color = HSLtoRGB(out_hsl_color);
-    return vec4(out_rgb_color, 1.0);
+    return vec4(out_rgb_color, in_rgb_color.a);
 }
 
 void main()
