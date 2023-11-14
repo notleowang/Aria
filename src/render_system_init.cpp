@@ -58,6 +58,7 @@ bool RenderSystem::init(GLFWwindow* window_arg)
     initializeGlTextures();
 	initializeGlEffects();
 	initializeGlGeometryBuffers();
+	initializeAnimations();
 	initializeFreeType();
 
 	return true;
@@ -402,6 +403,41 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PROJECTILE, 1, 4);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::POWER_UP_BLOCK, 1, 15);
 	initializeResourceBarGeometryBuffer();
+}
+
+void RenderSystem::initializePowerUpBlockAnimation()
+{
+	int num_rows = 1;
+	int num_cols = 15;
+
+	int ss_index = (int)SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK;
+
+	std::vector<vec2> states((int)POWER_UP_BLOCK_STATES::NUM_ROWS);
+	states[(int)POWER_UP_BLOCK_STATES::ACTIVE] = vec2(0, num_cols - 1);
+
+	animations[ss_index].num_rows = num_rows;
+	animations[ss_index].num_cols = num_cols;
+	animations[ss_index].states = states;
+}
+
+void RenderSystem::initializeProjectileAnimation()
+{
+	int num_rows = 1;
+	int num_cols = 4;
+	int ss_index = (int)SPRITE_SHEET_DATA_ID::PROJECTILE;
+
+	std::vector<vec2> states((int)PROJECTILE_STATES::NUM_ROWS);
+	states[(int)PROJECTILE_STATES::MOVING] = vec2(0, num_cols - 1);
+
+	animations[ss_index].num_rows = num_rows;
+	animations[ss_index].num_cols = num_cols;
+	animations[ss_index].states = states;
+}
+
+void RenderSystem::initializeAnimations()
+{
+	initializePowerUpBlockAnimation();
+	initializeProjectileAnimation();
 }
 
 RenderSystem::~RenderSystem()

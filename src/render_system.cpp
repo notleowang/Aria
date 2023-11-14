@@ -88,13 +88,15 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			gl_has_errors();
 		}
 		else if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATED) {
-			assert(registry.animations.has(entity));
-			Animation& animation = registry.animations.get(entity);
+			assert(registry.animationPtrs.has(entity));
+			Animation* animation = registry.animationPtrs.get(entity);
 			glUniform1f(glGetUniformLocation(program, "time"), (float)(glfwGetTime() * 10.0f));
-			glUniform1i(glGetUniformLocation(program, "frame"), animation.frame);
-			glUniform1f(glGetUniformLocation(program, "frame_width"), animation.getFrameSizeInTexcoords().x);
-			glUniform1i(glGetUniformLocation(program, "is_animating"), animation.is_animating);
-			glUniform1i(glGetUniformLocation(program, "rainbow_enabled"), animation.rainbow_enabled);
+			glUniform1i(glGetUniformLocation(program, "frame_col"), animation->getColumn(animation->frame, animation->num_cols));
+			glUniform1i(glGetUniformLocation(program, "frame_row"), animation->getRow(animation->frame, animation->num_cols));
+			glUniform1f(glGetUniformLocation(program, "frame_width"), animation->getFrameSizeInTexcoords(animation->num_cols, animation->num_rows).x);
+			glUniform1f(glGetUniformLocation(program, "frame_height"), animation->getFrameSizeInTexcoords(animation->num_cols, animation->num_rows).y);
+			glUniform1i(glGetUniformLocation(program, "is_animating"), animation->is_animating);
+			glUniform1i(glGetUniformLocation(program, "rainbow_enabled"), animation->rainbow_enabled);
 			gl_has_errors();
 		}
 	}
@@ -329,10 +331,10 @@ void RenderSystem::animation_step(float elapsed_ms)
 	elapsed_time += elapsed_ms;
 	if (elapsed_time > ANIMATION_SPEED) {
 		elapsed_time = 0.f;
-		auto& animation_container = registry.animations;
+		auto& animation_container = registry.animationPtrs;
 		for (uint i = 0; i < animation_container.size(); i++) {
-			Animation& animation = animation_container.components[i];
-			animation.frame = (animation.frame + 1) % animation.getNumFrames();
+			Animation* animation = animation_container.components[i];
+			animation->frame = (animation->frame + 1) % animation->getNumFrames(animation->num_cols, animation->num_rows);
 		}
 	}
 }

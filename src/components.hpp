@@ -213,20 +213,17 @@ struct Mesh
 
 struct Animation
 {
+	std::vector<vec2> states; // list of pairs (first_frame, last_frame)
+	int state = 0;
 	int frame = 0;
 	int num_rows;
 	int num_cols;
 	bool is_animating = true;
 	bool rainbow_enabled = false;
-	vec2 getFrameSizeInTexcoords();
-	int getNumFrames();
-	int getColumn(int frame);
-	int getRow(int frame);
-
-	Animation(int num_rows, int num_cols) {
-		this->num_rows = num_rows;
-		this->num_cols = num_cols;
-	}
+	static vec2 getFrameSizeInTexcoords(int num_cols, int num_rows);
+	static int getNumFrames(int num_cols, int num_rows);
+	static int getColumn(int frame, int num_cols);
+	static int getRow(int frame, int num_cols);
 };
 
 /**
@@ -303,9 +300,29 @@ enum class GEOMETRY_BUFFER_ID {
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 
+enum class SPRITE_SHEET_DATA_ID {
+	NONE = 0,
+	PROJECTILE = NONE + 1,
+	POWER_UP_BLOCK = PROJECTILE + 1,
+	SPRITE_SHEET_COUNT = POWER_UP_BLOCK + 1
+};
+const int sprite_sheet_count = (int)SPRITE_SHEET_DATA_ID::SPRITE_SHEET_COUNT;
+
 struct RenderRequest {
 	TEXTURE_ASSET_ID used_texture = TEXTURE_ASSET_ID::TEXTURE_COUNT;
 	EFFECT_ASSET_ID used_effect = EFFECT_ASSET_ID::EFFECT_COUNT;
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 };
 
+// One for each sprite sheet to indicate the states
+enum class POWER_UP_BLOCK_STATES {
+	ACTIVE = 0,
+	NUM_ROWS = ACTIVE + 1
+};
+const int num_states_power_up_block = (int)POWER_UP_BLOCK_STATES::NUM_ROWS;
+
+enum class PROJECTILE_STATES {
+	MOVING = 0,
+	NUM_ROWS = MOVING + 1
+};
+const int num_states_projectile = (int)PROJECTILE_STATES::NUM_ROWS;

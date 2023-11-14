@@ -73,6 +73,8 @@ class RenderSystem {
 	std::array<GLuint, geometry_count> index_buffers;
 	std::array<Mesh, geometry_count> meshes;
 
+	std::array<Animation, sprite_sheet_count> animations;
+
 	GLuint vao;
 	std::unordered_map<GLchar, Character> Characters;
 
@@ -89,6 +91,9 @@ public:
 
 	void initializeGlMeshes();
 	Mesh& getMesh(GEOMETRY_BUFFER_ID id) { return meshes[(int)id]; };
+
+	void initializeAnimations();
+	Animation& getAnimation(SPRITE_SHEET_DATA_ID id) { return animations[(int)id]; };
 
 	void initializeGlGeometryBuffers();
 	// Initialize the screen texture used as intermediate render target
@@ -111,7 +116,7 @@ private:
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
 
-	// Helper functions for initalizeGlGeometryBuffers()
+	// Helper functions for initializeGlGeometryBuffers()
 	void initializePlayerGeometryBuffer();
 	void initializeSpriteGeometryBuffer();
 	void initializeDebugLineGeometryBuffer();
@@ -120,6 +125,10 @@ private:
 	void initializeExitDoorGeometryBuffer();
 	void initializeResourceBarGeometryBuffer();
 	void initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID goem_buffer_id, int num_rows, int num_cols);
+
+	// Helper functions for initializeAnimations()
+	void initializePowerUpBlockAnimation();
+	void initializeProjectileAnimation();
 
 	// Window handle
 	GLFWwindow* window;

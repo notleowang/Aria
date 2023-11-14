@@ -8,8 +8,10 @@ uniform sampler2D sampler0;
 uniform vec3 fcolor;
 
 uniform float time;
-uniform int frame;
+uniform int frame_col;
+uniform int frame_row;
 uniform float frame_width;
+uniform float frame_height;
 uniform bool is_animating;
 uniform bool rainbow_enabled;
 
@@ -81,7 +83,8 @@ void main()
 {
 	vec2 uv = texcoord;
 	if (is_animating) {
-	    uv.x += frame_width * frame;
+	    uv.x += frame_width * frame_col;
+        uv.y += frame_height * frame_row;
     }
     vec4 out_color = texture(sampler0, uv);
     color = rainbow_enabled ? rainbow_shift(out_color) : out_color;
