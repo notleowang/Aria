@@ -9,7 +9,7 @@
 #include "render_system.hpp"
 #include "world_system.hpp"
 #include "ai_system.hpp"
-#include "main_menu.hpp"
+#include "ui_system.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 
@@ -21,6 +21,9 @@ int main()
 	RenderSystem render_system;
 	PhysicsSystem physics_system;
 	AISystem ai_system;
+
+	// UI system
+	UISystem ui_system;
 
 	// Window states
 	bool show_main_menu = true;
@@ -34,14 +37,14 @@ int main()
 		return EXIT_FAILURE;
 	}
 
-	// initialize the main systems below
 	// initialize the render system
 	render_system.init(window);
 
-	// Initialize the level for the world system
+	// initialize the level for the world system
 	GameLevel level;
 	level.init(TUTORIAL);
 
+	// initialize other main systems
 	world_system.init(&render_system, level);
 	ai_system.init(&render_system);
 
@@ -51,10 +54,8 @@ int main()
 		// Processes system messages, if this wasn't present the window would become unresponsive
 		glfwPollEvents();
 
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-		ImGui::ShowDemoWindow();
+		// initialize UI system
+		ui_system.init();
 
 		// Calculating elapsed times in milliseconds from the previous iteration
 		auto now = Clock::now();
@@ -63,7 +64,7 @@ int main()
 		t = now;
 
 		if (show_main_menu) {
-
+			ImGui::ShowDemoWindow();
 		}
 
 		world_system.step(elapsed_ms);
