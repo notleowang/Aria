@@ -1,6 +1,7 @@
 // internal
 #include "render_system.hpp"
 #include <SDL.h>
+#include <iostream>
 
 #include "tiny_ecs_registry.hpp"
 
@@ -88,15 +89,16 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			gl_has_errors();
 		}
 		else if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATED) {
-			assert(registry.animationPtrs.has(entity));
-			Animation* animation = registry.animationPtrs.get(entity);
+			assert(registry.animations.has(entity));
+			Animation& animation = registry.animations.get(entity);
+			assert(animation.sprite_sheet_ptr != nullptr);
 			glUniform1f(glGetUniformLocation(program, "time"), (float)(glfwGetTime() * 10.0f));
-			glUniform1i(glGetUniformLocation(program, "frame_col"), animation->getColumn(animation->frame, animation->num_cols));
-			glUniform1i(glGetUniformLocation(program, "frame_row"), animation->getRow(animation->frame, animation->num_cols));
-			glUniform1f(glGetUniformLocation(program, "frame_width"), animation->getFrameSizeInTexcoords(animation->num_cols, animation->num_rows).x);
-			glUniform1f(glGetUniformLocation(program, "frame_height"), animation->getFrameSizeInTexcoords(animation->num_cols, animation->num_rows).y);
-			glUniform1i(glGetUniformLocation(program, "is_animating"), animation->is_animating);
-			glUniform1i(glGetUniformLocation(program, "rainbow_enabled"), animation->rainbow_enabled);
+			glUniform1i(glGetUniformLocation(program, "frame_col"), animation.getColumn());
+			glUniform1i(glGetUniformLocation(program, "frame_row"), animation.getRow());
+			glUniform1f(glGetUniformLocation(program, "frame_width"), animation.sprite_sheet_ptr->getFrameSizeInTexcoords().x);
+			glUniform1f(glGetUniformLocation(program, "frame_height"), animation.sprite_sheet_ptr->getFrameSizeInTexcoords().y);
+			glUniform1i(glGetUniformLocation(program, "is_animating"), animation.is_animating);
+			glUniform1i(glGetUniformLocation(program, "rainbow_enabled"), animation.rainbow_enabled);
 			gl_has_errors();
 		}
 	}
@@ -331,10 +333,9 @@ void RenderSystem::animation_step(float elapsed_ms)
 	elapsed_time += elapsed_ms;
 	if (elapsed_time > ANIMATION_SPEED) {
 		elapsed_time = 0.f;
-		auto& animation_container = registry.animationPtrs;
-		for (uint i = 0; i < animation_container.size(); i++) {
-			Animation* animation = animation_container.components[i];
-			animation->frame = (animation->frame + 1) % animation->getNumFrames(animation->num_cols, animation->num_rows);
+		for (uint i = 0; i < registry.animations.size(); i++) {
+ 			Animation& animation = registry.animations.components[i];
+			animation.advanceFrame();
 		}
 	}
 }

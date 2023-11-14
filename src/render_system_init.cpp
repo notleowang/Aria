@@ -57,8 +57,8 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	initScreenTexture();
     initializeGlTextures();
 	initializeGlEffects();
+	initializeSpriteSheets(); // must be called before initializeGlGeometryBuffers()
 	initializeGlGeometryBuffers();
-	initializeAnimations();
 	initializeFreeType();
 
 	return true;
@@ -206,6 +206,42 @@ void RenderSystem::initializeGlMeshes()
 			meshes[(int)geom_index].vertices, 
 			meshes[(int)geom_index].vertex_indices);
 	}
+}
+
+void RenderSystem::initializePowerUpBlockSpriteSheet()
+{
+	int num_rows = 1;
+	int num_cols = 15;
+	int ss_index = (int)SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK;
+
+	assert(num_rows == (int)POWER_UP_BLOCK_STATES::NUM_ROWS);
+	std::vector<AnimState> states((int)POWER_UP_BLOCK_STATES::NUM_ROWS);
+	states[(int)POWER_UP_BLOCK_STATES::ACTIVE] = AnimState(0, num_cols - 1);
+
+	sprite_sheets[ss_index].num_rows = num_rows;
+	sprite_sheets[ss_index].num_cols = num_cols;
+	sprite_sheets[ss_index].states = states;
+}
+
+void RenderSystem::initializeProjectileSpriteSheet()
+{
+	int num_rows = 1;
+	int num_cols = 4;
+	int ss_index = (int)SPRITE_SHEET_DATA_ID::PROJECTILE;
+
+	assert(num_rows == (int)PROJECTILE_STATES::NUM_ROWS);
+	std::vector<AnimState> states((int)PROJECTILE_STATES::NUM_ROWS);
+	states[(int)PROJECTILE_STATES::MOVING] = AnimState(0, num_cols - 1);
+
+	sprite_sheets[ss_index].num_rows = num_rows;
+	sprite_sheets[ss_index].num_cols = num_cols;
+	sprite_sheets[ss_index].states = states;
+}
+
+void RenderSystem::initializeSpriteSheets()
+{
+	initializePowerUpBlockSpriteSheet();
+	initializeProjectileSpriteSheet();
 }
 
 // Helper functions for initializing Gl Geometry Buffers
@@ -400,44 +436,16 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeScreenTriangleGeometryBuffer();
 	initializeTerrainGeometryBuffer();
 	initializeExitDoorGeometryBuffer();
-	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PROJECTILE, 1, 4);
-	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::POWER_UP_BLOCK, 1, 15);
+	// function initializeAnimations must be called before this point
+	initializeSpriteSheetGeometryBuffer(
+		GEOMETRY_BUFFER_ID::PROJECTILE, 
+		sprite_sheets[(int)SPRITE_SHEET_DATA_ID::PROJECTILE].num_rows,
+		sprite_sheets[(int)SPRITE_SHEET_DATA_ID::PROJECTILE].num_cols);
+	initializeSpriteSheetGeometryBuffer(
+		GEOMETRY_BUFFER_ID::POWER_UP_BLOCK, 
+		sprite_sheets[(int)SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK].num_rows,
+		sprite_sheets[(int)SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK].num_cols);
 	initializeResourceBarGeometryBuffer();
-}
-
-void RenderSystem::initializePowerUpBlockAnimation()
-{
-	int num_rows = 1;
-	int num_cols = 15;
-
-	int ss_index = (int)SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK;
-
-	std::vector<vec2> states((int)POWER_UP_BLOCK_STATES::NUM_ROWS);
-	states[(int)POWER_UP_BLOCK_STATES::ACTIVE] = vec2(0, num_cols - 1);
-
-	animations[ss_index].num_rows = num_rows;
-	animations[ss_index].num_cols = num_cols;
-	animations[ss_index].states = states;
-}
-
-void RenderSystem::initializeProjectileAnimation()
-{
-	int num_rows = 1;
-	int num_cols = 4;
-	int ss_index = (int)SPRITE_SHEET_DATA_ID::PROJECTILE;
-
-	std::vector<vec2> states((int)PROJECTILE_STATES::NUM_ROWS);
-	states[(int)PROJECTILE_STATES::MOVING] = vec2(0, num_cols - 1);
-
-	animations[ss_index].num_rows = num_rows;
-	animations[ss_index].num_cols = num_cols;
-	animations[ss_index].states = states;
-}
-
-void RenderSystem::initializeAnimations()
-{
-	initializePowerUpBlockAnimation();
-	initializeProjectileAnimation();
 }
 
 RenderSystem::~RenderSystem()

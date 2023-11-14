@@ -211,19 +211,40 @@ struct Mesh
 	std::vector<uint16_t> vertex_indices;
 };
 
-struct Animation
+struct AnimState
 {
-	std::vector<vec2> states; // list of pairs (first_frame, last_frame)
-	int state = 0;
-	int frame = 0;
+	int first;
+	int last;
+	int getNumFrames();
+	int getNextFrame(int curr_frame);
+	AnimState() = default;
+	AnimState(int first, int last) {
+		this->first = first;
+		this->last = last;
+	}
+};
+
+struct SpriteSheet
+{
+	std::vector<AnimState> states;
 	int num_rows;
 	int num_cols;
+	vec2 getFrameSizeInTexcoords();
+	int getNumFrames();
+};
+
+struct Animation
+{
+	SpriteSheet* sprite_sheet_ptr;
+	int curr_state_index = 0;
+	int curr_frame = 0;
 	bool is_animating = true;
 	bool rainbow_enabled = false;
-	static vec2 getFrameSizeInTexcoords(int num_cols, int num_rows);
-	static int getNumFrames(int num_cols, int num_rows);
-	static int getColumn(int frame, int num_cols);
-	static int getRow(int frame, int num_cols);
+	int getColumn();
+	int getRow();
+	void advanceFrame();
+	void advanceState();
+	void setState(int new_state_index);
 };
 
 /**
@@ -319,10 +340,8 @@ enum class POWER_UP_BLOCK_STATES {
 	ACTIVE = 0,
 	NUM_ROWS = ACTIVE + 1
 };
-const int num_states_power_up_block = (int)POWER_UP_BLOCK_STATES::NUM_ROWS;
 
 enum class PROJECTILE_STATES {
 	MOVING = 0,
 	NUM_ROWS = MOVING + 1
 };
-const int num_states_projectile = (int)PROJECTILE_STATES::NUM_ROWS;

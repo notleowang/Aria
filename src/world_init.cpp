@@ -219,9 +219,16 @@ Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp) 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::EXIT_DOOR);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	Animation& anim = renderer->getAnimation(SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK);
-	registry.animationPtrs.emplace(entity, &anim);
-	anim.rainbow_enabled = true;
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	int init_state = (int)POWER_UP_BLOCK_STATES::ACTIVE;
+	int init_frame = sprite_sheet.states[init_state].first;
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.curr_state_index = init_state;
+	animation.curr_frame = init_frame;
+	animation.rainbow_enabled = true;
 
 	Position& position = registry.positions.emplace(entity);
 	position.position = vec2(window_width_px / 2, window_height_px / 2);
@@ -283,8 +290,15 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::PROJECTILE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	Animation& anim = renderer->getAnimation(SPRITE_SHEET_DATA_ID::PROJECTILE);
-	registry.animationPtrs.emplace(entity, &anim);
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PROJECTILE);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	int init_state = (int)PROJECTILE_STATES::MOVING;
+	int init_frame = sprite_sheet.states[init_state].first;
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.curr_state_index = init_state;
+	animation.curr_frame = init_frame;
 
 	Projectile& projectile = registry.projectiles.emplace(entity);
 	projectile.type = elementType;
