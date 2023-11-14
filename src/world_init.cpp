@@ -59,8 +59,9 @@ Entity createFloor(RenderSystem* renderer, vec2 pos)
 
 	// set initial component values
 	Position& position = registry.positions.emplace(entity);
-	position.position = pos;
 	position.scale = vec2(250.f, 250.f);
+	// pos passed in to createFloor assumes top left corner is (x,y)
+	position.position = vec2(pos.x + position.scale.x/2, pos.y + position.scale.y/2);
 
 	registry.renderRequests.insert(
 		entity,
@@ -78,8 +79,10 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, bool moveable)
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::TERRAIN);
 	registry.meshPtrs.emplace(entity, &mesh);
 
+	// The position passed into createTerrain (x,y) assumes the top left corner
+	// and size corresponds to width and height
 	Position& position = registry.positions.emplace(entity);
-	position.position = pos;
+	position.position = vec2(pos.x + size.x/2, pos.y + size.y/2);
 	position.scale = size;
 
 	Terrain& terrain = registry.terrain.emplace(entity);
@@ -199,8 +202,8 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	Position& position = registry.positions.emplace(entity);
-	position.position = pos;
 	position.scale = vec2(100.f, 100.f);
+	position.position = vec2(pos.x + position.scale.x/2, pos.y + position.scale.y/2);
 
 	registry.exitDoors.emplace(entity);
 	registry.collidables.emplace(entity);
@@ -220,7 +223,7 @@ Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp) 
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	Position& position = registry.positions.emplace(entity);
-	position.position = vec2(window_width_px / 2, window_height_px / 2);
+	position.position = vec2(700, 300);
 	position.scale = vec2(100.f, 100.f);
 
 	PowerUpBlock& powerUpBlock = registry.powerUpBlock.emplace(entity);
