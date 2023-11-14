@@ -22,6 +22,9 @@ int main()
 	PhysicsSystem physics_system;
 	AISystem ai_system;
 
+	// Window states
+	bool show_main_menu = true;
+
 	// Initializing window
 	GLFWwindow* window = world_system.create_window();
 	if (!window) {
@@ -59,7 +62,10 @@ int main()
 			(float)(std::chrono::duration_cast<std::chrono::microseconds>(now - t)).count() / 1000;
 		t = now;
 
-		// !!! Add logic for main menu
+		if (show_main_menu) {
+
+		}
+
 		world_system.step(elapsed_ms);
 		physics_system.step(elapsed_ms);
 		ai_system.step(elapsed_ms);
