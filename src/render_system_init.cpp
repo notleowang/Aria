@@ -344,13 +344,11 @@ void RenderSystem::initializeExitDoorGeometryBuffer()
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::EXIT_DOOR, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
 }
 
-void RenderSystem::initializeProjectileGeometryBuffer()
+void RenderSystem::initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID geom_buffer_id, int num_rows, int num_cols)
 {
-	int geom_index = (int)GEOMETRY_BUFFER_ID::PROJECTILE;
-	// TODO: actually query these from somewhere
-	int num_cols = 4;
-	int num_rows = 1;
+	int geom_index = (int)geom_buffer_id;
 
+	// square aspect ratio
 	std::vector<TexturedVertex> textured_vertices(4);
 	textured_vertices[0].position = { -1.f / 2, +1.f / 2, 0.f };
 	textured_vertices[1].position = { +1.f / 2, +1.f / 2, 0.f };
@@ -371,7 +369,7 @@ void RenderSystem::initializeProjectileGeometryBuffer()
 
 	meshes[geom_index].vertices = vertices;
 	meshes[geom_index].vertex_indices = textured_indices;
-	bindVBOandIBO(GEOMETRY_BUFFER_ID::PROJECTILE, textured_vertices, textured_indices);
+	bindVBOandIBO(geom_buffer_id, textured_vertices, textured_indices);
 }
 
 void RenderSystem::initializeResourceBarGeometryBuffer()
@@ -419,7 +417,8 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeScreenTriangleGeometryBuffer();
 	initializeTerrainGeometryBuffer();
 	initializeExitDoorGeometryBuffer();
-	initializeProjectileGeometryBuffer();
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PROJECTILE, 1, 4);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::POWER_UP_BLOCK, 1, 15);
 	initializeResourceBarGeometryBuffer();
 }
 
