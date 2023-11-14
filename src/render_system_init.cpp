@@ -210,13 +210,14 @@ void RenderSystem::initializeGlMeshes()
 
 void RenderSystem::initializePowerUpBlockSpriteSheet()
 {
-	int num_rows = 1;
+	int num_rows = 2;
 	int num_cols = 15;
 	int ss_index = (int)SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK;
 
 	assert(num_rows == (int)POWER_UP_BLOCK_STATES::NUM_ROWS);
 	std::vector<AnimState> states((int)POWER_UP_BLOCK_STATES::NUM_ROWS);
 	states[(int)POWER_UP_BLOCK_STATES::ACTIVE] = AnimState(0, num_cols - 1);
+	states[(int)POWER_UP_BLOCK_STATES::INACTIVE] = AnimState(num_cols, num_cols);
 
 	sprite_sheets[ss_index].num_rows = num_rows;
 	sprite_sheets[ss_index].num_cols = num_cols;

@@ -12,7 +12,6 @@ uniform int frame_col;
 uniform int frame_row;
 uniform float frame_width;
 uniform float frame_height;
-uniform bool is_animating;
 uniform bool rainbow_enabled;
 
 // Output color
@@ -82,10 +81,8 @@ vec4 rainbow_shift(vec4 in_rgb_color)
 void main()
 {
 	vec2 uv = texcoord;
-	if (is_animating) {
-	    uv.x += frame_width * frame_col;
-        uv.y += frame_height * frame_row;
-    }
+	uv.x += frame_width * frame_col;
+    uv.y += frame_height * frame_row;
     vec4 out_color = texture(sampler0, uv);
     color = rainbow_enabled ? rainbow_shift(out_color) : out_color;
 }

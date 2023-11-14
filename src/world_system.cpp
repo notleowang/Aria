@@ -510,6 +510,7 @@ void WorldSystem::handle_collisions() {
 			Position& blockPos = registry.positions.get(entity_other);
 
 			Animation& animation = registry.animations.get(entity_other);
+			animation.setState((int)POWER_UP_BLOCK_STATES::INACTIVE);
 			animation.is_animating = false;
 			animation.rainbow_enabled = false;
 

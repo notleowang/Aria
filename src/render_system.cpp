@@ -97,7 +97,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			glUniform1i(glGetUniformLocation(program, "frame_row"), animation.getRow());
 			glUniform1f(glGetUniformLocation(program, "frame_width"), animation.sprite_sheet_ptr->getFrameSizeInTexcoords().x);
 			glUniform1f(glGetUniformLocation(program, "frame_height"), animation.sprite_sheet_ptr->getFrameSizeInTexcoords().y);
-			glUniform1i(glGetUniformLocation(program, "is_animating"), animation.is_animating);
 			glUniform1i(glGetUniformLocation(program, "rainbow_enabled"), animation.rainbow_enabled);
 			gl_has_errors();
 		}
@@ -335,7 +334,9 @@ void RenderSystem::animation_step(float elapsed_ms)
 		elapsed_time = 0.f;
 		for (uint i = 0; i < registry.animations.size(); i++) {
  			Animation& animation = registry.animations.components[i];
-			animation.advanceFrame();
+			if (animation.is_animating) {
+				animation.advanceFrame();
+			}
 		}
 	}
 }

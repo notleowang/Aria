@@ -338,7 +338,8 @@ struct RenderRequest {
 // One for each sprite sheet to indicate the states
 enum class POWER_UP_BLOCK_STATES {
 	ACTIVE = 0,
-	NUM_ROWS = ACTIVE + 1
+	INACTIVE = ACTIVE + 1,
+	NUM_ROWS = INACTIVE + 1
 };
 
 enum class PROJECTILE_STATES {
