@@ -70,9 +70,5 @@ int main()
 		render_system.draw();
 	}
 
-
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
 	return EXIT_SUCCESS;
 }
