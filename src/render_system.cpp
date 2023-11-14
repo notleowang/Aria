@@ -270,6 +270,12 @@ void RenderSystem::drawToScreen()
 	gl_has_errors();
 }
 
+void RenderSystem::drawImGui()
+{
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
 // Render our game world
 // http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/
 void RenderSystem::draw()
@@ -315,6 +321,9 @@ void RenderSystem::draw()
 
 	// Truely render to the screen
 	drawToScreen();
+
+	// Render ImGui to screen
+	drawImGui();
 
 	// flicker-free display with a double buffer
 	glfwSwapBuffers(window);

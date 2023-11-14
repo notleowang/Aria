@@ -140,17 +140,17 @@ void RenderSystem::initializeImGui()
 {
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
-	//ImGui::CreateContext();
-	//ImGuiIO& io = ImGui::GetIO();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 
-	// Setup Dear ImGui style
+	//Setup Dear ImGui style
 	//ImGui::StyleColorsDark();
 	//ImGui::StyleColorsClassic();
 
 	//Setup Platform/Renderer backends
-	//ImGui_ImplGlfw_InitForOpenGL(window, true);
-	//ImGui_ImplOpenGL3_Init("#version 130");
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init();
 }
 
 void RenderSystem::initializeGlTextures()

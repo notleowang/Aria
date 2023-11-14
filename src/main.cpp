@@ -48,6 +48,11 @@ int main()
 		// Processes system messages, if this wasn't present the window would become unresponsive
 		glfwPollEvents();
 
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		ImGui::ShowDemoWindow();
+
 		// Calculating elapsed times in milliseconds from the previous iteration
 		auto now = Clock::now();
 		float elapsed_ms =
@@ -65,5 +70,9 @@ int main()
 		render_system.draw();
 	}
 
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 	return EXIT_SUCCESS;
 }
