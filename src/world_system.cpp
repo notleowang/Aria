@@ -6,6 +6,7 @@
 // stlib
 #include <cassert>
 #include <sstream>
+#include <iostream>
 
 #include "physics_system.hpp"
 using namespace std;
@@ -32,6 +33,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(enemy_death_sound);
 	if (damage_tick_sound != nullptr)
 		Mix_FreeChunk(damage_tick_sound);
+	if (end_level_sound != nullptr)
+		Mix_FreeChunk(end_level_sound);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -109,6 +112,7 @@ GLFWwindow* WorldSystem::create_window() {
 	aria_death_sound = Mix_LoadWAV(audio_path("aria_death.wav").c_str());
 	enemy_death_sound = Mix_LoadWAV(audio_path("enemy_death.wav").c_str());
 	damage_tick_sound = Mix_LoadWAV(audio_path("damage_tick.wav").c_str());
+	end_level_sound = Mix_LoadWAV(audio_path("end_level.wav").c_str());
 
 	if (background_music == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
@@ -175,7 +179,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 	screen.screen_darken_factor = 1 - min_death_timer_ms / 3000;
-	float min_win_timer_ms = 3000.f;
+	float min_win_timer_ms = 1500.f;
 	for (Entity entity : registry.winTimers.entities) {
 		WinTimer& timer = registry.winTimers.get(entity);
 		timer.timer_ms -= elapsed_ms_since_last_update;
@@ -307,6 +311,7 @@ void WorldSystem::win_level() {
 	printf("hooray you won the level\n"); 
 	registry.velocities.get(player).velocity = { 0.f,0.f };
 	registry.winTimers.emplace(player);
+	Mix_PlayChannel(-1, end_level_sound, 0);
 }
 
 void WorldSystem::display_power_up() {
@@ -505,6 +510,11 @@ void WorldSystem::handle_collisions() {
 			PowerUpBlock& powerUpBlock = registry.powerUpBlock.get(entity_other);
 			Position& blockPos = registry.positions.get(entity_other);
 
+			Animation& animation = registry.animations.get(entity_other);
+			animation.setState((int)POWER_UP_BLOCK_STATES::INACTIVE);
+			animation.is_animating = false;
+			animation.rainbow_enabled = false;
+
 			*(powerUpBlock.powerUpToggle) = true;
 			printf("%s\n", powerUpBlock.powerUpText.c_str());
 
@@ -534,12 +544,16 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	Velocity& player_velocity = registry.velocities.get(player);
 	Position& player_position = registry.positions.get(player);
 	Direction& player_direction = registry.directions.get(player);
+	Animation& player_animation = registry.animations.get(player);
 
 	// get states of each arrow key
 	int state_up = glfwGetKey(window, GLFW_KEY_W);
 	int state_down = glfwGetKey(window, GLFW_KEY_S);
 	int state_left = glfwGetKey(window, GLFW_KEY_A);
 	int state_right = glfwGetKey(window, GLFW_KEY_D);
+
+	DIRECTION prev_direction = player_direction.direction;
+	bool was_mirrored = player_position.scale.x < 0;
 
 	DIRECTION new_direction = DIRECTION::NONE;
 
@@ -600,14 +614,28 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		}
 	}
 
-	// set the player velocity based on the new_direction
+	// player is moving
 	if (new_direction != DIRECTION::NONE) {
+		// velocity
 		player_direction.direction = new_direction;
 		PowerUp& player_powerUp = registry.powerUps.get(player);
 		player_velocity = computeVelocity(player_powerUp.fasterMovement ? PLAYER_SPEED * 1.5 : PLAYER_SPEED, player_direction);
+
+		// animation
+		if (prev_direction != new_direction) {
+			int new_state = player_animation.sprite_sheet_ptr->getPlayerStateFromDirection(new_direction);
+			player_animation.setState(new_state);
+			bool mirror = player_animation.sprite_sheet_ptr->getPlayerMirrored(new_direction);
+			if (was_mirrored != mirror) {
+				player_position.scale.x *= -1;
+			}
+		}
+		player_animation.is_animating = true;
 	}
+	// player is stopped
 	else {
 		player_velocity = computeVelocity(0.0, player_direction);
+		player_animation.is_animating = false;
 	}
 
 	// Resetting game

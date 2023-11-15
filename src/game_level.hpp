@@ -16,7 +16,7 @@ enum Level {
 	LEVEL_2 = LEVEL_1 + 1,
 	LEVEL_3 = LEVEL_2 + 1,
 	LEVEL_4 = LEVEL_3 + 1,
-	POWER_UP = LEVEL_2 + 1,
+	POWER_UP = LEVEL_4 + 1,
 };
 
 class GameLevel

@@ -1,6 +1,7 @@
 // internal
 #include "render_system.hpp"
 #include <SDL.h>
+#include <iostream>
 
 #include "tiny_ecs_registry.hpp"
 
@@ -90,8 +91,13 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		else if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATED) {
 			assert(registry.animations.has(entity));
 			Animation& animation = registry.animations.get(entity);
-			glUniform1i(glGetUniformLocation(program, "frame"), animation.frame);
-			glUniform1f(glGetUniformLocation(program, "frame_width"), animation.getFrameSizeInTexcoords().x);
+			assert(animation.sprite_sheet_ptr != nullptr);
+			glUniform1f(glGetUniformLocation(program, "time"), (float)(glfwGetTime() * 10.0f));
+			glUniform1i(glGetUniformLocation(program, "frame_col"), animation.getColumn());
+			glUniform1i(glGetUniformLocation(program, "frame_row"), animation.getRow());
+			glUniform1f(glGetUniformLocation(program, "frame_width"), animation.sprite_sheet_ptr->getFrameSizeInTexcoords().x);
+			glUniform1f(glGetUniformLocation(program, "frame_height"), animation.sprite_sheet_ptr->getFrameSizeInTexcoords().y);
+			glUniform1i(glGetUniformLocation(program, "rainbow_enabled"), animation.rainbow_enabled);
 			gl_has_errors();
 		}
 	}
@@ -147,7 +153,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		gl_has_errors();
 		return;
 	}
-	else if (render_request.used_effect == EFFECT_ASSET_ID::SALMON || render_request.used_effect == EFFECT_ASSET_ID::ARIA ||
+	else if (render_request.used_effect == EFFECT_ASSET_ID::SALMON || render_request.used_effect == EFFECT_ASSET_ID::PLAYER ||
 		render_request.used_effect == EFFECT_ASSET_ID::TERRAIN || render_request.used_effect == EFFECT_ASSET_ID::EXIT_DOOR)
 	{
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
@@ -164,7 +170,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			sizeof(ColoredVertex), (void*)sizeof(vec3));
 		gl_has_errors();
 
-		if (render_request.used_effect == EFFECT_ASSET_ID::ARIA) {
+		if (render_request.used_effect == EFFECT_ASSET_ID::PLAYER) {
 
 			float time = (float) glfwGetTime();
 			vec3 initial_color = vec3(0.3f, 0.0f, 0.0f);
@@ -326,10 +332,11 @@ void RenderSystem::animation_step(float elapsed_ms)
 	elapsed_time += elapsed_ms;
 	if (elapsed_time > ANIMATION_SPEED) {
 		elapsed_time = 0.f;
-		auto& animation_container = registry.animations;
-		for (uint i = 0; i < animation_container.size(); i++) {
-			Animation& animation = animation_container.components[i];
-			animation.frame = (animation.frame + 1) % animation.getNumFrames();
+		for (uint i = 0; i < registry.animations.size(); i++) {
+ 			Animation& animation = registry.animations.components[i];
+			if (animation.is_animating) {
+				animation.advanceFrame();
+			}
 		}
 	}
 }
