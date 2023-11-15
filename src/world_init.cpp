@@ -7,13 +7,21 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::ARIA);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::PLAYER);
 	registry.meshPtrs.emplace(entity, &mesh);
+
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PLAYER);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)PLAYER_SPRITE_STATES::EAST);
+	animation.is_animating = false; // initially stationary
 
 	// set initial component values
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
-	position.scale = vec2(100.f, 100.f);
+	position.scale = vec2(60.f, 100.f);
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = { 0.f, 0.f };
@@ -46,9 +54,9 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TODO: CHANGE TEXTURE OF ARIA
-			EFFECT_ASSET_ID::ARIA,
-			GEOMETRY_BUFFER_ID::ARIA});
+		{ TEXTURE_ASSET_ID::PLAYER,
+			EFFECT_ASSET_ID::ANIMATED,
+			GEOMETRY_BUFFER_ID::PLAYER});
 
 	return entity;
 }
@@ -223,11 +231,8 @@ Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp) 
 	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
 
 	Animation& animation = registry.animations.emplace(entity);
-	int init_state = (int)POWER_UP_BLOCK_STATES::ACTIVE;
-	int init_frame = sprite_sheet.states[init_state].first;
 	animation.sprite_sheet_ptr = &sprite_sheet;
-	animation.curr_state_index = init_state;
-	animation.curr_frame = init_frame;
+	animation.setState((int)POWER_UP_BLOCK_STATES::ACTIVE);
 	animation.rainbow_enabled = true;
 
 	Position& position = registry.positions.emplace(entity);
@@ -294,11 +299,8 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
 
 	Animation& animation = registry.animations.emplace(entity);
-	int init_state = (int)PROJECTILE_STATES::MOVING;
-	int init_frame = sprite_sheet.states[init_state].first;
 	animation.sprite_sheet_ptr = &sprite_sheet;
-	animation.curr_state_index = init_state;
-	animation.curr_frame = init_frame;
+	animation.setState((int)PROJECTILE_STATES::MOVING);
 
 	Projectile& projectile = registry.projectiles.emplace(entity);
 	projectile.type = elementType;

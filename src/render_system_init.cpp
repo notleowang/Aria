@@ -214,8 +214,7 @@ void RenderSystem::initializePowerUpBlockSpriteSheet()
 	int num_cols = 15;
 	int ss_index = (int)SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK;
 
-	assert(num_rows == (int)POWER_UP_BLOCK_STATES::NUM_ROWS);
-	std::vector<AnimState> states((int)POWER_UP_BLOCK_STATES::NUM_ROWS);
+	std::vector<AnimState> states((int)POWER_UP_BLOCK_STATES::STATE_COUNT);
 	states[(int)POWER_UP_BLOCK_STATES::ACTIVE] = AnimState(0, num_cols - 1);
 	states[(int)POWER_UP_BLOCK_STATES::INACTIVE] = AnimState(num_cols, num_cols);
 
@@ -230,9 +229,26 @@ void RenderSystem::initializeProjectileSpriteSheet()
 	int num_cols = 4;
 	int ss_index = (int)SPRITE_SHEET_DATA_ID::PROJECTILE;
 
-	assert(num_rows == (int)PROJECTILE_STATES::NUM_ROWS);
-	std::vector<AnimState> states((int)PROJECTILE_STATES::NUM_ROWS);
+	std::vector<AnimState> states((int)PROJECTILE_STATES::STATE_COUNT);
 	states[(int)PROJECTILE_STATES::MOVING] = AnimState(0, num_cols - 1);
+
+	sprite_sheets[ss_index].num_rows = num_rows;
+	sprite_sheets[ss_index].num_cols = num_cols;
+	sprite_sheets[ss_index].states = states;
+}
+
+void RenderSystem::initializePlayerSpriteSheet()
+{
+	int num_rows = 1;
+	int num_cols = 20;
+	int ss_index = (int)SPRITE_SHEET_DATA_ID::PLAYER;
+	int num_states = (int)PLAYER_SPRITE_STATES::STATE_COUNT;
+	int num_frames_in_state = num_cols / num_states;
+
+	std::vector<AnimState> states(num_states);
+	for (int i = 0; i < num_states; i++) {
+		states[i] = AnimState(i * num_frames_in_state, (i + 1) * num_frames_in_state - 1);
+	}
 
 	sprite_sheets[ss_index].num_rows = num_rows;
 	sprite_sheets[ss_index].num_cols = num_cols;
@@ -243,12 +259,13 @@ void RenderSystem::initializeSpriteSheets()
 {
 	initializePowerUpBlockSpriteSheet();
 	initializeProjectileSpriteSheet();
+	initializePlayerSpriteSheet();
 }
 
 // Helper functions for initializing Gl Geometry Buffers
 void RenderSystem::initializePlayerGeometryBuffer()
 {
-	int geom_index = (int)GEOMETRY_BUFFER_ID::ARIA;
+	int geom_index = (int)GEOMETRY_BUFFER_ID::PLAYER;
 	
 	std::vector<ColoredVertex> vertices(3);
 	vertices[0].position = { 0.f, -0.5f, 0.f };
@@ -259,7 +276,7 @@ void RenderSystem::initializePlayerGeometryBuffer()
 
 	meshes[geom_index].vertices = vertices;
 	meshes[geom_index].vertex_indices = vertex_indices;
-	bindVBOandIBO(GEOMETRY_BUFFER_ID::ARIA, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::PLAYER, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
 }
 
 void RenderSystem::initializeSpriteGeometryBuffer()
@@ -446,6 +463,10 @@ void RenderSystem::initializeGlGeometryBuffers()
 		GEOMETRY_BUFFER_ID::POWER_UP_BLOCK, 
 		sprite_sheets[(int)SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK].num_rows,
 		sprite_sheets[(int)SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK].num_cols);
+	initializeSpriteSheetGeometryBuffer(
+		GEOMETRY_BUFFER_ID::PLAYER,
+		sprite_sheets[(int)SPRITE_SHEET_DATA_ID::PLAYER].num_rows,
+		sprite_sheets[(int)SPRITE_SHEET_DATA_ID::PLAYER].num_cols);
 	initializeResourceBarGeometryBuffer();
 }
 

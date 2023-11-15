@@ -153,7 +153,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		gl_has_errors();
 		return;
 	}
-	else if (render_request.used_effect == EFFECT_ASSET_ID::SALMON || render_request.used_effect == EFFECT_ASSET_ID::ARIA ||
+	else if (render_request.used_effect == EFFECT_ASSET_ID::SALMON || render_request.used_effect == EFFECT_ASSET_ID::PLAYER ||
 		render_request.used_effect == EFFECT_ASSET_ID::TERRAIN || render_request.used_effect == EFFECT_ASSET_ID::EXIT_DOOR)
 	{
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
@@ -170,7 +170,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			sizeof(ColoredVertex), (void*)sizeof(vec3));
 		gl_has_errors();
 
-		if (render_request.used_effect == EFFECT_ASSET_ID::ARIA) {
+		if (render_request.used_effect == EFFECT_ASSET_ID::PLAYER) {
 
 			float time = (float) glfwGetTime();
 			vec3 initial_color = vec3(0.3f, 0.0f, 0.0f);

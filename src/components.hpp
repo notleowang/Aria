@@ -231,6 +231,8 @@ struct SpriteSheet
 	int num_cols;
 	vec2 getFrameSizeInTexcoords();
 	int getNumFrames();
+	static int getPlayerStateFromDirection(DIRECTION dir);
+	static bool getPlayerMirrored(DIRECTION dir);
 };
 
 struct Animation
@@ -286,13 +288,14 @@ enum class TEXTURE_ASSET_ID {
 	HEALTH_BAR = FLOOR + 1,
 	MANA_BAR = HEALTH_BAR + 1,
 	POWER_UP_BLOCK = MANA_BAR + 1,
-	TEXTURE_COUNT = POWER_UP_BLOCK + 1
+	PLAYER = POWER_UP_BLOCK + 1,
+	TEXTURE_COUNT = PLAYER + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
 enum class EFFECT_ASSET_ID {
-	ARIA = 0,
-	COLOURED = ARIA + 1,
+	PLAYER = 0,
+	COLOURED = PLAYER + 1,
 	SALMON = COLOURED + 1,
 	TEXTURED = SALMON + 1,
 	WATER = TEXTURED + 1,
@@ -306,8 +309,7 @@ enum class EFFECT_ASSET_ID {
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
 enum class GEOMETRY_BUFFER_ID {
-	ARIA = 0,
-	SALMON = ARIA + 1,
+	SALMON = 0,
 	SPRITE = SALMON + 1,
 	DEBUG_LINE = SPRITE + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,
@@ -317,7 +319,8 @@ enum class GEOMETRY_BUFFER_ID {
 	RESOURCE_BAR = TEXT_2D + 1,
 	PROJECTILE = RESOURCE_BAR + 1,
 	POWER_UP_BLOCK = PROJECTILE + 1,
-	GEOMETRY_COUNT = POWER_UP_BLOCK + 1
+	PLAYER = POWER_UP_BLOCK + 1,
+	GEOMETRY_COUNT = PLAYER + 1
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 
@@ -325,7 +328,8 @@ enum class SPRITE_SHEET_DATA_ID {
 	NONE = 0,
 	PROJECTILE = NONE + 1,
 	POWER_UP_BLOCK = PROJECTILE + 1,
-	SPRITE_SHEET_COUNT = POWER_UP_BLOCK + 1
+	PLAYER = POWER_UP_BLOCK + 1,
+	SPRITE_SHEET_COUNT = PLAYER + 1
 };
 const int sprite_sheet_count = (int)SPRITE_SHEET_DATA_ID::SPRITE_SHEET_COUNT;
 
@@ -339,10 +343,19 @@ struct RenderRequest {
 enum class POWER_UP_BLOCK_STATES {
 	ACTIVE = 0,
 	INACTIVE = ACTIVE + 1,
-	NUM_ROWS = INACTIVE + 1
+	STATE_COUNT = INACTIVE + 1
 };
 
 enum class PROJECTILE_STATES {
 	MOVING = 0,
-	NUM_ROWS = MOVING + 1
+	STATE_COUNT = MOVING + 1
+};
+
+enum class PLAYER_SPRITE_STATES {
+	EAST = 0,
+	SOUTH_EAST = EAST + 1,
+	NORTH_EAST = SOUTH_EAST + 1,
+	NORTH = NORTH_EAST + 1,
+	SOUTH = NORTH + 1,
+	STATE_COUNT = SOUTH + 1
 };

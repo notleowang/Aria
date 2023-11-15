@@ -169,3 +169,32 @@ void Animation::setState(int new_state_index)
 		curr_frame = sprite_sheet_ptr->states[curr_state_index].first;
 	}
 }
+
+int SpriteSheet::getPlayerStateFromDirection(DIRECTION dir)
+{
+	switch (dir) {
+		case DIRECTION::N:
+			return (int)PLAYER_SPRITE_STATES::NORTH;
+		case DIRECTION::NE:
+			return (int)PLAYER_SPRITE_STATES::NORTH_EAST;
+		case DIRECTION::E:
+			return (int)PLAYER_SPRITE_STATES::EAST;
+		case DIRECTION::SE:
+			return (int)PLAYER_SPRITE_STATES::SOUTH_EAST;
+		case DIRECTION::S:
+			return (int)PLAYER_SPRITE_STATES::SOUTH;
+		case DIRECTION::SW:
+			return (int)PLAYER_SPRITE_STATES::SOUTH_EAST;
+		case DIRECTION::W:
+			return (int)PLAYER_SPRITE_STATES::EAST;
+		case DIRECTION::NW:
+			return (int)PLAYER_SPRITE_STATES::NORTH_EAST;
+		default:
+			return (int)PLAYER_SPRITE_STATES::EAST;
+	}
+}
+
+bool SpriteSheet::getPlayerMirrored(DIRECTION dir)
+{
+	return (dir == DIRECTION::SW || dir == DIRECTION::W || dir == DIRECTION::NW);
+}

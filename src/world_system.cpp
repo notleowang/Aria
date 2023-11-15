@@ -6,6 +6,7 @@
 // stlib
 #include <cassert>
 #include <sstream>
+#include <iostream>
 
 #include "physics_system.hpp"
 using namespace std;
@@ -543,12 +544,16 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	Velocity& player_velocity = registry.velocities.get(player);
 	Position& player_position = registry.positions.get(player);
 	Direction& player_direction = registry.directions.get(player);
+	Animation& player_animation = registry.animations.get(player);
 
 	// get states of each arrow key
 	int state_up = glfwGetKey(window, GLFW_KEY_W);
 	int state_down = glfwGetKey(window, GLFW_KEY_S);
 	int state_left = glfwGetKey(window, GLFW_KEY_A);
 	int state_right = glfwGetKey(window, GLFW_KEY_D);
+
+	DIRECTION prev_direction = player_direction.direction;
+	bool was_mirrored = player_position.scale.x < 0;
 
 	DIRECTION new_direction = DIRECTION::NONE;
 
@@ -609,14 +614,28 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		}
 	}
 
-	// set the player velocity based on the new_direction
+	// player is moving
 	if (new_direction != DIRECTION::NONE) {
+		// velocity
 		player_direction.direction = new_direction;
 		PowerUp& player_powerUp = registry.powerUps.get(player);
 		player_velocity = computeVelocity(player_powerUp.fasterMovement ? PLAYER_SPEED * 1.5 : PLAYER_SPEED, player_direction);
+
+		// animation
+		if (prev_direction != new_direction) {
+			int new_state = player_animation.sprite_sheet_ptr->getPlayerStateFromDirection(new_direction);
+			player_animation.setState(new_state);
+			bool mirror = player_animation.sprite_sheet_ptr->getPlayerMirrored(new_direction);
+			if (was_mirrored != mirror) {
+				player_position.scale.x *= -1;
+			}
+		}
+		player_animation.is_animating = true;
 	}
+	// player is stopped
 	else {
 		player_velocity = computeVelocity(0.0, player_direction);
+		player_animation.is_animating = false;
 	}
 
 	// Resetting game

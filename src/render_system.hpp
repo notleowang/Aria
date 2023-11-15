@@ -51,7 +51,8 @@ class RenderSystem {
 			textures_path("dungeon_tile.png"),
 			textures_path("health_bar.png"),
 			textures_path("mana_bar.png"),
-			textures_path("power_up_block.png")
+			textures_path("power_up_block.png"),
+			textures_path("witch.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -119,6 +120,7 @@ private:
 	// Helper functions for initializeAnimations()
 	void initializePowerUpBlockSpriteSheet();
 	void initializeProjectileSpriteSheet();
+	void initializePlayerSpriteSheet();
 
 	// Helper functions for initializeGlGeometryBuffers()
 	void initializePlayerGeometryBuffer();
