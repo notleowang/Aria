@@ -144,11 +144,16 @@ void RenderSystem::initializeImGui()
 	ImGuiIO& io = ImGui::GetIO();
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 
-	//Setup Dear ImGui style
+	// Fonts
+	ImFont* DefaultFont = io.Fonts->AddFontFromFileTTF("../../../data/fonts/PixeloidSans.ttf", 24.0f);	// index 0
+	ImFont* MainMenuFont = io.Fonts->AddFontFromFileTTF("../../../data/fonts/PixeloidSans.ttf", 60.0f); // index 1
+	ImFont* MainMenuButtonFont = io.Fonts->AddFontFromFileTTF("../../../data/fonts/PixeloidSans.ttf", 48.0f); // index 1
+
+	// Setup Dear ImGui style
 	//ImGui::StyleColorsDark();
 	//ImGui::StyleColorsClassic();
 
-	//Setup Platform/Renderer backends
+	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 }
