@@ -28,6 +28,8 @@ int main()
 	// Window states
 	bool show_main_menu = true;
 
+	UISystem::State state;
+
 	// Initializing window
 	GLFWwindow* window = world_system.create_window();
 	if (!window) {
@@ -64,14 +66,22 @@ int main()
 		t = now;
 
 		if (show_main_menu) {
-			ImGui::ShowDemoWindow();
+			ui_system.showWindows();
+			state = ui_system.getState();
+			//ImGui::ShowDemoWindow();
 		}
 
-		world_system.step(elapsed_ms);
-		physics_system.step(elapsed_ms);
-		ai_system.step(elapsed_ms);
+		if (state == 0) {
+			world_system.step(elapsed_ms);
+			physics_system.step(elapsed_ms);
+			ai_system.step(elapsed_ms);
 
-		world_system.handle_collisions();
+			world_system.handle_collisions();
+		}
+
+		if (state == 4) {
+			glfwSetWindowShouldClose(window, GLFW_TRUE);
+		}
 
 		render_system.animation_step(elapsed_ms);
 		render_system.draw();
