@@ -7,13 +7,21 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::ARIA);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::PLAYER);
 	registry.meshPtrs.emplace(entity, &mesh);
+
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PLAYER);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)PLAYER_SPRITE_STATES::EAST);
+	animation.is_animating = false; // initially stationary
 
 	// set initial component values
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
-	position.scale = vec2(100.f, 100.f);
+	position.scale = vec2(60.f, 100.f);
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = { 0.f, 0.f };
@@ -46,9 +54,9 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TODO: CHANGE TEXTURE OF ARIA
-			EFFECT_ASSET_ID::ARIA,
-			GEOMETRY_BUFFER_ID::ARIA});
+		{ TEXTURE_ASSET_ID::PLAYER,
+			EFFECT_ASSET_ID::ANIMATED,
+			GEOMETRY_BUFFER_ID::PLAYER});
 
 	return entity;
 }
@@ -222,6 +230,14 @@ Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp) 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::EXIT_DOOR);
 	registry.meshPtrs.emplace(entity, &mesh);
 
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)POWER_UP_BLOCK_STATES::ACTIVE);
+	animation.rainbow_enabled = true;
+
 	Position& position = registry.positions.emplace(entity);
 	position.position = vec2(700, 300);
 	position.scale = vec2(100.f, 100.f);
@@ -229,11 +245,6 @@ Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp) 
 	PowerUpBlock& powerUpBlock = registry.powerUpBlock.emplace(entity);
 	powerUpBlock.powerUpText = powerUp->first;
 	powerUpBlock.powerUpToggle = powerUp->second;
-
-	int num_rows = 1;
-	int num_cols = 15;
-	Animation& anim = registry.animations.emplace(entity, num_rows, num_cols);
-	anim.rainbow_enabled = true;
 
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
@@ -287,9 +298,12 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::PROJECTILE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	registry.animations.insert(
-		entity, 
-		Animation(PROJECTILE_SPRITESHEET_NUM_ROWS, PROJECTILE_SPRITESHEET_NUM_COLS));
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PROJECTILE);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)PROJECTILE_STATES::MOVING);
 
 	Projectile& projectile = registry.projectiles.emplace(entity);
 	projectile.type = elementType;

@@ -211,22 +211,42 @@ struct Mesh
 	std::vector<uint16_t> vertex_indices;
 };
 
-struct Animation
+struct AnimState
 {
-	int frame = 0;
+	int first;
+	int last;
+	int getNumFrames();
+	int getNextFrame(int curr_frame);
+	AnimState() = default;
+	AnimState(int first, int last) {
+		this->first = first;
+		this->last = last;
+	}
+};
+
+struct SpriteSheet
+{
+	std::vector<AnimState> states;
 	int num_rows;
 	int num_cols;
-	bool is_animating = true;
-	bool rainbow_enabled = false;
 	vec2 getFrameSizeInTexcoords();
 	int getNumFrames();
-	int getColumn(int frame);
-	int getRow(int frame);
+	static int getPlayerStateFromDirection(DIRECTION dir);
+	static bool getPlayerMirrored(DIRECTION dir);
+};
 
-	Animation(int num_rows, int num_cols) {
-		this->num_rows = num_rows;
-		this->num_cols = num_cols;
-	}
+struct Animation
+{
+	SpriteSheet* sprite_sheet_ptr;
+	int curr_state_index = 0;
+	int curr_frame = 0;
+	bool is_animating = true;
+	bool rainbow_enabled = false;
+	int getColumn();
+	int getRow();
+	void advanceFrame();
+	void advanceState();
+	void setState(int new_state_index);
 };
 
 /**
@@ -268,13 +288,14 @@ enum class TEXTURE_ASSET_ID {
 	HEALTH_BAR = FLOOR + 1,
 	MANA_BAR = HEALTH_BAR + 1,
 	POWER_UP_BLOCK = MANA_BAR + 1,
-	TEXTURE_COUNT = POWER_UP_BLOCK + 1
+	PLAYER = POWER_UP_BLOCK + 1,
+	TEXTURE_COUNT = PLAYER + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
 enum class EFFECT_ASSET_ID {
-	ARIA = 0,
-	COLOURED = ARIA + 1,
+	PLAYER = 0,
+	COLOURED = PLAYER + 1,
 	SALMON = COLOURED + 1,
 	TEXTURED = SALMON + 1,
 	WATER = TEXTURED + 1,
@@ -288,8 +309,7 @@ enum class EFFECT_ASSET_ID {
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
 enum class GEOMETRY_BUFFER_ID {
-	ARIA = 0,
-	SALMON = ARIA + 1,
+	SALMON = 0,
 	SPRITE = SALMON + 1,
 	DEBUG_LINE = SPRITE + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,
@@ -299,9 +319,19 @@ enum class GEOMETRY_BUFFER_ID {
 	RESOURCE_BAR = TEXT_2D + 1,
 	PROJECTILE = RESOURCE_BAR + 1,
 	POWER_UP_BLOCK = PROJECTILE + 1,
-	GEOMETRY_COUNT = POWER_UP_BLOCK + 1
+	PLAYER = POWER_UP_BLOCK + 1,
+	GEOMETRY_COUNT = PLAYER + 1
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
+
+enum class SPRITE_SHEET_DATA_ID {
+	NONE = 0,
+	PROJECTILE = NONE + 1,
+	POWER_UP_BLOCK = PROJECTILE + 1,
+	PLAYER = POWER_UP_BLOCK + 1,
+	SPRITE_SHEET_COUNT = PLAYER + 1
+};
+const int sprite_sheet_count = (int)SPRITE_SHEET_DATA_ID::SPRITE_SHEET_COUNT;
 
 struct RenderRequest {
 	TEXTURE_ASSET_ID used_texture = TEXTURE_ASSET_ID::TEXTURE_COUNT;
@@ -309,3 +339,23 @@ struct RenderRequest {
 	GEOMETRY_BUFFER_ID used_geometry = GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 };
 
+// One for each sprite sheet to indicate the states
+enum class POWER_UP_BLOCK_STATES {
+	ACTIVE = 0,
+	INACTIVE = ACTIVE + 1,
+	STATE_COUNT = INACTIVE + 1
+};
+
+enum class PROJECTILE_STATES {
+	MOVING = 0,
+	STATE_COUNT = MOVING + 1
+};
+
+enum class PLAYER_SPRITE_STATES {
+	EAST = 0,
+	SOUTH_EAST = EAST + 1,
+	NORTH_EAST = SOUTH_EAST + 1,
+	NORTH = NORTH_EAST + 1,
+	SOUTH = NORTH + 1,
+	STATE_COUNT = SOUTH + 1
+};

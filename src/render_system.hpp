@@ -51,7 +51,8 @@ class RenderSystem {
 			textures_path("dungeon_tile.png"),
 			textures_path("health_bar.png"),
 			textures_path("mana_bar.png"),
-			textures_path("power_up_block.png")
+			textures_path("power_up_block.png"),
+			textures_path("witch.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -73,6 +74,8 @@ class RenderSystem {
 	std::array<GLuint, geometry_count> index_buffers;
 	std::array<Mesh, geometry_count> meshes;
 
+	std::array<SpriteSheet, sprite_sheet_count> sprite_sheets;
+
 	GLuint vao;
 	std::unordered_map<GLchar, Character> Characters;
 
@@ -89,6 +92,9 @@ public:
 
 	void initializeGlMeshes();
 	Mesh& getMesh(GEOMETRY_BUFFER_ID id) { return meshes[(int)id]; };
+
+	void initializeSpriteSheets();
+	SpriteSheet& getSpriteSheet(SPRITE_SHEET_DATA_ID id) { return sprite_sheets[(int)id]; };
 
 	void initializeGlGeometryBuffers();
 	// Initialize the screen texture used as intermediate render target
@@ -111,7 +117,12 @@ private:
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
 
-	// Helper functions for initalizeGlGeometryBuffers()
+	// Helper functions for initializeAnimations()
+	void initializePowerUpBlockSpriteSheet();
+	void initializeProjectileSpriteSheet();
+	void initializePlayerSpriteSheet();
+
+	// Helper functions for initializeGlGeometryBuffers()
 	void initializePlayerGeometryBuffer();
 	void initializeSpriteGeometryBuffer();
 	void initializeDebugLineGeometryBuffer();
