@@ -131,6 +131,7 @@ private:
 	void initializeExitDoorGeometryBuffer();
 	void initializeResourceBarGeometryBuffer();
 	void initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID goem_buffer_id, int num_rows, int num_cols);
+	void initializeShadowMap();
 
 	// Window handle
 	GLFWwindow* window;
