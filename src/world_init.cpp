@@ -364,6 +364,32 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 	return entity;
 }
 
+Entity createProjectileSelectDisplay(RenderSystem* renderer)
+{
+	auto entity = Entity();
+
+	ProjectileSelectDisplay& display = registry.projectileSelectDisplays.emplace(entity);
+
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)ElementType::WATER);
+	animation.is_animating = false;
+
+	Position& position = registry.positions.emplace(entity);
+	position.scale = vec2(PROJECTILE_SELECT_DISPLAY_WIDTH, PROJECTILE_SELECT_DISPLAY_HEIGHT);
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::PROJECTILE_SELECT_DISPLAY,
+			EFFECT_ASSET_ID::ANIMATED,
+			GEOMETRY_BUFFER_ID::PROJECTILE_SELECT_DISPLAY });
+
+	return entity;
+}
+
 Entity createText(std::string in_text, vec2 pos, float scale, vec3 color)
 {
 	Entity entity = Entity();

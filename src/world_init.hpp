@@ -9,6 +9,8 @@ const float RESOURCE_BAR_HEIGHT = 0.3f * 33.f;
 const float RESOURCE_BAR_WIDTH = 0.3f * 369.f;
 const int PROJECTILE_SPRITESHEET_NUM_ROWS = 1;
 const int PROJECTILE_SPRITESHEET_NUM_COLS = 4;
+const float PROJECTILE_SELECT_DISPLAY_WIDTH = 3 * 88.f;
+const float PROJECTILE_SELECT_DISPLAY_HEIGHT = 3 * 25.f;
 
 // the player
 Entity createAria(RenderSystem* renderer, vec2 pos);
@@ -35,6 +37,8 @@ Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity);
 
 // creates a mana bar associated with an owner entity
 Entity createManaBar(RenderSystem* renderer, Entity& owner_entity);
+
+Entity createProjectileSelectDisplay(RenderSystem* renderer);
 
 Entity createFloor(RenderSystem* renderer, vec2 pos);
 

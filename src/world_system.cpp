@@ -78,7 +78,7 @@ GLFWwindow* WorldSystem::create_window() {
 	// Create the main window (for rendering, keyboard, and mouse input)
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-	window = glfwCreateWindow(mode->width, mode->height, "Aria", monitor, nullptr);
+	window = glfwCreateWindow(mode->width, mode->height, "Aria", nullptr, nullptr);
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
@@ -277,6 +277,9 @@ void WorldSystem::restart_game() {
 	}
 
 	createExitDoor(renderer, exit_door_pos);
+	Entity projectile_select_display = createProjectileSelectDisplay(renderer);
+	Player& player_comp = registry.players.get(player);
+	player_comp.projectile_select_display = projectile_select_display;
 
 	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
 }
@@ -380,11 +383,15 @@ void WorldSystem::handle_collisions() {
 
 			// TODO: make sure player has all this stuff and this wont be awful
 			// TODO: REFACTOR
+			Player& player = registry.players.get(entity);
 			Resources& resources = registry.resources.get(entity);
 			HealthBar& health_bar = registry.healthBars.get(resources.healthBar);
 			ManaBar& mana_bar = registry.manaBars.get(resources.manaBar);
+			ProjectileSelectDisplay& select_display = registry.projectileSelectDisplays.get(player.projectile_select_display);
+
 			Position& health_bar_position = registry.positions.get(resources.healthBar);
 			Position& mana_bar_position = registry.positions.get(resources.manaBar);
+			Position& select_display_position = registry.positions.get(player.projectile_select_display);
 
 			if (collidedLeft(player_position, terrain_position) || collidedRight(player_position, terrain_position)) {
 				player_position.position.x = player_position.prev_position.x;
@@ -395,11 +402,13 @@ void WorldSystem::handle_collisions() {
 			else { // Collided on diagonal, displace based on vector
 				player_position.position += collisionsRegistry.components[i].displacement;
 			}
-			// update health bar position to remove jitter
+			// update position of entities that follow player to remove jitter
 			health_bar_position.position = player_position.position;
 			health_bar_position.position.y += health_bar.y_offset;
 			mana_bar_position.position = player_position.position;
 			mana_bar_position.position.y += mana_bar.y_offset;
+			select_display_position.position = player_position.position;
+			select_display_position.position.y += select_display.y_offset;
 		}
 		
 		// Checking Enemy - Terrain Collisions
@@ -612,6 +621,10 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			characterProjectileType.projectileType = ElementType::LIGHTNING;
 			break;
 		}
+
+		Player& player_comp = registry.players.get(player);
+		Animation& select_display = registry.animations.get(player_comp.projectile_select_display);
+		select_display.setState((int)characterProjectileType.projectileType);
 	}
 
 	// player is moving
