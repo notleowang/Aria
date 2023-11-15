@@ -159,6 +159,10 @@ void PhysicsSystem::step(float elapsed_ms)
 		}
 	}
 
+	assert(registry.players.size() > 0);
+	Entity player_entity = registry.players.entities[0];
+	Player& player = registry.players.components[0];
+
 	// Position the health bars
 	auto& healthBarContainer = registry.healthBars;
 	for (int i = 0; i < healthBarContainer.size(); i++) {
@@ -184,4 +188,14 @@ void PhysicsSystem::step(float elapsed_ms)
 		position.position.x = ownerPosition.position.x;
 		position.position.y = ownerPosition.position.y + manaBar.y_offset;
 	}
+
+	// Position the Projectile Select Display
+	Entity display_entity = player.projectile_select_display;
+	ProjectileSelectDisplay& display = registry.projectileSelectDisplays.get(display_entity);
+
+	Position& display_position = registry.positions.get(display_entity);
+	Position& player_position = registry.positions.get(player_entity);
+
+	display_position.position.x = player_position.position.x;
+	display_position.position.y = player_position.position.y + display.y_offset;
 }

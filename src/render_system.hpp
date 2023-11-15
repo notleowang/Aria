@@ -52,7 +52,8 @@ class RenderSystem {
 			textures_path("health_bar.png"),
 			textures_path("mana_bar.png"),
 			textures_path("power_up_block.png"),
-			textures_path("witch.png")
+			textures_path("witch.png"),
+			textures_path("element_select_placeholder.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -117,10 +118,11 @@ private:
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
 
-	// Helper functions for initializeAnimations()
+	// Helper functions for initializeSpriteSheets()
 	void initializePowerUpBlockSpriteSheet();
 	void initializeProjectileSpriteSheet();
 	void initializePlayerSpriteSheet();
+	void initializeProjectileSelectDisplaySpriteSheet();
 
 	// Helper functions for initializeGlGeometryBuffers()
 	void initializePlayerGeometryBuffer();
