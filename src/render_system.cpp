@@ -101,58 +101,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			gl_has_errors();
 		}
 	}
-	else if (render_request.used_effect == EFFECT_ASSET_ID::TEXT_2D) {
-		Text& text_component = registry.texts.get(entity);
-		float scale = position.scale.x;
-		std::string text = text_component.text;
-		vec3 color = text_component.color;
-		GLint vertex_loc = glGetAttribLocation(program, "vertex");
-		glEnableVertexAttribArray(vertex_loc);
-		glVertexAttribPointer(vertex_loc, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-
-		glUniform3f(glGetUniformLocation(program, "textColor"), color.x, color.y, color.z);
-		glActiveTexture(GL_TEXTURE0);
-		// iterate through all characters
-		std::string::const_iterator c;
-		float x = position.position.x;
-		float y = position.position.y;
-		for (c = text.begin(); c != text.end(); c++)
-		{
-			Character ch = Characters[*c];
-
-			float xpos = x + ch.Bearing.x * scale;
-			float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
-
-			float w = ch.Size.x * scale;
-			float h = ch.Size.y * scale;
-
-			// update VBO for each character
-			float vertices[6][4] = {
-				{ xpos,     ypos + h,   0.0f, 0.0f },
-				{ xpos,     ypos,       0.0f, 1.0f },
-				{ xpos + w, ypos,       1.0f, 1.0f },
-
-				{ xpos,     ypos + h,   0.0f, 0.0f },
-				{ xpos + w, ypos,       1.0f, 1.0f },
-				{ xpos + w, ypos + h,   1.0f, 0.0f }
-			};
-			// render glyph texture over quad
-			glBindTexture(GL_TEXTURE_2D, ch.TextureID);
-			// update content of VBO memory
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); // be sure to use glBufferSubData and not glBufferData
-			// render quad
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-			// now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-			x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
-		}
-		GLint currProgram;
-		glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-		mat4 text_projection = ortho(0.0f, static_cast<float>(window_width_px), 0.0f, static_cast<float>(window_height_px));
-		glUniformMatrix4fv(glGetUniformLocation(currProgram, "projection"), 1, GL_FALSE, (float*)&text_projection);
-		gl_has_errors();
-		return;
-	}
 	else if (render_request.used_effect == EFFECT_ASSET_ID::SALMON || render_request.used_effect == EFFECT_ASSET_ID::PLAYER ||
 		render_request.used_effect == EFFECT_ASSET_ID::TERRAIN || render_request.used_effect == EFFECT_ASSET_ID::EXIT_DOOR)
 	{
@@ -233,7 +181,7 @@ void RenderSystem::drawToScreen()
 	gl_has_errors();
 	// Enabling alpha channel for textures
 	glDisable(GL_BLEND);
-	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_DEPTH_TEST);
 
 	// Draw the screen texture on the quad geometry
@@ -244,6 +192,11 @@ void RenderSystem::drawToScreen()
 	// indices to the bound GL_ARRAY_BUFFER
 	gl_has_errors();
 	const GLuint darken_program = effects[(GLuint)EFFECT_ASSET_ID::DARKEN];
+	float light_radius = 0.5;
+
+	// Pass light radius to the post-processing shader
+	glUniform1f(glGetUniformLocation(darken_program, "light_radius"), light_radius);
+
 	// Set clock
 	GLuint dead_timer_uloc = glGetUniformLocation(darken_program, "screen_darken_factor");
 	GLuint radius_uloc = glGetUniformLocation(darken_program, "radius");
@@ -279,8 +232,6 @@ void RenderSystem::drawToScreen()
 // http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/
 void RenderSystem::draw()
 {
-	updateLight();
-
 	// Getting size of window
 	int w, h;
 	glfwGetFramebufferSize(window, &w, &h); // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
@@ -289,32 +240,10 @@ void RenderSystem::draw()
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 	gl_has_errors();
 
-	// Create a texture to hold the rendered scene
-	GLuint sceneTexture;
-	glGenTextures(1, &sceneTexture);
-	glBindTexture(GL_TEXTURE_2D, sceneTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, window_width_px, window_height_px, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, sceneTexture, 0);
-
-	// Create a renderbuffer for depth testing
-	GLuint depthRenderbuffer;
-	glGenRenderbuffers(1, &depthRenderbuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER, depthRenderbuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, window_width_px, window_height_px);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderbuffer);
-
-	// Set the list of draw buffers to none (we only care about the color attachment)
-	GLenum drawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, drawBuffers);
-
-	gl_has_errors();
-
-	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
-
 	// Clearing backbuffer
 	glViewport(0, 0, w, h);
 	glDepthRange(0.00001, 10);
-	glClearColor(0, 0, 0, 1.0);
+	glClearColor(0.2, 0.2, 0.2, 1.0);
 	glClearDepth(10.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_BLEND);
@@ -336,7 +265,7 @@ void RenderSystem::draw()
 	// Draw all textured meshes that have a position and size component
 	for (Entity entity : registry.renderRequests.entities)
 	{
-		if (!registry.positions.has(entity))
+		if (!registry.positions.has(entity) || registry.texts.has(entity))
 			continue;
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize
@@ -346,65 +275,92 @@ void RenderSystem::draw()
 	// Truely render to the screen
 	drawToScreen();
 
-	postProcess(sceneTexture);
+	// We do this after post processing the lighting effect
+	for (Entity entity : registry.texts.entities)
+	{
+		drawText(entity);
+	}
 
 	// flicker-free display with a double buffer
 	glfwSwapBuffers(window);
 	gl_has_errors();
 }
 
-void RenderSystem::postProcess(GLuint sceneTexture) {
-	GLuint postProcessingShaderProgram = effects[(GLuint)EFFECT_ASSET_ID::LIGHTING];
-	glUseProgram(postProcessingShaderProgram);
+void RenderSystem::drawText(Entity entity) {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	Position& position = registry.positions.get(entity);
+
+	assert(registry.renderRequests.has(entity));
+	const RenderRequest& render_request = registry.renderRequests.get(entity);
+
+	const GLuint used_effect_enum = (GLuint)render_request.used_effect;
+	assert(used_effect_enum != (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
+	const GLuint program = (GLuint)effects[used_effect_enum];
+
+	// Setting shaders
+	glUseProgram(program);
 	gl_has_errors();
 
-	// Bind the framebuffer texture as input to the post-processing shader
+	assert(render_request.used_geometry != GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
+	const GLuint vbo = vertex_buffers[(GLuint)render_request.used_geometry];
+	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+	Text& text_component = registry.texts.get(entity);
+	float scale = position.scale.x;
+	std::string text = text_component.text;
+	vec3 color = text_component.color;
+	GLint vertex_loc = glGetAttribLocation(program, "vertex");
+	glEnableVertexAttribArray(vertex_loc);
+	glVertexAttribPointer(vertex_loc, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+
+	glUniform3f(glGetUniformLocation(program, "textColor"), color.x, color.y, color.z);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, sceneTexture);
-	glUniform1i(glGetUniformLocation(postProcessingShaderProgram, "sceneTexture"), 0);
+	// iterate through all characters
+	std::string::const_iterator c;
+	float x = position.position.x;
+	float y = position.position.y;
+	for (c = text.begin(); c != text.end(); c++)
+	{
+		Character ch = Characters[*c];
+
+		float xpos = x + ch.Bearing.x * scale;
+		float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+
+		float w = ch.Size.x * scale;
+		float h = ch.Size.y * scale;
+
+		// update VBO for each character
+		float vertices[6][4] = {
+			{ xpos,     ypos + h,   0.0f, 0.0f },
+			{ xpos,     ypos,       0.0f, 1.0f },
+			{ xpos + w, ypos,       1.0f, 1.0f },
+
+			{ xpos,     ypos + h,   0.0f, 0.0f },
+			{ xpos + w, ypos,       1.0f, 1.0f },
+			{ xpos + w, ypos + h,   1.0f, 0.0f }
+		};
+		// render glyph texture over quad
+		glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+		// update content of VBO memory
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); // be sure to use glBufferSubData and not glBufferData
+		// render quad
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		// now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+		x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
+	}
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	mat4 text_projection = ortho(0.0f, static_cast<float>(window_width_px), 0.0f, static_cast<float>(window_height_px));
+	glUniformMatrix4fv(glGetUniformLocation(currProgram, "projection"), 1, GL_FALSE, (float*)&text_projection);
 	gl_has_errors();
-
-	// Render a full-screen quad to apply the post-processing shader
-	glDrawArrays(GL_QUADS, 0, 4);
-	gl_has_errors();
-
-	// Unbind the texture
-	glBindTexture(GL_TEXTURE_2D, 0);
-	gl_has_errors();
-}
-
-void RenderSystem::updateLight() {
-	Position& player_pos = registry.positions.get(registry.players.entities[0]);
-	vec2 playerPosition = player_pos.position;
-	float lightRadius = 200.f;
-	//vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-
-	// Calculate the view matrix based on the player's position
-	//mat4 viewMatrix = lookAt(vec3(playerPosition.x, playerPosition.y, 2.0), vec3(playerPosition.x, playerPosition.y, 0.0), vec3(0.0, 1.0, 0.0));
-
-	// Calculate the projection matrix for orthographic projection
-	//mat4 projectionMatrix = ortho(-2.0f, 2.0f, -2.0f, 2.0f, 1.0f, 10.0f);
-
-	// Combine the matrices to get the Model-View-Projection (MVP) matrix
-	//mat4 MVP = projectionMatrix * viewMatrix;
-
-	GLuint postProcessingShaderProgram = effects[(GLuint)EFFECT_ASSET_ID::LIGHTING];
-
-	// Use the shader program
-	glUseProgram(postProcessingShaderProgram);
-
-	// Pass player position and light radius to the post-processing shader
-	glUniform2fv(glGetUniformLocation(postProcessingShaderProgram, "playerPos"), 1, &playerPosition[0]);
-	glUniform1f(glGetUniformLocation(postProcessingShaderProgram, "lightRadius"), lightRadius);
-
-	// Pass MVP matrix to the shader
-	//glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "MVP"), 1, GL_FALSE, &MVP[0][0]);
-
-	// Pass player position to the shader
-	//glUniform2fv(glGetUniformLocation(shaderProgram, "playerPos"), 1, &playerPosition[0]);
-
-	// Pass light position and color to the shader
-	//glUniform3fv(glGetUniformLocation(shaderProgram, "lightColor"), 1, &lightColor[0]);
+	return;
 }
 
 void RenderSystem::animation_step(float elapsed_ms)
