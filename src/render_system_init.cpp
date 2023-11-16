@@ -60,8 +60,13 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	initializeSpriteSheets(); // must be called before initializeGlGeometryBuffers()
 	initializeGlGeometryBuffers();
 	initializeFreeType();
+	initializeLighting();
 
 	return true;
+}
+
+void RenderSystem::initializeLighting() {
+
 }
 
 void RenderSystem::initializeFreeType() {

@@ -214,13 +214,12 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	gl_has_errors();
 }
 
-// draw the intermediate texture to the screen, with some distortion to simulate
-// water
+// draw the intermediate texture to the screen
 void RenderSystem::drawToScreen()
 {
 	// Setting shaders
-	// get the water texture, sprite mesh, and program
-	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::WATER]);
+	// get the lighting texture, sprite mesh, and program
+	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::DARKEN]);
 	gl_has_errors();
 	// Clearing backbuffer
 	int w, h;
@@ -244,11 +243,11 @@ void RenderSystem::drawToScreen()
 		index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE]); // Note, GL_ELEMENT_ARRAY_BUFFER associates
 	// indices to the bound GL_ARRAY_BUFFER
 	gl_has_errors();
-	const GLuint water_program = effects[(GLuint)EFFECT_ASSET_ID::WATER];
+	const GLuint darken_program = effects[(GLuint)EFFECT_ASSET_ID::DARKEN];
 	// Set clock
-	GLuint dead_timer_uloc = glGetUniformLocation(water_program, "screen_darken_factor");
-	GLuint radius_uloc = glGetUniformLocation(water_program, "radius");
-	GLuint apply_spotlight_bool = glGetUniformLocation(water_program, "apply_spotlight");
+	GLuint dead_timer_uloc = glGetUniformLocation(darken_program, "screen_darken_factor");
+	GLuint radius_uloc = glGetUniformLocation(darken_program, "radius");
+	GLuint apply_spotlight_bool = glGetUniformLocation(darken_program, "apply_spotlight");
 	
 	ScreenState& screen = registry.screenStates.get(screen_state_entity);
 
@@ -258,7 +257,7 @@ void RenderSystem::drawToScreen()
 	gl_has_errors();
 	// Set the vertex position and vertex texture coordinates (both stored in the
 	// same VBO)
-	GLint in_position_loc = glGetAttribLocation(water_program, "in_position");
+	GLint in_position_loc = glGetAttribLocation(darken_program, "in_position");
 	glEnableVertexAttribArray(in_position_loc);
 	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
 	gl_has_errors();
@@ -280,6 +279,8 @@ void RenderSystem::drawToScreen()
 // http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/
 void RenderSystem::draw()
 {
+	updateLight();
+
 	// Getting size of window
 	int w, h;
 	glfwGetFramebufferSize(window, &w, &h); // Note, this will be 2x the resolution given to glfwCreateWindow on retina displays
@@ -287,10 +288,33 @@ void RenderSystem::draw()
 	// First render to the custom framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 	gl_has_errors();
+
+	// Create a texture to hold the rendered scene
+	GLuint sceneTexture;
+	glGenTextures(1, &sceneTexture);
+	glBindTexture(GL_TEXTURE_2D, sceneTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, window_width_px, window_height_px, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, sceneTexture, 0);
+
+	// Create a renderbuffer for depth testing
+	GLuint depthRenderbuffer;
+	glGenRenderbuffers(1, &depthRenderbuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthRenderbuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, window_width_px, window_height_px);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderbuffer);
+
+	// Set the list of draw buffers to none (we only care about the color attachment)
+	GLenum drawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, drawBuffers);
+
+	gl_has_errors();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+
 	// Clearing backbuffer
 	glViewport(0, 0, w, h);
 	glDepthRange(0.00001, 10);
-	glClearColor(0, 0, 1, 1.0);
+	glClearColor(0, 0, 0, 1.0);
 	glClearDepth(10.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_BLEND);
@@ -322,9 +346,65 @@ void RenderSystem::draw()
 	// Truely render to the screen
 	drawToScreen();
 
+	postProcess(sceneTexture);
+
 	// flicker-free display with a double buffer
 	glfwSwapBuffers(window);
 	gl_has_errors();
+}
+
+void RenderSystem::postProcess(GLuint sceneTexture) {
+	GLuint postProcessingShaderProgram = effects[(GLuint)EFFECT_ASSET_ID::LIGHTING];
+	glUseProgram(postProcessingShaderProgram);
+	gl_has_errors();
+
+	// Bind the framebuffer texture as input to the post-processing shader
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, sceneTexture);
+	glUniform1i(glGetUniformLocation(postProcessingShaderProgram, "sceneTexture"), 0);
+	gl_has_errors();
+
+	// Render a full-screen quad to apply the post-processing shader
+	glDrawArrays(GL_QUADS, 0, 4);
+	gl_has_errors();
+
+	// Unbind the texture
+	glBindTexture(GL_TEXTURE_2D, 0);
+	gl_has_errors();
+}
+
+void RenderSystem::updateLight() {
+	Position& player_pos = registry.positions.get(registry.players.entities[0]);
+	vec2 playerPosition = player_pos.position;
+	float lightRadius = 200.f;
+	//vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+
+	// Calculate the view matrix based on the player's position
+	//mat4 viewMatrix = lookAt(vec3(playerPosition.x, playerPosition.y, 2.0), vec3(playerPosition.x, playerPosition.y, 0.0), vec3(0.0, 1.0, 0.0));
+
+	// Calculate the projection matrix for orthographic projection
+	//mat4 projectionMatrix = ortho(-2.0f, 2.0f, -2.0f, 2.0f, 1.0f, 10.0f);
+
+	// Combine the matrices to get the Model-View-Projection (MVP) matrix
+	//mat4 MVP = projectionMatrix * viewMatrix;
+
+	GLuint postProcessingShaderProgram = effects[(GLuint)EFFECT_ASSET_ID::LIGHTING];
+
+	// Use the shader program
+	glUseProgram(postProcessingShaderProgram);
+
+	// Pass player position and light radius to the post-processing shader
+	glUniform2fv(glGetUniformLocation(postProcessingShaderProgram, "playerPos"), 1, &playerPosition[0]);
+	glUniform1f(glGetUniformLocation(postProcessingShaderProgram, "lightRadius"), lightRadius);
+
+	// Pass MVP matrix to the shader
+	//glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "MVP"), 1, GL_FALSE, &MVP[0][0]);
+
+	// Pass player position to the shader
+	//glUniform2fv(glGetUniformLocation(shaderProgram, "playerPos"), 1, &playerPosition[0]);
+
+	// Pass light position and color to the shader
+	//glUniform3fv(glGetUniformLocation(shaderProgram, "lightColor"), 1, &lightColor[0]);
 }
 
 void RenderSystem::animation_step(float elapsed_ms)

@@ -67,7 +67,8 @@ class RenderSystem {
 		shader_path("exit_door"),
 		shader_path("resource_bar"),
 		shader_path("text_2d"),
-		shader_path("animated")
+		shader_path("animated"),
+		shader_path("lighting")
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
@@ -104,6 +105,8 @@ public:
 
 	void initializeFreeType();
 
+	void initializeLighting();
+
 	// Destroy resources associated to one or all entities created by the system
 	~RenderSystem();
 
@@ -116,6 +119,8 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
+	void updateLight();
+	void postProcess(GLuint sceneTexture);
 
 	// Helper functions for initializeAnimations()
 	void initializePowerUpBlockSpriteSheet();
