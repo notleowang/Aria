@@ -73,16 +73,16 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			float filled = 0.0;
 			if (render_request.used_texture == TEXTURE_ASSET_ID::HEALTH_BAR) {
 				assert(registry.healthBars.has(entity));
-				HealthBar& healthBar = registry.healthBars.get(entity);
-				assert(registry.resources.has(healthBar.owner));
-				Resources& resources = registry.resources.get(healthBar.owner);
+				Follower& follower = registry.followers.get(entity);
+				assert(registry.resources.has(follower.owner));
+				Resources& resources = registry.resources.get(follower.owner);
 				filled = resources.currentHealth / resources.maxHealth;
 			}
 			else if (render_request.used_texture == TEXTURE_ASSET_ID::MANA_BAR) {
 				assert(registry.manaBars.has(entity));
-				ManaBar& manaBar = registry.manaBars.get(entity);
-				assert(registry.resources.has(manaBar.owner));
-				Resources& resources = registry.resources.get(manaBar.owner);
+				Follower& follower = registry.followers.get(entity);
+				assert(registry.resources.has(follower.owner));
+				Resources& resources = registry.resources.get(follower.owner);
 				filled = resources.currentMana / resources.maxMana;
 			}
 			glUniform1f(glGetUniformLocation(program, "filled"), filled);

@@ -9,7 +9,7 @@ using namespace std;
 // Aria component
 struct Player
 {
-	Entity projectile_select_display;
+
 };
 
 // All data relevant to elements and weaknesses
@@ -77,14 +77,23 @@ struct Resources
 
 struct HealthBar
 {
-	Entity owner;
-	float y_offset = -60.f;
+
 };
 
 struct ManaBar
 {
+
+};
+
+struct ProjectileSelectDisplay
+{
+
+};
+
+struct Follower
+{
 	Entity owner;
-	float y_offset = -75.f;
+	float y_offset = 0.f;
 };
 
 // Structure to store projectile entities
@@ -99,11 +108,6 @@ struct Projectile
 struct CharacterProjectileType
 {
 	ElementType projectileType = ElementType::WATER; //By default, the characters projectile type is water
-};
-
-struct ProjectileSelectDisplay
-{
-	float y_offset = -350.f;
 };
 
 // All data relevant to the position of entities
