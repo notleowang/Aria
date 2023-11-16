@@ -179,19 +179,20 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 	screen.screen_darken_factor = 1 - min_death_timer_ms / 3000;
-	float min_win_timer_ms = 1500.f;
+
 	for (Entity entity : registry.winTimers.entities) {
 		WinTimer& timer = registry.winTimers.get(entity);
+		timer.timer_ms = std::min(timer.timer_ms, timer.start_timer_ms);
 		timer.timer_ms -= elapsed_ms_since_last_update;
-		if (0< timer.timer_ms < min_win_timer_ms) {
-			min_win_timer_ms = timer.timer_ms;
+
+		if (timer.timer_ms > 0.f) {
 			screen.apply_spotlight = true;
-			screen.spotlight_radius = min_win_timer_ms/2000.f;
+			screen.spotlight_radius = timer.timer_ms / timer.start_timer_ms;
 		}
-		if (timer.timer_ms <= 0.f) {
-			min_win_timer_ms = timer.timer_ms;
+		else if (timer.timer_ms <= 0.f) {
 			screen.apply_spotlight = true;
-			screen.spotlight_radius = - min_win_timer_ms / 2000.f;
+			screen.spotlight_radius = -(timer.timer_ms / timer.start_timer_ms);
+
 			// Change level here
 			if (!timer.changedLevel) {
 				timer.changedLevel = true;
@@ -205,7 +206,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				restart_game();
 			}
 		}
-		if (timer.timer_ms <= -4000.f) {
+		else if (timer.timer_ms <= -timer.start_timer_ms) {
 			registry.winTimers.remove(entity);
 			screen.apply_spotlight = false;
 		}
