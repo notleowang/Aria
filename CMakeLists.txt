@@ -68,11 +68,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES ENABLE_EXPORTS 0)
 target_include_directories(${PROJECT_NAME} PUBLIC ext/stb_image/)
 target_include_directories(${PROJECT_NAME} PUBLIC ext/gl3w)
 
-
-set(FREETYPE_INCLUDE_DIRS_LIN "${CMAKE_CURRENT_SOURCE_DIR}/ext/freetype/include")
-set(FREETYPE_LIBRARIES_LIN "${CMAKE_CURRENT_SOURCE_DIR}/ext/freetype/lib/libfreetype.so")
-target_include_directories(${PROJECT_NAME} PUBLIC ${FREETYPE_INCLUDE_DIRS_LIN})
-target_link_libraries(${PROJECT_NAME} PUBLIC ${FREETYPE_LIBRARIES_LIN})
+if(IS_OS_LINUX)
+  set(FREETYPE_INCLUDE_DIRS_LIN "${CMAKE_CURRENT_SOURCE_DIR}/ext/freetype/include")
+  set(FREETYPE_LIBRARIES_LIN "${CMAKE_CURRENT_SOURCE_DIR}/ext/freetype/lib/libfreetype.so")
+  target_include_directories(${PROJECT_NAME} PUBLIC ${FREETYPE_INCLUDE_DIRS_LIN})
+  target_link_libraries(${PROJECT_NAME} PUBLIC ${FREETYPE_LIBRARIES_LIN})
+endif()
 
 # Find OpenGL
 find_package(OpenGL REQUIRED)
