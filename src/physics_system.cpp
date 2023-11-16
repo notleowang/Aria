@@ -159,43 +159,13 @@ void PhysicsSystem::step(float elapsed_ms)
 		}
 	}
 
-	assert(registry.players.size() > 0);
-	Entity player_entity = registry.players.entities[0];
-	Player& player = registry.players.components[0];
-
-	// Position the health bars
-	auto& healthBarContainer = registry.healthBars;
-	for (int i = 0; i < healthBarContainer.size(); i++) {
-		HealthBar& healthBar = healthBarContainer.components[i];
-		Entity entity = healthBarContainer.entities[i];
-
+	// update position of entities that follow player or enemies to remove jitter
+	for (int i = 0; i < registry.followers.size(); i++) {
+		Follower& follower = registry.followers.components[i];
+		Entity entity = registry.followers.entities[i];
 		Position& position = registry.positions.get(entity);
-		Position& ownerPosition = registry.positions.get(healthBar.owner);
-
-		position.position.x = ownerPosition.position.x;
-		position.position.y = ownerPosition.position.y + healthBar.y_offset;
+		Position& owner_position = registry.positions.get(follower.owner);
+		position.position = owner_position.position;
+		position.position.y += follower.y_offset;
 	}
-	
-	// Position the mana bars
-	auto& manaBarContainer = registry.manaBars;
-	for (int i = 0; i < manaBarContainer.size(); i++) {
-		ManaBar& manaBar = manaBarContainer.components[i];
-		Entity entity = manaBarContainer.entities[i];
-
-		Position& position = registry.positions.get(entity);
-		Position& ownerPosition = registry.positions.get(manaBar.owner);
-
-		position.position.x = ownerPosition.position.x;
-		position.position.y = ownerPosition.position.y + manaBar.y_offset;
-	}
-
-	// Position the Projectile Select Display
-	Entity display_entity = player.projectile_select_display;
-	ProjectileSelectDisplay& display = registry.projectileSelectDisplays.get(display_entity);
-
-	Position& display_position = registry.positions.get(display_entity);
-	Position& player_position = registry.positions.get(player_entity);
-
-	display_position.position.x = player_position.position.x;
-	display_position.position.y = player_position.position.y + display.y_offset;
 }
