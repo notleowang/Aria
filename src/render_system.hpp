@@ -116,6 +116,7 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
+	void drawText(Entity entity);
 
 	// Helper functions for initializeAnimations()
 	void initializePowerUpBlockSpriteSheet();
