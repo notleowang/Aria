@@ -59,6 +59,7 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	initializeGlEffects();
 	initializeSpriteSheets(); // must be called before initializeGlGeometryBuffers()
 	initializeGlGeometryBuffers();
+	initializeImGui();
 	initializeFreeType();
 
 	return true;
@@ -134,6 +135,28 @@ void RenderSystem::initializeFreeType() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
 
 	gl_has_errors();
+}
+
+void RenderSystem::initializeImGui()
+{
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+
+	// Fonts
+	ImFont* DefaultFont = io.Fonts->AddFontFromFileTTF("../../../data/fonts/PixeloidSans.ttf", 24.0f);	// index 0
+	ImFont* MainMenuFont = io.Fonts->AddFontFromFileTTF("../../../data/fonts/PixeloidSans.ttf", 60.0f); // index 1
+	ImFont* MainMenuButtonFont = io.Fonts->AddFontFromFileTTF("../../../data/fonts/PixeloidSans.ttf", 48.0f); // index 1
+
+	// Setup Dear ImGui style
+	//ImGui::StyleColorsDark();
+	//ImGui::StyleColorsClassic();
+
+	// Setup Platform/Renderer backends
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init();
 }
 
 void RenderSystem::initializeGlTextures()
