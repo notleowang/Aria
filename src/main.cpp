@@ -72,9 +72,9 @@ int main()
 		}
 
 		if (state == 0) {
-			world_system.step(elapsed_ms);
 			physics_system.step(elapsed_ms);
 			ai_system.step(elapsed_ms);
+			world_system.step(elapsed_ms);
 
 			world_system.handle_collisions();
 		}

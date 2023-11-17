@@ -12,9 +12,9 @@ struct Player
 };
 // All data relevant to elements and weaknesses
 enum ElementType {
-	WATER=0,
-	FIRE=1,
-	EARTH= 2,
+	WATER = 0,
+	FIRE = 1,
+	EARTH = 2,
 	LIGHTNING = 3
 };
 
@@ -26,6 +26,12 @@ struct Enemy
 	float stamina = 0.5f;
 	float mana = 1.f;
 	ElementType type = ElementType::FIRE; // By default, an enemy is of fire type
+};
+
+// Obstacles
+struct Obstacle
+{
+
 };
 
 // all data relevant to the player's power ups
@@ -277,9 +283,12 @@ struct Animation
 enum class TEXTURE_ASSET_ID {
 	FISH = 0,
 	LANDSCAPE = FISH + 1,
-	TURTLE = LANDSCAPE + 1,
-	FIRE_ENEMY = TURTLE + 1,
-	WATER_PROJECTILE_SHEET = FIRE_ENEMY + 1,
+	WATER_ENEMY = LANDSCAPE + 1,
+	FIRE_ENEMY = WATER_ENEMY + 1,
+	EARTH_ENEMY = FIRE_ENEMY + 1,
+	LIGHTNING_ENEMY = EARTH_ENEMY + 1,
+	GHOST = LIGHTNING_ENEMY + 1,
+	WATER_PROJECTILE_SHEET = GHOST + 1,
 	FIRE_PROJECTILE_SHEET = WATER_PROJECTILE_SHEET + 1,
 	EARTH_PROJECTILE_SHEET = FIRE_PROJECTILE_SHEET + 1,
 	LIGHTNING_PROJECTILE_SHEET = EARTH_PROJECTILE_SHEET + 1,
@@ -288,7 +297,8 @@ enum class TEXTURE_ASSET_ID {
 	MANA_BAR = HEALTH_BAR + 1,
 	POWER_UP_BLOCK = MANA_BAR + 1,
 	PLAYER = POWER_UP_BLOCK + 1,
-	TEXTURE_COUNT = PLAYER + 1
+	PORTAL = PLAYER+1,
+	TEXTURE_COUNT = PORTAL + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

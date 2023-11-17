@@ -105,7 +105,7 @@ bool AABBCollides(Entity& entity_i, Entity& entity_j)
 	float j_top = position_j.position.y - abs(position_j.scale.y) / 2;
 	float j_bottom = position_j.position.y + abs(position_j.scale.y) / 2;
 
-	if (i_left < j_right && i_right > j_left && i_bottom > j_top && i_top < j_bottom)
+	if (i_left <= j_right && i_right >= j_left && i_bottom >= j_top && i_top <= j_bottom)
 	{
 		return true;
 	}
