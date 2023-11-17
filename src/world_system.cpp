@@ -328,7 +328,7 @@ bool collidedTop(Position& pos_i, Position& pos_j)
 bool collidedBottom(Position& pos_i, Position& pos_j) 
 {
 	return (((pos_i.prev_position.y - abs(pos_i.scale.y / 2)) >= (pos_j.position.y + abs(pos_j.scale.y / 2))) &&
-		((pos_i.position.y - abs(pos_i.scale.x / 2)) <= (pos_j.position.x + abs(pos_j.scale.x / 2))));
+		((pos_i.position.y - abs(pos_i.scale.x / 2)) <= (pos_j.position.x + abs(pos_j.scale.x/2))));
 }
 
 void WorldSystem::win_level() {
@@ -481,9 +481,11 @@ void WorldSystem::handle_collisions() {
 				Position& terrain_2_position = registry.positions.get(entity_other);
 
 				if (collidedLeft(terrain_1_position, terrain_2_position) || collidedRight(terrain_1_position, terrain_2_position)) {
+					//terrain_1_position.position.x = terrain_1_position.prev_position.x; <- might help
 					terrain_1_velocity.velocity[0] = -terrain_1_velocity.velocity[0]; // switch x direction
 				}
 				if (collidedTop(terrain_1_position, terrain_2_position) || collidedBottom(terrain_1_position, terrain_2_position)) {
+					//terrain_1_position.position.y = terrain_1_position.prev_position.y; <- might help
 					terrain_1_velocity.velocity[1] = -terrain_1_velocity.velocity[1]; // switch y direction
 				}
 			}

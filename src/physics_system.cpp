@@ -33,7 +33,7 @@ vec2 worldTransform(vec2 coords, Position& position) {
 
 // Reference: 
 // https://github.com/OneLoneCoder/Javidx9/blob/master/PixelGameEngine/SmallerProjects/OneLoneCoder_PGE_PolygonCollisions1.cpp?fbclid=IwAR1e0EyRPtFFGmg1EuiiKU9JxBwOAFN42YA3LIvfm0GHspBbE1df43ZeCz8
-void diagonalCollides(Entity& ent_i, Entity& ent_j) 
+void diagonalCollides(Entity& ent_i, Entity& ent_j)
 {
 	Entity* entity_i = &ent_i;
 	Entity* entity_j = &ent_j;
@@ -51,7 +51,7 @@ void diagonalCollides(Entity& ent_i, Entity& ent_j)
 		Position& position_i = registry.positions.get(*entity_i);
 		Position& position_j = registry.positions.get(*entity_j);
 
-		for (uint i = 0; i < i_vertices.size(); i++) 
+		for (uint i = 0; i < i_vertices.size(); i++)
 		{
 			vec2 i_line_start = position_i.position;
 			// Will need to add rotation into transformation as well
@@ -59,16 +59,16 @@ void diagonalCollides(Entity& ent_i, Entity& ent_j)
 			vec2 displacement = { 0, 0 };
 
 			for (uint j = 0; j < j_vertices.size(); j++) {
-				uint next_point = (j + 1) % j_vertices.size();		
+				uint next_point = (j + 1) % j_vertices.size();
 				vec2 j_line_start = worldTransform(vec2(j_vertices[j].position.x, j_vertices[j].position.y), position_j);
 				vec2 j_line_end = worldTransform(vec2(j_vertices[next_point].position.x, j_vertices[next_point].position.y), position_j);
-				
+
 				// Line segment intersection
 				float h = (j_line_end.x - j_line_start.x) * (i_line_start.y - i_line_end.y) - (i_line_start.x - i_line_end.x) * (j_line_end.y - j_line_start.y);
 				float t = ((j_line_start.y - j_line_end.y) * (i_line_start.x - j_line_start.x) + (j_line_end.x - j_line_start.x) * (i_line_start.y - j_line_start.y)) / h;
 				float r = ((i_line_start.y - i_line_end.y) * (i_line_start.x - j_line_start.x) + (i_line_end.x - i_line_start.x) * (i_line_start.y - j_line_start.y)) / h;
 
-				if (t >= 0.0f && t < 1.0f && r >= 0.0f && r < 1.0f) 
+				if (t >= 0.0f && t < 1.0f && r >= 0.0f && r < 1.0f)
 				{
 					displacement.x += (1.0f - t) * (i_line_end.x - i_line_start.x);
 					displacement.y += (1.0f - t) * (i_line_end.y - i_line_start.y);
