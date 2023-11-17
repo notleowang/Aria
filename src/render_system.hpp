@@ -104,8 +104,6 @@ public:
 
 	void initializeFreeType();
 
-	void initializeImGui();
-
 	// Destroy resources associated to one or all entities created by the system
 	~RenderSystem();
 
@@ -118,7 +116,6 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
-	void drawImGui();
 
 	// Helper functions for initializeAnimations()
 	void initializePowerUpBlockSpriteSheet();
