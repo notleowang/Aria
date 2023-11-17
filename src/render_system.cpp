@@ -131,6 +131,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		}
 	}
 	else if (render_request.used_effect == EFFECT_ASSET_ID::SHADOW) {
+		if (!registry.shadows.get(entity).active) return;
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
 		gl_has_errors();
@@ -220,7 +221,6 @@ void RenderSystem::drawToScreen()
 	// indices to the bound GL_ARRAY_BUFFER
 	gl_has_errors();
 	const GLuint darken_program = effects[(GLuint)EFFECT_ASSET_ID::DARKEN];
-	float light_radius = 0.5;
 
 	// Pass light radius to the post-processing shader
 	glUniform1f(glGetUniformLocation(darken_program, "light_radius"), light_radius);

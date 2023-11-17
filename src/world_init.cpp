@@ -156,7 +156,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
 		break;
 	}
 
-	//createShadow(renderer, entity, textureAsset, GEOMETRY_BUFFER_ID::SPRITE);
+	createShadow(renderer, entity, textureAsset, GEOMETRY_BUFFER_ID::SPRITE);
 
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
@@ -206,9 +206,13 @@ Entity createManaBar(RenderSystem* renderer, Entity& owner_entity)
 	return entity;
 }
 
-Entity createShadow(RenderSystem* renderer, Entity owner_entity, TEXTURE_ASSET_ID texture, GEOMETRY_BUFFER_ID geom)
+Entity createShadow(RenderSystem* renderer, Entity& owner_entity, TEXTURE_ASSET_ID texture, GEOMETRY_BUFFER_ID geom)
 {
 	auto entity = Entity();
+
+	Shadow& shadow = registry.shadows.emplace(entity);
+	shadow.owner = owner_entity;
+	shadow.active = false;
 
 	Mesh& mesh = renderer->getMesh(geom);
 	registry.meshPtrs.emplace(entity, &mesh);
@@ -218,8 +222,6 @@ Entity createShadow(RenderSystem* renderer, Entity owner_entity, TEXTURE_ASSET_I
 	position.position = owner_position.position;
 	position.scale = owner_position.scale;
 
-	Shadow& shadow = registry.shadows.emplace(entity);
-	shadow.owner = owner_entity;
 	registry.renderRequests.insert(
 		entity,
 		{ texture,

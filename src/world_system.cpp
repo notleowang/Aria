@@ -216,33 +216,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			screen.apply_spotlight = false;
 		}
 	}
-
-	updateShadows();
-
 	return true;
-}
-
-void WorldSystem::updateShadows() {
-	Entity player_entity = registry.players.entities[0];
-	Position& player_position = registry.positions.get(player_entity);
-	for (uint i = 0; i < registry.shadows.entities.size(); i++) {
-		Entity entity = registry.shadows.entities[i];
-		Shadow& shadow = registry.shadows.get(entity);
-
-		Entity owner_entity = shadow.owner;
-
-		Position& shadow_pos = registry.positions.get(entity);
-		if (!registry.positions.has(owner_entity)) {
-			registry.remove_all_components_of(entity);
-			continue;
-		}
-		Position& owner_pos = registry.positions.get(owner_entity);
-
-		shadow_pos.position = owner_pos.position;
-		shadow_pos.position.y += owner_pos.scale.y/2;
-		shadow_pos.angle = -atan2(shadow_pos.position.y - player_position.position.y, shadow_pos.position.x - player_position.position.x);
-		// update angle here
-	}
 }
 
 // Reset the world state to its initial state

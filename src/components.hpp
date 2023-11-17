@@ -53,6 +53,7 @@ struct Terrain
 struct Shadow
 {
 	Entity owner;
+	bool active;
 };
 
 // Exit door
