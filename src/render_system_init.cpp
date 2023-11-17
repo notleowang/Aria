@@ -223,11 +223,10 @@ void RenderSystem::initializePowerUpBlockSpriteSheet()
 	sprite_sheets[ss_index].states = states;
 }
 
-void RenderSystem::initializeProjectileSpriteSheet()
+void RenderSystem::initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols)
 {
 	int num_rows = 1;
-	int num_cols = 4;
-	int ss_index = (int)SPRITE_SHEET_DATA_ID::PROJECTILE;
+	int ss_index = (int)ss_id;
 
 	std::vector<AnimState> states((int)PROJECTILE_STATES::STATE_COUNT);
 	states[(int)PROJECTILE_STATES::MOVING] = AnimState(0, num_cols - 1);
@@ -258,7 +257,11 @@ void RenderSystem::initializePlayerSpriteSheet()
 void RenderSystem::initializeSpriteSheets()
 {
 	initializePowerUpBlockSpriteSheet();
-	initializeProjectileSpriteSheet();
+	// !!! LEO: change the num_cols parameter here based on the sprite sheet
+	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::WATER_PROJECTILE, 4);
+	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::FIRE_PROJECTILE, 5);
+	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET, 1);
+	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET, 1);
 	initializePlayerSpriteSheet();
 }
 
@@ -381,9 +384,11 @@ void RenderSystem::initializeExitDoorGeometryBuffer()
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::EXIT_DOOR, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
 }
 
-void RenderSystem::initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID geom_buffer_id, int num_rows, int num_cols)
+void RenderSystem::initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID geom_buffer_id, SPRITE_SHEET_DATA_ID ss_id)
 {
 	int geom_index = (int)geom_buffer_id;
+	int num_rows = sprite_sheets[(int)ss_id].num_rows;
+	int num_cols = sprite_sheets[(int)ss_id].num_cols;
 
 	// square aspect ratio
 	std::vector<TexturedVertex> textured_vertices(4);
@@ -454,19 +459,13 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeScreenTriangleGeometryBuffer();
 	initializeTerrainGeometryBuffer();
 	initializeExitDoorGeometryBuffer();
-	// function initializeAnimations must be called before this point
-	initializeSpriteSheetGeometryBuffer(
-		GEOMETRY_BUFFER_ID::PROJECTILE, 
-		sprite_sheets[(int)SPRITE_SHEET_DATA_ID::PROJECTILE].num_rows,
-		sprite_sheets[(int)SPRITE_SHEET_DATA_ID::PROJECTILE].num_cols);
-	initializeSpriteSheetGeometryBuffer(
-		GEOMETRY_BUFFER_ID::POWER_UP_BLOCK, 
-		sprite_sheets[(int)SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK].num_rows,
-		sprite_sheets[(int)SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK].num_cols);
-	initializeSpriteSheetGeometryBuffer(
-		GEOMETRY_BUFFER_ID::PLAYER,
-		sprite_sheets[(int)SPRITE_SHEET_DATA_ID::PLAYER].num_rows,
-		sprite_sheets[(int)SPRITE_SHEET_DATA_ID::PLAYER].num_cols);
+	// function initializeSpriteSheets must be called before this point
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FIRE_PROJECTILE, SPRITE_SHEET_DATA_ID::FIRE_PROJECTILE);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::WATER_PROJECTILE, SPRITE_SHEET_DATA_ID::WATER_PROJECTILE);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::EARTH_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIGHTNING_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::POWER_UP_BLOCK, SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PLAYER, SPRITE_SHEET_DATA_ID::PLAYER);
 	initializeResourceBarGeometryBuffer();
 }
 
