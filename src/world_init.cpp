@@ -294,51 +294,51 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType, bool hostile, Entity& player) {
 	auto entity = Entity();
 
-	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::PROJECTILE);
-	registry.meshPtrs.emplace(entity, &mesh);
-
-	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PROJECTILE);
-	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
-
-	Animation& animation = registry.animations.emplace(entity);
-	animation.sprite_sheet_ptr = &sprite_sheet;
-	animation.setState((int)PROJECTILE_STATES::MOVING);
-
 	Projectile& projectile = registry.projectiles.emplace(entity);
 	projectile.type = elementType;
 	projectile.hostile = hostile;
 
 	TEXTURE_ASSET_ID textureAsset;
-	EFFECT_ASSET_ID effectAsset;
 	GEOMETRY_BUFFER_ID geometryBuffer;
+	SPRITE_SHEET_DATA_ID spriteSheet;
 	switch (projectile.type) {
 		case ElementType::WATER:
 			textureAsset = TEXTURE_ASSET_ID::WATER_PROJECTILE_SHEET;
-			effectAsset = EFFECT_ASSET_ID::ANIMATED;
-			geometryBuffer = GEOMETRY_BUFFER_ID::PROJECTILE;
+			geometryBuffer = GEOMETRY_BUFFER_ID::WATER_PROJECTILE;
+			spriteSheet = SPRITE_SHEET_DATA_ID::WATER_PROJECTILE;
 			break;
 		case ElementType::FIRE:
 			textureAsset = TEXTURE_ASSET_ID::FIRE_PROJECTILE_SHEET;
-			effectAsset = EFFECT_ASSET_ID::ANIMATED;
-			geometryBuffer = GEOMETRY_BUFFER_ID::PROJECTILE;
+			geometryBuffer = GEOMETRY_BUFFER_ID::FIRE_PROJECTILE;
+			spriteSheet = SPRITE_SHEET_DATA_ID::FIRE_PROJECTILE;
 			break;
 		case ElementType::EARTH:
-			textureAsset = TEXTURE_ASSET_ID::EARTH_PROJECTILE;
-			effectAsset = EFFECT_ASSET_ID::TEXTURED;
-			geometryBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+			textureAsset = TEXTURE_ASSET_ID::EARTH_PROJECTILE_SHEET;
+			geometryBuffer = GEOMETRY_BUFFER_ID::EARTH_PROJECTILE_SHEET;
+			spriteSheet = SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET;
 			break;
 		case ElementType::LIGHTNING:
-			textureAsset = TEXTURE_ASSET_ID::LIGHTNING_PROJECTILE;
-			effectAsset = EFFECT_ASSET_ID::TEXTURED;
-			geometryBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+			textureAsset = TEXTURE_ASSET_ID::LIGHTNING_PROJECTILE_SHEET;
+			geometryBuffer = GEOMETRY_BUFFER_ID::LIGHTNING_PROJECTILE_SHEET;
+			spriteSheet = SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET;
 			break;
 		default:
 			textureAsset = TEXTURE_ASSET_ID::WATER_PROJECTILE_SHEET;
-			effectAsset = EFFECT_ASSET_ID::ANIMATED;
-			geometryBuffer = GEOMETRY_BUFFER_ID::PROJECTILE;
+			geometryBuffer = GEOMETRY_BUFFER_ID::WATER_PROJECTILE;
+			spriteSheet = SPRITE_SHEET_DATA_ID::WATER_PROJECTILE;
 			break;
 	}
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(geometryBuffer);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(spriteSheet);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)PROJECTILE_STATES::MOVING);
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = vel;
@@ -359,7 +359,7 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 	registry.renderRequests.insert(
 		entity,
 		{	textureAsset,
-			effectAsset,
+			EFFECT_ASSET_ID::ANIMATED,
 			geometryBuffer });
 	return entity;
 }
