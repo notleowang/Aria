@@ -67,7 +67,8 @@ class RenderSystem {
 		shader_path("exit_door"),
 		shader_path("resource_bar"),
 		shader_path("text_2d"),
-		shader_path("animated")
+		shader_path("animated"),
+		shader_path("shadow")
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;

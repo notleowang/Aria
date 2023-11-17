@@ -48,6 +48,13 @@ struct Terrain
 	bool moveable = false;
 };
 
+
+// Shadow of the owner entity
+struct Shadow
+{
+	Entity owner;
+};
+
 // Exit door
 struct ExitDoor
 {
@@ -304,7 +311,8 @@ enum class EFFECT_ASSET_ID {
 	RESOURCE_BAR = EXIT_DOOR + 1,
 	TEXT_2D = RESOURCE_BAR + 1,
 	ANIMATED = TEXT_2D + 1,
-	EFFECT_COUNT = ANIMATED + 1
+	SHADOW = ANIMATED + 1,
+	EFFECT_COUNT = SHADOW + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 

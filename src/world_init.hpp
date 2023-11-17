@@ -38,6 +38,8 @@ Entity createManaBar(RenderSystem* renderer, Entity& owner_entity);
 
 Entity createFloor(RenderSystem* renderer, vec2 pos);
 
+Entity createShadow(RenderSystem* renderer, Entity owner_entity, TEXTURE_ASSET_ID texture, GEOMETRY_BUFFER_ID geom);
+
 // test
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos);
 
