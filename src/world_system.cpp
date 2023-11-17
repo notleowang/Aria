@@ -40,11 +40,6 @@ WorldSystem::~WorldSystem() {
 	// Destroy all created components
 	registry.clear_all_components();
 
-	// remove ImGui resources
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
-
 	// Close the window
 	glfwDestroyWindow(window);
 }
