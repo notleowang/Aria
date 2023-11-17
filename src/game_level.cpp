@@ -159,58 +159,6 @@ bool GameLevel::init(uint level) {
 
 		this->exit_door_pos = vec2(1450, 900);
 		break;
-	case LEVEL_3:
-		this->player_starting_pos = vec2(50, 200);
-		terrains.push_back(std::make_pair(vec4(0, 0, 800, 100), false));
-		terrains.push_back(std::make_pair(vec4(-350, 650, 100, 1200), false));
-		terrains.push_back(std::make_pair(vec4(300, 1200, 1200, 100), false));
-		terrains.push_back(std::make_pair(vec4(450, 200, 100, 500), false));
-		terrains.push_back(std::make_pair(vec4(200, 500, 600, 100), false));
-		terrains.push_back(std::make_pair(vec4(650, 500, 1000, 100), false));
-		terrains.push_back(std::make_pair(vec4(1200, 1250, 100, 1600), false));
-		terrains.push_back(std::make_pair(vec4(900, 1600, 100, 900), false));
-		terrains.push_back(std::make_pair(vec4(1050, 2000, 250, 100), false));
-
-		enemies.push_back({ 50, 900, 100, 100, 0, 0 });
-		enemies.push_back({ 450, 900, 100, 100, 0, 0 });
-		enemies.push_back({ 850, 900, 100, 100, 0, 0 });
-		enemies.push_back({ 1000, 1400, 100, 100, 0, 0 });
-		enemies.push_back({ 1000, 1550, 100, 100, 0, 0 });
-		enemies.push_back({ 1000, 1700, 100, 100, 0, 0 });
-		enemies.push_back({ 1000, 1850, 100, 100, 0, 0 });
-
-		this->exit_door_pos = vec2(1050, 2000);
-	case LEVEL_4:
-		this->player_starting_pos = vec2(200, 700);
-
-		terrains.push_back(std::make_pair(vec4(900, 0, 1800, 100), false));
-		terrains.push_back(std::make_pair(vec4(50, 500, 100, 900), false));
-		terrains.push_back(std::make_pair(vec4(900, 1000, 1800, 100), false));
-		terrains.push_back(std::make_pair(vec4(1750, 500, 100, 900), false));
-		terrains.push_back(std::make_pair(vec4(400, 700, 100, 600), false));
-		terrains.push_back(std::make_pair(vec4(800, 300, 100, 600), false));
-		terrains.push_back(std::make_pair(vec4(1200, 700, 100, 600), false));
-
-		terrains.push_back(std::make_pair(vec4(200, 500, 50, 100), true));
-		terrains.push_back(std::make_pair(vec4(550, 500, 50, 100), true));
-		terrains.push_back(std::make_pair(vec4(800, 500, 50, 100), true));
-		terrains.push_back(std::make_pair(vec4(1150, 500, 50, 100), true));
-
-		enemies.push_back({ 350, 250, 100, 100, 0, 0 });
-		enemies.push_back({ 700, 800, 100, 100, 0, 0 });
-		enemies.push_back({ 950, 800, 100, 100, 0, 0 });
-		enemies.push_back({ 1100, 250, 100, 100, 0, 0 });
-
-		for (uint i = 0; i < 6; i++) {
-			for (uint j = 0; j < 4; j++) {
-				floors.push_back(vec2(225 + i * 250, 175 + j * 250));
-			}
-		}
-		for (uint i = 0; i < 4; i++) {
-			floors.push_back(vec2(1600, 175 + i * 250));
-		}
-
-		this->exit_door_pos = vec2(1500, 950);
 	default:
 		printf("no level provided\n");
 		break;
