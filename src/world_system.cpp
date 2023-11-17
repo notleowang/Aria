@@ -302,6 +302,7 @@ void WorldSystem::restart_game() {
 	createExitDoor(renderer, exit_door_pos);
 
 	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
+
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 }
