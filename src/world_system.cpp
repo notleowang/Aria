@@ -212,8 +212,32 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	updateShadows();
 
 	return true;
+}
+
+void WorldSystem::updateShadows() {
+	Entity player_entity = registry.players.entities[0];
+	Position& player_position = registry.positions.get(player_entity);
+	for (uint i = 0; i < registry.shadows.entities.size(); i++) {
+		Entity entity = registry.shadows.entities[i];
+		Shadow& shadow = registry.shadows.get(entity);
+
+		Entity owner_entity = shadow.owner;
+
+		Position& shadow_pos = registry.positions.get(entity);
+		if (!registry.positions.has(owner_entity)) {
+			registry.remove_all_components_of(entity);
+			continue;
+		}
+		Position& owner_pos = registry.positions.get(owner_entity);
+
+		shadow_pos.position = owner_pos.position;
+		shadow_pos.position.y += owner_pos.scale.y/2;
+		shadow_pos.angle = -atan2(shadow_pos.position.y - player_position.position.y, shadow_pos.position.x - player_position.position.x);
+		// update angle here
+	}
 }
 
 // Reset the world state to its initial state
@@ -407,6 +431,7 @@ void WorldSystem::handle_collisions() {
 		if (registry.enemies.has(entity) && registry.terrain.has(entity_other)) {
 			Position& enemy_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
+			Velocity& enemy_velocity = registry.velocities.get(entity);
       
 			// TODO: make sure enemy has all this stuff and this wont be awful
 			// TODO: REFACTOR
@@ -416,9 +441,11 @@ void WorldSystem::handle_collisions() {
 
 			if (collidedLeft(enemy_position, terrain_position) || collidedRight(enemy_position, terrain_position)) {
 				enemy_position.position.x = enemy_position.prev_position.x;
+				enemy_velocity.velocity.x *= -1;
 			}
 			else if (collidedTop(enemy_position, terrain_position) || collidedBottom(enemy_position, terrain_position)) {
 				enemy_position.position.y = enemy_position.prev_position.y;
+				enemy_velocity.velocity.y *= -1;
 			}
 			else { // Collided on diagonal, displace based on vector
 				enemy_position.position += collisionsRegistry.components[i].displacement;

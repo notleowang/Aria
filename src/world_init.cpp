@@ -49,6 +49,7 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	//powerUp.bounceOffWalls[ElementType::EARTH] = true;
 	//powerUp.bounceOffWalls[ElementType::LIGHTNING] = true;
 
+	//createShadow(renderer, entity, TEXTURE_ASSET_ID::PLAYER, GEOMETRY_BUFFER_ID::PLAYER);
 	registry.characterProjectileTypes.emplace(entity);
 	registry.players.emplace(entity);
 	registry.collidables.emplace(entity);
@@ -155,6 +156,8 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
 		break;
 	}
 
+	//createShadow(renderer, entity, textureAsset, GEOMETRY_BUFFER_ID::SPRITE);
+
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
@@ -199,6 +202,29 @@ Entity createManaBar(RenderSystem* renderer, Entity& owner_entity)
 		{ TEXTURE_ASSET_ID::MANA_BAR,
 			EFFECT_ASSET_ID::RESOURCE_BAR,
 			GEOMETRY_BUFFER_ID::RESOURCE_BAR });
+
+	return entity;
+}
+
+Entity createShadow(RenderSystem* renderer, Entity owner_entity, TEXTURE_ASSET_ID texture, GEOMETRY_BUFFER_ID geom)
+{
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(geom);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& owner_position = registry.positions.get(owner_entity);
+	Position& position = registry.positions.emplace(entity);
+	position.position = owner_position.position;
+	position.scale = owner_position.scale;
+
+	Shadow& shadow = registry.shadows.emplace(entity);
+	shadow.owner = owner_entity;
+	registry.renderRequests.insert(
+		entity,
+		{ texture,
+			EFFECT_ASSET_ID::SHADOW,
+			geom });
 
 	return entity;
 }
