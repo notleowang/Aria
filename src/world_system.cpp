@@ -406,6 +406,7 @@ void WorldSystem::handle_collisions() {
 		if (registry.enemies.has(entity) && registry.terrain.has(entity_other)) {
 			Position& enemy_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
+			Velocity& enemy_velocity = registry.velocities.get(entity);
       
 			// TODO: make sure enemy has all this stuff and this wont be awful
 			// TODO: REFACTOR
@@ -415,9 +416,11 @@ void WorldSystem::handle_collisions() {
 
 			if (collidedLeft(enemy_position, terrain_position) || collidedRight(enemy_position, terrain_position)) {
 				enemy_position.position.x = enemy_position.prev_position.x;
+				enemy_velocity.velocity.x *= -1;
 			}
 			else if (collidedTop(enemy_position, terrain_position) || collidedBottom(enemy_position, terrain_position)) {
 				enemy_position.position.y = enemy_position.prev_position.y;
+				enemy_velocity.velocity.y *= -1;
 			}
 			else { // Collided on diagonal, displace based on vector
 				enemy_position.position += collisionsRegistry.components[i].displacement;
