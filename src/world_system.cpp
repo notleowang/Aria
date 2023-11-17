@@ -6,6 +6,7 @@
 // stlib
 #include <cassert>
 #include <sstream>
+#include <iostream>
 
 #include "physics_system.hpp"
 using namespace std;
@@ -183,19 +184,20 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 	screen.screen_darken_factor = 1 - min_death_timer_ms / 3000;
-	float min_win_timer_ms = 1500.f;
+
 	for (Entity entity : registry.winTimers.entities) {
 		WinTimer& timer = registry.winTimers.get(entity);
+		timer.timer_ms = std::min(timer.timer_ms, timer.start_timer_ms);
 		timer.timer_ms -= elapsed_ms_since_last_update;
-		if (0< timer.timer_ms < min_win_timer_ms) {
-			min_win_timer_ms = timer.timer_ms;
+
+		if (timer.timer_ms > 0.f) {
 			screen.apply_spotlight = true;
-			screen.spotlight_radius = min_win_timer_ms/2000.f;
+			screen.spotlight_radius = timer.timer_ms / timer.start_timer_ms;
 		}
-		if (timer.timer_ms <= 0.f) {
-			min_win_timer_ms = timer.timer_ms;
+		else if (timer.timer_ms <= 0.f) {
 			screen.apply_spotlight = true;
-			screen.spotlight_radius = - min_win_timer_ms / 2000.f;
+			screen.spotlight_radius = -(timer.timer_ms / timer.start_timer_ms);
+
 			// Change level here
 			if (!timer.changedLevel) {
 				timer.changedLevel = true;
@@ -209,7 +211,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				restart_game();
 			}
 		}
-		if (timer.timer_ms <= -4000.f) {
+		else if (timer.timer_ms <= -timer.start_timer_ms) {
 			registry.winTimers.remove(entity);
 			screen.apply_spotlight = false;
 		}
@@ -514,9 +516,10 @@ void WorldSystem::handle_collisions() {
 			PowerUpBlock& powerUpBlock = registry.powerUpBlock.get(entity_other);
 			Position& blockPos = registry.positions.get(entity_other);
 
-			Animation& anim = registry.animations.get(entity_other);
-			anim.is_animating = false;
-			anim.rainbow_enabled = false;
+			Animation& animation = registry.animations.get(entity_other);
+			animation.setState((int)POWER_UP_BLOCK_STATES::INACTIVE);
+			animation.is_animating = false;
+			animation.rainbow_enabled = false;
 
 			*(powerUpBlock.powerUpToggle) = true;
 			printf("%s\n", powerUpBlock.powerUpText.c_str());
@@ -547,12 +550,16 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	Velocity& player_velocity = registry.velocities.get(player);
 	Position& player_position = registry.positions.get(player);
 	Direction& player_direction = registry.directions.get(player);
+	Animation& player_animation = registry.animations.get(player);
 
 	// get states of each arrow key
 	int state_up = glfwGetKey(window, GLFW_KEY_W);
 	int state_down = glfwGetKey(window, GLFW_KEY_S);
 	int state_left = glfwGetKey(window, GLFW_KEY_A);
 	int state_right = glfwGetKey(window, GLFW_KEY_D);
+
+	DIRECTION prev_direction = player_direction.direction;
+	bool was_mirrored = player_position.scale.x < 0;
 
 	DIRECTION new_direction = DIRECTION::NONE;
 
@@ -613,14 +620,28 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		}
 	}
 
-	// set the player velocity based on the new_direction
+	// player is moving
 	if (new_direction != DIRECTION::NONE) {
+		// velocity
 		player_direction.direction = new_direction;
 		PowerUp& player_powerUp = registry.powerUps.get(player);
 		player_velocity = computeVelocity(player_powerUp.fasterMovement ? PLAYER_SPEED * 1.5 : PLAYER_SPEED, player_direction);
+
+		// animation
+		if (prev_direction != new_direction) {
+			int new_state = player_animation.sprite_sheet_ptr->getPlayerStateFromDirection(new_direction);
+			player_animation.setState(new_state);
+			bool mirror = player_animation.sprite_sheet_ptr->getPlayerMirrored(new_direction);
+			if (was_mirrored != mirror) {
+				player_position.scale.x *= -1;
+			}
+		}
+		player_animation.is_animating = true;
 	}
+	// player is stopped
 	else {
 		player_velocity = computeVelocity(0.0, player_direction);
+		player_animation.is_animating = false;
 	}
 
 	// Resetting game
