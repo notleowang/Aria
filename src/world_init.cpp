@@ -100,6 +100,7 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, bool moveable)
 		Velocity& velocity = registry.velocities.emplace(entity);
 		velocity.velocity = { 200.f, 0.f };
 	}
+
 	registry.collidables.emplace(entity); // Marking terrain as collidable
 	registry.renderRequests.insert(
 		entity, 
@@ -221,6 +222,7 @@ Entity createShadow(RenderSystem* renderer, Entity& owner_entity, TEXTURE_ASSET_
 	Position& position = registry.positions.emplace(entity);
 	position.position = owner_position.position;
 	position.scale = owner_position.scale;
+	shadow.original_size = position.scale;
 
 	registry.renderRequests.insert(
 		entity,

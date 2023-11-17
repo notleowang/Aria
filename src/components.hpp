@@ -54,6 +54,7 @@ struct Shadow
 {
 	Entity owner;
 	bool active;
+	vec2 original_size;
 };
 
 // Exit door
