@@ -235,10 +235,14 @@ void WorldSystem::restart_game() {
 	registry.list_all_components();
 	printf("Restarting\n");
 
-	// hacky solution to persist player attributes after restart
+	// hacky solution to persist player components after restart
 	bool persistPowerUps = registry.powerUps.has(player);
 	PowerUp persistedPowerUps;
 	if (persistPowerUps) persistedPowerUps = registry.powerUps.get(player);
+
+	bool persistProjectileType = registry.characterProjectileTypes.has(player);
+	CharacterProjectileType persistedProjectileType;
+	if (persistProjectileType) persistedProjectileType = registry.characterProjectileTypes.get(player);
 
 	// !!!
 	// Remove all entities that we created
@@ -271,7 +275,10 @@ void WorldSystem::restart_game() {
 	}
 
 	player = createAria(renderer, player_starting_pos);
+
+	// ADD BACK THE PERSISTED COMPONENTS
 	if (persistPowerUps) registry.powerUps.get(player) = persistedPowerUps;
+	if (persistProjectileType) registry.characterProjectileTypes.get(player) = persistedProjectileType;
 
 	for (uint i = 0; i < terrains_attrs.size(); i++) {
 		vec4 terrain_i = terrains_attrs[i].first;
