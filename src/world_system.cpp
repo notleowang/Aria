@@ -445,17 +445,28 @@ void WorldSystem::handle_collisions() {
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
 			Resources& enemy_resource = registry.resources.get(entity_other);
 			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
-			if (isWeakTo(registry.enemies.get(entity_other).type, registry.projectiles.get(entity).type)) {
-				damage_dealt *= 2;
+
+			if (registry.enemies.get(entity_other).type == registry.projectiles.get(entity).type) {
+				enemy_resource.currentHealth += damage_dealt / 2; // regen half of the damage worth of health
+				if (enemy_resource.currentHealth > enemy_resource.maxHealth) enemy_resource.currentHealth = enemy_resource.maxHealth;
 			}
-			enemy_resource.currentHealth -= damage_dealt;
+			else {
+				if (isWeakTo(registry.enemies.get(entity_other).type, registry.projectiles.get(entity).type)) {
+					damage_dealt *= 2;
+				}
+				enemy_resource.currentHealth -= damage_dealt;
+			}
+
+			registry.remove_all_components_of(entity); // delete projectile
+
 			printf("enemy hp: %f\n", enemy_resource.currentHealth);
+
+			// remove enemy if health <= 0
 			if (enemy_resource.currentHealth <= 0) {
 				registry.remove_all_components_of(enemy_resource.healthBar);
 				registry.remove_all_components_of(entity_other);
 				Mix_PlayChannel(-1, enemy_death_sound, 0);
 			}
-			registry.remove_all_components_of(entity);
 		}
 
 		// Checking Projectile - Player collisions
