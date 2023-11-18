@@ -217,6 +217,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// create exit door once all enemies are dead
+	if (registry.enemies.entities.size() == 0 && registry.exitDoors.entities.size() == 0) 
+		createExitDoor(renderer, this->curr_level.getExitDoorPos());
 
 	return true;
 }
@@ -251,7 +254,6 @@ void WorldSystem::restart_game() {
 
 	GameLevel current_level = this->curr_level;
 	vec2 player_starting_pos = current_level.getPlayerStartingPos();
-	vec2 exit_door_pos = current_level.getExitDoorPos();
 	std::vector<vec2> floor_pos = current_level.getFloorPos();
 	std::vector<std::pair<vec4, bool>> terrains_attrs = current_level.getTerrains();
 	std::vector<std::string> texts = current_level.getTexts();
@@ -282,7 +284,6 @@ void WorldSystem::restart_game() {
 		createEnemy(renderer, vec2(enemy_i[0], enemy_i[1]), ElementType::FIRE); //TODO: pass the type as an enemy attribute
 	}
 
-	createExitDoor(renderer, exit_door_pos);
 	projectileSelectDisplay = createProjectileSelectDisplay(renderer, player, PROJECTILE_SELECT_DISPLAY_Y_OFFSET);
 
 	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
