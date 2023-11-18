@@ -120,6 +120,7 @@ private:
 	void drawToScreen();
 	void drawText(Entity entity);
 	void drawImGui();
+	void drawArsenal(Entity entity, const mat3& projection);
 
 	// Helper functions for initializeSpriteSheets()
 	void initializePowerUpBlockSpriteSheet();

@@ -258,6 +258,96 @@ void RenderSystem::drawToScreen()
 	gl_has_errors();
 }
 
+void RenderSystem::drawArsenal(Entity entity, const mat3& projection){
+	Position& position = registry.positions.get(entity);
+	Transform transform;
+	transform.translate(position.position);
+	transform.rotate(position.angle);
+	transform.scale(position.scale);
+
+	assert(registry.renderRequests.has(entity));
+	const RenderRequest& render_request = registry.renderRequests.get(entity);
+
+	const GLuint program = (GLuint)effects[(GLuint)EFFECT_ASSET_ID::ANIMATED];
+
+	// Setting shaders
+	glUseProgram(program);
+	gl_has_errors();
+
+	assert(render_request.used_geometry != GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
+	const GLuint vbo = vertex_buffers[(GLuint)render_request.used_geometry];
+	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+	GLint in_position_loc = glGetAttribLocation(program, "in_position");
+	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+	gl_has_errors();
+	assert(in_texcoord_loc >= 0);
+
+	glEnableVertexAttribArray(in_position_loc);
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(TexturedVertex), (void*)0);
+	gl_has_errors();
+
+	glEnableVertexAttribArray(in_texcoord_loc);
+	glVertexAttribPointer(
+		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
+		(void*)sizeof(
+			vec3)); // note the stride to skip the preceeding vertex position
+
+	// Enabling and binding texture to slot 0
+	glActiveTexture(GL_TEXTURE0);
+	gl_has_errors();
+
+	assert(registry.renderRequests.has(entity));
+	GLuint texture_id =
+		texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
+
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+	gl_has_errors();
+
+	assert(registry.animations.has(entity));
+	Animation& animation = registry.animations.get(entity);
+	assert(animation.sprite_sheet_ptr != nullptr);
+	glUniform1f(glGetUniformLocation(program, "time"), (float)(glfwGetTime() * 10.0f));
+	glUniform1i(glGetUniformLocation(program, "frame_col"), animation.getColumn());
+	glUniform1i(glGetUniformLocation(program, "frame_row"), animation.getRow());
+	glUniform1f(glGetUniformLocation(program, "frame_width"), animation.sprite_sheet_ptr->getFrameSizeInTexcoords().x);
+	glUniform1f(glGetUniformLocation(program, "frame_height"), animation.sprite_sheet_ptr->getFrameSizeInTexcoords().y);
+	glUniform1i(glGetUniformLocation(program, "rainbow_enabled"), animation.rainbow_enabled);
+	gl_has_errors();
+
+	// Getting uniform locations for glUniform* calls
+	GLint color_uloc = glGetUniformLocation(program, "fcolor");
+	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
+	glUniform3fv(color_uloc, 1, (float*)&color);
+	gl_has_errors();
+
+	// Get number of indices from index buffer, which has elements uint16_t
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+	gl_has_errors();
+
+	GLsizei num_indices = size / sizeof(uint16_t);
+	// GLsizei num_triangles = num_indices / 3;
+
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	// Setting uniform values to the currently bound program
+	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
+	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	gl_has_errors();
+	// Drawing of num_indices/3 triangles specified in the index buffer
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+	gl_has_errors();
+}
+
 void RenderSystem::drawImGui()
 {
 	ImGui::Render();
@@ -311,7 +401,9 @@ void RenderSystem::draw()
 	// Draw all textured meshes that have a position and size component
 	for (Entity entity : registry.renderRequests.entities)
 	{
-		if (!registry.positions.has(entity) || registry.texts.has(entity) || registry.shadows.has(entity) || registry.floors.has(entity))
+		if (!registry.positions.has(entity) || registry.texts.has(entity) || 
+			registry.shadows.has(entity) || registry.floors.has(entity) ||
+			registry.projectileSelectDisplays.has(entity))
 			continue;
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize
@@ -325,6 +417,10 @@ void RenderSystem::draw()
 	for (Entity entity : registry.texts.entities)
 	{
 		drawText(entity);
+	}
+
+	for (Entity entity : registry.projectileSelectDisplays.entities) {
+		drawArsenal(entity, camera.projectionMat);
 	}
   
 	// Render ImGui to screen

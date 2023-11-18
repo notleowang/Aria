@@ -236,6 +236,9 @@ Entity createShadow(RenderSystem* renderer, Entity& owner_entity, TEXTURE_ASSET_
 			EFFECT_ASSET_ID::SHADOW,
 			geom });
 
+	return entity;
+}
+
 Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entity, float y_offset)
 {
 	auto entity = Entity();
