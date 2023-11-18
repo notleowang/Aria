@@ -513,12 +513,15 @@ void WorldSystem::handle_collisions() {
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
 			Resources& enemy_resource = registry.resources.get(entity_other);
 			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
-      if (isWeakTo(registry.enemies.get(entity_other).type, registry.projectiles.get(entity).type)) {
-				damage_dealt *= 3;
-        enemy_resource.currentHealth -= damage_dealt;
-      } else if (registry.enemies.get(entity_other).type == registry.projectiles.get(entity).type) {
-        enemy_resource.currentHealth = std::min(enemy_resource.maxHealth, enemy_resource.currentHealth + damage_dealt / 2); // regen half of the damage worth of health
-      }
+			if (registry.enemies.get(entity_other).type == registry.projectiles.get(entity).type) {
+				enemy_resource.currentHealth = std::min(enemy_resource.maxHealth, enemy_resource.currentHealth + damage_dealt / 2);
+			}
+			else {
+				if (isWeakTo(registry.enemies.get(entity_other).type, registry.projectiles.get(entity).type)) {
+					damage_dealt *= 3;
+				}
+				enemy_resource.currentHealth -= damage_dealt;
+			}
       
 			registry.remove_all_components_of(entity); // delete projectile
 
