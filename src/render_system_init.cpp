@@ -483,6 +483,7 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIGHTNING_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::POWER_UP_BLOCK, SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PLAYER, SPRITE_SHEET_DATA_ID::PLAYER);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PROJECTILE_SELECT_DISPLAY, SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY);
 	initializeResourceBarGeometryBuffer();
 }
 
