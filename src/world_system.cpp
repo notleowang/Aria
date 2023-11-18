@@ -472,7 +472,7 @@ void WorldSystem::handle_collisions() {
 			registry.remove_all_components_of(entity);
 		}
 
-		// Checking Projectile - Player collisions
+		// Checking Terrain - Projectile collisions
 		if (registry.terrain.has(entity_other) && registry.projectiles.has(entity)) {
 			Projectile& projectile = registry.projectiles.get(entity);
 
@@ -484,9 +484,11 @@ void WorldSystem::handle_collisions() {
 
 				if (collidedLeft(projectile_position, terrain_position) || collidedRight(projectile_position, terrain_position)) {
 					projectile_velocity.velocity.x *= -1;
+					projectile_position.angle = atan2(projectile_velocity.velocity.y, projectile_velocity.velocity.x);
 				}
 				else if (collidedTop(projectile_position, terrain_position) || collidedBottom(projectile_position, terrain_position)) {
 					projectile_velocity.velocity.y *= -1;
+					projectile_position.angle = atan2(projectile_velocity.velocity.y, projectile_velocity.velocity.x);
 				}
 			}
 			else {
