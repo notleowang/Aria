@@ -27,8 +27,8 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity);
-	resources.manaBar = createManaBar(renderer, entity);
+	resources.healthBar = createHealthBar(renderer, entity, PLAYER_HEALTH_BAR_Y_OFFSET);
+	resources.manaBar = createManaBar(renderer, entity, PLAYER_MANA_BAR_Y_OFFSET);
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
@@ -49,6 +49,7 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	powerUp.bounceOffWalls[ElementType::EARTH] = true;
 	powerUp.bounceOffWalls[ElementType::LIGHTNING] = true;*/
 
+	//createShadow(renderer, entity, TEXTURE_ASSET_ID::PLAYER, GEOMETRY_BUFFER_ID::PLAYER);
 	registry.characterProjectileTypes.emplace(entity);
 	registry.players.emplace(entity);
 	registry.collidables.emplace(entity);
@@ -70,6 +71,8 @@ Entity createFloor(RenderSystem* renderer, vec2 pos)
 	position.scale = vec2(250.f, 250.f);
 	// pos passed in to createFloor assumes top left corner is (x,y)
 	position.position = vec2(pos.x + position.scale.x/2, pos.y + position.scale.y/2);
+
+	Floor& floor = registry.floors.emplace(entity);
 
 	registry.renderRequests.insert(
 		entity,
@@ -100,6 +103,7 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, bool moveable)
 		Velocity& velocity = registry.velocities.emplace(entity);
 		velocity.velocity = { 200.f, 0.f };
 	}
+
 	registry.collidables.emplace(entity); // Marking terrain as collidable
 	registry.renderRequests.insert(
 		entity,
@@ -153,10 +157,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	velocity.velocity.x = 50;
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity);
-	
-	HealthBar& healthBar = registry.healthBars.get(resources.healthBar);
-	healthBar.y_offset = -50.f;
+	resources.healthBar = createHealthBar(renderer, entity, ENEMY_HEALTH_BAR_Y_OFFSET);
 
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy= enemyAttributes;
@@ -182,6 +183,8 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 		break;
 	}
 
+	createShadow(renderer, entity, textureAsset, GEOMETRY_BUFFER_ID::SPRITE);
+
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
@@ -192,15 +195,18 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	return entity;
 }
 
-Entity createHealthBar(RenderSystem* renderer, Entity& owner_entity)
+Entity createHealthBar(RenderSystem* renderer, Entity& owner_entity, float y_offset)
 {
 	auto entity = Entity();
 
 	HealthBar& healthBar = registry.healthBars.emplace(entity);
-	healthBar.owner = owner_entity;
 
 	Position& position = registry.positions.emplace(entity);
 	position.scale = vec2(RESOURCE_BAR_WIDTH, RESOURCE_BAR_HEIGHT);
+
+	Follower& follower = registry.followers.emplace(entity);
+	follower.owner = owner_entity;
+	follower.y_offset = y_offset;
 
 	registry.renderRequests.insert(
 		entity,
@@ -211,21 +217,81 @@ Entity createHealthBar(RenderSystem* renderer, Entity& owner_entity)
 	return entity;
 }
 
-Entity createManaBar(RenderSystem* renderer, Entity& owner_entity)
+Entity createManaBar(RenderSystem* renderer, Entity& owner_entity, float y_offset)
 {
 	auto entity = Entity();
 
 	ManaBar& manaBar = registry.manaBars.emplace(entity);
-	manaBar.owner = owner_entity;
 
 	Position& position = registry.positions.emplace(entity);
 	position.scale = vec2(RESOURCE_BAR_WIDTH, RESOURCE_BAR_HEIGHT);
+
+	Follower& follower = registry.followers.emplace(entity);
+	follower.owner = owner_entity;
+	follower.y_offset = y_offset;
 
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::MANA_BAR,
 			EFFECT_ASSET_ID::RESOURCE_BAR,
 			GEOMETRY_BUFFER_ID::RESOURCE_BAR });
+
+	return entity;
+}
+
+
+Entity createShadow(RenderSystem* renderer, Entity& owner_entity, TEXTURE_ASSET_ID texture, GEOMETRY_BUFFER_ID geom)
+{
+	auto entity = Entity();
+
+	Shadow& shadow = registry.shadows.emplace(entity);
+	shadow.owner = owner_entity;
+	shadow.active = false;
+
+	Mesh& mesh = renderer->getMesh(geom);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& owner_position = registry.positions.get(owner_entity);
+	Position& position = registry.positions.emplace(entity);
+	position.position = owner_position.position;
+	position.scale = owner_position.scale;
+	shadow.original_size = position.scale;
+
+	registry.renderRequests.insert(
+		entity,
+		{ texture,
+			EFFECT_ASSET_ID::SHADOW,
+			geom });
+
+	return entity;
+}
+
+Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entity, float y_offset)
+{
+	auto entity = Entity();
+
+	ProjectileSelectDisplay& display = registry.projectileSelectDisplays.emplace(entity);
+
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)ElementType::WATER);
+	animation.is_animating = false;
+
+	Position& position = registry.positions.emplace(entity);
+	position.scale = vec2(PROJECTILE_SELECT_DISPLAY_WIDTH, PROJECTILE_SELECT_DISPLAY_HEIGHT);
+
+	Follower& follower = registry.followers.emplace(entity);
+	follower.owner = owner_entity;
+	follower.y_offset = y_offset;
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::PROJECTILE_SELECT_DISPLAY,
+			EFFECT_ASSET_ID::ANIMATED,
+			GEOMETRY_BUFFER_ID::PROJECTILE_SELECT_DISPLAY });
 
 	return entity;
 }
@@ -302,7 +368,7 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity);
+	resources.healthBar = createHealthBar(renderer, entity, PLAYER_HEALTH_BAR_Y_OFFSET);
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;

@@ -128,19 +128,59 @@ bool shouldIgnoreCollision(Entity& entity_i, Entity& entity_j)
 	return false;
 }
 
+void updateShadows() {
+	Entity player_entity = registry.players.entities[0];
+	Position& player_position = registry.positions.get(player_entity);
+	for (uint i = 0; i < registry.shadows.entities.size(); i++) {
+		Entity entity = registry.shadows.entities[i];
+		Shadow& shadow = registry.shadows.get(entity);
+
+		Entity owner_entity = shadow.owner;
+
+		Position& shadow_pos = registry.positions.get(entity);
+		if (!registry.positions.has(owner_entity)) {
+			registry.remove_all_components_of(entity);
+			continue;
+		}
+		Position& owner_pos = registry.positions.get(owner_entity);
+		shadow.active = true;
+
+		if (distance((shadow_pos.position / vec2(window_width_px, window_height_px)), 
+			(player_position.position / vec2(window_width_px, window_height_px))) > light_radius) {
+			shadow.active = false;
+		}
+
+		shadow_pos.position = owner_pos.position;
+		shadow_pos.angle = atan2(shadow_pos.position.y - player_position.position.y, shadow_pos.position.x - player_position.position.x) + M_PI / 2;
+		shadow_pos.position.x += cos(shadow_pos.angle - M_PI / 2) * owner_pos.scale.x / 2;
+		shadow_pos.position.y += sin(shadow_pos.angle - M_PI / 2) * owner_pos.scale.y / 2;
+
+		float x_dist = abs(shadow_pos.position.x - player_position.position.x);
+		float y_dist = abs(shadow_pos.position.y - player_position.position.y);
+		shadow_pos.scale.x = shadow.original_size.x * std::min(1.0, (0.7 + abs(sin(shadow_pos.angle - M_PI / 2)) * 0.3));
+		shadow_pos.scale.y = shadow.original_size.y * std::min(1.0, (0.7 + abs(cos(shadow_pos.angle - M_PI / 2)) * 0.3));
+
+		// enemy sprites are not sprite sheets yet so adding this here
+		shadow_pos.angle = 0;
+	}
+}
+
 void PhysicsSystem::step(float elapsed_ms)
 {
 	auto& velocity_container = registry.velocities;
 	for (uint i = 0; i < velocity_container.size(); i++)
 	{
-		Velocity& velocity = velocity_container.components[i];
 		Entity entity = velocity_container.entities[i];
+		Velocity& velocity = velocity_container.get(entity);
 		Position& position = registry.positions.get(entity);
 		float step_seconds = elapsed_ms / 1000.f;
 		position.prev_position = position.position;
 		position.position[0] += step_seconds * velocity.velocity[0];
 		position.position[1] += step_seconds * velocity.velocity[1];
 	}
+
+	// Update shadows
+	updateShadows();
 
 	// Check for collisions between things that are collidable
 	auto& collidables_container = registry.collidables;
@@ -159,29 +199,13 @@ void PhysicsSystem::step(float elapsed_ms)
 		}
 	}
 
-	// Position the health bars
-	auto& healthBarContainer = registry.healthBars;
-	for (int i = 0; i < healthBarContainer.size(); i++) {
-		HealthBar& healthBar = healthBarContainer.components[i];
-		Entity entity = healthBarContainer.entities[i];
-
+	// update position of entities that follow player or enemies to remove jitter
+	for (int i = 0; i < registry.followers.size(); i++) {
+		Follower& follower = registry.followers.components[i];
+		Entity entity = registry.followers.entities[i];
 		Position& position = registry.positions.get(entity);
-		Position& ownerPosition = registry.positions.get(healthBar.owner);
-
-		position.position.x = ownerPosition.position.x;
-		position.position.y = ownerPosition.position.y + healthBar.y_offset;
-	}
-	
-	// Position the mana bars
-	auto& manaBarContainer = registry.manaBars;
-	for (int i = 0; i < manaBarContainer.size(); i++) {
-		ManaBar& manaBar = manaBarContainer.components[i];
-		Entity entity = manaBarContainer.entities[i];
-
-		Position& position = registry.positions.get(entity);
-		Position& ownerPosition = registry.positions.get(manaBar.owner);
-
-		position.position.x = ownerPosition.position.x;
-		position.position.y = ownerPosition.position.y + manaBar.y_offset;
+		Position& owner_position = registry.positions.get(follower.owner);
+		position.position = owner_position.position;
+		position.position.y += follower.y_offset;
 	}
 }

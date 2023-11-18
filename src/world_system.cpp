@@ -82,9 +82,14 @@ GLFWwindow* WorldSystem::create_window() {
 
 	//TODO: Re-comment out to allow full screen
 	// Create the main window (for rendering, keyboard, and mouse input)
-	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-	window = glfwCreateWindow(mode->width, mode->height, "Aria", monitor, nullptr);
+	//GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	//const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+	//window = glfwCreateWindow(mode->width, mode->height, "Aria", monitor, nullptr);
+	
+	// for testing
+	GLFWmonitor* monitor = nullptr; // glfwGetPrimaryMonitor();
+	//const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+	window = glfwCreateWindow(window_width_px, window_height_px, "Aria", monitor, nullptr);
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
@@ -225,6 +230,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	// create exit door once all enemies are dead
+	if (registry.enemies.entities.size() == 0 && registry.exitDoors.entities.size() == 0) 
+		createExitDoor(renderer, this->curr_level.getExitDoorPos());
 
 	return true;
 }
@@ -258,7 +266,6 @@ void WorldSystem::restart_game() {
 
 	GameLevel current_level = this->curr_level;
 	vec2 player_starting_pos = current_level.getPlayerStartingPos();
-	vec2 exit_door_pos = current_level.getExitDoorPos();
 	std::vector<vec2> floor_pos = current_level.getFloorPos();
 	std::vector<std::pair<vec4, bool>> terrains_attrs = current_level.getTerrains();
 	std::vector<std::string> texts = current_level.getTexts();
@@ -299,7 +306,7 @@ void WorldSystem::restart_game() {
 		createObstacle(renderer, pos, scale, vel);
 	}
 
-	createExitDoor(renderer, exit_door_pos);
+	projectileSelectDisplay = createProjectileSelectDisplay(renderer, player, PROJECTILE_SELECT_DISPLAY_Y_OFFSET);
 
 	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
 
@@ -419,14 +426,6 @@ void WorldSystem::handle_collisions() {
 			Position& player_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
 
-			// TODO: make sure player has all this stuff and this wont be awful
-			// TODO: REFACTOR
-			Resources& resources = registry.resources.get(entity);
-			HealthBar& health_bar = registry.healthBars.get(resources.healthBar);
-			ManaBar& mana_bar = registry.manaBars.get(resources.manaBar);
-			Position& health_bar_position = registry.positions.get(resources.healthBar);
-			Position& mana_bar_position = registry.positions.get(resources.manaBar);
-
 			if (collidedLeft(player_position, terrain_position) || collidedRight(player_position, terrain_position)) {
 				player_position.position.x = player_position.prev_position.x;
 
@@ -437,11 +436,6 @@ void WorldSystem::handle_collisions() {
 			else { // Collided on diagonal, displace based on vector
 				player_position.position += collisionsRegistry.components[i].displacement;
 			}
-			// update health bar position to remove jitter
-			health_bar_position.position = player_position.position;
-			health_bar_position.position.y += health_bar.y_offset;
-			mana_bar_position.position = player_position.position;
-			mana_bar_position.position.y += mana_bar.y_offset;
 		}
 		
 		
@@ -449,6 +443,7 @@ void WorldSystem::handle_collisions() {
 		if (registry.enemies.has(entity) && registry.terrain.has(entity_other)) {
 			Position& enemy_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
+			Velocity& enemy_velocity = registry.velocities.get(entity);
       
 			// TODO: make sure enemy has all this stuff and this wont be awful
 			// TODO: REFACTOR
@@ -458,17 +453,25 @@ void WorldSystem::handle_collisions() {
 
 			if (collidedLeft(enemy_position, terrain_position) || collidedRight(enemy_position, terrain_position)) {
 				enemy_position.position.x = enemy_position.prev_position.x;
+				enemy_velocity.velocity.x *= -1;
 			}
 			else if (collidedTop(enemy_position, terrain_position) || collidedBottom(enemy_position, terrain_position)) {
 				enemy_position.position.y = enemy_position.prev_position.y;
+				enemy_velocity.velocity.y *= -1;
 			}
 			else { // Collided on diagonal, displace based on vector
 				enemy_position.position += collisionsRegistry.components[i].displacement;
 			}
+		}
 
-			// update health bar position to remove jitter
-			health_bar_position.position = enemy_position.position;
-			health_bar_position.position.y += health_bar.y_offset;
+		// update position of entities that follow player or enemies to remove jitter
+		for (int i = 0; i < registry.followers.size(); i++) {
+			Follower& follower = registry.followers.components[i];
+			Entity entity = registry.followers.entities[i];
+			Position& position = registry.positions.get(entity);
+			Position& owner_position = registry.positions.get(follower.owner);
+			position.position = owner_position.position;
+			position.position.y += follower.y_offset;
 		}
 
 		// Checking Moveable Terrain - Terrain Collisions
@@ -510,17 +513,23 @@ void WorldSystem::handle_collisions() {
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
 			Resources& enemy_resource = registry.resources.get(entity_other);
 			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
-			if (isWeakTo(registry.enemies.get(entity_other).type, registry.projectiles.get(entity).type)) {
+      if (isWeakTo(registry.enemies.get(entity_other).type, registry.projectiles.get(entity).type)) {
 				damage_dealt *= 3;
-			}
-			enemy_resource.currentHealth -= damage_dealt;
+        enemy_resource.currentHealth -= damage_dealt;
+      } else if (registry.enemies.get(entity_other).type == registry.projectiles.get(entity).type) {
+        enemy_resource.currentHealth = std::min(enemy_resource.maxHealth, enemy_resource.currentHealth + damage_dealt / 2); // regen half of the damage worth of health
+      }
+      
+			registry.remove_all_components_of(entity); // delete projectile
+
 			printf("enemy hp: %f\n", enemy_resource.currentHealth);
+
+			// remove enemy if health <= 0
 			if (enemy_resource.currentHealth <= 0) {
 				registry.remove_all_components_of(enemy_resource.healthBar);
 				registry.remove_all_components_of(entity_other);
 				Mix_PlayChannel(-1, enemy_death_sound, 0);
 			}
-			registry.remove_all_components_of(entity);
 		}
 
 		// Checking Projectile - Player collisions
@@ -673,6 +682,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			characterProjectileType.projectileType = ElementType::LIGHTNING;
 			break;
 		}
+
+		Animation& select_display = registry.animations.get(projectileSelectDisplay);
+		select_display.setState((int)characterProjectileType.projectileType);
 	}
 
 	// player is moving

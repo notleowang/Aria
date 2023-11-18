@@ -55,6 +55,7 @@ class RenderSystem {
 			textures_path("power_up_block.png"),
 			textures_path("witch.png"),
 			textures_path("portal.png")
+			textures_path("projectile-select-display-purple.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -69,7 +70,8 @@ class RenderSystem {
 		shader_path("exit_door"),
 		shader_path("resource_bar"),
 		shader_path("text_2d"),
-		shader_path("animated")
+		shader_path("animated"),
+		shader_path("shadow")
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
@@ -120,12 +122,15 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
+	void drawText(Entity entity);
 	void drawImGui();
+	void drawArsenal(Entity entity, const mat3& projection);
 
-	// Helper functions for initializeAnimations()
+	// Helper functions for initializeSpriteSheets()
 	void initializePowerUpBlockSpriteSheet();
 	void initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols);
 	void initializePlayerSpriteSheet();
+	void initializeProjectileSelectDisplaySpriteSheet();
 
 	// Helper functions for initializeGlGeometryBuffers()
 	void initializePlayerGeometryBuffer();

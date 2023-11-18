@@ -9,13 +9,16 @@ using namespace std;
 // Aria component
 struct Player
 {
+
 };
+
 // All data relevant to elements and weaknesses
 enum ElementType {
 	WATER = 0,
 	FIRE = 1,
 	EARTH = 2,
-	LIGHTNING = 3
+	LIGHTNING = 3,
+	COUNT = 4
 };
 
 // Enemy component
@@ -54,6 +57,15 @@ struct Terrain
 	bool moveable = false;
 };
 
+
+// Shadow of the owner entity
+struct Shadow
+{
+	Entity owner;
+	bool active;
+	vec2 original_size;
+};
+
 // Exit door
 struct ExitDoor
 {
@@ -80,14 +92,23 @@ struct Resources
 
 struct HealthBar
 {
-	Entity owner;
-	float y_offset = -60.f;
+
 };
 
 struct ManaBar
 {
+
+};
+
+struct ProjectileSelectDisplay
+{
+
+};
+
+struct Follower
+{
 	Entity owner;
-	float y_offset = -75.f;
+	float y_offset = 0.f;
 };
 
 // Structure to store projectile entities
@@ -115,6 +136,10 @@ struct Position {
 // Data relevant to velocity of entities
 struct Velocity {
 	vec2 velocity = { 0.f, 0.f };
+};
+
+struct Floor {
+
 };
 
 
@@ -298,7 +323,8 @@ enum class TEXTURE_ASSET_ID {
 	POWER_UP_BLOCK = MANA_BAR + 1,
 	PLAYER = POWER_UP_BLOCK + 1,
 	PORTAL = PLAYER+1,
-	TEXTURE_COUNT = PORTAL + 1
+	PROJECTILE_SELECT_DISPLAY = PORTAL + 1,
+	TEXTURE_COUNT = PROJECTILE_SELECT_DISPLAY + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -307,13 +333,14 @@ enum class EFFECT_ASSET_ID {
 	COLOURED = PLAYER + 1,
 	SALMON = COLOURED + 1,
 	TEXTURED = SALMON + 1,
-	WATER = TEXTURED + 1,
-	TERRAIN = WATER + 1,
+	DARKEN = TEXTURED + 1,
+	TERRAIN = DARKEN + 1,
 	EXIT_DOOR = TERRAIN + 1,
 	RESOURCE_BAR = EXIT_DOOR + 1,
 	TEXT_2D = RESOURCE_BAR + 1,
 	ANIMATED = TEXT_2D + 1,
-	EFFECT_COUNT = ANIMATED + 1
+	SHADOW = ANIMATED + 1,
+	EFFECT_COUNT = SHADOW + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
@@ -332,7 +359,8 @@ enum class GEOMETRY_BUFFER_ID {
 	LIGHTNING_PROJECTILE_SHEET = EARTH_PROJECTILE_SHEET + 1,
 	POWER_UP_BLOCK = LIGHTNING_PROJECTILE_SHEET + 1,
 	PLAYER = POWER_UP_BLOCK + 1,
-	GEOMETRY_COUNT = PLAYER + 1
+	PROJECTILE_SELECT_DISPLAY = PLAYER + 1,
+	GEOMETRY_COUNT = PROJECTILE_SELECT_DISPLAY + 1
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 
@@ -344,7 +372,8 @@ enum class SPRITE_SHEET_DATA_ID {
 	LIGHTNING_PROJECTILE_SHEET = EARTH_PROJECTILE_SHEET + 1,
 	POWER_UP_BLOCK = LIGHTNING_PROJECTILE_SHEET + 1,
 	PLAYER = POWER_UP_BLOCK + 1,
-	SPRITE_SHEET_COUNT = PLAYER + 1
+	PROJECTILE_SELECT_DISPLAY = PLAYER + 1,
+	SPRITE_SHEET_COUNT = PROJECTILE_SELECT_DISPLAY + 1
 };
 const int sprite_sheet_count = (int)SPRITE_SHEET_DATA_ID::SPRITE_SHEET_COUNT;
 

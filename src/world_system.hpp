@@ -56,6 +56,7 @@ private:
 	// Game state
 	RenderSystem* renderer;
 	Entity player;
+	Entity projectileSelectDisplay;
 
 	GameLevel curr_level;
 	uint next_level;
