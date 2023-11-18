@@ -7,25 +7,28 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::ARIA);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::PLAYER);
 	registry.meshPtrs.emplace(entity, &mesh);
+
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PLAYER);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)PLAYER_SPRITE_STATES::EAST);
+	animation.is_animating = false; // initially stationary
 
 	// set initial component values
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
-	position.scale = vec2(100.f, 100.f);
+	position.scale = vec2(60.f, 100.f);
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
 	resources.healthBar = createHealthBar(renderer, entity);
-	resources.manaBar = createHealthBar(renderer, entity);
-	registry.healthBars.get(resources.manaBar).y_offset = -75.f;
-	registry.healthBars.get(resources.manaBar).isManaBar = true;
-	
-	HealthBar& healthBar = registry.healthBars.get(resources.healthBar);
-	healthBar.y_offset = -60.f;
+	resources.manaBar = createManaBar(renderer, entity);
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
@@ -46,14 +49,15 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	//powerUp.bounceOffWalls[ElementType::EARTH] = true;
 	//powerUp.bounceOffWalls[ElementType::LIGHTNING] = true;
 
+	//createShadow(renderer, entity, TEXTURE_ASSET_ID::PLAYER, GEOMETRY_BUFFER_ID::PLAYER);
 	registry.characterProjectileTypes.emplace(entity);
 	registry.players.emplace(entity);
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TODO: CHANGE TEXTURE OF ARIA
-			EFFECT_ASSET_ID::ARIA,
-			GEOMETRY_BUFFER_ID::ARIA});
+		{ TEXTURE_ASSET_ID::PLAYER,
+			EFFECT_ASSET_ID::ANIMATED,
+			GEOMETRY_BUFFER_ID::PLAYER});
 
 	return entity;
 }
@@ -64,8 +68,9 @@ Entity createFloor(RenderSystem* renderer, vec2 pos)
 
 	// set initial component values
 	Position& position = registry.positions.emplace(entity);
-	position.position = pos;
 	position.scale = vec2(250.f, 250.f);
+	// pos passed in to createFloor assumes top left corner is (x,y)
+	position.position = vec2(pos.x + position.scale.x/2, pos.y + position.scale.y/2);
 
 	registry.renderRequests.insert(
 		entity,
@@ -83,8 +88,10 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, bool moveable)
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::TERRAIN);
 	registry.meshPtrs.emplace(entity, &mesh);
 
+	// The position passed into createTerrain (x,y) assumes the top left corner
+	// and size corresponds to width and height
 	Position& position = registry.positions.emplace(entity);
-	position.position = pos;
+	position.position = vec2(pos.x + size.x/2, pos.y + size.y/2);
 	position.scale = size;
 
 	Terrain& terrain = registry.terrain.emplace(entity);
@@ -93,6 +100,7 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, bool moveable)
 		Velocity& velocity = registry.velocities.emplace(entity);
 		velocity.velocity = { 200.f, 0.f };
 	}
+
 	registry.collidables.emplace(entity); // Marking terrain as collidable
 	registry.renderRequests.insert(
 		entity, 
@@ -122,6 +130,9 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
 
 	Resources& resources = registry.resources.emplace(entity);
 	resources.healthBar = createHealthBar(renderer, entity);
+	
+	HealthBar& healthBar = registry.healthBars.get(resources.healthBar);
+	healthBar.y_offset = -50.f;
 
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy.type = enemyType;
@@ -146,6 +157,8 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
 		break;
 	}
 
+	createShadow(renderer, entity, textureAsset, GEOMETRY_BUFFER_ID::SPRITE);
+
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
@@ -156,7 +169,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
 	return entity;
 }
 
-Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity)
+Entity createHealthBar(RenderSystem* renderer, Entity& owner_entity)
 {
 	auto entity = Entity();
 
@@ -164,13 +177,58 @@ Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity)
 	healthBar.owner = owner_entity;
 
 	Position& position = registry.positions.emplace(entity);
-	position.scale = vec2(HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
+	position.scale = vec2(RESOURCE_BAR_WIDTH, RESOURCE_BAR_HEIGHT);
 
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::HEALTH_BAR,
-			EFFECT_ASSET_ID::HEALTH_BAR,
-			GEOMETRY_BUFFER_ID::HEALTH_BAR });
+			EFFECT_ASSET_ID::RESOURCE_BAR,
+			GEOMETRY_BUFFER_ID::RESOURCE_BAR });
+
+	return entity;
+}
+
+Entity createManaBar(RenderSystem* renderer, Entity& owner_entity)
+{
+	auto entity = Entity();
+
+	ManaBar& manaBar = registry.manaBars.emplace(entity);
+	manaBar.owner = owner_entity;
+
+	Position& position = registry.positions.emplace(entity);
+	position.scale = vec2(RESOURCE_BAR_WIDTH, RESOURCE_BAR_HEIGHT);
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::MANA_BAR,
+			EFFECT_ASSET_ID::RESOURCE_BAR,
+			GEOMETRY_BUFFER_ID::RESOURCE_BAR });
+
+	return entity;
+}
+
+Entity createShadow(RenderSystem* renderer, Entity& owner_entity, TEXTURE_ASSET_ID texture, GEOMETRY_BUFFER_ID geom)
+{
+	auto entity = Entity();
+
+	Shadow& shadow = registry.shadows.emplace(entity);
+	shadow.owner = owner_entity;
+	shadow.active = false;
+
+	Mesh& mesh = renderer->getMesh(geom);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& owner_position = registry.positions.get(owner_entity);
+	Position& position = registry.positions.emplace(entity);
+	position.position = owner_position.position;
+	position.scale = owner_position.scale;
+	shadow.original_size = position.scale;
+
+	registry.renderRequests.insert(
+		entity,
+		{ texture,
+			EFFECT_ASSET_ID::SHADOW,
+			geom });
 
 	return entity;
 }
@@ -182,8 +240,8 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	Position& position = registry.positions.emplace(entity);
-	position.position = pos;
 	position.scale = vec2(100.f, 100.f);
+	position.position = vec2(pos.x + position.scale.x/2, pos.y + position.scale.y/2);
 
 	registry.exitDoors.emplace(entity);
 	registry.collidables.emplace(entity);
@@ -202,8 +260,16 @@ Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp) 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::EXIT_DOOR);
 	registry.meshPtrs.emplace(entity, &mesh);
 
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)POWER_UP_BLOCK_STATES::ACTIVE);
+	animation.rainbow_enabled = true;
+
 	Position& position = registry.positions.emplace(entity);
-	position.position = vec2(window_width_px / 2, window_height_px / 2);
+	position.position = vec2(700, 300);
 	position.scale = vec2(100.f, 100.f);
 
 	PowerUpBlock& powerUpBlock = registry.powerUpBlock.emplace(entity);
@@ -213,9 +279,9 @@ Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp) 
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
-			EFFECT_ASSET_ID::EXIT_DOOR,
-			GEOMETRY_BUFFER_ID::EXIT_DOOR });
+		{ TEXTURE_ASSET_ID::POWER_UP_BLOCK,
+			EFFECT_ASSET_ID::ANIMATED,
+			GEOMETRY_BUFFER_ID::POWER_UP_BLOCK });
 
 	return entity;
 }
@@ -262,9 +328,12 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::PROJECTILE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	registry.animations.insert(
-		entity, 
-		Animation(PROJECTILE_SPRITESHEET_NUM_ROWS, PROJECTILE_SPRITESHEET_NUM_COLS));
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PROJECTILE);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)PROJECTILE_STATES::MOVING);
 
 	Projectile& projectile = registry.projectiles.emplace(entity);
 	projectile.type = elementType;

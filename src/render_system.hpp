@@ -49,7 +49,10 @@ class RenderSystem {
 			textures_path("water_projectile_spritesheet.png"),
 			textures_path("fire_projectile_spritesheet.png"),
 			textures_path("dungeon_tile.png"),
-			textures_path("health_bar.png")
+			textures_path("health_bar.png"),
+			textures_path("mana_bar.png"),
+			textures_path("power_up_block.png"),
+			textures_path("witch.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -62,14 +65,17 @@ class RenderSystem {
 		shader_path("screen_darken"),
 		shader_path("terrain"),
 		shader_path("exit_door"),
-		shader_path("health_bar"),
+		shader_path("resource_bar"),
 		shader_path("text_2d"),
-		shader_path("animated")
+		shader_path("animated"),
+		shader_path("shadow")
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
 	std::array<GLuint, geometry_count> index_buffers;
 	std::array<Mesh, geometry_count> meshes;
+
+	std::array<SpriteSheet, sprite_sheet_count> sprite_sheets;
 
 	GLuint vao;
 	std::unordered_map<GLchar, Character> Characters;
@@ -87,6 +93,9 @@ public:
 
 	void initializeGlMeshes();
 	Mesh& getMesh(GEOMETRY_BUFFER_ID id) { return meshes[(int)id]; };
+
+	void initializeSpriteSheets();
+	SpriteSheet& getSpriteSheet(SPRITE_SHEET_DATA_ID id) { return sprite_sheets[(int)id]; };
 
 	void initializeGlGeometryBuffers();
 	// Initialize the screen texture used as intermediate render target
@@ -108,16 +117,22 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
+	void drawText(Entity entity);
 
-	// Helper functions for initalizeGlGeometryBuffers()
+	// Helper functions for initializeAnimations()
+	void initializePowerUpBlockSpriteSheet();
+	void initializeProjectileSpriteSheet();
+	void initializePlayerSpriteSheet();
+
+	// Helper functions for initializeGlGeometryBuffers()
 	void initializePlayerGeometryBuffer();
 	void initializeSpriteGeometryBuffer();
 	void initializeDebugLineGeometryBuffer();
 	void initializeScreenTriangleGeometryBuffer();
 	void initializeTerrainGeometryBuffer();
 	void initializeExitDoorGeometryBuffer();
-	void initializeProjectileGeometryBuffer();
-	void initializeHealthBarGeometryBuffer();
+	void initializeResourceBarGeometryBuffer();
+	void initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID goem_buffer_id, int num_rows, int num_cols);
 
 	// Window handle
 	GLFWwindow* window;

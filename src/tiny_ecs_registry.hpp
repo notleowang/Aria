@@ -15,6 +15,7 @@ public:
 	ComponentContainer<WinTimer> winTimers;
 	ComponentContainer<Resources> resources;
 	ComponentContainer<HealthBar> healthBars;
+	ComponentContainer<ManaBar> manaBars;
 	ComponentContainer<Projectile> projectiles;
 	ComponentContainer<CharacterProjectileType> characterProjectileTypes;
 	ComponentContainer<Text> texts;
@@ -29,8 +30,10 @@ public:
 	ComponentContainer<PowerUp> powerUps;
 	ComponentContainer<PowerUpBlock> powerUpBlock;
 	ComponentContainer<Terrain> terrain;
+	ComponentContainer<Shadow> shadows;
 	ComponentContainer<ExitDoor> exitDoors;
 	ComponentContainer<Mesh*> meshPtrs;
+	ComponentContainer<SpriteSheet*> spriteSheetPtrs;
 	ComponentContainer<Animation> animations;
 	ComponentContainer<RenderRequest> renderRequests;
 	ComponentContainer<ScreenState> screenStates;
@@ -46,6 +49,7 @@ public:
 		registry_list.push_back(&texts);
 		registry_list.push_back(&resources);
 		registry_list.push_back(&healthBars);
+		registry_list.push_back(&manaBars);
 		registry_list.push_back(&characterProjectileTypes);
 		registry_list.push_back(&invulnerableTimers);
 		registry_list.push_back(&positions);
@@ -58,8 +62,10 @@ public:
 		registry_list.push_back(&powerUps);
 		registry_list.push_back(&powerUpBlock);
 		registry_list.push_back(&terrain);
+		registry_list.push_back(&shadows);
 		registry_list.push_back(&exitDoors);
 		registry_list.push_back(&meshPtrs);
+		registry_list.push_back(&spriteSheetPtrs);
 		registry_list.push_back(&animations);
 		registry_list.push_back(&renderRequests);
 		registry_list.push_back(&screenStates);

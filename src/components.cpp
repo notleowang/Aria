@@ -117,22 +117,84 @@ bool Mesh::loadFromOBJFile(std::string obj_path, std::vector<ColoredVertex>& out
 	return true;
 }
 
-vec2 Animation::getFrameSizeInTexcoords()
+int AnimState::getNumFrames()
+{
+	return (last + 1) - first;
+}
+
+int AnimState::getNextFrame(int curr_frame)
+{
+	if (curr_frame < first || curr_frame > last) {
+		return first;
+	}
+	return ((curr_frame - first + 1) % getNumFrames()) + first;
+}
+
+vec2 SpriteSheet::getFrameSizeInTexcoords()
 {
 	return vec2(1.f / num_cols, 1.f / num_rows);
 }
 
-int Animation::getNumFrames()
+int SpriteSheet::getNumFrames()
 {
 	return num_cols * num_rows;
 }
 
-int Animation::getColumn(int frame)
+int Animation::getColumn()
 {
-	return frame % num_cols;
+	return curr_frame % sprite_sheet_ptr->num_cols;
 }
 
-int Animation::getRow(int frame)
+int Animation::getRow()
 {
-	return floor((float)frame / num_cols);
+	return floor((float)curr_frame / sprite_sheet_ptr->num_cols);
+}
+
+void Animation::advanceFrame()
+{
+	AnimState state = sprite_sheet_ptr->states[curr_state_index];
+	curr_frame = state.getNextFrame(curr_frame);
+}
+
+void Animation::advanceState()
+{
+	curr_state_index = (curr_state_index + 1) % sprite_sheet_ptr->states.size();
+	curr_frame = sprite_sheet_ptr->states[curr_state_index].first;
+}
+
+void Animation::setState(int new_state_index)
+{
+	if (new_state_index >= 0 && new_state_index < sprite_sheet_ptr->states.size()) {
+		curr_state_index = new_state_index;
+		curr_frame = sprite_sheet_ptr->states[curr_state_index].first;
+	}
+}
+
+int SpriteSheet::getPlayerStateFromDirection(DIRECTION dir)
+{
+	switch (dir) {
+		case DIRECTION::N:
+			return (int)PLAYER_SPRITE_STATES::NORTH;
+		case DIRECTION::NE:
+			return (int)PLAYER_SPRITE_STATES::NORTH_EAST;
+		case DIRECTION::E:
+			return (int)PLAYER_SPRITE_STATES::EAST;
+		case DIRECTION::SE:
+			return (int)PLAYER_SPRITE_STATES::SOUTH_EAST;
+		case DIRECTION::S:
+			return (int)PLAYER_SPRITE_STATES::SOUTH;
+		case DIRECTION::SW:
+			return (int)PLAYER_SPRITE_STATES::SOUTH_EAST;
+		case DIRECTION::W:
+			return (int)PLAYER_SPRITE_STATES::EAST;
+		case DIRECTION::NW:
+			return (int)PLAYER_SPRITE_STATES::NORTH_EAST;
+		default:
+			return (int)PLAYER_SPRITE_STATES::EAST;
+	}
+}
+
+bool SpriteSheet::getPlayerMirrored(DIRECTION dir)
+{
+	return (dir == DIRECTION::SW || dir == DIRECTION::W || dir == DIRECTION::NW);
 }

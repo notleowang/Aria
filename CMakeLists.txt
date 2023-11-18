@@ -67,7 +67,13 @@ set_target_properties(${PROJECT_NAME} PROPERTIES ENABLE_EXPORTS 0)
 # External header-only libraries in the ext/
 target_include_directories(${PROJECT_NAME} PUBLIC ext/stb_image/)
 target_include_directories(${PROJECT_NAME} PUBLIC ext/gl3w)
-target_include_directories(${PROJECT_NAME} PUBLIC ext/freetype/include/)
+
+if(IS_OS_LINUX)
+  set(FREETYPE_INCLUDE_DIRS_LIN "${CMAKE_CURRENT_SOURCE_DIR}/ext/freetype/include")
+  set(FREETYPE_LIBRARIES_LIN "${CMAKE_CURRENT_SOURCE_DIR}/ext/freetype/lib/libfreetype.so")
+  target_include_directories(${PROJECT_NAME} PUBLIC ${FREETYPE_INCLUDE_DIRS_LIN})
+  target_link_libraries(${PROJECT_NAME} PUBLIC ${FREETYPE_LIBRARIES_LIN})
+endif()
 
 # Find OpenGL
 find_package(OpenGL REQUIRED)
@@ -174,8 +180,8 @@ if (NOT GLFW_FOUND OR NOT SDL2_FOUND OR NOT FREETYPE_FOUND)
       message(FATAL_ERROR "Can't find GLFW." )
    elseif (NOT SDL2_FOUND)
       message(FATAL_ERROR "Can't find SDL." )
-   else ()
-      message(FATAL_ERROR "Can't find freetype.")
+#   else ()
+#      message(FATAL_ERROR "Can't find freetype.")
       
    endif()
 endif()
@@ -189,4 +195,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${GLFW_LIBRARIES} ${SDL2_LIBRARIES}
 # Needed to add this
 if(IS_OS_LINUX)
   target_link_libraries(${PROJECT_NAME} PUBLIC glfw ${CMAKE_DL_LIBS})
+  #target_link_libraries(${PROJECT_NAME} PUBLIC freetype ${CMAKE_DL_LIBS})
+  include_directories (etc/freetype)
 endif()
