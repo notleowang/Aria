@@ -4,8 +4,10 @@ class UISystem {
 
 public:
 	enum State {
-		GAME_START = 0,
-		LOAD = 3,
+		MAIN_MENU = 0,
+		GAME_START = 1,
+		LOAD = 2,
+		SAVE = 3,
 		GAME_OVER = 4
 	};
 
@@ -18,7 +20,8 @@ public:
 private:
 	// Helpers
 	void showMainMenu(bool* p_open);
+	void CenterText(const char* text);
 
 	// State
-	State state = GAME_START;
+	State state = MAIN_MENU;
 };

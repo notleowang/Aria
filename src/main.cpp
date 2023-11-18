@@ -71,7 +71,7 @@ int main()
 			//ImGui::ShowDemoWindow();
 		}
 
-		if (state == 0) {
+		if (state == 1) {
 			world_system.step(elapsed_ms);
 			physics_system.step(elapsed_ms);
 			ai_system.step(elapsed_ms);

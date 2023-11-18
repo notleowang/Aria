@@ -25,10 +25,10 @@ void UISystem::showMainMenu(bool* p_open) {
 	ImGui::SetNextWindowPos(viewport->Pos);
 	ImGui::SetNextWindowSize(viewport->Size);
 
-	float w = ImGui::GetWindowWidth();
+	//float w = ImGui::GetWindowWidth(); For some reason this is returning 400.f? Ask TA maybe? - Leo
+	float w = viewport->Size.x;
 	const ImVec2 padding = ImVec2(24.f, 24.f);
-	const ImVec2 button_size = ImVec2(w, ButtonFont->FontSize + 20.0f);
-	const float text_center = (w - ImGui::CalcTextSize("Aria: Whipsers Of Darkness").x) * 0.5f;
+	const ImVec2 button_size = ImVec2(350.f, ButtonFont->FontSize + 20.0f);
 
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.084f, 0.067f, 0.148f, 1.0f));		// Set Window Background Color
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, padding);							// Set Window Padding
@@ -36,12 +36,12 @@ void UISystem::showMainMenu(bool* p_open) {
 
 	if (ImGui::Begin("Main Menu", p_open, flags))
 	{
-		ImVec2 spc = ImVec2(0.f, 60.f);
+		ImVec2 spc = ImVec2(0.f, 100.f);
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, spc);
 
 		ImGui::PushFont(MainMenuFont);
-		ImGui::SetCursorPosX(text_center);
-		ImGui::Text("Aria: Whipsers Of Darkness");
+		ImGui::SetCursorPosY(100.f);
+		CenterText("Aria: Whipsers Of Darkness");
 		ImGui::PopFont();
 		ImGui::PopStyleVar();
 
@@ -49,16 +49,25 @@ void UISystem::showMainMenu(bool* p_open) {
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, spc);
 
 		ImGui::PushFont(ButtonFont);
+		ImGui::SetCursorPosX((w - button_size.x) * 0.5f);
 		if (ImGui::Button("Start Game", button_size)) {
 			state = GAME_START;
 			*p_open = false;
 		}
 
+		ImGui::SetCursorPosX((w - button_size.x) * 0.5f);
+		if (ImGui::Button("Save Game", button_size)) {
+			state = SAVE;
+			//*p_open = false;
+		}
+
+		ImGui::SetCursorPosX((w - button_size.x) * 0.5f);
 		if (ImGui::Button("Load Game", button_size)) {
 			state = LOAD;
 			//*p_open = false;
 		}
 
+		ImGui::SetCursorPosX((w - button_size.x) * 0.5f);
 		if (ImGui::Button("Quit Game", button_size)) {
 			state = GAME_OVER;
 			*p_open = false;
@@ -72,4 +81,16 @@ void UISystem::showMainMenu(bool* p_open) {
 	ImGui::End();
 	ImGui::PopStyleColor();
 	ImGui::PopStyleVar(2);
+}
+
+void UISystem::CenterText(const char* text) {
+	ImVec2 textSize = ImGui::CalcTextSize(text);
+	float w = ImGui::GetWindowWidth();
+	float center = (w - textSize.x) * 0.5f;
+
+	// Center the text horizontally
+	ImGui::SetCursorPosX(center);
+
+	// Draw the centered text
+	ImGui::Text(text);
 }
