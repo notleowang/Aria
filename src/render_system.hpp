@@ -53,7 +53,7 @@ class RenderSystem {
 			textures_path("mana_bar.png"),
 			textures_path("power_up_block.png"),
 			textures_path("witch.png"),
-			textures_path("element_select_placeholder.png")
+			textures_path("projectile-select-display-purple.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
