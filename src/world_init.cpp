@@ -49,6 +49,7 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	//powerUp.bounceOffWalls[ElementType::EARTH] = true;
 	//powerUp.bounceOffWalls[ElementType::LIGHTNING] = true;
 
+	//createShadow(renderer, entity, TEXTURE_ASSET_ID::PLAYER, GEOMETRY_BUFFER_ID::PLAYER);
 	registry.characterProjectileTypes.emplace(entity);
 	registry.players.emplace(entity);
 	registry.collidables.emplace(entity);
@@ -70,6 +71,8 @@ Entity createFloor(RenderSystem* renderer, vec2 pos)
 	position.scale = vec2(250.f, 250.f);
 	// pos passed in to createFloor assumes top left corner is (x,y)
 	position.position = vec2(pos.x + position.scale.x/2, pos.y + position.scale.y/2);
+
+	Floor& floor = registry.floors.emplace(entity);
 
 	registry.renderRequests.insert(
 		entity,
@@ -99,6 +102,7 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, bool moveable)
 		Velocity& velocity = registry.velocities.emplace(entity);
 		velocity.velocity = { 200.f, 0.f };
 	}
+
 	registry.collidables.emplace(entity); // Marking terrain as collidable
 	registry.renderRequests.insert(
 		entity, 
@@ -152,6 +156,8 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
 		break;
 	}
 
+	createShadow(renderer, entity, textureAsset, GEOMETRY_BUFFER_ID::SPRITE);
+
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
@@ -202,6 +208,33 @@ Entity createManaBar(RenderSystem* renderer, Entity& owner_entity, float y_offse
 		{ TEXTURE_ASSET_ID::MANA_BAR,
 			EFFECT_ASSET_ID::RESOURCE_BAR,
 			GEOMETRY_BUFFER_ID::RESOURCE_BAR });
+
+	return entity;
+}
+
+
+Entity createShadow(RenderSystem* renderer, Entity& owner_entity, TEXTURE_ASSET_ID texture, GEOMETRY_BUFFER_ID geom)
+{
+	auto entity = Entity();
+
+	Shadow& shadow = registry.shadows.emplace(entity);
+	shadow.owner = owner_entity;
+	shadow.active = false;
+
+	Mesh& mesh = renderer->getMesh(geom);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& owner_position = registry.positions.get(owner_entity);
+	Position& position = registry.positions.emplace(entity);
+	position.position = owner_position.position;
+	position.scale = owner_position.scale;
+	shadow.original_size = position.scale;
+
+	registry.renderRequests.insert(
+		entity,
+		{ texture,
+			EFFECT_ASSET_ID::SHADOW,
+			geom });
 
 	return entity;
 }

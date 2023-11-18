@@ -65,15 +65,6 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(1300, 100, 100, 700), false));
 		break;
 	case LEVEL_1:
-		for (uint i = 0; i < 6; i++) {
-			for (uint j = 0; j < 4; j++) {
-				floors.push_back(vec2(100 + i * 250, 50 + j * 250));
-			}
-		}
-		for (uint i = 0; i < 4; i++) {
-			floors.push_back(vec2(1475, 50 + i * 250));
-		}
-
 		this->player_starting_pos = vec2(200, 700);
 		this->exit_door_pos = vec2(1450, 900);
 
@@ -88,11 +79,20 @@ bool GameLevel::init(uint level) {
 
 		enemies.push_back({ 800, 700, 100, 100, 0, 0});
 		enemies.push_back({ 1200, 300, 100, 100, 0, 0 });
+
+		for (uint i = 0; i < 6; i++) {
+			for (uint j = 0; j < 4; j++) {
+				floors.push_back(vec2(100 + i * 250, 50 + j * 250));
+			}
+		}
+		for (uint i = 0; i < 4; i++) {
+			floors.push_back(vec2(1475, 50 + i * 250));
+		}
 		break;
 	case LEVEL_2:
 		// Temporary level 2
 		this->player_starting_pos = vec2(200, 200);
-		terrains.push_back(std::make_pair(vec4(550, 350, 100, 100), true));
+		//terrains.push_back(std::make_pair(vec4(550, 350, 100, 100), true));
 		terrains.push_back(std::make_pair(vec4(100, 0, 1000, 100), false));
 		terrains.push_back(std::make_pair(vec4(0, 0, 100, 800), false));
 		terrains.push_back(std::make_pair(vec4(100, 700, 1000, 100), false));

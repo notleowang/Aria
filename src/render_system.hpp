@@ -66,7 +66,8 @@ class RenderSystem {
 		shader_path("exit_door"),
 		shader_path("resource_bar"),
 		shader_path("text_2d"),
-		shader_path("animated")
+		shader_path("animated"),
+		shader_path("shadow")
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
@@ -117,7 +118,9 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
+	void drawText(Entity entity);
 	void drawImGui();
+	void drawArsenal(Entity entity, const mat3& projection);
 
 	// Helper functions for initializeSpriteSheets()
 	void initializePowerUpBlockSpriteSheet();

@@ -81,9 +81,14 @@ GLFWwindow* WorldSystem::create_window() {
 	glfwWindowHint(GLFW_RESIZABLE, 0);
 
 	// Create the main window (for rendering, keyboard, and mouse input)
-	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-	window = glfwCreateWindow(mode->width, mode->height, "Aria", monitor, nullptr);
+	//GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	//const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+	//window = glfwCreateWindow(mode->width, mode->height, "Aria", monitor, nullptr);
+	
+	// for testing
+	GLFWmonitor* monitor = nullptr; // glfwGetPrimaryMonitor();
+	//const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+	window = glfwCreateWindow(window_width_px, window_height_px, "Aria", monitor, nullptr);
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
@@ -401,12 +406,21 @@ void WorldSystem::handle_collisions() {
 		if (registry.enemies.has(entity) && registry.terrain.has(entity_other)) {
 			Position& enemy_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
+			Velocity& enemy_velocity = registry.velocities.get(entity);
+      
+			// TODO: make sure enemy has all this stuff and this wont be awful
+			// TODO: REFACTOR
+			Resources& resources = registry.resources.get(entity);
+			HealthBar& health_bar = registry.healthBars.get(resources.healthBar);
+			Position& health_bar_position = registry.positions.get(resources.healthBar);
 
 			if (collidedLeft(enemy_position, terrain_position) || collidedRight(enemy_position, terrain_position)) {
 				enemy_position.position.x = enemy_position.prev_position.x;
+				enemy_velocity.velocity.x *= -1;
 			}
 			else if (collidedTop(enemy_position, terrain_position) || collidedBottom(enemy_position, terrain_position)) {
 				enemy_position.position.y = enemy_position.prev_position.y;
+				enemy_velocity.velocity.y *= -1;
 			}
 			else { // Collided on diagonal, displace based on vector
 				enemy_position.position += collisionsRegistry.components[i].displacement;

@@ -47,6 +47,9 @@ Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entit
 
 Entity createFloor(RenderSystem* renderer, vec2 pos);
 
+
+Entity createShadow(RenderSystem* renderer, Entity& owner_entity, TEXTURE_ASSET_ID texture, GEOMETRY_BUFFER_ID geom);
+
 // test entity
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos);
 
