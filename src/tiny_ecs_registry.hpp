@@ -18,6 +18,8 @@ public:
 	ComponentContainer<ManaBar> manaBars;
 	ComponentContainer<Projectile> projectiles;
 	ComponentContainer<CharacterProjectileType> characterProjectileTypes;
+	ComponentContainer<ProjectileSelectDisplay> projectileSelectDisplays;
+	ComponentContainer<Follower> followers;
 	ComponentContainer<Text> texts;
 	ComponentContainer<InvulnerableTimer> invulnerableTimers;
 	ComponentContainer<Position> positions;
@@ -50,6 +52,8 @@ public:
 		registry_list.push_back(&healthBars);
 		registry_list.push_back(&manaBars);
 		registry_list.push_back(&characterProjectileTypes);
+		registry_list.push_back(&projectileSelectDisplays);
+		registry_list.push_back(&followers);
 		registry_list.push_back(&invulnerableTimers);
 		registry_list.push_back(&positions);
 		registry_list.push_back(&velocities);

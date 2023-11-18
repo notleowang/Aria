@@ -277,6 +277,22 @@ void RenderSystem::initializePlayerSpriteSheet()
 	sprite_sheets[ss_index].states = states;
 }
 
+void RenderSystem::initializeProjectileSelectDisplaySpriteSheet()
+{
+	int num_rows = 4;
+	int num_cols = 1;
+	int ss_index = (int)SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY;
+
+	std::vector<AnimState> states((int)ElementType::COUNT);
+	for (int i = 0; i < (int)ElementType::COUNT; i++) {
+		states[i] = AnimState(i, i);
+	}
+
+	sprite_sheets[ss_index].num_rows = num_rows;
+	sprite_sheets[ss_index].num_cols = num_cols;
+	sprite_sheets[ss_index].states = states;
+}
+
 void RenderSystem::initializeSpriteSheets()
 {
 	initializePowerUpBlockSpriteSheet();
@@ -286,6 +302,7 @@ void RenderSystem::initializeSpriteSheets()
 	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET, 1);
 	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET, 1);
 	initializePlayerSpriteSheet();
+	initializeProjectileSelectDisplaySpriteSheet();
 }
 
 // Helper functions for initializing Gl Geometry Buffers
@@ -489,6 +506,7 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIGHTNING_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::POWER_UP_BLOCK, SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PLAYER, SPRITE_SHEET_DATA_ID::PLAYER);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PROJECTILE_SELECT_DISPLAY, SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY);
 	initializeResourceBarGeometryBuffer();
 }
 

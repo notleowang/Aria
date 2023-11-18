@@ -9,13 +9,16 @@ using namespace std;
 // Aria component
 struct Player
 {
+
 };
+
 // All data relevant to elements and weaknesses
 enum ElementType {
-	WATER=0,
-	FIRE=1,
-	EARTH= 2,
-	LIGHTNING = 3
+	WATER = 0,
+	FIRE = 1,
+	EARTH = 2,
+	LIGHTNING = 3,
+	COUNT = 4
 };
 
 // Enemy component
@@ -74,14 +77,23 @@ struct Resources
 
 struct HealthBar
 {
-	Entity owner;
-	float y_offset = -60.f;
+
 };
 
 struct ManaBar
 {
+
+};
+
+struct ProjectileSelectDisplay
+{
+
+};
+
+struct Follower
+{
 	Entity owner;
-	float y_offset = -75.f;
+	float y_offset = 0.f;
 };
 
 // Structure to store projectile entities
@@ -288,7 +300,8 @@ enum class TEXTURE_ASSET_ID {
 	MANA_BAR = HEALTH_BAR + 1,
 	POWER_UP_BLOCK = MANA_BAR + 1,
 	PLAYER = POWER_UP_BLOCK + 1,
-	TEXTURE_COUNT = PLAYER + 1
+	PROJECTILE_SELECT_DISPLAY = PLAYER + 1,
+	TEXTURE_COUNT = PROJECTILE_SELECT_DISPLAY + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -322,7 +335,8 @@ enum class GEOMETRY_BUFFER_ID {
 	LIGHTNING_PROJECTILE_SHEET = EARTH_PROJECTILE_SHEET + 1,
 	POWER_UP_BLOCK = LIGHTNING_PROJECTILE_SHEET + 1,
 	PLAYER = POWER_UP_BLOCK + 1,
-	GEOMETRY_COUNT = PLAYER + 1
+	PROJECTILE_SELECT_DISPLAY = PLAYER + 1,
+	GEOMETRY_COUNT = PROJECTILE_SELECT_DISPLAY + 1
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 
@@ -334,7 +348,8 @@ enum class SPRITE_SHEET_DATA_ID {
 	LIGHTNING_PROJECTILE_SHEET = EARTH_PROJECTILE_SHEET + 1,
 	POWER_UP_BLOCK = LIGHTNING_PROJECTILE_SHEET + 1,
 	PLAYER = POWER_UP_BLOCK + 1,
-	SPRITE_SHEET_COUNT = PLAYER + 1
+	PROJECTILE_SELECT_DISPLAY = PLAYER + 1,
+	SPRITE_SHEET_COUNT = PROJECTILE_SELECT_DISPLAY + 1
 };
 const int sprite_sheet_count = (int)SPRITE_SHEET_DATA_ID::SPRITE_SHEET_COUNT;
 
