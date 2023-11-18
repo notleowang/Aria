@@ -78,7 +78,7 @@ GLFWwindow* WorldSystem::create_window() {
 	// Create the main window (for rendering, keyboard, and mouse input)
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-	window = glfwCreateWindow(mode->width, mode->height, "Aria", nullptr, nullptr);
+	window = glfwCreateWindow(mode->width, mode->height, "Aria", monitor, nullptr);
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
