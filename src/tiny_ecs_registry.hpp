@@ -22,6 +22,7 @@ public:
 	ComponentContainer<InvulnerableTimer> invulnerableTimers;
 	ComponentContainer<Position> positions;
 	ComponentContainer<Velocity> velocities;
+	ComponentContainer<Floor> floors;
 	ComponentContainer<Direction> directions;
 	ComponentContainer<Collision> collisions;
 	ComponentContainer<Collidable> collidables;
@@ -54,6 +55,7 @@ public:
 		registry_list.push_back(&invulnerableTimers);
 		registry_list.push_back(&positions);
 		registry_list.push_back(&velocities);
+		registry_list.push_back(&floors);
 		registry_list.push_back(&directions);
 		registry_list.push_back(&collisions);
 		registry_list.push_back(&collidables);

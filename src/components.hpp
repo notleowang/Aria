@@ -120,6 +120,10 @@ struct Velocity {
 	vec2 velocity = { 0.f, 0.f };
 };
 
+struct Floor {
+
+};
+
 
 // Data relevant to direction of entities
 typedef enum {
@@ -331,7 +335,8 @@ enum class GEOMETRY_BUFFER_ID {
 	PROJECTILE = RESOURCE_BAR + 1,
 	POWER_UP_BLOCK = PROJECTILE + 1,
 	PLAYER = POWER_UP_BLOCK + 1,
-	GEOMETRY_COUNT = PLAYER + 1
+	SPRITE_SHADOW = PLAYER + 1,
+	GEOMETRY_COUNT = SPRITE_SHADOW + 1
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 

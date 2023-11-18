@@ -292,10 +292,20 @@ void RenderSystem::draw()
 	Camera camera;
 	camera.centerAt(player_pos.position);
 
+	// Handle drawing floors first
+	for (Entity entity : registry.floors.entities) {
+		drawTexturedMesh(entity, camera.projectionMat);
+	}
+
+	// Handle all shadows next
+	for (Entity entity : registry.shadows.entities) {
+		drawTexturedMesh(entity, camera.projectionMat);
+	}
+
 	// Draw all textured meshes that have a position and size component
 	for (Entity entity : registry.renderRequests.entities)
 	{
-		if (!registry.positions.has(entity) || registry.texts.has(entity))
+		if (!registry.positions.has(entity) || registry.texts.has(entity) || registry.shadows.has(entity) || registry.floors.has(entity))
 			continue;
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize

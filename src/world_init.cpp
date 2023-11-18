@@ -72,6 +72,8 @@ Entity createFloor(RenderSystem* renderer, vec2 pos)
 	// pos passed in to createFloor assumes top left corner is (x,y)
 	position.position = vec2(pos.x + position.scale.x/2, pos.y + position.scale.y/2);
 
+	Floor& floor = registry.floors.emplace(entity);
+
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::FLOOR,
