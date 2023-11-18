@@ -28,7 +28,7 @@ endif()
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/ext/project_path.hpp.in" "${CMAKE_CURRENT_SOURCE_DIR}/ext/project_path.hpp")
 
 # You can switch to use the file GLOB for simplicity but at your own risk
-file(GLOB SOURCE_FILES src/*.cpp src/*.hpp)
+file(GLOB SOURCE_FILES src/*.cpp src/*.hpp ext/imgui/*.cpp ext/imgui/*.hpp)
 
 #set(SOURCE_FILES
 #	src/main.cpp
@@ -67,6 +67,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES ENABLE_EXPORTS 0)
 # External header-only libraries in the ext/
 target_include_directories(${PROJECT_NAME} PUBLIC ext/stb_image/)
 target_include_directories(${PROJECT_NAME} PUBLIC ext/gl3w)
+target_include_directories(${PROJECT_NAME} PUBLIC ext/freetype)
+target_include_directories(${PROJECT_NAME} PUBLIC ext/imgui)
 
 if(IS_OS_LINUX)
   set(FREETYPE_INCLUDE_DIRS_LIN "${CMAKE_CURRENT_SOURCE_DIR}/ext/freetype/include")

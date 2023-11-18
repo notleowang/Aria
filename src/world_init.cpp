@@ -27,8 +27,8 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity);
-	resources.manaBar = createManaBar(renderer, entity);
+	resources.healthBar = createHealthBar(renderer, entity, PLAYER_HEALTH_BAR_Y_OFFSET);
+	resources.manaBar = createManaBar(renderer, entity, PLAYER_MANA_BAR_Y_OFFSET);
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
@@ -131,10 +131,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
 	velocity.velocity.x = 50;
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity);
-	
-	HealthBar& healthBar = registry.healthBars.get(resources.healthBar);
-	healthBar.y_offset = -50.f;
+	resources.healthBar = createHealthBar(renderer, entity, ENEMY_HEALTH_BAR_Y_OFFSET);
 
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy.type = enemyType;
@@ -171,15 +168,18 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
 	return entity;
 }
 
-Entity createHealthBar(RenderSystem* renderer, Entity& owner_entity)
+Entity createHealthBar(RenderSystem* renderer, Entity& owner_entity, float y_offset)
 {
 	auto entity = Entity();
 
 	HealthBar& healthBar = registry.healthBars.emplace(entity);
-	healthBar.owner = owner_entity;
 
 	Position& position = registry.positions.emplace(entity);
 	position.scale = vec2(RESOURCE_BAR_WIDTH, RESOURCE_BAR_HEIGHT);
+
+	Follower& follower = registry.followers.emplace(entity);
+	follower.owner = owner_entity;
+	follower.y_offset = y_offset;
 
 	registry.renderRequests.insert(
 		entity,
@@ -190,15 +190,18 @@ Entity createHealthBar(RenderSystem* renderer, Entity& owner_entity)
 	return entity;
 }
 
-Entity createManaBar(RenderSystem* renderer, Entity& owner_entity)
+Entity createManaBar(RenderSystem* renderer, Entity& owner_entity, float y_offset)
 {
 	auto entity = Entity();
 
 	ManaBar& manaBar = registry.manaBars.emplace(entity);
-	manaBar.owner = owner_entity;
 
 	Position& position = registry.positions.emplace(entity);
 	position.scale = vec2(RESOURCE_BAR_WIDTH, RESOURCE_BAR_HEIGHT);
+
+	Follower& follower = registry.followers.emplace(entity);
+	follower.owner = owner_entity;
+	follower.y_offset = y_offset;
 
 	registry.renderRequests.insert(
 		entity,
@@ -208,6 +211,7 @@ Entity createManaBar(RenderSystem* renderer, Entity& owner_entity)
 
 	return entity;
 }
+
 
 Entity createShadow(RenderSystem* renderer, Entity& owner_entity, TEXTURE_ASSET_ID texture, GEOMETRY_BUFFER_ID geom)
 {
@@ -231,6 +235,33 @@ Entity createShadow(RenderSystem* renderer, Entity& owner_entity, TEXTURE_ASSET_
 		{ texture,
 			EFFECT_ASSET_ID::SHADOW,
 			geom });
+
+Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entity, float y_offset)
+{
+	auto entity = Entity();
+
+	ProjectileSelectDisplay& display = registry.projectileSelectDisplays.emplace(entity);
+
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)ElementType::WATER);
+	animation.is_animating = false;
+
+	Position& position = registry.positions.emplace(entity);
+	position.scale = vec2(PROJECTILE_SELECT_DISPLAY_WIDTH, PROJECTILE_SELECT_DISPLAY_HEIGHT);
+
+	Follower& follower = registry.followers.emplace(entity);
+	follower.owner = owner_entity;
+	follower.y_offset = y_offset;
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::PROJECTILE_SELECT_DISPLAY,
+			EFFECT_ASSET_ID::ANIMATED,
+			GEOMETRY_BUFFER_ID::PROJECTILE_SELECT_DISPLAY });
 
 	return entity;
 }
@@ -307,7 +338,7 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity);
+	resources.healthBar = createHealthBar(renderer, entity, PLAYER_HEALTH_BAR_Y_OFFSET);
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
@@ -326,51 +357,51 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType elementType, bool hostile, Entity& player) {
 	auto entity = Entity();
 
-	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::PROJECTILE);
-	registry.meshPtrs.emplace(entity, &mesh);
-
-	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PROJECTILE);
-	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
-
-	Animation& animation = registry.animations.emplace(entity);
-	animation.sprite_sheet_ptr = &sprite_sheet;
-	animation.setState((int)PROJECTILE_STATES::MOVING);
-
 	Projectile& projectile = registry.projectiles.emplace(entity);
 	projectile.type = elementType;
 	projectile.hostile = hostile;
 
 	TEXTURE_ASSET_ID textureAsset;
-	EFFECT_ASSET_ID effectAsset;
 	GEOMETRY_BUFFER_ID geometryBuffer;
+	SPRITE_SHEET_DATA_ID spriteSheet;
 	switch (projectile.type) {
 		case ElementType::WATER:
 			textureAsset = TEXTURE_ASSET_ID::WATER_PROJECTILE_SHEET;
-			effectAsset = EFFECT_ASSET_ID::ANIMATED;
-			geometryBuffer = GEOMETRY_BUFFER_ID::PROJECTILE;
+			geometryBuffer = GEOMETRY_BUFFER_ID::WATER_PROJECTILE;
+			spriteSheet = SPRITE_SHEET_DATA_ID::WATER_PROJECTILE;
 			break;
 		case ElementType::FIRE:
 			textureAsset = TEXTURE_ASSET_ID::FIRE_PROJECTILE_SHEET;
-			effectAsset = EFFECT_ASSET_ID::ANIMATED;
-			geometryBuffer = GEOMETRY_BUFFER_ID::PROJECTILE;
+			geometryBuffer = GEOMETRY_BUFFER_ID::FIRE_PROJECTILE;
+			spriteSheet = SPRITE_SHEET_DATA_ID::FIRE_PROJECTILE;
 			break;
 		case ElementType::EARTH:
-			textureAsset = TEXTURE_ASSET_ID::EARTH_PROJECTILE;
-			effectAsset = EFFECT_ASSET_ID::TEXTURED;
-			geometryBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+			textureAsset = TEXTURE_ASSET_ID::EARTH_PROJECTILE_SHEET;
+			geometryBuffer = GEOMETRY_BUFFER_ID::EARTH_PROJECTILE_SHEET;
+			spriteSheet = SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET;
 			break;
 		case ElementType::LIGHTNING:
-			textureAsset = TEXTURE_ASSET_ID::LIGHTNING_PROJECTILE;
-			effectAsset = EFFECT_ASSET_ID::TEXTURED;
-			geometryBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+			textureAsset = TEXTURE_ASSET_ID::LIGHTNING_PROJECTILE_SHEET;
+			geometryBuffer = GEOMETRY_BUFFER_ID::LIGHTNING_PROJECTILE_SHEET;
+			spriteSheet = SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET;
 			break;
 		default:
 			textureAsset = TEXTURE_ASSET_ID::WATER_PROJECTILE_SHEET;
-			effectAsset = EFFECT_ASSET_ID::ANIMATED;
-			geometryBuffer = GEOMETRY_BUFFER_ID::PROJECTILE;
+			geometryBuffer = GEOMETRY_BUFFER_ID::WATER_PROJECTILE;
+			spriteSheet = SPRITE_SHEET_DATA_ID::WATER_PROJECTILE;
 			break;
 	}
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(geometryBuffer);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(spriteSheet);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)PROJECTILE_STATES::MOVING);
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = vel;
@@ -391,7 +422,7 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 	registry.renderRequests.insert(
 		entity,
 		{	textureAsset,
-			effectAsset,
+			EFFECT_ASSET_ID::ANIMATED,
 			geometryBuffer });
 	return entity;
 }

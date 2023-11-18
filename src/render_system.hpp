@@ -42,17 +42,16 @@ class RenderSystem {
 			textures_path("landscape.png"),
 			textures_path("turtle.png") ,
 			textures_path("fire_enemy.png") ,
-			textures_path("water_projectile.png"),
-			textures_path("fire_projectile.png"),
-			textures_path("earth_projectile.png"),
-			textures_path("lightning_projectile.png"),
-			textures_path("water_projectile_spritesheet.png"),
-			textures_path("fire_projectile_spritesheet.png"),
+			textures_path("projectile_water_sprite_sheet.png"),
+			textures_path("projectile_fire_sprite_sheet.png"),
+			textures_path("projectile_earth.png"),
+			textures_path("projectile_lightning.png"),
 			textures_path("dungeon_tile.png"),
 			textures_path("health_bar.png"),
 			textures_path("mana_bar.png"),
 			textures_path("power_up_block.png"),
-			textures_path("witch.png")
+			textures_path("witch.png"),
+			textures_path("projectile-select-display-purple.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -105,6 +104,8 @@ public:
 
 	void initializeFreeType();
 
+	void initializeImGui();
+
 	// Destroy resources associated to one or all entities created by the system
 	~RenderSystem();
 
@@ -118,11 +119,13 @@ private:
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
 	void drawText(Entity entity);
+	void drawImGui();
 
-	// Helper functions for initializeAnimations()
+	// Helper functions for initializeSpriteSheets()
 	void initializePowerUpBlockSpriteSheet();
-	void initializeProjectileSpriteSheet();
+	void initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols);
 	void initializePlayerSpriteSheet();
+	void initializeProjectileSelectDisplaySpriteSheet();
 
 	// Helper functions for initializeGlGeometryBuffers()
 	void initializePlayerGeometryBuffer();
@@ -132,7 +135,7 @@ private:
 	void initializeTerrainGeometryBuffer();
 	void initializeExitDoorGeometryBuffer();
 	void initializeResourceBarGeometryBuffer();
-	void initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID goem_buffer_id, int num_rows, int num_cols);
+	void initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID goem_buffer_id, SPRITE_SHEET_DATA_ID ss_id);
 
 	// Window handle
 	GLFWwindow* window;

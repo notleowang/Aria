@@ -40,6 +40,11 @@ WorldSystem::~WorldSystem() {
 	// Destroy all created components
 	registry.clear_all_components();
 
+	// remove ImGui resources
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+
 	// Close the window
 	glfwDestroyWindow(window);
 }
@@ -216,6 +221,11 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			screen.apply_spotlight = false;
 		}
 	}
+
+	// create exit door once all enemies are dead
+	if (registry.enemies.entities.size() == 0 && registry.exitDoors.entities.size() == 0) 
+		createExitDoor(renderer, this->curr_level.getExitDoorPos());
+
 	return true;
 }
 
@@ -249,7 +259,6 @@ void WorldSystem::restart_game() {
 
 	GameLevel current_level = this->curr_level;
 	vec2 player_starting_pos = current_level.getPlayerStartingPos();
-	vec2 exit_door_pos = current_level.getExitDoorPos();
 	std::vector<vec2> floor_pos = current_level.getFloorPos();
 	std::vector<std::pair<vec4, bool>> terrains_attrs = current_level.getTerrains();
 	std::vector<std::string> texts = current_level.getTexts();
@@ -280,7 +289,7 @@ void WorldSystem::restart_game() {
 		createEnemy(renderer, vec2(enemy_i[0], enemy_i[1]), ElementType::FIRE); //TODO: pass the type as an enemy attribute
 	}
 
-	createExitDoor(renderer, exit_door_pos);
+	projectileSelectDisplay = createProjectileSelectDisplay(renderer, player, PROJECTILE_SELECT_DISPLAY_Y_OFFSET);
 
 	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
 }
@@ -382,14 +391,6 @@ void WorldSystem::handle_collisions() {
 			Position& player_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
 
-			// TODO: make sure player has all this stuff and this wont be awful
-			// TODO: REFACTOR
-			Resources& resources = registry.resources.get(entity);
-			HealthBar& health_bar = registry.healthBars.get(resources.healthBar);
-			ManaBar& mana_bar = registry.manaBars.get(resources.manaBar);
-			Position& health_bar_position = registry.positions.get(resources.healthBar);
-			Position& mana_bar_position = registry.positions.get(resources.manaBar);
-
 			if (collidedLeft(player_position, terrain_position) || collidedRight(player_position, terrain_position)) {
 				player_position.position.x = player_position.prev_position.x;
 
@@ -399,11 +400,6 @@ void WorldSystem::handle_collisions() {
 			else { // Collided on diagonal, displace based on vector
 				player_position.position += collisionsRegistry.components[i].displacement;
 			}
-			// update health bar position to remove jitter
-			health_bar_position.position = player_position.position;
-			health_bar_position.position.y += health_bar.y_offset;
-			mana_bar_position.position = player_position.position;
-			mana_bar_position.position.y += mana_bar.y_offset;
 		}
 		
 		// Checking Enemy - Terrain Collisions
@@ -429,10 +425,16 @@ void WorldSystem::handle_collisions() {
 			else { // Collided on diagonal, displace based on vector
 				enemy_position.position += collisionsRegistry.components[i].displacement;
 			}
+		}
 
-			// update health bar position to remove jitter
-			health_bar_position.position = enemy_position.position;
-			health_bar_position.position.y += health_bar.y_offset;
+		// update position of entities that follow player or enemies to remove jitter
+		for (int i = 0; i < registry.followers.size(); i++) {
+			Follower& follower = registry.followers.components[i];
+			Entity entity = registry.followers.entities[i];
+			Position& position = registry.positions.get(entity);
+			Position& owner_position = registry.positions.get(follower.owner);
+			position.position = owner_position.position;
+			position.position.y += follower.y_offset;
 		}
 
 		// Checking Moveable Terrain - Terrain Collisions
@@ -458,17 +460,28 @@ void WorldSystem::handle_collisions() {
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
 			Resources& enemy_resource = registry.resources.get(entity_other);
 			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
-			if (isWeakTo(registry.enemies.get(entity_other).type, registry.projectiles.get(entity).type)) {
-				damage_dealt *= 2;
+
+			if (registry.enemies.get(entity_other).type == registry.projectiles.get(entity).type) {
+				enemy_resource.currentHealth += damage_dealt / 2; // regen half of the damage worth of health
+				if (enemy_resource.currentHealth > enemy_resource.maxHealth) enemy_resource.currentHealth = enemy_resource.maxHealth;
 			}
-			enemy_resource.currentHealth -= damage_dealt;
+			else {
+				if (isWeakTo(registry.enemies.get(entity_other).type, registry.projectiles.get(entity).type)) {
+					damage_dealt *= 2;
+				}
+				enemy_resource.currentHealth -= damage_dealt;
+			}
+
+			registry.remove_all_components_of(entity); // delete projectile
+
 			printf("enemy hp: %f\n", enemy_resource.currentHealth);
+
+			// remove enemy if health <= 0
 			if (enemy_resource.currentHealth <= 0) {
 				registry.remove_all_components_of(enemy_resource.healthBar);
 				registry.remove_all_components_of(entity_other);
 				Mix_PlayChannel(-1, enemy_death_sound, 0);
 			}
-			registry.remove_all_components_of(entity);
 		}
 
 		// Checking Projectile - Player collisions
@@ -490,7 +503,7 @@ void WorldSystem::handle_collisions() {
 			registry.remove_all_components_of(entity);
 		}
 
-		// Checking Projectile - Player collisions
+		// Checking Terrain - Projectile collisions
 		if (registry.terrain.has(entity_other) && registry.projectiles.has(entity)) {
 			Projectile& projectile = registry.projectiles.get(entity);
 
@@ -502,9 +515,11 @@ void WorldSystem::handle_collisions() {
 
 				if (collidedLeft(projectile_position, terrain_position) || collidedRight(projectile_position, terrain_position)) {
 					projectile_velocity.velocity.x *= -1;
+					projectile_position.angle = atan2(projectile_velocity.velocity.y, projectile_velocity.velocity.x);
 				}
 				else if (collidedTop(projectile_position, terrain_position) || collidedBottom(projectile_position, terrain_position)) {
 					projectile_velocity.velocity.y *= -1;
+					projectile_position.angle = atan2(projectile_velocity.velocity.y, projectile_velocity.velocity.x);
 				}
 			}
 			else {
@@ -619,6 +634,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			characterProjectileType.projectileType = ElementType::LIGHTNING;
 			break;
 		}
+
+		Animation& select_display = registry.animations.get(projectileSelectDisplay);
+		select_display.setState((int)characterProjectileType.projectileType);
 	}
 
 	// player is moving
