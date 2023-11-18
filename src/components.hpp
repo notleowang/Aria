@@ -108,6 +108,7 @@ struct Projectile
 struct CharacterProjectileType
 {
 	ElementType projectileType = ElementType::WATER; //By default, the characters projectile type is water
+	char foo; // just a random extra data type added in the struct to make it a "complete" definition (otherwise compiler throws an error)
 };
 
 // All data relevant to the position of entities

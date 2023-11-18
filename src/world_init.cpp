@@ -215,9 +215,10 @@ Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entit
 	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY);
 	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
 
+	CharacterProjectileType& characterProjectileType = registry.characterProjectileTypes.get(owner_entity);
 	Animation& animation = registry.animations.emplace(entity);
 	animation.sprite_sheet_ptr = &sprite_sheet;
-	animation.setState((int)ElementType::WATER);
+	animation.setState((int) characterProjectileType.projectileType);
 	animation.is_animating = false;
 
 	Position& position = registry.positions.emplace(entity);
