@@ -284,6 +284,8 @@ void WorldSystem::restart_game() {
 		createEnemy(renderer, vec2(enemy_i[0], enemy_i[1]), ElementType::FIRE); //TODO: pass the type as an enemy attribute
 	}
 
+	projectileSelectDisplay = createProjectileSelectDisplay(renderer, player, PROJECTILE_SELECT_DISPLAY_Y_OFFSET);
+
 	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
 }
 
@@ -384,14 +386,6 @@ void WorldSystem::handle_collisions() {
 			Position& player_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
 
-			// TODO: make sure player has all this stuff and this wont be awful
-			// TODO: REFACTOR
-			Resources& resources = registry.resources.get(entity);
-			HealthBar& health_bar = registry.healthBars.get(resources.healthBar);
-			ManaBar& mana_bar = registry.manaBars.get(resources.manaBar);
-			Position& health_bar_position = registry.positions.get(resources.healthBar);
-			Position& mana_bar_position = registry.positions.get(resources.manaBar);
-
 			if (collidedLeft(player_position, terrain_position) || collidedRight(player_position, terrain_position)) {
 				player_position.position.x = player_position.prev_position.x;
 
@@ -401,23 +395,12 @@ void WorldSystem::handle_collisions() {
 			else { // Collided on diagonal, displace based on vector
 				player_position.position += collisionsRegistry.components[i].displacement;
 			}
-			// update health bar position to remove jitter
-			health_bar_position.position = player_position.position;
-			health_bar_position.position.y += health_bar.y_offset;
-			mana_bar_position.position = player_position.position;
-			mana_bar_position.position.y += mana_bar.y_offset;
 		}
 		
 		// Checking Enemy - Terrain Collisions
 		if (registry.enemies.has(entity) && registry.terrain.has(entity_other)) {
 			Position& enemy_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
-      
-			// TODO: make sure enemy has all this stuff and this wont be awful
-			// TODO: REFACTOR
-			Resources& resources = registry.resources.get(entity);
-			HealthBar& health_bar = registry.healthBars.get(resources.healthBar);
-			Position& health_bar_position = registry.positions.get(resources.healthBar);
 
 			if (collidedLeft(enemy_position, terrain_position) || collidedRight(enemy_position, terrain_position)) {
 				enemy_position.position.x = enemy_position.prev_position.x;
@@ -428,10 +411,16 @@ void WorldSystem::handle_collisions() {
 			else { // Collided on diagonal, displace based on vector
 				enemy_position.position += collisionsRegistry.components[i].displacement;
 			}
+		}
 
-			// update health bar position to remove jitter
-			health_bar_position.position = enemy_position.position;
-			health_bar_position.position.y += health_bar.y_offset;
+		// update position of entities that follow player or enemies to remove jitter
+		for (int i = 0; i < registry.followers.size(); i++) {
+			Follower& follower = registry.followers.components[i];
+			Entity entity = registry.followers.entities[i];
+			Position& position = registry.positions.get(entity);
+			Position& owner_position = registry.positions.get(follower.owner);
+			position.position = owner_position.position;
+			position.position.y += follower.y_offset;
 		}
 
 		// Checking Moveable Terrain - Terrain Collisions
@@ -620,6 +609,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			characterProjectileType.projectileType = ElementType::LIGHTNING;
 			break;
 		}
+
+		Animation& select_display = registry.animations.get(projectileSelectDisplay);
+		select_display.setState((int)characterProjectileType.projectileType);
 	}
 
 	// player is moving

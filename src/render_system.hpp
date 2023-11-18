@@ -50,7 +50,8 @@ class RenderSystem {
 			textures_path("health_bar.png"),
 			textures_path("mana_bar.png"),
 			textures_path("power_up_block.png"),
-			textures_path("witch.png")
+			textures_path("witch.png"),
+			textures_path("projectile-select-display-purple.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -118,10 +119,11 @@ private:
 	void drawToScreen();
 	void drawImGui();
 
-	// Helper functions for initializeAnimations()
+	// Helper functions for initializeSpriteSheets()
 	void initializePowerUpBlockSpriteSheet();
 	void initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols);
 	void initializePlayerSpriteSheet();
+	void initializeProjectileSelectDisplaySpriteSheet();
 
 	// Helper functions for initializeGlGeometryBuffers()
 	void initializePlayerGeometryBuffer();
