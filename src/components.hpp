@@ -49,6 +49,7 @@ struct PowerUp {
 struct PowerUpBlock {
 	string powerUpText;
 	bool* powerUpToggle;
+	Entity textEntity;
 };
 
 // Terrain

@@ -193,7 +193,10 @@ bool GameLevel::init(uint level) {
 		this->player_starting_pos = vec2(500, 500);
 		this->exit_door_pos = vec2(1200, 700);
 
-		texts.push_back("Shoot the mystery block to power up!");
+		texts.push_back("Shoot the mystery boxes to power up!");
+		text_attrs.push_back({ 0.f,150.f,1.0f,1.0f,1.0f,0.f });
+
+		texts.push_back("Choose wisely... you can only keep one!");
 		text_attrs.push_back({ 0.f,100.f,1.0f,1.0f,1.0f,0.f });
 
 

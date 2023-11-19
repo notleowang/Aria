@@ -384,7 +384,18 @@ void WorldSystem::display_power_up() {
 		printf("%s\n", availPowerUps[i].first.c_str());
 	}*/
 
-	createPowerUpBlock(renderer, &availPowerUps[0]); // take top element after shuffling list (randomness!)
+	if (availPowerUps.size() == 1) {
+		createPowerUpBlock(renderer, &availPowerUps[0], vec2(700, 300)); // take top element after shuffling list (randomness!)
+	}
+	else if (availPowerUps.size() == 2) {
+		createPowerUpBlock(renderer, &availPowerUps[0], vec2(625, 300));
+		createPowerUpBlock(renderer, &availPowerUps[1], vec2(775, 300));
+	}
+	else {
+		createPowerUpBlock(renderer, &availPowerUps[0], vec2(550, 300));
+		createPowerUpBlock(renderer, &availPowerUps[1], vec2(700, 300));
+		createPowerUpBlock(renderer, &availPowerUps[2], vec2(850, 300));
+	}
 }
 
 // Compute collisions between entities
@@ -586,21 +597,37 @@ void WorldSystem::handle_collisions() {
 		}
 
 		// Checking Projectile - Power Up Block collisions
-		if (registry.powerUpBlock.has(entity_other) && registry.projectiles.has(entity)) {
-			PowerUpBlock& powerUpBlock = registry.powerUpBlock.get(entity_other);
+		if (registry.powerUpBlocks.has(entity_other) && registry.projectiles.has(entity)) {
+			PowerUpBlock& powerUpBlock = registry.powerUpBlocks.get(entity_other);
 			Position& blockPos = registry.positions.get(entity_other);
 
+			// disable previously selected power up first
+			auto& powerUpBlocksRegistry = registry.powerUpBlocks;
+			for (uint j = 0; j < powerUpBlocksRegistry.entities.size(); j++) {
+				Entity pubEntity = powerUpBlocksRegistry.entities[j];
+				PowerUpBlock pub = powerUpBlocksRegistry.get(pubEntity);
+
+				if (!*pub.powerUpToggle) continue; // skip over curr power up block if its already disabled
+
+				Animation& animation = registry.animations.get(pubEntity);
+				animation.setState((int)POWER_UP_BLOCK_STATES::ACTIVE);
+				animation.is_animating = true;
+				animation.rainbow_enabled = true;
+
+				*(pub.powerUpToggle) = false;
+				registry.remove_all_components_of(pub.textEntity);
+			}
+
+			// enable newly selected power up
 			Animation& animation = registry.animations.get(entity_other);
 			animation.setState((int)POWER_UP_BLOCK_STATES::INACTIVE);
 			animation.is_animating = false;
 			animation.rainbow_enabled = false;
 
 			*(powerUpBlock.powerUpToggle) = true;
-			printf("%s\n", powerUpBlock.powerUpText.c_str());
+			powerUpBlock.textEntity = createText("You unlocked: " + powerUpBlock.powerUpText, vec2(0.f, 50.f), 1.f, vec3(0.f, 1.f, 0.f));
 
-			createText("You unlocked: " + powerUpBlock.powerUpText, vec2(0.f, 50.f), 1.f, vec3(0.f, 1.f, 0.f));
-
-			registry.remove_all_components_of(entity);
+			registry.remove_all_components_of(entity); // remove projectile
 		}
 
 		// Checking Player - Exit Door collision
