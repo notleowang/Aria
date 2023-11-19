@@ -151,22 +151,25 @@ void updateShadows() {
 		}
 
 		shadow_pos.position = owner_pos.position;
-		shadow_pos.angle = atan2(shadow_pos.position.y - player_position.position.y, shadow_pos.position.x - player_position.position.x) + M_PI / 2;
-		shadow_pos.position.x += cos(shadow_pos.angle - M_PI / 2) * owner_pos.scale.x / 2;
-		shadow_pos.position.y += sin(shadow_pos.angle - M_PI / 2) * owner_pos.scale.y / 2;
 
-		float x_dist = abs(shadow_pos.position.x - player_position.position.x);
-		float y_dist = abs(shadow_pos.position.y - player_position.position.y);
-		shadow_pos.scale.x = shadow.original_size.x * std::min(1.0, (0.7 + abs(sin(shadow_pos.angle - M_PI / 2)) * 0.3));
-		shadow_pos.scale.y = shadow.original_size.y * std::min(1.0, (0.7 + abs(cos(shadow_pos.angle - M_PI / 2)) * 0.3));
+		// M_PI / 2 is to make the shadow upright
+		shadow_pos.angle = atan2(owner_pos.position.y - player_position.position.y, owner_pos.position.x - player_position.position.x) + M_PI/2;
 
-		// enemy sprites are not sprite sheets yet so adding this here
-		shadow_pos.angle = 0;
+		//float y_dist = abs(owner_pos.position.y - player_position.position.y);
+		float max_dist = 500;
+
+		float dist = abs(distance(owner_pos.position, player_position.position));
+		shadow_pos.scale = owner_pos.scale * (max_dist - dist) / max_dist;
+		shadow_pos.scale.y *= 2;
+
+		shadow_pos.position.x += cos(shadow_pos.angle - M_PI / 2) * (shadow_pos.scale.x);
+		shadow_pos.position.y += owner_pos.scale.y / 2 + shadow_pos.scale.y / 2 * sin(shadow_pos.angle - M_PI/2);
 	}
 }
 
 void PhysicsSystem::step(float elapsed_ms)
 {
+	if (registry.deathTimers.entities.size() > 0) return;
 	auto& velocity_container = registry.velocities;
 	for (uint i = 0; i < velocity_container.size(); i++)
 	{

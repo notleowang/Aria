@@ -130,6 +130,8 @@ Entity createObstacle(RenderSystem* renderer, vec2 pos, vec2 size, vec2 vel) {
 	Obstacle& obstacle = registry.obstacles.emplace(entity);
 	registry.collidables.emplace(entity); // Marking obstacle as collidable
 
+	createShadow(renderer, entity, TEXTURE_ASSET_ID::GHOST, GEOMETRY_BUFFER_ID::SPRITE);
+
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::GHOST,
