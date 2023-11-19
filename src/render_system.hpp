@@ -40,8 +40,11 @@ class RenderSystem {
 	const std::array<std::string, texture_count> texture_paths = {
 			textures_path("fish.png"),   // Currently keeping this so we know how to import our textures
 			textures_path("landscape.png"),
-			textures_path("turtle.png") ,
+			textures_path("water_enemy.png"),
 			textures_path("fire_enemy.png") ,
+			textures_path("earth_enemy.png"),
+			textures_path("lightning_enemy.png"),
+			textures_path("ghost.png"),
 			textures_path("projectile_water_sprite_sheet.png"),
 			textures_path("projectile_fire_sprite_sheet.png"),
 			textures_path("projectile_earth.png"),
@@ -51,6 +54,7 @@ class RenderSystem {
 			textures_path("mana_bar.png"),
 			textures_path("power_up_block.png"),
 			textures_path("witch.png"),
+			textures_path("portal.png"),
 			textures_path("projectile-select-display-purple.png")
 	};
 
