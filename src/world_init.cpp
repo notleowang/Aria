@@ -216,8 +216,8 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	velocity.velocity.x = 25;
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.maxHealth = 500.f;
-	resources.currentHealth = 500.f;
+	resources.maxHealth = 1500.f;
+	resources.currentHealth = 1500.f;
 	resources.healthBar = createHealthBar(renderer, entity, BOSS_HEALTH_BAR_Y_OFFSET);
 
 	Enemy& enemy = registry.enemies.emplace(entity);
