@@ -35,6 +35,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(damage_tick_sound);
 	if (end_level_sound != nullptr)
 		Mix_FreeChunk(end_level_sound);
+	if (power_up_sound != nullptr)
+		Mix_FreeChunk(power_up_sound);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -131,6 +133,7 @@ GLFWwindow* WorldSystem::create_window() {
 	damage_tick_sound = Mix_LoadWAV(audio_path("damage_tick.wav").c_str());
 	obstacle_collision_sound = Mix_LoadWAV(audio_path("obstacle_collision.wav").c_str());
 	end_level_sound = Mix_LoadWAV(audio_path("portal.wav").c_str());
+	power_up_sound = Mix_LoadWAV(audio_path("power_up.wav").c_str());
 
 	if (background_music == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
@@ -243,10 +246,14 @@ void WorldSystem::restart_game() {
 	registry.list_all_components();
 	printf("Restarting\n");
 
-	// hacky solution to persist player attributes after restart
+	// hacky solution to persist player components after restart
 	bool persistPowerUps = registry.powerUps.has(player);
 	PowerUp persistedPowerUps;
 	if (persistPowerUps) persistedPowerUps = registry.powerUps.get(player);
+
+	bool persistProjectileType = registry.characterProjectileTypes.has(player);
+	CharacterProjectileType persistedProjectileType;
+	if (persistProjectileType) persistedProjectileType = registry.characterProjectileTypes.get(player);
 
 	// !!!
 	// Remove all entities that we created
@@ -279,7 +286,10 @@ void WorldSystem::restart_game() {
 	}
 
 	player = createAria(renderer, player_starting_pos);
+
+	// ADD BACK THE PERSISTED COMPONENTS
 	if (persistPowerUps) registry.powerUps.get(player) = persistedPowerUps;
+	if (persistProjectileType) registry.characterProjectileTypes.get(player) = persistedProjectileType;
 
 	for (uint i = 0; i < terrains_attrs.size(); i++) {
 		vec4 terrain_i = terrains_attrs[i].first;
@@ -377,7 +387,18 @@ void WorldSystem::display_power_up() {
 		printf("%s\n", availPowerUps[i].first.c_str());
 	}*/
 
-	createPowerUpBlock(renderer, &availPowerUps[0]); // take top element after shuffling list (randomness!)
+	if (availPowerUps.size() == 1) {
+		createPowerUpBlock(renderer, &availPowerUps[0], vec2(700, 300)); // take top element after shuffling list (randomness!)
+	}
+	else if (availPowerUps.size() == 2) {
+		createPowerUpBlock(renderer, &availPowerUps[0], vec2(625, 300));
+		createPowerUpBlock(renderer, &availPowerUps[1], vec2(775, 300));
+	}
+	else {
+		createPowerUpBlock(renderer, &availPowerUps[0], vec2(550, 300));
+		createPowerUpBlock(renderer, &availPowerUps[1], vec2(700, 300));
+		createPowerUpBlock(renderer, &availPowerUps[2], vec2(850, 300));
+	}
 }
 
 // Compute collisions between entities
@@ -579,21 +600,45 @@ void WorldSystem::handle_collisions() {
 		}
 
 		// Checking Projectile - Power Up Block collisions
-		if (registry.powerUpBlock.has(entity_other) && registry.projectiles.has(entity)) {
-			PowerUpBlock& powerUpBlock = registry.powerUpBlock.get(entity_other);
+		if (registry.powerUpBlocks.has(entity_other) && registry.projectiles.has(entity)) {
+			PowerUpBlock& powerUpBlock = registry.powerUpBlocks.get(entity_other);
 			Position& blockPos = registry.positions.get(entity_other);
 
+			// do nothing if this power up is already toggled on
+			if (*powerUpBlock.powerUpToggle) {
+				registry.remove_all_components_of(entity); // remove projectile
+				continue;
+			}
+
+			// disable previously selected power up first
+			auto& powerUpBlocksRegistry = registry.powerUpBlocks;
+			for (uint j = 0; j < powerUpBlocksRegistry.entities.size(); j++) {
+				Entity pubEntity = powerUpBlocksRegistry.entities[j];
+				PowerUpBlock pub = powerUpBlocksRegistry.get(pubEntity);
+
+				if (!*pub.powerUpToggle) continue; // skip over curr power up block if its already disabled
+
+				Animation& animation = registry.animations.get(pubEntity);
+				animation.setState((int)POWER_UP_BLOCK_STATES::ACTIVE);
+				animation.is_animating = true;
+				animation.rainbow_enabled = true;
+
+				*(pub.powerUpToggle) = false;
+				registry.remove_all_components_of(pub.textEntity);
+			}
+
+			// enable newly selected power up
 			Animation& animation = registry.animations.get(entity_other);
 			animation.setState((int)POWER_UP_BLOCK_STATES::INACTIVE);
 			animation.is_animating = false;
 			animation.rainbow_enabled = false;
 
 			*(powerUpBlock.powerUpToggle) = true;
-			printf("%s\n", powerUpBlock.powerUpText.c_str());
+			powerUpBlock.textEntity = createText("You unlocked: " + powerUpBlock.powerUpText, vec2(0.f, 50.f), 1.f, vec3(0.f, 1.f, 0.f));
 
-			createText("You unlocked: " + powerUpBlock.powerUpText, vec2(0.f, 50.f), 1.f, vec3(0.f, 1.f, 0.f));
+			Mix_PlayChannel(-1, power_up_sound, 0);
 
-			registry.remove_all_components_of(entity);
+			registry.remove_all_components_of(entity); // remove projectile
 		}
 
 		// Checking Player - Exit Door collision

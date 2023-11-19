@@ -277,9 +277,10 @@ Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entit
 	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY);
 	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
 
+	CharacterProjectileType& characterProjectileType = registry.characterProjectileTypes.get(owner_entity);
 	Animation& animation = registry.animations.emplace(entity);
 	animation.sprite_sheet_ptr = &sprite_sheet;
-	animation.setState((int)ElementType::WATER);
+	animation.setState((int) characterProjectileType.projectileType);
 	animation.is_animating = false;
 
 	Position& position = registry.positions.emplace(entity);
@@ -319,7 +320,7 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	return entity;
 }
 
-Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp) {
+Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp, vec2 pos) {
 	auto entity = Entity();
 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::EXIT_DOOR);
@@ -334,10 +335,10 @@ Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp) 
 	animation.rainbow_enabled = true;
 
 	Position& position = registry.positions.emplace(entity);
-	position.position = vec2(700, 300);
+	position.position = pos;
 	position.scale = vec2(100.f, 100.f);
 
-	PowerUpBlock& powerUpBlock = registry.powerUpBlock.emplace(entity);
+	PowerUpBlock& powerUpBlock = registry.powerUpBlocks.emplace(entity);
 	powerUpBlock.powerUpText = powerUp->first;
 	powerUpBlock.powerUpToggle = powerUp->second;
 
