@@ -397,13 +397,13 @@ void WorldSystem::display_power_up() {
 		createPowerUpBlock(renderer, &availPowerUps[0], vec2(700, 300)); // take top element after shuffling list (randomness!)
 	}
 	else if (availPowerUps.size() == 2) {
-		createPowerUpBlock(renderer, &availPowerUps[0], vec2(625, 300));
-		createPowerUpBlock(renderer, &availPowerUps[1], vec2(775, 300));
+		createPowerUpBlock(renderer, &availPowerUps[0], vec2(575, 300));
+		createPowerUpBlock(renderer, &availPowerUps[1], vec2(825, 300));
 	}
 	else {
-		createPowerUpBlock(renderer, &availPowerUps[0], vec2(550, 300));
+		createPowerUpBlock(renderer, &availPowerUps[0], vec2(500, 300));
 		createPowerUpBlock(renderer, &availPowerUps[1], vec2(700, 300));
-		createPowerUpBlock(renderer, &availPowerUps[2], vec2(850, 300));
+		createPowerUpBlock(renderer, &availPowerUps[2], vec2(900, 300));
 	}
 }
 
