@@ -160,7 +160,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	resources.healthBar = createHealthBar(renderer, entity, ENEMY_HEALTH_BAR_Y_OFFSET);
 
 	Enemy& enemy = registry.enemies.emplace(entity);
-	enemy= enemyAttributes;
+	enemy = enemyAttributes;
 	
 	TEXTURE_ASSET_ID textureAsset;
 	switch (enemy.type) {
@@ -189,6 +189,64 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	registry.renderRequests.insert(
 		entity,
 		{textureAsset,
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
+{
+	auto entity = Entity();
+
+	registry.bosses.emplace(entity);
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+
+	position.scale = vec2({ 135, 200 });
+
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity.x = 25;
+
+	Resources& resources = registry.resources.emplace(entity);
+	resources.maxHealth = 500.f;
+	resources.currentHealth = 500.f;
+	resources.healthBar = createHealthBar(renderer, entity, BOSS_HEALTH_BAR_Y_OFFSET);
+
+	Enemy& enemy = registry.enemies.emplace(entity);
+	enemy = enemyAttributes;
+
+	TEXTURE_ASSET_ID textureAsset;
+	switch (enemy.type) {
+	case ElementType::WATER:
+		textureAsset = TEXTURE_ASSET_ID::WATER_BOSS;
+		break;
+
+	case ElementType::FIRE:
+		textureAsset = TEXTURE_ASSET_ID::FIRE_BOSS;
+		break;
+	case ElementType::EARTH:
+		textureAsset = TEXTURE_ASSET_ID::EARTH_BOSS;
+		break;
+	case ElementType::LIGHTNING:
+		textureAsset = TEXTURE_ASSET_ID::LIGHTNING_BOSS;
+		break;
+	default:
+		textureAsset = TEXTURE_ASSET_ID::FINAL_BOSS;
+		break;
+	}
+
+	createShadow(renderer, entity, textureAsset, GEOMETRY_BUFFER_ID::SPRITE);
+
+	registry.collidables.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ textureAsset,
 		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::SPRITE });
 

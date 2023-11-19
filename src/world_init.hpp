@@ -13,6 +13,7 @@ const float PROJECTILE_SELECT_DISPLAY_WIDTH = 3 * 126.f;
 const float PROJECTILE_SELECT_DISPLAY_HEIGHT = 3 * 33.f;
 const float PLAYER_HEALTH_BAR_Y_OFFSET = -60.f;
 const float ENEMY_HEALTH_BAR_Y_OFFSET = -50.f;
+const float BOSS_HEALTH_BAR_Y_OFFSET = -110.f;
 const float PLAYER_MANA_BAR_Y_OFFSET = -75.f;
 const float PROJECTILE_SELECT_DISPLAY_Y_OFFSET = -350.f;
 
@@ -35,6 +36,9 @@ Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp);
 
 // mock enemy TODO: change enemy implementation
 Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes);
+
+// creates a boss
+Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes);
 
 //Creates a ghost obstacle
 Entity createObstacle(RenderSystem* renderer, vec2 pos, vec2 size, vec2 vel);

@@ -10,11 +10,14 @@ const int ENEMY_ATTRIBUTES = 6;
 const int TEXT_ATTRIBUTES = 6;
 const int OBSTACLE_ATTRIBUTES = 3;
 
+const vec2 NULL_POS = vec2(-1, -1);
+
 // enum for each level type
 enum Level {
 	TUTORIAL = 0,
 	LEVEL_1 = TUTORIAL + 1,
-	LEVEL_2 = LEVEL_1 + 1,
+	BOSS_1 = LEVEL_1 + 1,
+	LEVEL_2 = BOSS_1 + 1,
 	LEVEL_3 = LEVEL_2 + 1,
 	LEVEL_4 = LEVEL_3 + 1,
 	POWER_UP = LEVEL_4 + 1,
@@ -22,16 +25,16 @@ enum Level {
 
 //Enemy types to re-use later
 const Enemy WATER_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::WATER };
-const Enemy WATER_HIGH_DAMAGE = { 30.f, 3000.f, 0.5f, 1.f, ElementType::WATER };
+const Enemy WATER_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::WATER };
 
 const Enemy FIRE_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::FIRE };
-const Enemy FIRE_HIGH_DAMAGE = { 30.f, 3000.f, 0.5f, 1.f, ElementType::FIRE };
+const Enemy FIRE_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::FIRE };
 
 const Enemy EARTH_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::EARTH };
-const Enemy EARTH_HIGH_DAMAGE = { 30.f, 3000.f, 0.5f, 1.f, ElementType::EARTH };
+const Enemy EARTH_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::EARTH };
 
 const Enemy LIGHTNING_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING };
-const Enemy LIGHTNING_HIGH_DAMAGE = { 30.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING };
+const Enemy LIGHTNING_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING };
 
 class GameLevel
 {
@@ -56,6 +59,9 @@ public:
 
 	// pos_x, pos_y, vel_x, vel_y, scale_x, scale_y
 	std::vector<std::pair<vec2, Enemy>> enemies_attr;
+
+	// pos_x, pos_y, vel_x, vel_y, scale_x, scale_y
+	std::vector<std::pair<vec2, Enemy>> bosses_attr;
 
 	bool init(uint level);
 
@@ -93,5 +99,9 @@ public:
 
 	std::vector<std::pair<vec2,Enemy>>& getEnemies() {
 		return enemies_attr;
+	}
+
+	std::vector<std::pair<vec2, Enemy>>& getBosses() {
+		return bosses_attr;
 	}
 };

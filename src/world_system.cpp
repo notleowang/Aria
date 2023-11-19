@@ -231,7 +231,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
 	// create exit door once all enemies are dead
-	if (registry.enemies.entities.size() == 0 && registry.exitDoors.entities.size() == 0) 
+	if (registry.enemies.entities.size() == 0 && 
+		registry.exitDoors.entities.size() == 0 && 
+		this->curr_level.getExitDoorPos() != NULL_POS)
 		createExitDoor(renderer, this->curr_level.getExitDoorPos());
 
 	return true;
@@ -261,9 +263,6 @@ void WorldSystem::restart_game() {
 	while (registry.collidables.entities.size() > 0)
 		registry.remove_all_components_of(registry.collidables.entities.back());
 
-
-
-
 	GameLevel current_level = this->curr_level;
 	vec2 player_starting_pos = current_level.getPlayerStartingPos();
 	std::vector<vec2> floor_pos = current_level.getFloorPos();
@@ -271,6 +270,7 @@ void WorldSystem::restart_game() {
 	std::vector<std::string> texts = current_level.getTexts();
 	std::vector<std::array<float, TEXT_ATTRIBUTES>> text_attrs = current_level.getTextAttrs();
 	std::vector<std::pair<vec2, Enemy>> enemies_attrs = current_level.getEnemies();
+	std::vector<std::pair<vec2, Enemy>> bosses_attrs = current_level.getBosses();
 	std::vector<std::array<vec2, OBSTACLE_ATTRIBUTES >> obstacles = current_level.getObstacleAttrs();
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
@@ -296,6 +296,12 @@ void WorldSystem::restart_game() {
 		vec2 pos = enemies_attrs[i].first;
 		Enemy enemy = enemies_attrs[i].second;
 		createEnemy(renderer, pos, enemy);
+	}
+
+	for (uint i = 0; i < bosses_attrs.size(); i++) {
+		vec2 pos = bosses_attrs[i].first;
+		Enemy enemy = bosses_attrs[i].second;
+		createBoss(renderer, pos, enemy);
 	}
 
 	for (uint i = 0; i < obstacles.size(); i++) {
@@ -529,9 +535,13 @@ void WorldSystem::handle_collisions() {
 
 			// remove enemy if health <= 0
 			if (enemy_resource.currentHealth <= 0) {
+				bool boss = registry.bosses.has(entity_other); // store bool before removing all components
+
 				registry.remove_all_components_of(enemy_resource.healthBar);
 				registry.remove_all_components_of(entity_other);
 				Mix_PlayChannel(-1, enemy_death_sound, 0);
+
+				if (boss) win_level(); // win level if boss died
 			}
 		}
 
