@@ -35,6 +35,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(damage_tick_sound);
 	if (end_level_sound != nullptr)
 		Mix_FreeChunk(end_level_sound);
+	if (power_up_sound != nullptr)
+		Mix_FreeChunk(power_up_sound);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -131,6 +133,7 @@ GLFWwindow* WorldSystem::create_window() {
 	damage_tick_sound = Mix_LoadWAV(audio_path("damage_tick.wav").c_str());
 	obstacle_collision_sound = Mix_LoadWAV(audio_path("obstacle_collision.wav").c_str());
 	end_level_sound = Mix_LoadWAV(audio_path("portal.wav").c_str());
+	power_up_sound = Mix_LoadWAV(audio_path("power_up.wav").c_str());
 
 	if (background_music == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
@@ -601,6 +604,12 @@ void WorldSystem::handle_collisions() {
 			PowerUpBlock& powerUpBlock = registry.powerUpBlocks.get(entity_other);
 			Position& blockPos = registry.positions.get(entity_other);
 
+			// do nothing if this power up is already toggled on
+			if (*powerUpBlock.powerUpToggle) {
+				registry.remove_all_components_of(entity); // remove projectile
+				continue;
+			}
+
 			// disable previously selected power up first
 			auto& powerUpBlocksRegistry = registry.powerUpBlocks;
 			for (uint j = 0; j < powerUpBlocksRegistry.entities.size(); j++) {
@@ -626,6 +635,8 @@ void WorldSystem::handle_collisions() {
 
 			*(powerUpBlock.powerUpToggle) = true;
 			powerUpBlock.textEntity = createText("You unlocked: " + powerUpBlock.powerUpText, vec2(0.f, 50.f), 1.f, vec3(0.f, 1.f, 0.f));
+
+			Mix_PlayChannel(-1, power_up_sound, 0);
 
 			registry.remove_all_components_of(entity); // remove projectile
 		}
