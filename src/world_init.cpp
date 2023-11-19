@@ -35,19 +35,19 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 
 	PowerUp& powerUp = registry.powerUps.emplace(entity);
 	// TOGGLE THESE TO TEST OR GO GOD MODE - enjoy! :)
-	//powerUp.fasterMovement = true;
-	//powerUp.increasedDamage[ElementType::WATER] = true;
-	//powerUp.increasedDamage[ElementType::FIRE] = true;
-	//powerUp.increasedDamage[ElementType::EARTH] = true;
-	//powerUp.increasedDamage[ElementType::LIGHTNING] = true;
-	//powerUp.tripleShot[ElementType::WATER] = true;
-	//powerUp.tripleShot[ElementType::FIRE] = true;
-	//powerUp.tripleShot[ElementType::EARTH] = true;
-	//powerUp.tripleShot[ElementType::LIGHTNING] = true;
-	//powerUp.bounceOffWalls[ElementType::WATER] = true;
-	//powerUp.bounceOffWalls[ElementType::FIRE] = true;
-	//powerUp.bounceOffWalls[ElementType::EARTH] = true;
-	//powerUp.bounceOffWalls[ElementType::LIGHTNING] = true;
+	/*powerUp.fasterMovement = true;
+	powerUp.increasedDamage[ElementType::WATER] = true;
+	powerUp.increasedDamage[ElementType::FIRE] = true;
+	powerUp.increasedDamage[ElementType::EARTH] = true;
+	powerUp.increasedDamage[ElementType::LIGHTNING] = true;
+	powerUp.tripleShot[ElementType::WATER] = true;
+	powerUp.tripleShot[ElementType::FIRE] = true;
+	powerUp.tripleShot[ElementType::EARTH] = true;
+	powerUp.tripleShot[ElementType::LIGHTNING] = true;
+	powerUp.bounceOffWalls[ElementType::WATER] = true;
+	powerUp.bounceOffWalls[ElementType::FIRE] = true;
+	powerUp.bounceOffWalls[ElementType::EARTH] = true;
+	powerUp.bounceOffWalls[ElementType::LIGHTNING] = true;*/
 
 	//createShadow(renderer, entity, TEXTURE_ASSET_ID::PLAYER, GEOMETRY_BUFFER_ID::PLAYER);
 	registry.characterProjectileTypes.emplace(entity);
@@ -94,6 +94,7 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, bool moveable)
 	// and size corresponds to width and height
 	Position& position = registry.positions.emplace(entity);
 	position.position = vec2(pos.x + size.x/2, pos.y + size.y/2);
+	position.prev_position = vec2(pos.x + size.x / 2, pos.y + size.y / 2);
 	position.scale = size;
 
 	Terrain& terrain = registry.terrain.emplace(entity);
@@ -105,15 +106,40 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, bool moveable)
 
 	registry.collidables.emplace(entity); // Marking terrain as collidable
 	registry.renderRequests.insert(
-		entity, 
+		entity,
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
 			EFFECT_ASSET_ID::TERRAIN,
 			GEOMETRY_BUFFER_ID::TERRAIN });
 	
 	return entity;
 }
+Entity createObstacle(RenderSystem* renderer, vec2 pos, vec2 size, vec2 vel) {
+	auto entity = Entity();
 
-Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+
+	position.scale = size;
+
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity = vel;
+
+	Obstacle& obstacle = registry.obstacles.emplace(entity);
+	registry.collidables.emplace(entity); // Marking obstacle as collidable
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::GHOST,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 {
 	// TODO: change enemy implementation to include different enemy types
 	auto entity = Entity();
@@ -125,7 +151,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 
-	position.scale = vec2({ 125, 100 });
+	position.scale = vec2({ 50, 50 });
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity.x = 50;
@@ -134,25 +160,26 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
 	resources.healthBar = createHealthBar(renderer, entity, ENEMY_HEALTH_BAR_Y_OFFSET);
 
 	Enemy& enemy = registry.enemies.emplace(entity);
-	enemy.type = enemyType;
+	enemy= enemyAttributes;
 	
 	TEXTURE_ASSET_ID textureAsset;
 	switch (enemy.type) {
 	case ElementType::WATER:
-		textureAsset = TEXTURE_ASSET_ID::TURTLE;
+		textureAsset = TEXTURE_ASSET_ID::WATER_ENEMY;
 		break;
 
 	case ElementType::FIRE:
 		textureAsset = TEXTURE_ASSET_ID::FIRE_ENEMY;
 		break;
-	//case ElementType::Earth:
-	//	textureAsset = TEXTURE_ASSET_ID::EARTH_ENEMY;
-	//	break;
-	//case ElementType::Lightning:
-	//	textureAsset = TEXTURE_ASSET_ID::LIGHTNING_ENEMY;
-	//	break;
+	case ElementType::EARTH:
+		textureAsset = TEXTURE_ASSET_ID::EARTH_ENEMY;
+		break;
+	case ElementType::LIGHTNING:
+		textureAsset = TEXTURE_ASSET_ID::LIGHTNING_ENEMY;
+		break;
 	default:
-		textureAsset = TEXTURE_ASSET_ID::TURTLE;
+		//Should never reach here
+		textureAsset = TEXTURE_ASSET_ID::FIRE_ENEMY;
 		break;
 	}
 
@@ -283,9 +310,9 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
-			EFFECT_ASSET_ID::EXIT_DOOR,
-			GEOMETRY_BUFFER_ID::EXIT_DOOR});
+		{ TEXTURE_ASSET_ID::PORTAL,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE});
 
 	return entity;
 }

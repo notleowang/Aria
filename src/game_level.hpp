@@ -8,6 +8,7 @@
 const int TERRAIN_ATTRIBUTES = 4;
 const int ENEMY_ATTRIBUTES = 6;
 const int TEXT_ATTRIBUTES = 6;
+const int OBSTACLE_ATTRIBUTES = 3;
 
 // enum for each level type
 enum Level {
@@ -18,6 +19,19 @@ enum Level {
 	LEVEL_4 = LEVEL_3 + 1,
 	POWER_UP = LEVEL_4 + 1,
 };
+
+//Enemy types to re-use later
+const Enemy WATER_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::WATER };
+const Enemy WATER_HIGH_DAMAGE = { 30.f, 3000.f, 0.5f, 1.f, ElementType::WATER };
+
+const Enemy FIRE_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::FIRE };
+const Enemy FIRE_HIGH_DAMAGE = { 30.f, 3000.f, 0.5f, 1.f, ElementType::FIRE };
+
+const Enemy EARTH_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::EARTH };
+const Enemy EARTH_HIGH_DAMAGE = { 30.f, 3000.f, 0.5f, 1.f, ElementType::EARTH };
+
+const Enemy LIGHTNING_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING };
+const Enemy LIGHTNING_HIGH_DAMAGE = { 30.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING };
 
 class GameLevel
 {
@@ -34,11 +48,14 @@ public:
 	// pos_x, pos_y
 	std::vector<vec2> floor_pos;
 
+	// [{pos_x,pos_y} {scale_x,scale_y} {vel_x,vel_y}]
+	std::vector<std::array<vec2,OBSTACLE_ATTRIBUTES>> obstacle_attrs;
+
 	// pos_x, pos_y, scale_x, scale_y, moveable?
 	std::vector<std::pair<vec4, bool>> terrains_attr;
 
 	// pos_x, pos_y, vel_x, vel_y, scale_x, scale_y
-	std::vector<std::array<float, ENEMY_ATTRIBUTES>> enemies_attr;
+	std::vector<std::pair<vec2, Enemy>> enemies_attr;
 
 	bool init(uint level);
 
@@ -66,11 +83,15 @@ public:
 		return floor_pos;
 	}
 
+	std::vector<std::array<vec2,OBSTACLE_ATTRIBUTES>>& getObstacleAttrs() {
+		return obstacle_attrs;
+	}
+
 	std::vector<std::pair<vec4, bool>>& getTerrains() {
 		return terrains_attr;
 	}
 
-	std::vector<std::array<float,ENEMY_ATTRIBUTES>>& getEnemies() {
+	std::vector<std::pair<vec2,Enemy>>& getEnemies() {
 		return enemies_attr;
 	}
 };

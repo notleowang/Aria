@@ -34,7 +34,10 @@ Entity createText(std::string in_text, vec2 pos, float scale, vec3 color);
 Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp);
 
 // mock enemy TODO: change enemy implementation
-Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType);
+Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes);
+
+//Creates a ghost obstacle
+Entity createObstacle(RenderSystem* renderer, vec2 pos, vec2 size, vec2 vel);
 
 // creates a health bar associated with an owner entity
 Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity, float y_offset);
