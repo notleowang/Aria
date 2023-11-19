@@ -18,7 +18,8 @@ enum ElementType {
 	FIRE = 1,
 	EARTH = 2,
 	LIGHTNING = 3,
-	COUNT = 4
+	COUNT = 4,
+	COMBO = 5 // this is reserved for the final boss only
 };
 
 // Enemy component

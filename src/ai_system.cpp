@@ -5,6 +5,7 @@
 #include "world_init.hpp"
 #include "world_system.hpp"
 #include "render_system.hpp"
+#include <utils.hpp>
 
 #define ENEMY_PROJECTILE_SPEED 500
 
@@ -118,6 +119,7 @@ bool AISystem::enemyFireProjectile(Entity& enemy, vec2 direction) {
 
 	// Get current player projectile type
 	ElementType elementType = registry.enemies.get(enemy).type;
+	if (elementType == ElementType::COMBO) elementType = getRandomElementType();
 
 	createProjectile(renderer, enemyPos, vel, elementType, true, enemy);
 	//															 ^^^^^ doesnt matter as ignored by the hostile = true

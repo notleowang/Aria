@@ -236,7 +236,11 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	case ElementType::LIGHTNING:
 		textureAsset = TEXTURE_ASSET_ID::LIGHTNING_BOSS;
 		break;
+	case ElementType::COMBO:
+		textureAsset = TEXTURE_ASSET_ID::FINAL_BOSS;
+		break;
 	default:
+		// should never reach here
 		textureAsset = TEXTURE_ASSET_ID::FINAL_BOSS;
 		break;
 	}

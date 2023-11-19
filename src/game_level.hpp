@@ -16,11 +16,15 @@ const vec2 NULL_POS = vec2(-1, -1);
 enum Level {
 	TUTORIAL = 0,
 	LEVEL_1 = TUTORIAL + 1,
-	BOSS_1 = LEVEL_1 + 1,
-	LEVEL_2 = BOSS_1 + 1,
-	LEVEL_3 = LEVEL_2 + 1,
-	LEVEL_4 = LEVEL_3 + 1,
-	POWER_UP = LEVEL_4 + 1,
+	FIRE_BOSS = LEVEL_1 + 1,
+	LEVEL_2 = FIRE_BOSS + 1,
+	EARTH_BOSS = LEVEL_2 + 1,
+	LEVEL_3 = EARTH_BOSS + 1,
+	LIGHTNING_BOSS = LEVEL_3 + 1,
+	LEVEL_4 = LIGHTNING_BOSS + 1,
+	WATER_BOSS = LEVEL_4 + 1,
+	FINAL_BOSS = WATER_BOSS + 1,
+	POWER_UP = FINAL_BOSS + 1,
 };
 
 //Enemy types to re-use later
@@ -35,6 +39,8 @@ const Enemy EARTH_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::EARTH };
 
 const Enemy LIGHTNING_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING };
 const Enemy LIGHTNING_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING };
+
+const Enemy COMBO_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::COMBO };
 
 class GameLevel
 {
