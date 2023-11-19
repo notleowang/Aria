@@ -32,7 +32,7 @@ public:
 	ComponentContainer<Enemy> enemies;
 	ComponentContainer<Boss> bosses;
 	ComponentContainer<PowerUp> powerUps;
-	ComponentContainer<PowerUpBlock> powerUpBlock;
+	ComponentContainer<PowerUpBlock> powerUpBlocks;
 	ComponentContainer<Terrain> terrain;
 	ComponentContainer<Shadow> shadows;
 	ComponentContainer<ExitDoor> exitDoors;
@@ -69,7 +69,7 @@ public:
 		registry_list.push_back(&enemies);
 		registry_list.push_back(&bosses);
 		registry_list.push_back(&powerUps);
-		registry_list.push_back(&powerUpBlock);
+		registry_list.push_back(&powerUpBlocks);
 		registry_list.push_back(&terrain);
 		registry_list.push_back(&shadows);
 		registry_list.push_back(&exitDoors);

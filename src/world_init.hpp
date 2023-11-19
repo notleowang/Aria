@@ -32,7 +32,7 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos);
 Entity createText(std::string in_text, vec2 pos, float scale, vec3 color);
 
 // creates a power up block
-Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp);
+Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp, vec2 pos);
 
 // mock enemy TODO: change enemy implementation
 Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes);
