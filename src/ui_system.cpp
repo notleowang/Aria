@@ -99,8 +99,7 @@ void UISystem::showTutorial(bool* p_open) {
 
 	if (ImGui::Begin("Tutorial", p_open, flags)) {
 
-		WorldCoordinateText("Welcome to Aria: Whispers of Darkness!", 40, 40);
-
+		//WorldCoordinateText("Welcome to Aria: Whispers of Darkness!", 40, 40);
 		//ImGui::Text("This is a tutorial on how to play the game.");
 		//ImGui::Text("The goal of the game is to defeat the boss at the end of the level.");
 		//ImGui::Text("You can move around with WASD and use your mouse to aim.");
