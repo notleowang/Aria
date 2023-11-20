@@ -41,6 +41,7 @@ public:
 
 	void win_level();
 	void display_power_up();
+	GameLevel getLevel() { return curr_level; }
 private:
 	// Input callback functions
 	void on_key(int key, int, int action, int mod);
