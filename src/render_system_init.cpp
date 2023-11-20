@@ -77,7 +77,7 @@ void RenderSystem::initializeFreeType() {
 
 	// load font as face
 	FT_Face face;
-	if (FT_New_Face(ft, "data/fonts/PixeloidSans.ttf", 0, &face)) {
+	if (FT_New_Face(ft, "../../../data/fonts/PixeloidSans.ttf", 0, &face)) {
 		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
 		return;
 	}
@@ -146,9 +146,9 @@ void RenderSystem::initializeImGui()
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 
 	// Fonts
-	ImFont* DefaultFont = io.Fonts->AddFontFromFileTTF("data/fonts/PixeloidSans.ttf", 24.0f);	// index 0
-	ImFont* MainMenuFont = io.Fonts->AddFontFromFileTTF("data/fonts/PixeloidSans.ttf", 60.0f); // index 1
-	ImFont* MainMenuButtonFont = io.Fonts->AddFontFromFileTTF("data/fonts/PixeloidSans.ttf", 48.0f); // index 1
+	ImFont* DefaultFont = io.Fonts->AddFontFromFileTTF("../../../data/fonts/PixeloidSans.ttf", 24.0f);	// index 0
+	ImFont* MainMenuFont = io.Fonts->AddFontFromFileTTF("../../../data/fonts/PixeloidSans.ttf", 60.0f); // index 1
+	ImFont* MainMenuButtonFont = io.Fonts->AddFontFromFileTTF("../../../data/fonts/PixeloidSans.ttf", 48.0f); // index 1
 
 	// Setup Dear ImGui style
 	//ImGui::StyleColorsDark();
