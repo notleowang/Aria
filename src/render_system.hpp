@@ -40,19 +40,22 @@ class RenderSystem {
 	const std::array<std::string, texture_count> texture_paths = {
 			textures_path("fish.png"),   // Currently keeping this so we know how to import our textures
 			textures_path("landscape.png"),
-			textures_path("turtle.png") ,
+			textures_path("water_enemy.png"),
 			textures_path("fire_enemy.png") ,
-			textures_path("water_projectile.png"),
-			textures_path("fire_projectile.png"),
-			textures_path("earth_projectile.png"),
-			textures_path("lightning_projectile.png"),
-			textures_path("water_projectile_spritesheet.png"),
-			textures_path("fire_projectile_spritesheet.png"),
+			textures_path("earth_enemy.png"),
+			textures_path("lightning_enemy.png"),
+			textures_path("ghost.png"),
+			textures_path("projectile_water_sprite_sheet.png"),
+			textures_path("projectile_fire_sprite_sheet.png"),
+			textures_path("projectile_earth.png"),
+			textures_path("projectile_lightning.png"),
 			textures_path("dungeon_tile.png"),
 			textures_path("health_bar.png"),
 			textures_path("mana_bar.png"),
 			textures_path("power_up_block.png"),
-			textures_path("witch.png")
+			textures_path("witch.png"),
+			textures_path("portal.png"),
+			textures_path("projectile-select-display-purple.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -67,7 +70,8 @@ class RenderSystem {
 		shader_path("exit_door"),
 		shader_path("resource_bar"),
 		shader_path("text_2d"),
-		shader_path("animated")
+		shader_path("animated"),
+		shader_path("shadow")
 	};
 
 	std::array<GLuint, geometry_count> vertex_buffers;
@@ -118,12 +122,15 @@ private:
 	// Internal drawing functions for each entity type
 	void drawTexturedMesh(Entity entity, const mat3& projection);
 	void drawToScreen();
+	void drawText(Entity entity);
 	void drawImGui();
+	void drawArsenal(Entity entity, const mat3& projection);
 
-	// Helper functions for initializeAnimations()
+	// Helper functions for initializeSpriteSheets()
 	void initializePowerUpBlockSpriteSheet();
-	void initializeProjectileSpriteSheet();
+	void initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols);
 	void initializePlayerSpriteSheet();
+	void initializeProjectileSelectDisplaySpriteSheet();
 
 	// Helper functions for initializeGlGeometryBuffers()
 	void initializePlayerGeometryBuffer();
@@ -133,7 +140,7 @@ private:
 	void initializeTerrainGeometryBuffer();
 	void initializeExitDoorGeometryBuffer();
 	void initializeResourceBarGeometryBuffer();
-	void initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID goem_buffer_id, int num_rows, int num_cols);
+	void initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID goem_buffer_id, SPRITE_SHEET_DATA_ID ss_id);
 
 	// Window handle
 	GLFWwindow* window;

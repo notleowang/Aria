@@ -33,7 +33,7 @@ vec2 worldTransform(vec2 coords, Position& position) {
 
 // Reference: 
 // https://github.com/OneLoneCoder/Javidx9/blob/master/PixelGameEngine/SmallerProjects/OneLoneCoder_PGE_PolygonCollisions1.cpp?fbclid=IwAR1e0EyRPtFFGmg1EuiiKU9JxBwOAFN42YA3LIvfm0GHspBbE1df43ZeCz8
-void diagonalCollides(Entity& ent_i, Entity& ent_j) 
+void diagonalCollides(Entity& ent_i, Entity& ent_j)
 {
 	Entity* entity_i = &ent_i;
 	Entity* entity_j = &ent_j;
@@ -51,7 +51,7 @@ void diagonalCollides(Entity& ent_i, Entity& ent_j)
 		Position& position_i = registry.positions.get(*entity_i);
 		Position& position_j = registry.positions.get(*entity_j);
 
-		for (uint i = 0; i < i_vertices.size(); i++) 
+		for (uint i = 0; i < i_vertices.size(); i++)
 		{
 			vec2 i_line_start = position_i.position;
 			// Will need to add rotation into transformation as well
@@ -59,16 +59,16 @@ void diagonalCollides(Entity& ent_i, Entity& ent_j)
 			vec2 displacement = { 0, 0 };
 
 			for (uint j = 0; j < j_vertices.size(); j++) {
-				uint next_point = (j + 1) % j_vertices.size();		
+				uint next_point = (j + 1) % j_vertices.size();
 				vec2 j_line_start = worldTransform(vec2(j_vertices[j].position.x, j_vertices[j].position.y), position_j);
 				vec2 j_line_end = worldTransform(vec2(j_vertices[next_point].position.x, j_vertices[next_point].position.y), position_j);
-				
+
 				// Line segment intersection
 				float h = (j_line_end.x - j_line_start.x) * (i_line_start.y - i_line_end.y) - (i_line_start.x - i_line_end.x) * (j_line_end.y - j_line_start.y);
 				float t = ((j_line_start.y - j_line_end.y) * (i_line_start.x - j_line_start.x) + (j_line_end.x - j_line_start.x) * (i_line_start.y - j_line_start.y)) / h;
 				float r = ((i_line_start.y - i_line_end.y) * (i_line_start.x - j_line_start.x) + (i_line_end.x - i_line_start.x) * (i_line_start.y - j_line_start.y)) / h;
 
-				if (t >= 0.0f && t < 1.0f && r >= 0.0f && r < 1.0f) 
+				if (t >= 0.0f && t < 1.0f && r >= 0.0f && r < 1.0f)
 				{
 					displacement.x += (1.0f - t) * (i_line_end.x - i_line_start.x);
 					displacement.y += (1.0f - t) * (i_line_end.y - i_line_start.y);
@@ -105,7 +105,7 @@ bool AABBCollides(Entity& entity_i, Entity& entity_j)
 	float j_top = position_j.position.y - abs(position_j.scale.y) / 2;
 	float j_bottom = position_j.position.y + abs(position_j.scale.y) / 2;
 
-	if (i_left < j_right && i_right > j_left && i_bottom > j_top && i_top < j_bottom)
+	if (i_left <= j_right && i_right >= j_left && i_bottom >= j_top && i_top <= j_bottom)
 	{
 		return true;
 	}
@@ -128,19 +128,62 @@ bool shouldIgnoreCollision(Entity& entity_i, Entity& entity_j)
 	return false;
 }
 
+void updateShadows() {
+	Entity player_entity = registry.players.entities[0];
+	Position& player_position = registry.positions.get(player_entity);
+	for (uint i = 0; i < registry.shadows.entities.size(); i++) {
+		Entity entity = registry.shadows.entities[i];
+		Shadow& shadow = registry.shadows.get(entity);
+
+		Entity owner_entity = shadow.owner;
+
+		Position& shadow_pos = registry.positions.get(entity);
+		if (!registry.positions.has(owner_entity)) {
+			registry.remove_all_components_of(entity);
+			continue;
+		}
+		Position& owner_pos = registry.positions.get(owner_entity);
+		shadow.active = true;
+
+		if (distance((shadow_pos.position / vec2(window_width_px, window_height_px)), 
+			(player_position.position / vec2(window_width_px, window_height_px))) > light_radius) {
+			shadow.active = false;
+		}
+
+		shadow_pos.position = owner_pos.position;
+
+		// M_PI / 2 is to make the shadow upright
+		shadow_pos.angle = atan2(owner_pos.position.y - player_position.position.y, owner_pos.position.x - player_position.position.x) + M_PI/2;
+
+		//float y_dist = abs(owner_pos.position.y - player_position.position.y);
+		float max_dist = 500;
+
+		float dist = abs(distance(owner_pos.position, player_position.position));
+		shadow_pos.scale = owner_pos.scale * (max_dist - dist) / max_dist;
+		shadow_pos.scale.y *= 2;
+
+		shadow_pos.position.x += cos(shadow_pos.angle - M_PI / 2) * (shadow_pos.scale.x);
+		shadow_pos.position.y += owner_pos.scale.y / 2 + shadow_pos.scale.y / 2 * sin(shadow_pos.angle - M_PI/2);
+	}
+}
+
 void PhysicsSystem::step(float elapsed_ms)
 {
+	if (registry.deathTimers.entities.size() > 0) return;
 	auto& velocity_container = registry.velocities;
 	for (uint i = 0; i < velocity_container.size(); i++)
 	{
-		Velocity& velocity = velocity_container.components[i];
 		Entity entity = velocity_container.entities[i];
+		Velocity& velocity = velocity_container.get(entity);
 		Position& position = registry.positions.get(entity);
 		float step_seconds = elapsed_ms / 1000.f;
 		position.prev_position = position.position;
 		position.position[0] += step_seconds * velocity.velocity[0];
 		position.position[1] += step_seconds * velocity.velocity[1];
 	}
+
+	// Update shadows
+	updateShadows();
 
 	// Check for collisions between things that are collidable
 	auto& collidables_container = registry.collidables;
@@ -159,29 +202,13 @@ void PhysicsSystem::step(float elapsed_ms)
 		}
 	}
 
-	// Position the health bars
-	auto& healthBarContainer = registry.healthBars;
-	for (int i = 0; i < healthBarContainer.size(); i++) {
-		HealthBar& healthBar = healthBarContainer.components[i];
-		Entity entity = healthBarContainer.entities[i];
-
+	// update position of entities that follow player or enemies to remove jitter
+	for (int i = 0; i < registry.followers.size(); i++) {
+		Follower& follower = registry.followers.components[i];
+		Entity entity = registry.followers.entities[i];
 		Position& position = registry.positions.get(entity);
-		Position& ownerPosition = registry.positions.get(healthBar.owner);
-
-		position.position.x = ownerPosition.position.x;
-		position.position.y = ownerPosition.position.y + healthBar.y_offset;
-	}
-	
-	// Position the mana bars
-	auto& manaBarContainer = registry.manaBars;
-	for (int i = 0; i < manaBarContainer.size(); i++) {
-		ManaBar& manaBar = manaBarContainer.components[i];
-		Entity entity = manaBarContainer.entities[i];
-
-		Position& position = registry.positions.get(entity);
-		Position& ownerPosition = registry.positions.get(manaBar.owner);
-
-		position.position.x = ownerPosition.position.x;
-		position.position.y = ownerPosition.position.y + manaBar.y_offset;
+		Position& owner_position = registry.positions.get(follower.owner);
+		position.position = owner_position.position;
+		position.position.y += follower.y_offset;
 	}
 }

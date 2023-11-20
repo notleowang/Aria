@@ -5,6 +5,7 @@ uniform vec2 window_size;
 uniform float screen_darken_factor;
 uniform float radius;
 uniform bool apply_spotlight;
+uniform float light_radius;
 
 in vec2 texcoord;
 
@@ -39,9 +40,23 @@ vec4 spotlight(vec4 in_color)
 	}
 }
 
+vec4 dim_light(vec4 in_color) {
+	float dist = abs(distance(vec2(0.5, 0.5), texcoord));
+
+    // If outside the light radius, darken the pixel
+    if (dist > light_radius) {
+        return vec4(0.0, 0.0, 0.0, in_color.a);
+    } else {
+        // Otherwise, apply lighting based on distance
+        float intensity = 1.0 - (dist / light_radius);
+        return in_color * intensity;
+    }
+}
+
 void main()
 {
 	vec4 in_color = texture(screen_texture, texcoord);
-	color = apply_spotlight ? spotlight(in_color) : in_color;
+	color = dim_light(in_color);
+	color = apply_spotlight ? spotlight(color) : color;
 	color = fade_color(color);
 }
