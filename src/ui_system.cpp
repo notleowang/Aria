@@ -7,12 +7,16 @@ void UISystem::init() {
 }
 
 void UISystem::showWindows() {
-	static bool show_main_menu_window = true;
+	static bool show_main_menu = true;
+	bool show_tutorial = isTutorial;
 
-	if (show_main_menu_window) showMainMenu(&show_main_menu_window);
+	if (show_main_menu) showMainMenu(&show_main_menu);
+	if (show_tutorial) showTutorial(&show_tutorial);
 }
 
 void UISystem::showMainMenu(bool* p_open) {
+
+
 	ImGuiIO io = ImGui::GetIO();
 	ImFont* MainMenuFont = io.Fonts->Fonts[1];
 	ImFont* ButtonFont = io.Fonts->Fonts[2];
@@ -21,6 +25,7 @@ void UISystem::showMainMenu(bool* p_open) {
 	style.WindowBorderSize = 0.0f;
 
 	static ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings;
+
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();							// For setting the main menu window to fullscreen
 	ImGui::SetNextWindowPos(viewport->Pos);
 	ImGui::SetNextWindowSize(viewport->Size);
@@ -41,7 +46,7 @@ void UISystem::showMainMenu(bool* p_open) {
 
 		ImGui::PushFont(MainMenuFont);
 		ImGui::SetCursorPosY(100.f);
-		CenterText("Aria: Whipsers Of Darkness");
+		CenterText("Aria: Whispers Of Darkness");
 		ImGui::PopFont();
 		ImGui::PopStyleVar();
 
@@ -69,18 +74,43 @@ void UISystem::showMainMenu(bool* p_open) {
 
 		ImGui::SetCursorPosX((w - button_size.x) * 0.5f);
 		if (ImGui::Button("Quit Game", button_size)) {
-			state = GAME_OVER;
+			state = QUIT;
 			*p_open = false;
 		}
 
 		ImGui::PopStyleVar();
-
 		ImGui::PopFont();
 	}
 
 	ImGui::End();
 	ImGui::PopStyleColor();
 	ImGui::PopStyleVar(2);
+}
+
+void UISystem::showTutorial(bool* p_open) {
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.WindowBorderSize = 0.0f;
+
+	static ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBackground;
+	
+	const ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(viewport->Pos);
+	ImGui::SetNextWindowSize(viewport->Size);
+
+	if (ImGui::Begin("Tutorial", p_open, flags)) {
+
+		WorldCoordinateText("Welcome to Aria: Whispers of Darkness!", 40, 40);
+
+		//ImGui::Text("This is a tutorial on how to play the game.");
+		//ImGui::Text("The goal of the game is to defeat the boss at the end of the level.");
+		//ImGui::Text("You can move around with WASD and use your mouse to aim.");
+		//ImGui::Text("You can attack with your left mouse button and dodge with your right mouse button.");
+		//ImGui::Text("You can also use your abilities with the number keys 1-4.");
+		//ImGui::Text("You can pause the game with the escape key.");
+		//ImGui::Text("Good luck!");
+	}
+
+	ImGui::End();
 }
 
 void UISystem::CenterText(const char* text) {
@@ -92,5 +122,18 @@ void UISystem::CenterText(const char* text) {
 	ImGui::SetCursorPosX(center);
 
 	// Draw the centered text
+	ImGui::Text(text);
+}
+
+void UISystem::WorldCoordinateText(const char* text, float x, float y) {
+	Entity player = registry.players.entities[0];
+	vec2 player_pos = registry.positions.get(player).position;
+	float left = -(player_pos.x - (float)window_width_px / 2);
+	float top = -(player_pos.y - (float)window_height_px / 2);
+
+	// Position the text at the given coordinates
+	ImGui::SetCursorPos(ImVec2(left + x, top + y));
+
+	// Draw the text
 	ImGui::Text(text);
 }
