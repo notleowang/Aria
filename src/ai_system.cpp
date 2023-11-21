@@ -90,8 +90,8 @@ void AISystem::step(float elapsed_ms)
 			}
 		}
 
-		if (!isDodging && !isFlanking && enemy.isAggravated) {
-			if (dist <= 350 && dist > 15) {
+		if (!isDodging && !isFlanking) {
+			if (dist <= 350 && dist > 15 && enemy.isAggravated) {
 				if (canSprint) {
 					isSprinting = true;
 					enemy.stamina -= elapsed_ms / 1000;
@@ -104,7 +104,7 @@ void AISystem::step(float elapsed_ms)
 				}
 				direction *= isSprinting ? 200 : 50;
 				vel_i.velocity = direction;
-			} else if (dist > 350) {
+			} else {
 				vel_i.velocity.y = 0;
 				if (abs(vel_i.velocity.x) != 50) {
 					vel_i.velocity.x = 50;
