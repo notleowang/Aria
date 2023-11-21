@@ -26,6 +26,7 @@ void AISystem::step(float elapsed_ms)
 		bool canSprint = enemy.stamina > 0;
 		bool isDodging = false;
 		bool isSprinting = false;
+		bool isFlanking = false;
 
 		for (uint i = 0; i < registry.projectiles.size(); i++) {
 			Entity entity_p = registry.projectiles.entities[i];
@@ -56,7 +57,13 @@ void AISystem::step(float elapsed_ms)
 			}
 		}
 
+		if (enemy.mana < 1.f) {
+			enemy.mana += elapsed_ms / 1000;
+		}
+
+
 		for (uint j = 0; j < enemy_container.size(); j++) {
+			if (i == j) continue;
 			Entity entity_j = enemy_container.entities[j];
 			Enemy& enemy_j = enemy_container.get(entity_j);
 			if (distance(registry.positions.get(entity_j).position, thisPos) < 250 && registry.resources.get(entity_j).currentHealth < 80 && enemy_j.type != enemy.type) {
@@ -68,13 +75,20 @@ void AISystem::step(float elapsed_ms)
 					enemy.mana -= 0.75f;
 				}
 			}
+			// flank the player
+			if (distance(thisPos, registry.positions.get(entity_j).position) < 100 && i > j) {
+				vec2 direction = playerPos - thisPos;
+				direction /= length(direction);
+				direction *= -50;
+				if (distance(thisPos, playerPos) > 100) {
+					vel_i.velocity = direction;
+				}
+				isFlanking = true;
+			}
 		}
 
-		if (enemy.mana < 1.f) {
-			enemy.mana += elapsed_ms / 1000;
-		}
-		if (!isDodging) {
-			if (dist <= 350) {
+		if (!isDodging && !isFlanking) {
+			if (dist <= 350 && dist > 15) {
 				if (canSprint) {
 					isSprinting = true;
 					enemy.stamina -= elapsed_ms / 1000;
@@ -87,7 +101,7 @@ void AISystem::step(float elapsed_ms)
 				}
 				direction *= isSprinting ? 200 : 50;
 				vel_i.velocity = direction;
-			} else {
+			} else if (dist > 350) {
 				vel_i.velocity.y = 0;
 				if (abs(vel_i.velocity.x) != 50) {
 					vel_i.velocity.x = 50;
