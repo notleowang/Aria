@@ -90,27 +90,16 @@ GLFWwindow* WorldSystem::create_window() {
 #endif
 	glfwWindowHint(GLFW_RESIZABLE, 0);
 
-	//TODO: Re-comment out to allow full screen
-	// Create the main window (for rendering, keyboard, and mouse input)
-	//GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-	//const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-	//window = glfwCreateWindow(mode->width, mode->height, "Aria", monitor, nullptr);
-	
-	// for testing
-	GLFWmonitor* monitor = nullptr; // glfwGetPrimaryMonitor();
-	//const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-	window = glfwCreateWindow(window_width_px, window_height_px, "Aria", monitor, nullptr);
+	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+	// To disable fullscreen-mode, change "monitor" to "nullptr" on next line:
+	window = glfwCreateWindow(mode->width, mode->height, "Aria", monitor, nullptr);
+
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
 		return nullptr;
 	}
 	glfwSetWindowSize(window, window_width_px, window_height_px); // set the resolution
-	// Set the windowed mode with a specific width and height
-	//window = glfwCreateWindow(window_width_px, window_height_px, "Aria", nullptr, nullptr);
-	//if (window == nullptr) {
-	//	fprintf(stderr, "Failed to glfwCreateWindow");
-	//	return nullptr;
-	//}
 
 	// Setting callbacks to member functions (that's why the redirect is needed)
 	// Input is handled using GLFW, for more info see
@@ -212,19 +201,19 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 	screen.screen_darken_factor = 1 - min_death_timer_ms / 3000;
-	float min_win_timer_ms = 1500.f;
+
+	float min_win_timer_ms = 3600.f;
 	for (Entity entity : registry.winTimers.entities) {
 		WinTimer& timer = registry.winTimers.get(entity);
-		timer.timer_ms = std::min(timer.timer_ms, timer.start_timer_ms);
+		timer.timer_ms = std::min(timer.timer_ms, min_win_timer_ms);
 		timer.timer_ms -= elapsed_ms_since_last_update;
-
 		if (timer.timer_ms > 0.f) {
 			screen.apply_spotlight = true;
-			screen.spotlight_radius = timer.timer_ms / timer.start_timer_ms;
+			screen.spotlight_radius = timer.timer_ms / min_win_timer_ms;
 		}
-		else if (timer.timer_ms <= 0.f) {
+		if (timer.timer_ms <= 0.f) {
 			screen.apply_spotlight = true;
-			screen.spotlight_radius = -(timer.timer_ms / timer.start_timer_ms);
+			screen.spotlight_radius = -timer.timer_ms / 400.f;
 
 			// Change level here
 			if (!timer.changedLevel) {
@@ -239,7 +228,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 				restart_game();
 			}
 		}
-		else if (timer.timer_ms <= -timer.start_timer_ms) {
+		if (timer.timer_ms <= -4000.f) {
 			registry.winTimers.remove(entity);
 			screen.apply_spotlight = false;
 		}
