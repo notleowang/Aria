@@ -574,7 +574,7 @@ void WorldSystem::handle_collisions() {
 		}
 		// Checking Projectile - Enemy collisions
 		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity)) {
-			if (registry.projectiles.get(entity).hostile && registry.projectiles.get(entity).type != registry.enemies.get(entity_other).type) {
+			if (registry.projectiles.get(entity).hostile && registry.projectiles.get(entity).type != registry.enemies.get(entity_other).type && !registry.bosses.has(entity_other)) {
 				// HEAL the target instead
 				registry.resources.get(entity_other).currentHealth += 5;
 				registry.remove_all_components_of_no_collision(entity); // delete projectile
@@ -803,6 +803,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			break;
 		case GLFW_KEY_4:
 			characterProjectileType.projectileType = ElementType::LIGHTNING;
+			break;
+		case GLFW_KEY_9:
+			win_level();
 			break;
 		case GLFW_KEY_0:
 			registry.resources.get(player).maxHealth = 10000.f;

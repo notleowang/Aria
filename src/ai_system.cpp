@@ -90,7 +90,7 @@ void AISystem::step(float elapsed_ms)
 			}
 		}
 
-		if (!isDodging && !isFlanking) {
+		if (!isDodging && !isFlanking && enemy.isAggravated) {
 			if (dist <= 350 && dist > 15) {
 				if (canSprint) {
 					isSprinting = true;
@@ -102,7 +102,7 @@ void AISystem::step(float elapsed_ms)
 					enemyFireProjectile(entity_i, direction);
 					enemy.mana -= 1.f;
 				}
-				direction *= isSprinting ? (enemy.isAggravated ? 200 : 150) : 50;
+				direction *= isSprinting ? 200 : 50;
 				vel_i.velocity = direction;
 			} else if (dist > 350) {
 				vel_i.velocity.y = 0;
