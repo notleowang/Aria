@@ -21,7 +21,12 @@ New Music (TODO: ADD LINK),
 [Power-up Block Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/power_up_block.png),
 [Projectile Select Display Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/projectile-select-display-purple.png),
 [Portal Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/portal.png).
-- **2D Dynamic Shadows**
+- **2D Dynamic Shadows**:
+  - [Shadow entity](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/src/components.hpp#L63)
+  - [Shadow creation](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/src/world_init.cpp#L245)
+  - [Shadow vertex shader](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/shaders/shadow.vs.glsl), [Shadow fragment shader](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/shaders/shadow.fs.glsl)
+  - [Dynamic shadow update](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/src/physics_system.cpp#L131)
+  - [Dim lights to simulate lighting and shadows](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/shaders/screen_darken.fs.glsl#L43)
 - **Basic Story Elements**
 
 ## Development Plan
