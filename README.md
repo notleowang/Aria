@@ -5,6 +5,22 @@ In the eerie village of Grimhaven, shrouded in perpetual mist and shadows, Aria'
 Below is the documentation for our `README.md` submission for Milestone 3.
 
 ## Entry Points
+- **Sprite sheet animation** (prior milestone fix): adapted to accomodate sprite sheets with rows and partitions frames into animation states. 
+[Initializing sprite sheets](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/src/render_system_init.cpp#L296), 
+[Passing in shader parameters](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/src/render_system.cpp#L91), 
+[Shader implementation](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/shaders/animated.fs.glsl#L84).
+- **Simple rendering effects** (prior milestone fix): 2 shader effects, 
+[Spotlight](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/shaders/screen_darken.fs.glsl#L21) and 
+[Rainbow](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/shaders/animated.fs.glsl#L70).
+- Consistent game resolution (TODO: ADD LINK)
+- Basic Integrated Assets: 
+Player Sprite (TODO: ADD LINK), 
+Enemy Sprites (water, fire, earth, air, ghost; TODO: ADD LINKS),
+Boss Sprites (TODO: ADD LINK),
+New Music (TODO: ADD LINK),
+[Power-up Block Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/power_up_block.png),
+[Projectile Select Display Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/projectile-select-display-purple.png),
+[Portal Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/portal.png).
 
 ## Development Plan
 Most of the work in this milestone aligned with our development plan for this milestone.
