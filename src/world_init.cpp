@@ -21,7 +21,7 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	// set initial component values
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
-	position.scale = vec2(60.f, 100.f);
+	position.scale = vec2(100.f, 100.f);
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = { 0.f, 0.f };

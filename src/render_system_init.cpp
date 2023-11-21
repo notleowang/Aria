@@ -261,11 +261,12 @@ void RenderSystem::initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, i
 
 void RenderSystem::initializePlayerSpriteSheet()
 {
-	int num_rows = 1;
-	int num_cols = 20;
+	int num_rows = 6;
+	int num_cols = 4;
 	int ss_index = (int)SPRITE_SHEET_DATA_ID::PLAYER;
 	int num_states = (int)PLAYER_SPRITE_STATES::STATE_COUNT;
-	int num_frames_in_state = num_cols / num_states;
+	//int num_frames_in_state = num_cols / num_states;
+	int num_frames_in_state = 4;
 
 	std::vector<AnimState> states(num_states);
 	for (int i = 0; i < num_states; i++) {

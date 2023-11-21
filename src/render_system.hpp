@@ -53,7 +53,7 @@ class RenderSystem {
 			textures_path("health_bar.png"),
 			textures_path("mana_bar.png"),
 			textures_path("power_up_block.png"),
-			textures_path("witch.png"),
+			textures_path("aria.png"),
 			textures_path("portal.png"),
 			textures_path("projectile-select-display-purple.png")
 	};
