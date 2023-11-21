@@ -65,7 +65,9 @@ private:
 	// music references
 	Mix_Music* background_music; // TODO: change background music for our game
 	Mix_Music* boss_music;
+	Mix_Music* boss_intro_music;
 	Mix_Music* final_boss_music;
+	Mix_Music* final_boss_intro_music;
 	Mix_Chunk* projectile_sound;
 	Mix_Chunk* aria_death_sound;
 	Mix_Chunk* enemy_death_sound;

@@ -28,26 +28,29 @@ void AISystem::step(float elapsed_ms)
 		bool isDodging = false;
 		bool isSprinting = false;
 
-		for (uint i = 0; i < registry.projectiles.size(); i++) {
-			Entity entity_p = registry.projectiles.entities[i];
-			Projectile& projectile = registry.projectiles.get(entity_p);
-			if (projectile.hostile) continue;
-			vec2 projectilePos = registry.positions.get(entity_p).position;
-			if (distance(projectilePos, thisPos) < 300) {
-				isDodging = true;
-				if (canSprint) {
-					isSprinting = true;
-					enemy.stamina -= elapsed_ms / 1000;
+		// ensure enemy is aggravated to be able to dodge
+		if (enemy.isAggravated) {
+			for (uint i = 0; i < registry.projectiles.size(); i++) {
+				Entity entity_p = registry.projectiles.entities[i];
+				Projectile& projectile = registry.projectiles.get(entity_p);
+				if (projectile.hostile) continue;
+				vec2 projectilePos = registry.positions.get(entity_p).position;
+				if (distance(projectilePos, thisPos) < 300) {
+					isDodging = true;
+					if (canSprint) {
+						isSprinting = true;
+						enemy.stamina -= elapsed_ms / 1000;
+					}
+
+					float c = cosf(90);
+					float s = sinf(90);
+					mat2 R = {{c, s}, {-s, c}};
+
+					vec2 direction = projectilePos - thisPos;
+					direction /= length(direction);
+					direction *= isSprinting ? 350 : 50; // allow enemies to sprint even faster to dodge
+					vel_i.velocity = direction * R;
 				}
-
-				float c = cosf(90);
-				float s = sinf(90);
-				mat2 R = {{c, s}, {-s, c}};
-
-				vec2 direction = projectilePos - thisPos;
-				direction /= length(direction);
-				direction *= isSprinting ? 350 : 50; // allow enemies to sprint even faster to dodge
-				vel_i.velocity = direction * R;
 			}
 		}
 
@@ -55,7 +58,7 @@ void AISystem::step(float elapsed_ms)
 			enemy.mana += elapsed_ms / 1000;
 		}
 		if (!isDodging) {
-			if (dist <= 350) {
+			if (enemy.isAggravated && dist <= 350) { // ensure enemy is aggravated before chasing/shooting
 				if (canSprint) {
 					isSprinting = true;
 					enemy.stamina -= elapsed_ms / 1000;

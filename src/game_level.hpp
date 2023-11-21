@@ -28,19 +28,19 @@ enum Level {
 };
 
 //Enemy types to re-use later
-const Enemy WATER_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::WATER };
-const Enemy WATER_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::WATER };
+const Enemy WATER_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::WATER, true };
+const Enemy WATER_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::WATER, false };
 
-const Enemy FIRE_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::FIRE };
-const Enemy FIRE_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::FIRE };
+const Enemy FIRE_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::FIRE, true };
+const Enemy FIRE_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::FIRE, false };
 
-const Enemy EARTH_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::EARTH };
-const Enemy EARTH_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::EARTH };
+const Enemy EARTH_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::EARTH, true };
+const Enemy EARTH_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::EARTH, false };
 
-const Enemy LIGHTNING_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING };
-const Enemy LIGHTNING_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING };
+const Enemy LIGHTNING_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING, true };
+const Enemy LIGHTNING_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING, false };
 
-const Enemy COMBO_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::COMBO };
+const Enemy COMBO_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::COMBO, false };
 
 class GameLevel
 {

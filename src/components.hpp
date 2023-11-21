@@ -30,6 +30,7 @@ struct Enemy
 	float stamina = 0.5f;
 	float mana = 1.f;
 	ElementType type = ElementType::FIRE; // By default, an enemy is of fire type
+	float isAggravated = true;
 };
 
 // Boss

@@ -27,8 +27,12 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeMusic(background_music);
 	if (boss_music != nullptr)
 		Mix_FreeMusic(boss_music);
+	if (boss_intro_music != nullptr)
+		Mix_FreeMusic(boss_intro_music);
 	if (final_boss_music != nullptr)
 		Mix_FreeMusic(final_boss_music);
+	if (final_boss_intro_music != nullptr)
+		Mix_FreeMusic(final_boss_intro_music);
 	if (projectile_sound != nullptr)
 		Mix_FreeChunk(projectile_sound);
 	if (aria_death_sound != nullptr)
@@ -132,7 +136,9 @@ GLFWwindow* WorldSystem::create_window() {
 
 	background_music = Mix_LoadMUS(audio_path("fast_pace_background.wav").c_str());
 	boss_music = Mix_LoadMUS(audio_path("boss_battle.wav").c_str());
+	boss_intro_music = Mix_LoadMUS(audio_path("boss_battle_intro.wav").c_str());
 	final_boss_music = Mix_LoadMUS(audio_path("final_boss_battle.wav").c_str());
+	final_boss_intro_music = Mix_LoadMUS(audio_path("final_boss_battle_intro.wav").c_str());
 	projectile_sound = Mix_LoadWAV(audio_path("projectile.wav").c_str());
 	aria_death_sound = Mix_LoadWAV(audio_path("aria_death.wav").c_str());
 	enemy_death_sound = Mix_LoadWAV(audio_path("enemy_death.wav").c_str());
@@ -291,10 +297,10 @@ void WorldSystem::restart_game() {
 		curr_level == Level::EARTH_BOSS ||
 		curr_level == Level::LIGHTNING_BOSS ||
 		curr_level == Level::WATER_BOSS) {
-		Mix_FadeInMusic(boss_music, -1, 500);
+		Mix_FadeInMusic(boss_intro_music, 1, 500);
 	}
 	else if (curr_level == Level::FINAL_BOSS) {
-		Mix_FadeInMusic(final_boss_music, -1, 500);
+		Mix_FadeInMusic(final_boss_intro_music, 1, 500);
 	}
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
@@ -436,6 +442,25 @@ void WorldSystem::handle_collisions() {
 
 		// Checking Player - Enemy collisions
 		if (registry.enemies.has(entity_other) && registry.players.has(entity)) {
+			Enemy& enemy = registry.enemies.get(entity_other);
+			if (!enemy.isAggravated) {
+				enemy.isAggravated = true;
+
+				if (registry.bosses.has(entity_other)) {
+					uint curr_level = this->curr_level.getCurrLevel();
+
+					if (curr_level == Level::FIRE_BOSS ||
+						curr_level == Level::EARTH_BOSS ||
+						curr_level == Level::LIGHTNING_BOSS ||
+						curr_level == Level::WATER_BOSS) {
+						Mix_FadeInMusic(boss_music, -1, 250);
+					}
+					else if (curr_level == Level::FINAL_BOSS) {
+						Mix_FadeInMusic(final_boss_music, -1, 250);
+					}
+				}
+			}
+
 			if (!registry.invulnerableTimers.has(entity)) {
 				Mix_PlayChannel(-1, damage_tick_sound, 0);
 				Resources& player_resource = registry.resources.get(entity);
@@ -554,6 +579,24 @@ void WorldSystem::handle_collisions() {
 		}
 		// Checking Projectile - Enemy collisions
 		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity) && !registry.projectiles.get(entity).hostile) {
+			Enemy& enemy = registry.enemies.get(entity_other);
+
+			// start boss intro music once aggravated
+			if (!enemy.isAggravated && registry.bosses.has(entity_other)) {
+				enemy.isAggravated = true;
+				uint curr_level = this->curr_level.getCurrLevel();
+
+				if (curr_level == Level::FIRE_BOSS ||
+					curr_level == Level::EARTH_BOSS ||
+					curr_level == Level::LIGHTNING_BOSS ||
+					curr_level == Level::WATER_BOSS) {
+					Mix_FadeInMusic(boss_music, -1, 250);
+				}
+				else if (curr_level == Level::FINAL_BOSS) {
+					Mix_FadeInMusic(final_boss_music, -1, 250);
+				}
+			}
+
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
 			Resources& enemy_resource = registry.resources.get(entity_other);
 			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
