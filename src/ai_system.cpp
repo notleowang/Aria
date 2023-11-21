@@ -29,7 +29,6 @@ void AISystem::step(float elapsed_ms)
 		bool isSprinting = false;
 		bool isFlanking = false;
 
-		// ensure enemy is aggravated to be able to dodge
 		if (enemy.isAggravated) {
 			for (uint i = 0; i < registry.projectiles.size(); i++) {
 				Entity entity_p = registry.projectiles.entities[i];
@@ -43,30 +42,21 @@ void AISystem::step(float elapsed_ms)
 						enemy.stamina -= elapsed_ms / 1000;
 					}
 
-					float c = cosf(90);
-					float s = sinf(90);
+					int deg = 90;
+					// https://stackoverflow.com/questions/16177295/get-time-since-epoch-in-milliseconds-preferably-using-c11-chrono
+					unsigned long milliseconds_since_epoch = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
+					if (milliseconds_since_epoch % 10000 > 5000) {
+						deg = -90;
+					}
+					float c = cosf(deg);
+					float s = sinf(deg);
 					mat2 R = {{c, s}, {-s, c}};
 
 					vec2 direction = projectilePos - thisPos;
 					direction /= length(direction);
-					direction *= isSprinting ? 350 : 50; // allow enemies to sprint even faster to dodge
+					direction *= isSprinting ? 300 : 50; // allow enemies to sprint even faster to dodge
 					vel_i.velocity = direction * R;
 				}
-				
-				int deg = 90;
-				// https://stackoverflow.com/questions/16177295/get-time-since-epoch-in-milliseconds-preferably-using-c11-chrono
-				unsigned long milliseconds_since_epoch = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
-				if (milliseconds_since_epoch % 10000 > 5000) {
-					deg = -90;
-				}
-				float c = cosf(deg);
-				float s = sinf(deg);
-				mat2 R = {{c, s}, {-s, c}};
-
-				vec2 direction = projectilePos - thisPos;
-				direction /= length(direction);
-				direction *= isSprinting ? 300 : 50; // allow enemies to sprint even faster to dodge
-				vel_i.velocity = direction * R;
 			}
 		}
 
