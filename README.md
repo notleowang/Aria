@@ -12,8 +12,8 @@ Below is the documentation for our `README.md` submission for Milestone 3.
 - **Simple rendering effects** (prior milestone fix): 2 shader effects, 
 [Spotlight](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/shaders/screen_darken.fs.glsl#L21) and 
 [Rainbow](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/shaders/animated.fs.glsl#L70).
-- Consistent game resolution (TODO: ADD LINK)
-- Basic Integrated Assets: 
+- **Consistent game resolution** (TODO: ADD LINK)
+- **Basic Integrated Assets**: 
 Player Sprite (TODO: ADD LINK), 
 Enemy Sprites (water, fire, earth, air, ghost; TODO: ADD LINKS),
 Boss Sprites (TODO: ADD LINK),
