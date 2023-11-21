@@ -494,15 +494,18 @@ void WorldSystem::handle_collisions() {
 
 			Position& player_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
+			bool resolved = false;
 
 			if (collidedLeft(player_position, terrain_position) || collidedRight(player_position, terrain_position)) {
 				player_position.position.x = player_position.prev_position.x;
+				resolved = true;
 
 			}
-			else if (collidedTop(player_position, terrain_position) || collidedBottom(player_position, terrain_position)) {
+			if (collidedTop(player_position, terrain_position) || collidedBottom(player_position, terrain_position)) {
 				player_position.position.y = player_position.prev_position.y;
+				resolved = true;
 			}
-			else { // Collided on diagonal, displace based on vector
+			if (!resolved) {
 				player_position.position += collisionsRegistry.components[i].displacement;
 			}
 		}
@@ -519,16 +522,19 @@ void WorldSystem::handle_collisions() {
 			Resources& resources = registry.resources.get(entity);
 			HealthBar& health_bar = registry.healthBars.get(resources.healthBar);
 			Position& health_bar_position = registry.positions.get(resources.healthBar);
+			bool resolved = false;
 
 			if (collidedLeft(enemy_position, terrain_position) || collidedRight(enemy_position, terrain_position)) {
 				enemy_position.position.x = enemy_position.prev_position.x;
 				enemy_velocity.velocity.x *= -1;
+				resolved = true;
 			}
-			else if (collidedTop(enemy_position, terrain_position) || collidedBottom(enemy_position, terrain_position)) {
+			if (collidedTop(enemy_position, terrain_position) || collidedBottom(enemy_position, terrain_position)) {
 				enemy_position.position.y = enemy_position.prev_position.y;
 				enemy_velocity.velocity.y *= -1;
+				resolved = true;
 			}
-			else { // Collided on diagonal, displace based on vector
+			if (!resolved) {
 				enemy_position.position += collisionsRegistry.components[i].displacement;
 			}
 		}
@@ -610,7 +616,7 @@ void WorldSystem::handle_collisions() {
 				enemy_resource.currentHealth -= damage_dealt;
 			}
       
-			registry.remove_all_components_of(entity); // delete projectile
+			registry.remove_all_components_of_no_collision(entity); // delete projectile
 
 			printf("enemy hp: %f\n", enemy_resource.currentHealth);
 
@@ -619,7 +625,7 @@ void WorldSystem::handle_collisions() {
 				bool boss = registry.bosses.has(entity_other); // store bool before removing all components
 
 				registry.remove_all_components_of(enemy_resource.healthBar);
-				registry.remove_all_components_of(entity_other);
+				registry.remove_all_components_of_no_collision(entity_other);
 				Mix_PlayChannel(-1, enemy_death_sound, 0);
 
 				// win level and change background music if boss died
@@ -646,7 +652,7 @@ void WorldSystem::handle_collisions() {
 				registry.velocities.get(player).velocity = vec2(0.f, 0.f);
 				Mix_PlayChannel(-1, aria_death_sound, 0);
 			}
-			registry.remove_all_components_of(entity);
+			registry.remove_all_components_of_no_collision(entity);
 		}
 
 		// Checking Terrain - Projectile collisions
@@ -669,7 +675,7 @@ void WorldSystem::handle_collisions() {
 				}
 			}
 			else {
-				registry.remove_all_components_of(entity);
+				registry.remove_all_components_of_no_collision(entity);
 			}
 		}
 
@@ -680,7 +686,7 @@ void WorldSystem::handle_collisions() {
 
 			// do nothing if this power up is already toggled on
 			if (*powerUpBlock.powerUpToggle) {
-				registry.remove_all_components_of(entity); // remove projectile
+				registry.remove_all_components_of_no_collision(entity); // remove projectile
 				continue;
 			}
 
@@ -712,7 +718,7 @@ void WorldSystem::handle_collisions() {
 
 			Mix_PlayChannel(-1, power_up_sound, 0);
 
-			registry.remove_all_components_of(entity); // remove projectile
+			registry.remove_all_components_of_no_collision(entity); // remove projectile
 		}
 
 		// Checking Player - Exit Door collision
