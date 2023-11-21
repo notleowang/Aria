@@ -81,6 +81,15 @@ bool GameLevel::init(uint level) {
 		this->player_starting_pos = vec2(200, 700);
 		this->exit_door_pos = vec2(1450, 900);
 
+		for (uint i = 0; i < 6; i++) {
+			for (uint j = 0; j < 4; j++) {
+				floors.push_back(vec2(100 + i * 250, 50 + j * 250));
+			}
+		}
+		for (uint i = 0; i < 4; i++) {
+			floors.push_back(vec2(1475, 50 + i * 250));
+		}
+
 		// I think we should make a helper for pushing back into terrains vector, thoughts? - Leo
 		terrains.push_back(std::make_pair(vec4(0, -50, 1800, 100), false));
 		terrains.push_back(std::make_pair(vec4(0, 50, 100, 900), false));
