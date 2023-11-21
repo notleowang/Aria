@@ -18,7 +18,8 @@ enum ElementType {
 	FIRE = 1,
 	EARTH = 2,
 	LIGHTNING = 3,
-	COUNT = 4
+	COUNT = 4,
+	COMBO = 5 // this is reserved for the final boss only
 };
 
 // Enemy component
@@ -29,6 +30,12 @@ struct Enemy
 	float stamina = 0.5f;
 	float mana = 1.f;
 	ElementType type = ElementType::FIRE; // By default, an enemy is of fire type
+	float isAggravated = true;
+};
+
+// Boss
+struct Boss {
+
 };
 
 // Obstacles
@@ -314,7 +321,12 @@ enum class TEXTURE_ASSET_ID {
 	FIRE_ENEMY = WATER_ENEMY + 1,
 	EARTH_ENEMY = FIRE_ENEMY + 1,
 	LIGHTNING_ENEMY = EARTH_ENEMY + 1,
-	GHOST = LIGHTNING_ENEMY + 1,
+	WATER_BOSS = LIGHTNING_ENEMY + 1,
+	FIRE_BOSS = WATER_BOSS + 1,
+	EARTH_BOSS = FIRE_BOSS + 1,
+	LIGHTNING_BOSS = EARTH_BOSS + 1,
+	FINAL_BOSS = LIGHTNING_BOSS + 1,
+	GHOST = FINAL_BOSS + 1,
 	WATER_PROJECTILE_SHEET = GHOST + 1,
 	FIRE_PROJECTILE_SHEET = WATER_PROJECTILE_SHEET + 1,
 	EARTH_PROJECTILE_SHEET = FIRE_PROJECTILE_SHEET + 1,

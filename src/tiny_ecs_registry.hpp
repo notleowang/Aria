@@ -30,6 +30,7 @@ public:
 	ComponentContainer<Collidable> collidables;
 	ComponentContainer<Player> players;
 	ComponentContainer<Enemy> enemies;
+	ComponentContainer<Boss> bosses;
 	ComponentContainer<PowerUp> powerUps;
 	ComponentContainer<PowerUpBlock> powerUpBlocks;
 	ComponentContainer<Terrain> terrain;
@@ -66,6 +67,7 @@ public:
 		registry_list.push_back(&collidables);
 		registry_list.push_back(&players);
 		registry_list.push_back(&enemies);
+		registry_list.push_back(&bosses);
 		registry_list.push_back(&powerUps);
 		registry_list.push_back(&powerUpBlocks);
 		registry_list.push_back(&terrain);

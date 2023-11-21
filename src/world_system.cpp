@@ -25,6 +25,14 @@ WorldSystem::~WorldSystem() {
 	// Destroy music components
 	if (background_music != nullptr)
 		Mix_FreeMusic(background_music);
+	if (boss_music != nullptr)
+		Mix_FreeMusic(boss_music);
+	if (boss_intro_music != nullptr)
+		Mix_FreeMusic(boss_intro_music);
+	if (final_boss_music != nullptr)
+		Mix_FreeMusic(final_boss_music);
+	if (final_boss_intro_music != nullptr)
+		Mix_FreeMusic(final_boss_intro_music);
 	if (projectile_sound != nullptr)
 		Mix_FreeChunk(projectile_sound);
 	if (aria_death_sound != nullptr)
@@ -127,6 +135,10 @@ GLFWwindow* WorldSystem::create_window() {
 	}
 
 	background_music = Mix_LoadMUS(audio_path("fast_pace_background.wav").c_str());
+	boss_music = Mix_LoadMUS(audio_path("boss_battle.wav").c_str());
+	boss_intro_music = Mix_LoadMUS(audio_path("boss_battle_intro.wav").c_str());
+	final_boss_music = Mix_LoadMUS(audio_path("final_boss_battle.wav").c_str());
+	final_boss_intro_music = Mix_LoadMUS(audio_path("final_boss_battle_intro.wav").c_str());
 	projectile_sound = Mix_LoadWAV(audio_path("projectile.wav").c_str());
 	aria_death_sound = Mix_LoadWAV(audio_path("aria_death.wav").c_str());
 	enemy_death_sound = Mix_LoadWAV(audio_path("enemy_death.wav").c_str());
@@ -234,7 +246,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
 	// create exit door once all enemies are dead
-	if (registry.enemies.entities.size() == 0 && registry.exitDoors.entities.size() == 0) 
+	if (registry.enemies.entities.size() == 0 && 
+		registry.exitDoors.entities.size() == 0 && 
+		this->curr_level.getExitDoorPos() != NULL_POS)
 		createExitDoor(renderer, this->curr_level.getExitDoorPos());
 
 	return true;
@@ -268,17 +282,26 @@ void WorldSystem::restart_game() {
 	while (registry.collidables.entities.size() > 0)
 		registry.remove_all_components_of(registry.collidables.entities.back());
 
-
-
-
 	GameLevel current_level = this->curr_level;
 	vec2 player_starting_pos = current_level.getPlayerStartingPos();
+	uint curr_level = current_level.getCurrLevel();
 	std::vector<vec2> floor_pos = current_level.getFloorPos();
 	std::vector<std::pair<vec4, bool>> terrains_attrs = current_level.getTerrains();
 	std::vector<std::string> texts = current_level.getTexts();
 	std::vector<std::array<float, TEXT_ATTRIBUTES>> text_attrs = current_level.getTextAttrs();
 	std::vector<std::pair<vec2, Enemy>> enemies_attrs = current_level.getEnemies();
+	std::vector<std::pair<vec2, Enemy>> bosses_attrs = current_level.getBosses();
 	std::vector<std::array<vec2, OBSTACLE_ATTRIBUTES >> obstacles = current_level.getObstacleAttrs();
+
+	if (curr_level == Level::FIRE_BOSS ||
+		curr_level == Level::EARTH_BOSS ||
+		curr_level == Level::LIGHTNING_BOSS ||
+		curr_level == Level::WATER_BOSS) {
+		Mix_FadeInMusic(boss_intro_music, 1, 500);
+	}
+	else if (curr_level == Level::FINAL_BOSS) {
+		Mix_FadeInMusic(final_boss_intro_music, 1, 500);
+	}
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
 	for (uint i = 0; i < floor_pos.size(); i++) {
@@ -306,6 +329,12 @@ void WorldSystem::restart_game() {
 		vec2 pos = enemies_attrs[i].first;
 		Enemy enemy = enemies_attrs[i].second;
 		createEnemy(renderer, pos, enemy);
+	}
+
+	for (uint i = 0; i < bosses_attrs.size(); i++) {
+		vec2 pos = bosses_attrs[i].first;
+		Enemy enemy = bosses_attrs[i].second;
+		createBoss(renderer, pos, enemy);
 	}
 
 	for (uint i = 0; i < obstacles.size(); i++) {
@@ -391,13 +420,13 @@ void WorldSystem::display_power_up() {
 		createPowerUpBlock(renderer, &availPowerUps[0], vec2(700, 300)); // take top element after shuffling list (randomness!)
 	}
 	else if (availPowerUps.size() == 2) {
-		createPowerUpBlock(renderer, &availPowerUps[0], vec2(625, 300));
-		createPowerUpBlock(renderer, &availPowerUps[1], vec2(775, 300));
+		createPowerUpBlock(renderer, &availPowerUps[0], vec2(575, 300));
+		createPowerUpBlock(renderer, &availPowerUps[1], vec2(825, 300));
 	}
 	else {
-		createPowerUpBlock(renderer, &availPowerUps[0], vec2(550, 300));
+		createPowerUpBlock(renderer, &availPowerUps[0], vec2(500, 300));
 		createPowerUpBlock(renderer, &availPowerUps[1], vec2(700, 300));
-		createPowerUpBlock(renderer, &availPowerUps[2], vec2(850, 300));
+		createPowerUpBlock(renderer, &availPowerUps[2], vec2(900, 300));
 	}
 }
 
@@ -413,6 +442,25 @@ void WorldSystem::handle_collisions() {
 
 		// Checking Player - Enemy collisions
 		if (registry.enemies.has(entity_other) && registry.players.has(entity)) {
+			Enemy& enemy = registry.enemies.get(entity_other);
+			if (!enemy.isAggravated) {
+				enemy.isAggravated = true;
+
+				if (registry.bosses.has(entity_other)) {
+					uint curr_level = this->curr_level.getCurrLevel();
+
+					if (curr_level == Level::FIRE_BOSS ||
+						curr_level == Level::EARTH_BOSS ||
+						curr_level == Level::LIGHTNING_BOSS ||
+						curr_level == Level::WATER_BOSS) {
+						Mix_FadeInMusic(boss_music, -1, 250);
+					}
+					else if (curr_level == Level::FINAL_BOSS) {
+						Mix_FadeInMusic(final_boss_music, -1, 250);
+					}
+				}
+			}
+
 			if (!registry.invulnerableTimers.has(entity)) {
 				Mix_PlayChannel(-1, damage_tick_sound, 0);
 				Resources& player_resource = registry.resources.get(entity);
@@ -531,6 +579,24 @@ void WorldSystem::handle_collisions() {
 		}
 		// Checking Projectile - Enemy collisions
 		if (registry.enemies.has(entity_other) && registry.projectiles.has(entity) && !registry.projectiles.get(entity).hostile) {
+			Enemy& enemy = registry.enemies.get(entity_other);
+
+			// start boss intro music once aggravated
+			if (!enemy.isAggravated && registry.bosses.has(entity_other)) {
+				enemy.isAggravated = true;
+				uint curr_level = this->curr_level.getCurrLevel();
+
+				if (curr_level == Level::FIRE_BOSS ||
+					curr_level == Level::EARTH_BOSS ||
+					curr_level == Level::LIGHTNING_BOSS ||
+					curr_level == Level::WATER_BOSS) {
+					Mix_FadeInMusic(boss_music, -1, 250);
+				}
+				else if (curr_level == Level::FINAL_BOSS) {
+					Mix_FadeInMusic(final_boss_music, -1, 250);
+				}
+			}
+
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
 			Resources& enemy_resource = registry.resources.get(entity_other);
 			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
@@ -550,9 +616,17 @@ void WorldSystem::handle_collisions() {
 
 			// remove enemy if health <= 0
 			if (enemy_resource.currentHealth <= 0) {
+				bool boss = registry.bosses.has(entity_other); // store bool before removing all components
+
 				registry.remove_all_components_of(enemy_resource.healthBar);
 				registry.remove_all_components_of(entity_other);
 				Mix_PlayChannel(-1, enemy_death_sound, 0);
+
+				// win level and change background music if boss died
+				if (boss) {
+					win_level();
+					Mix_FadeInMusic(background_music, -1, 1500);
+				}
 			}
 		}
 

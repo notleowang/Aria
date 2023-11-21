@@ -40,6 +40,7 @@ bool GameLevel::init(uint level) {
 	std::vector<vec2>& floors = this->floor_pos;
 	std::vector<std::pair<vec4, bool>>& terrains = this->terrains_attr;
 	std::vector<std::pair<vec2, Enemy>>& enemies = this->enemies_attr;
+	std::vector<std::pair<vec2, Enemy>>& bosses = this->bosses_attr;
 
 	texts.clear();
 	text_attrs.clear();
@@ -47,6 +48,7 @@ bool GameLevel::init(uint level) {
 	terrains.clear();
 	enemies.clear();
 	obstacles.clear();
+	bosses.clear();
 
 	switch (level) {
 	case TUTORIAL:
@@ -91,17 +93,33 @@ bool GameLevel::init(uint level) {
 		enemies.push_back(std::make_pair(vec2(350, 250), getRandomNormalEnemy()));
 		enemies.push_back(std::make_pair(vec2(700, 800), getRandomNormalEnemy()));
 		enemies.push_back(std::make_pair(vec2(950, 800), getRandomNormalEnemy()));
-		enemies.push_back(std::make_pair(vec2(1100, 250), getRandomNormalEnemy()));
+		enemies.push_back(std::make_pair(vec2(1100, 250), FIRE_NORMAL)); // last enemy must be fire
 		break;
+	
+	case FIRE_BOSS:
+		for (uint i = 0; i < 11; i++) {
+			for (uint j = 0; j < 6; j++) {
+				floors.push_back(vec2(i * 250, 100 + j * 250));
+			}
+		}
 
-	// Same as level 1 but with moving walls
-	case LEVEL_2:
+		this->player_starting_pos = vec2(200, 200);
+		this->exit_door_pos = NULL_POS;
+
+		terrains.push_back(std::make_pair(vec4(0, 0, 2800, 100), false));
+		terrains.push_back(std::make_pair(vec4(0, 100, 100, 1400), false));
+		terrains.push_back(std::make_pair(vec4(0, 1500, 2800, 100), false));
+		terrains.push_back(std::make_pair(vec4(2700, 100, 100, 1400), false));
+
+		bosses.push_back(std::make_pair(vec2(1400, 700), FIRE_HIGH_DAMAGE));
+		break;
+	
+	case LEVEL_2: // Same as level 1 but with moving walls
 		this->player_starting_pos = vec2(200, 700);
 
 		texts.push_back("Don't get haunted by the ghosts!");
 		text_attrs.push_back({ 0.f,80.f,1.0f,1.0f,1.0f,0.f });
 		
-		//TODO: WHY DOES GHOST PERSIST?
 		obstacles.push_back({ vec2(150, 450), vec2(80,80), vec2(100.f,0.f) });
 
 		terrains.push_back(std::make_pair(vec4(0, -50, 1800, 100), false));
@@ -120,7 +138,7 @@ bool GameLevel::init(uint level) {
 		enemies.push_back(std::make_pair(vec2(350, 250), getRandomNormalEnemy()));
 		enemies.push_back(std::make_pair(vec2(700, 800), getRandomNormalEnemy()));
 		enemies.push_back(std::make_pair(vec2(950, 800), getRandomNormalEnemy()));
-		enemies.push_back(std::make_pair(vec2(1100, 250), getRandomNormalEnemy()));
+		enemies.push_back(std::make_pair(vec2(1100, 250), EARTH_NORMAL)); // last enemy must be earth
 
 		for (uint i = 0; i < 6; i++) {
 			for (uint j = 0; j < 4; j++) {
@@ -134,7 +152,81 @@ bool GameLevel::init(uint level) {
 		this->exit_door_pos = vec2(1450, 900);
 		break;
 
-	case LEVEL_3:
+	case EARTH_BOSS:
+		for (uint i = 0; i < 11; i++) {
+			for (uint j = 0; j < 6; j++) {
+				floors.push_back(vec2(i * 250, 100 + j * 250));
+			}
+		}
+
+		this->player_starting_pos = vec2(200, 200);
+		this->exit_door_pos = NULL_POS;
+
+		terrains.push_back(std::make_pair(vec4(0, 0, 2800, 100), false));
+		terrains.push_back(std::make_pair(vec4(0, 100, 100, 1400), false));
+		terrains.push_back(std::make_pair(vec4(0, 1500, 2800, 100), false));
+		terrains.push_back(std::make_pair(vec4(2700, 100, 100, 1400), false));
+
+		bosses.push_back(std::make_pair(vec2(1400, 700), EARTH_HIGH_DAMAGE));
+		break;
+
+	case LEVEL_3: // Same as level 1 but with moving walls
+		this->player_starting_pos = vec2(200, 700);
+
+		texts.push_back("Don't get haunted by the ghosts!");
+		text_attrs.push_back({ 0.f,80.f,1.0f,1.0f,1.0f,0.f });
+
+		obstacles.push_back({ vec2(150, 450), vec2(80,80), vec2(100.f,0.f) });
+
+		terrains.push_back(std::make_pair(vec4(0, -50, 1800, 100), false));
+		terrains.push_back(std::make_pair(vec4(0, 50, 100, 900), false));
+		terrains.push_back(std::make_pair(vec4(0, 950, 1800, 100), false));
+		terrains.push_back(std::make_pair(vec4(1700, 50, 100, 900), false));
+		terrains.push_back(std::make_pair(vec4(350, 400, 100, 600), false));
+		terrains.push_back(std::make_pair(vec4(759, 0, 100, 600), false));
+		terrains.push_back(std::make_pair(vec4(1150, 400, 100, 600), false));
+
+		terrains.push_back(std::make_pair(vec4(525, 450, 75, 75), true));
+		terrains.push_back(std::make_pair(vec4(775, 450, 75, 75), true));
+		terrains.push_back(std::make_pair(vec4(1125, 450, 75, 75), true));
+
+
+		enemies.push_back(std::make_pair(vec2(350, 250), getRandomNormalEnemy()));
+		enemies.push_back(std::make_pair(vec2(700, 800), getRandomNormalEnemy()));
+		enemies.push_back(std::make_pair(vec2(950, 800), getRandomNormalEnemy()));
+		enemies.push_back(std::make_pair(vec2(1100, 250), LIGHTNING_NORMAL)); // last enemy must be lightning
+
+		for (uint i = 0; i < 6; i++) {
+			for (uint j = 0; j < 4; j++) {
+				floors.push_back(vec2(100 + i * 250, 50 + j * 250));
+			}
+		}
+		for (uint i = 0; i < 4; i++) {
+			floors.push_back(vec2(1475, 50 + i * 250));
+		}
+
+		this->exit_door_pos = vec2(1450, 900);
+		break;
+
+	case LIGHTNING_BOSS:
+		for (uint i = 0; i < 11; i++) {
+			for (uint j = 0; j < 6; j++) {
+				floors.push_back(vec2(i * 250, 100 + j * 250));
+			}
+		}
+
+		this->player_starting_pos = vec2(200, 200);
+		this->exit_door_pos = NULL_POS;
+
+		terrains.push_back(std::make_pair(vec4(0, 0, 2800, 100), false));
+		terrains.push_back(std::make_pair(vec4(0, 100, 100, 1400), false));
+		terrains.push_back(std::make_pair(vec4(0, 1500, 2800, 100), false));
+		terrains.push_back(std::make_pair(vec4(2700, 100, 100, 1400), false));
+
+		bosses.push_back(std::make_pair(vec2(1400, 700), LIGHTNING_HIGH_DAMAGE));
+		break;
+
+	case LEVEL_4:
 		this->player_starting_pos = vec2(200, 200);
 		this->exit_door_pos = vec2(3900, 1900);
 
@@ -176,13 +268,49 @@ bool GameLevel::init(uint level) {
 		enemies.push_back(std::make_pair(vec2(3000, 1250), EARTH_NORMAL));
 
 		// Area 4
-		enemies.push_back(std::make_pair(vec2(3200, 1600), WATER_NORMAL));
+		enemies.push_back(std::make_pair(vec2(3200, 1600), WATER_NORMAL));	// final group of water enemies before "final boss"
 		enemies.push_back(std::make_pair(vec2(3200, 1700), WATER_NORMAL));
 		enemies.push_back(std::make_pair(vec2(3200, 1800), WATER_NORMAL));
 		enemies.push_back(std::make_pair(vec2(3200, 1900), WATER_NORMAL));
 
-
 		break;
+
+	case WATER_BOSS:
+		for (uint i = 0; i < 11; i++) {
+			for (uint j = 0; j < 6; j++) {
+				floors.push_back(vec2(i * 250, 100 + j * 250));
+			}
+		}
+
+		this->player_starting_pos = vec2(200, 200);
+		this->exit_door_pos = NULL_POS;
+
+		terrains.push_back(std::make_pair(vec4(0, 0, 2800, 100), false));
+		terrains.push_back(std::make_pair(vec4(0, 100, 100, 1400), false));
+		terrains.push_back(std::make_pair(vec4(0, 1500, 2800, 100), false));
+		terrains.push_back(std::make_pair(vec4(2700, 100, 100, 1400), false));
+
+		bosses.push_back(std::make_pair(vec2(1400, 700), WATER_HIGH_DAMAGE));
+		break;
+
+	case FINAL_BOSS: // actual final boss (the reaper dude)
+		for (uint i = 0; i < 11; i++) {
+			for (uint j = 0; j < 6; j++) {
+				floors.push_back(vec2(i * 250, 100 + j * 250));
+			}
+		}
+
+		this->player_starting_pos = vec2(200, 200);
+		this->exit_door_pos = NULL_POS;
+
+		terrains.push_back(std::make_pair(vec4(0, 0, 2800, 100), false));
+		terrains.push_back(std::make_pair(vec4(0, 100, 100, 1400), false));
+		terrains.push_back(std::make_pair(vec4(0, 1500, 2800, 100), false));
+		terrains.push_back(std::make_pair(vec4(2700, 100, 100, 1400), false));
+
+		bosses.push_back(std::make_pair(vec2(1400, 700), COMBO_HIGH_DAMAGE));
+		break;
+
 	case POWER_UP:
 		for (uint i = 0; i < 5; i++) {
 			for (uint j = 0; j < 3; j++) {
