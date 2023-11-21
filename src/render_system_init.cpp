@@ -310,17 +310,32 @@ void RenderSystem::initializeSpriteSheets()
 void RenderSystem::initializePlayerGeometryBuffer()
 {
 	int geom_index = (int)GEOMETRY_BUFFER_ID::PLAYER;
-	
-	std::vector<ColoredVertex> vertices(3);
-	vertices[0].position = { 0.f, -0.5f, 0.f };
-	vertices[1].position = { -0.5f, 0.5f, 0.f };
-	vertices[2].position = { 0.5f, 0.5f, 0.f };
-	
-	const std::vector<uint16_t> vertex_indices = { 0, 1, 2 };
+	int ss_id = (int)SPRITE_SHEET_DATA_ID::PLAYER;
+	int num_rows = sprite_sheets[(int)ss_id].num_rows;
+	int num_cols = sprite_sheets[(int)ss_id].num_cols;
+
+	// square aspect ratio
+	std::vector<TexturedVertex> textured_vertices(4);
+	textured_vertices[0].position = { -1.f / 2, +1.f / 2, 0.f };
+	textured_vertices[1].position = { +1.f / 2, +1.f / 2, 0.f };
+	textured_vertices[2].position = { +1.f / 2, -1.f / 2, 0.f };
+	textured_vertices[3].position = { -1.f / 2, -1.f / 2, 0.f };
+	textured_vertices[0].texcoord = { 0.2f,				1.f / num_rows };
+	textured_vertices[1].texcoord = { 1.f / num_cols - 0.2f,	1.f / num_rows };
+	textured_vertices[2].texcoord = { 1.f / num_cols - 0.2f,	0.f };
+	textured_vertices[3].texcoord = { 0.2f,				0.f };
+
+	const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
+
+	std::vector<ColoredVertex> vertices(4);
+	vertices[0].position = textured_vertices[0].position;
+	vertices[1].position = textured_vertices[1].position;
+	vertices[2].position = textured_vertices[2].position;
+	vertices[3].position = textured_vertices[3].position;
 
 	meshes[geom_index].vertices = vertices;
-	meshes[geom_index].vertex_indices = vertex_indices;
-	bindVBOandIBO(GEOMETRY_BUFFER_ID::PLAYER, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
+	meshes[geom_index].vertex_indices = textured_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::PLAYER, textured_vertices, textured_indices);
 }
 
 void RenderSystem::initializeSpriteGeometryBuffer()
@@ -494,19 +509,18 @@ void RenderSystem::initializeGlGeometryBuffers()
 	// Index and Vertex buffer data initialization.
 	initializeGlMeshes();
 
-	initializePlayerGeometryBuffer();
 	initializeSpriteGeometryBuffer();
 	initializeDebugLineGeometryBuffer();
 	initializeScreenTriangleGeometryBuffer();
 	initializeTerrainGeometryBuffer();
 	initializeExitDoorGeometryBuffer();
 	// function initializeSpriteSheets must be called before this point
+	initializePlayerGeometryBuffer();
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FIRE_PROJECTILE, SPRITE_SHEET_DATA_ID::FIRE_PROJECTILE);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::WATER_PROJECTILE, SPRITE_SHEET_DATA_ID::WATER_PROJECTILE);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::EARTH_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIGHTNING_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::POWER_UP_BLOCK, SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK);
-	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PLAYER, SPRITE_SHEET_DATA_ID::PLAYER);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PROJECTILE_SELECT_DISPLAY, SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY);
 	initializeResourceBarGeometryBuffer();
 }
