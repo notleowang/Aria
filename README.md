@@ -15,7 +15,7 @@ Below is the documentation for our `README.md` submission for Milestone 3.
 - **Consistent game resolution** (TODO: ADD LINK)
 - **Basic Integrated Assets**: 
 Player Sprite (TODO: ADD LINK), 
-Enemy Sprites (water, fire, earth, air, ghost; TODO: ADD LINKS),
+Enemy Sprites (water, [fire](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/fire_enemy.png), earth, air, ghost; TODO: ADD LINKS),
 Boss Sprites (TODO: ADD LINK),
 New Music (TODO: ADD LINK),
 [Power-up Block Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/power_up_block.png),
