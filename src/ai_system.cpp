@@ -104,7 +104,7 @@ void AISystem::step(float elapsed_ms)
 				}
 				direction *= isSprinting ? 200 : 50;
 				vel_i.velocity = direction;
-			} else {
+			} else if (dist > 350 || !enemy.isAggravated) {
 				vel_i.velocity.y = 0;
 				if (abs(vel_i.velocity.x) != 50) {
 					vel_i.velocity.x = 50;
