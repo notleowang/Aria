@@ -12,7 +12,7 @@ Below is the documentation for our `README.md` submission for Milestone 3.
 - **Simple rendering effects** (prior milestone fix): 2 shader effects, 
 [Spotlight](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/shaders/screen_darken.fs.glsl#L21) and 
 [Rainbow](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/shaders/animated.fs.glsl#L70).
-- **Consistent game resolution** (TODO: ADD LINK)
+- [**Consistent game resolution**](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/5f074bd1f09434511ea25e1ac449e401fb17adc4/src/world_system.cpp#L96)
 - **Basic Integrated Assets**:
 Enemy Sprites ([water](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/water_enemy.png), [fire](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/fire_enemy.png), [earth](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/earth_enemy.png), [lightning](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/lightning_enemy.png), [ghost](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/ghost.png)),
 [Boss Sprites](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/fire_boss.png),
