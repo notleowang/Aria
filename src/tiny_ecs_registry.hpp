@@ -30,6 +30,7 @@ public:
 	ComponentContainer<Collidable> collidables;
 	ComponentContainer<Player> players;
 	ComponentContainer<Enemy> enemies;
+	ComponentContainer<Boss> bosses;
 	ComponentContainer<PowerUp> powerUps;
 	ComponentContainer<PowerUpBlock> powerUpBlocks;
 	ComponentContainer<Terrain> terrain;
@@ -66,6 +67,7 @@ public:
 		registry_list.push_back(&collidables);
 		registry_list.push_back(&players);
 		registry_list.push_back(&enemies);
+		registry_list.push_back(&bosses);
 		registry_list.push_back(&powerUps);
 		registry_list.push_back(&powerUpBlocks);
 		registry_list.push_back(&terrain);
@@ -103,6 +105,13 @@ public:
 	void remove_all_components_of(Entity e) {
 		for (ContainerInterface* reg : registry_list)
 			reg->remove(e);
+	}
+
+	void remove_all_components_of_no_collision(Entity e) {
+		for (ContainerInterface* reg : registry_list) {
+			if (reg == &collisions) continue;
+			reg->remove(e);
+		}
 	}
 };
 

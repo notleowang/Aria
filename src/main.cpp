@@ -58,6 +58,7 @@ int main()
 		auto now = Clock::now();
 		float elapsed_ms =
 			(float)(std::chrono::duration_cast<std::chrono::microseconds>(now - t)).count() / 1000;
+		if (elapsed_ms > 100) elapsed_ms = 100; // guarantee at least 10 ticks per second
 		t = now;
 
 		// handles what UI elements to show

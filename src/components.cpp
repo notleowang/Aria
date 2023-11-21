@@ -180,11 +180,11 @@ int SpriteSheet::getPlayerStateFromDirection(DIRECTION dir)
 		case DIRECTION::E:
 			return (int)PLAYER_SPRITE_STATES::EAST;
 		case DIRECTION::SE:
-			return (int)PLAYER_SPRITE_STATES::SOUTH_EAST;
+			return (int)PLAYER_SPRITE_STATES::EAST;
 		case DIRECTION::S:
 			return (int)PLAYER_SPRITE_STATES::SOUTH;
 		case DIRECTION::SW:
-			return (int)PLAYER_SPRITE_STATES::SOUTH_EAST;
+			return (int)PLAYER_SPRITE_STATES::EAST;
 		case DIRECTION::W:
 			return (int)PLAYER_SPRITE_STATES::EAST;
 		case DIRECTION::NW:

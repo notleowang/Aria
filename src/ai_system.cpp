@@ -6,6 +6,7 @@
 #include "world_system.hpp"
 #include "render_system.hpp"
 #include <chrono>
+#include <utils.hpp>
 
 #define ENEMY_PROJECTILE_SPEED 500
 
@@ -28,16 +29,28 @@ void AISystem::step(float elapsed_ms)
 		bool isSprinting = false;
 		bool isFlanking = false;
 
-		for (uint i = 0; i < registry.projectiles.size(); i++) {
-			Entity entity_p = registry.projectiles.entities[i];
-			Projectile& projectile = registry.projectiles.get(entity_p);
-			if (projectile.hostile) continue;
-			vec2 projectilePos = registry.positions.get(entity_p).position;
-			if (distance(projectilePos, thisPos) < 300) {
-				isDodging = true;
-				if (canSprint) {
-					isSprinting = true;
-					enemy.stamina -= elapsed_ms / 1000;
+		// ensure enemy is aggravated to be able to dodge
+		if (enemy.isAggravated) {
+			for (uint i = 0; i < registry.projectiles.size(); i++) {
+				Entity entity_p = registry.projectiles.entities[i];
+				Projectile& projectile = registry.projectiles.get(entity_p);
+				if (projectile.hostile) continue;
+				vec2 projectilePos = registry.positions.get(entity_p).position;
+				if (distance(projectilePos, thisPos) < 300) {
+					isDodging = true;
+					if (canSprint) {
+						isSprinting = true;
+						enemy.stamina -= elapsed_ms / 1000;
+					}
+
+					float c = cosf(90);
+					float s = sinf(90);
+					mat2 R = {{c, s}, {-s, c}};
+
+					vec2 direction = projectilePos - thisPos;
+					direction /= length(direction);
+					direction *= isSprinting ? 350 : 50; // allow enemies to sprint even faster to dodge
+					vel_i.velocity = direction * R;
 				}
 				
 				int deg = 90;
@@ -99,7 +112,7 @@ void AISystem::step(float elapsed_ms)
 					enemyFireProjectile(entity_i, direction);
 					enemy.mana -= 1.f;
 				}
-				direction *= isSprinting ? 200 : 50;
+				direction *= isSprinting ? (enemy.isAggravated ? 200 : 150) : 50;
 				vel_i.velocity = direction;
 			} else if (dist > 350) {
 				vel_i.velocity.y = 0;
@@ -149,6 +162,7 @@ bool AISystem::enemyFireProjectile(Entity& enemy, vec2 direction) {
 
 	// Get current player projectile type
 	ElementType elementType = registry.enemies.get(enemy).type;
+	if (elementType == ElementType::COMBO) elementType = getRandomElementType();
 
 	createProjectile(renderer, enemyPos, vel, elementType, true, enemy);
 	//															 ^^^^^ doesnt matter as ignored by the hostile = true
