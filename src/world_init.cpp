@@ -169,7 +169,6 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	case ElementType::WATER:
 		textureAsset = TEXTURE_ASSET_ID::WATER_ENEMY;
 		break;
-
 	case ElementType::FIRE:
 		textureAsset = TEXTURE_ASSET_ID::FIRE_ENEMY;
 		break;
