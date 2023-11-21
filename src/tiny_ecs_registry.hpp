@@ -106,6 +106,13 @@ public:
 		for (ContainerInterface* reg : registry_list)
 			reg->remove(e);
 	}
+
+	void remove_all_components_of_no_collision(Entity e) {
+		for (ContainerInterface* reg : registry_list) {
+			if (reg == &collisions) continue;
+			reg->remove(e);
+		}
+	}
 };
 
 extern ECSRegistry registry;

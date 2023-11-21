@@ -174,6 +174,7 @@ void PhysicsSystem::step(float elapsed_ms)
 	for (uint i = 0; i < velocity_container.size(); i++)
 	{
 		Entity entity = velocity_container.entities[i];
+		if (!velocity_container.has(entity) || !registry.positions.has(entity)) continue;
 		Velocity& velocity = velocity_container.get(entity);
 		Position& position = registry.positions.get(entity);
 		float step_seconds = elapsed_ms / 1000.f;
