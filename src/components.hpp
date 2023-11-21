@@ -217,8 +217,7 @@ struct DeathTimer
 // Timer that signifies level change
 struct WinTimer
 {
-	float start_timer_ms = 1500.f;
-	float timer_ms = start_timer_ms;
+	float timer_ms = 3600.f;
 	bool changedLevel = false;
 };
 
