@@ -1,70 +1,66 @@
 # Aria: Whispers of Darkness
 In the eerie village of Grimhaven, shrouded in perpetual mist and shadows, Aria's journey begins. 
 
-# Milestone 2
-Below is the documentation for our `README.md` submission for Milestone 2.
+# Milestone 3
+Below is the documentation for our `README.md` submission for Milestone 3.
 
 ## Entry Points
-- Game Logic Response to User Input: [AI System](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/src/ai_system.cpp#L5)
-
-- Sprite Sheet Animation: 
-[Animation Component](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/src/components.hpp#L196),
-[Handling Effect](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/src/render_system.cpp#L79),
-[Advancing Frames](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/src/render_system.cpp#L309),
-[Shader](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/shaders/animated.fs.glsl),
-[Animation Sequences](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/14e8f386b75c6a21ea42ea23c1cf00e87eade535/src/world_init.cpp#L274) (the projectiles with the ANIMATED effect asset id are animation sequences using different textures)
-- New integrated assets: 
-[Health/Mana bar texture](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/data/textures/health_bar.png), 
-[New Projectile Textures](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/005cfe61bd0082a3ecf530d97725b540bb8545e0/data/textures/water_projectile_spritesheet.png) (the link takes you to one of the new projectile textures, the rest are in the textures folder)
-- [Mesh Based Collision](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/src/physics_system.cpp#L36)
-  - Physics System first goes through a broad phase collision check (AABB Collision Detection) followed by a narrow phase collision check which uses line segment 
-    intersection. (Draw a line from entity's mid point to each vertex and check if it collides with the edge of another entity and vice versa for other entity)
-- Basic User Tutorial/Help
-  - Text is provided in the very first level (tutorial level) to inform the user what can be done in the game.
-  - Text is also provided on each power-up level prompting the player to shoot at the block to receive a power-up.
-- [Consistent Game Resolution](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/a02a00206804e162dfe492ea22aa1a741ab3b5fd/src/world_system.cpp#L75): Consistent resolution is set on line 83
-- [Simple Rendering Effects (Spotlight)](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/d7719e1b3523724e5169875fb26f12e86c066294/src/world_system.cpp#L178)
-- External Integration of FreeType Library
-  - [Modified CMake](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/CMakeLists.txt#L70)
-  - [FreeType Load](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/src/render_system_init.cpp#L66)
-  - [Character Render](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/src/render_system.cpp#L87)
-- 2 Minutes of Non-Repetitive Gameplay:
-[New Game Levels](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/a02a00206804e162dfe492ea22aa1a741ab3b5fd/src/game_level.cpp), [Power-Ups](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/a02a00206804e162dfe492ea22aa1a741ab3b5fd/src/components.hpp#L32)
-- [Key-frame/State Interpolation](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/src/render_system.cpp#L167)
+- **Sprite sheet animation** (prior milestone fix): adapted to accomodate sprite sheets with rows and partitions frames into animation states. 
+[Initializing sprite sheets](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/src/render_system_init.cpp#L296), 
+[Passing in shader parameters](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/src/render_system.cpp#L91), 
+[Shader implementation](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/shaders/animated.fs.glsl#L84).
+- **Simple rendering effects** (prior milestone fix): 2 shader effects, 
+[Spotlight](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/shaders/screen_darken.fs.glsl#L21) and 
+[Rainbow](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/shaders/animated.fs.glsl#L70).
+- [**Consistent game resolution**](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/5f074bd1f09434511ea25e1ac449e401fb17adc4/src/world_system.cpp#L96)
+- **Advanced Integrated Assets**:
+	- Music: [Changes from usual background music in boss levels](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/ced078a1d4c558b828c40fe0bd6f21cffb9eb988/src/world_system.cpp#L289), [changes when player starts to attack the boss](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/ced078a1d4c558b828c40fe0bd6f21cffb9eb988/src/world_system.cpp#L445), [link to new music files](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/audio/boss_battle.wav)
+	- New sprites: [Player Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/aria.png),
+Enemy Sprites ([water](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/water_enemy.png), [fire](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/fire_enemy.png), [earth](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/earth_enemy.png), [lightning](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/lightning_enemy.png), [ghost](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/ghost.png)),
+[Boss Sprites](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/fire_boss.png),
+[Power-up Block Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/power_up_block.png),
+[Projectile Select Display Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/projectile-select-display-purple.png),
+[Portal Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/portal.png).
+- **2D Dynamic Shadows**:
+  - [Shadow entity](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/src/components.hpp#L63)
+  - [Shadow creation](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/src/world_init.cpp#L245)
+  - [Shadow vertex shader](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/shaders/shadow.vs.glsl), [Shadow fragment shader](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/shaders/shadow.fs.glsl)
+  - [Dynamic shadow update](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/src/physics_system.cpp#L131)
+  - [Dim lights to simulate lighting and shadows](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/shaders/screen_darken.fs.glsl#L43)
+- **Enemy group behaviour / Cooperative planning**
+  - [Enemies Flank Player](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/e0e34f09731f7c53edfcdf05e690c7d275f4dec4/src/ai_system.cpp#L81)
+  - [Enemies Heal Allies](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/e0e34f09731f7c53edfcdf05e690c7d275f4dec4/src/ai_system.cpp#L76)
 
 ## Development Plan
 Most of the work in this milestone aligned with our development plan for this milestone.
 
 ### Aligned with the proposal:
-- Implemented new levels.
-- Enhanced enemy ai.
-- New sprites for enemeies.
-- UI sprites (health bar).
-- Projectile sprite animations.
-- Finished basic tutorial concept level.
-- Added power-ups.
-- Added weaknesses to enemies.
-- Incorporated mana.
-- Added additional audio feedback.
+- Gameplay extended to ~6-7 minutes.
+- Mini-bosses implemented.
+- Finished player sprite.
 
 ### Discreprancies:
-- No sprite animations for player yet.
+- Did not finish persistency (save/load).
+- Moving complex motion implementation to next milestone.
+- Did not add knockback to enemy collisions.
 
 ## ECS Design Pattern
-The ECS design pattern has not been changed since Milestone 1.
+The ECS design pattern has not been changed since Milestone 1 and 2.
 
 ## Game Entities
 - Player
 - Enemy
 - Terrain
 - Exit Door
-
-### New Game Entities:
 - Projectile
 - Text
 - Health Bar
 - Floor
 - PowerUpBlock
+
+### New Game Entities:
+- Shadow
+- Obstacle
 
 ## Actionable Components
 - Velocity
@@ -78,8 +74,6 @@ The ECS design pattern has not been changed since Milestone 1.
 - Render Request
 - Screen State
 - Color
-
-### New Actionable Components
 - Projectile
 - Text
 - CharacterProjectileType
@@ -88,6 +82,9 @@ The ECS design pattern has not been changed since Milestone 1.
 - Animation
 - Power Up
 
+### New Actionable Components
+- Follower
+
 ## Entity Component Diagram
 Highlight any changes versus the previous milestone.
-![ECS diagram](docu/images/M2_ECS_diagram.png)
+![ECS diagram](docu/images/M3_ECS_diagram.png)
