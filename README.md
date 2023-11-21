@@ -21,7 +21,7 @@ New Music (TODO: ADD LINK),
 [Power-up Block Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/power_up_block.png),
 [Projectile Select Display Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/projectile-select-display-purple.png),
 [Portal Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/portal.png).
-- **2D Dyanmic Shadows**
+- **2D Dynamic Shadows**
 - **Basic Story Elements**
 
 ## Development Plan
