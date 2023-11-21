@@ -33,8 +33,14 @@ New Music (TODO: ADD LINK),
 Most of the work in this milestone aligned with our development plan for this milestone.
 
 ### Aligned with the proposal:
+- Gameplay extended to ~6-7 minutes.
+- Mini-bosses implemented.
+- Finished player sprite.
 
 ### Discreprancies:
+- Did not finish persistency (save/load).
+- Moving complex motion implementation to next milestone.
+- Did not add knockback to enemy collisions.
 
 ## ECS Design Pattern
 The ECS design pattern has not been changed since Milestone 1 and 2.
