@@ -804,6 +804,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		case GLFW_KEY_4:
 			characterProjectileType.projectileType = ElementType::LIGHTNING;
 			break;
+		case GLFW_KEY_9:
+			win_level();
+			break;
 		case GLFW_KEY_0:
 			registry.resources.get(player).maxHealth = 10000.f;
 			registry.resources.get(player).currentHealth = 10000.f;
