@@ -21,34 +21,35 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	// set initial component values
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
-	position.scale = vec2(60.f, 100.f);
+	position.scale = vec2(63.f, 100.f);
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity);
-	resources.manaBar = createManaBar(renderer, entity);
+	resources.healthBar = createHealthBar(renderer, entity, PLAYER_HEALTH_BAR_Y_OFFSET);
+	resources.manaBar = createManaBar(renderer, entity, PLAYER_MANA_BAR_Y_OFFSET);
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
 
 	PowerUp& powerUp = registry.powerUps.emplace(entity);
 	// TOGGLE THESE TO TEST OR GO GOD MODE - enjoy! :)
-	//powerUp.fasterMovement = true;
-	//powerUp.increasedDamage[ElementType::WATER] = true;
-	//powerUp.increasedDamage[ElementType::FIRE] = true;
-	//powerUp.increasedDamage[ElementType::EARTH] = true;
-	//powerUp.increasedDamage[ElementType::LIGHTNING] = true;
-	//powerUp.tripleShot[ElementType::WATER] = true;
-	//powerUp.tripleShot[ElementType::FIRE] = true;
-	//powerUp.tripleShot[ElementType::EARTH] = true;
-	//powerUp.tripleShot[ElementType::LIGHTNING] = true;
-	//powerUp.bounceOffWalls[ElementType::WATER] = true;
-	//powerUp.bounceOffWalls[ElementType::FIRE] = true;
-	//powerUp.bounceOffWalls[ElementType::EARTH] = true;
-	//powerUp.bounceOffWalls[ElementType::LIGHTNING] = true;
+	/*powerUp.fasterMovement = true;
+	powerUp.increasedDamage[ElementType::WATER] = true;
+	powerUp.increasedDamage[ElementType::FIRE] = true;
+	powerUp.increasedDamage[ElementType::EARTH] = true;
+	powerUp.increasedDamage[ElementType::LIGHTNING] = true;
+	powerUp.tripleShot[ElementType::WATER] = true;
+	powerUp.tripleShot[ElementType::FIRE] = true;
+	powerUp.tripleShot[ElementType::EARTH] = true;
+	powerUp.tripleShot[ElementType::LIGHTNING] = true;
+	powerUp.bounceOffWalls[ElementType::WATER] = true;
+	powerUp.bounceOffWalls[ElementType::FIRE] = true;
+	powerUp.bounceOffWalls[ElementType::EARTH] = true;
+	powerUp.bounceOffWalls[ElementType::LIGHTNING] = true;*/
 
+	//createShadow(renderer, entity, TEXTURE_ASSET_ID::PLAYER, GEOMETRY_BUFFER_ID::PLAYER);
 	registry.characterProjectileTypes.emplace(entity);
 	registry.players.emplace(entity);
 	registry.collidables.emplace(entity);
@@ -71,6 +72,8 @@ Entity createFloor(RenderSystem* renderer, vec2 pos)
 	// pos passed in to createFloor assumes top left corner is (x,y)
 	position.position = vec2(pos.x + position.scale.x/2, pos.y + position.scale.y/2);
 
+	Floor& floor = registry.floors.emplace(entity);
+
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::FLOOR,
@@ -91,6 +94,7 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, bool moveable)
 	// and size corresponds to width and height
 	Position& position = registry.positions.emplace(entity);
 	position.position = vec2(pos.x + size.x/2, pos.y + size.y/2);
+	position.prev_position = vec2(pos.x + size.x / 2, pos.y + size.y / 2);
 	position.scale = size;
 
 	Terrain& terrain = registry.terrain.emplace(entity);
@@ -99,17 +103,45 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, bool moveable)
 		Velocity& velocity = registry.velocities.emplace(entity);
 		velocity.velocity = { 200.f, 0.f };
 	}
+
 	registry.collidables.emplace(entity); // Marking terrain as collidable
 	registry.renderRequests.insert(
-		entity, 
+		entity,
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
 			EFFECT_ASSET_ID::TERRAIN,
 			GEOMETRY_BUFFER_ID::TERRAIN });
 	
 	return entity;
 }
+Entity createObstacle(RenderSystem* renderer, vec2 pos, vec2 size, vec2 vel) {
+	auto entity = Entity();
 
-Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+
+	position.scale = size;
+
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity = vel;
+
+	Obstacle& obstacle = registry.obstacles.emplace(entity);
+	registry.collidables.emplace(entity); // Marking obstacle as collidable
+
+	createShadow(renderer, entity, TEXTURE_ASSET_ID::GHOST, GEOMETRY_BUFFER_ID::SPRITE);
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::GHOST,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 {
 	// TODO: change enemy implementation to include different enemy types
 	auto entity = Entity();
@@ -121,39 +153,38 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 
-	position.scale = vec2({ 125, 100 });
+	position.scale = vec2({ 50, 50 });
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity.x = 50;
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity);
-	
-	HealthBar& healthBar = registry.healthBars.get(resources.healthBar);
-	healthBar.y_offset = -50.f;
+	resources.healthBar = createHealthBar(renderer, entity, ENEMY_HEALTH_BAR_Y_OFFSET);
 
 	Enemy& enemy = registry.enemies.emplace(entity);
-	enemy.type = enemyType;
+	enemy = enemyAttributes;
 	
 	TEXTURE_ASSET_ID textureAsset;
 	switch (enemy.type) {
 	case ElementType::WATER:
-		textureAsset = TEXTURE_ASSET_ID::TURTLE;
+		textureAsset = TEXTURE_ASSET_ID::WATER_ENEMY;
 		break;
-
 	case ElementType::FIRE:
 		textureAsset = TEXTURE_ASSET_ID::FIRE_ENEMY;
 		break;
-	//case ElementType::Earth:
-	//	textureAsset = TEXTURE_ASSET_ID::EARTH_ENEMY;
-	//	break;
-	//case ElementType::Lightning:
-	//	textureAsset = TEXTURE_ASSET_ID::LIGHTNING_ENEMY;
-	//	break;
+	case ElementType::EARTH:
+		textureAsset = TEXTURE_ASSET_ID::EARTH_ENEMY;
+		break;
+	case ElementType::LIGHTNING:
+		textureAsset = TEXTURE_ASSET_ID::LIGHTNING_ENEMY;
+		break;
 	default:
-		textureAsset = TEXTURE_ASSET_ID::TURTLE;
+		//Should never reach here
+		textureAsset = TEXTURE_ASSET_ID::FIRE_ENEMY;
 		break;
 	}
+
+	createShadow(renderer, entity, textureAsset, GEOMETRY_BUFFER_ID::SPRITE);
 
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
@@ -165,15 +196,80 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, ElementType enemyType)
 	return entity;
 }
 
-Entity createHealthBar(RenderSystem* renderer, Entity& owner_entity)
+Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
+{
+	auto entity = Entity();
+
+	registry.bosses.emplace(entity);
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+
+	position.scale = vec2({ 135, 200 });
+
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity.x = 25;
+
+	Resources& resources = registry.resources.emplace(entity);
+	resources.maxHealth = 1500.f;
+	resources.currentHealth = 1500.f;
+	resources.healthBar = createHealthBar(renderer, entity, BOSS_HEALTH_BAR_Y_OFFSET);
+
+	Enemy& enemy = registry.enemies.emplace(entity);
+	enemy = enemyAttributes;
+
+	TEXTURE_ASSET_ID textureAsset;
+	switch (enemy.type) {
+	case ElementType::WATER:
+		textureAsset = TEXTURE_ASSET_ID::WATER_BOSS;
+		break;
+
+	case ElementType::FIRE:
+		textureAsset = TEXTURE_ASSET_ID::FIRE_BOSS;
+		break;
+	case ElementType::EARTH:
+		textureAsset = TEXTURE_ASSET_ID::EARTH_BOSS;
+		break;
+	case ElementType::LIGHTNING:
+		textureAsset = TEXTURE_ASSET_ID::LIGHTNING_BOSS;
+		break;
+	case ElementType::COMBO:
+		textureAsset = TEXTURE_ASSET_ID::FINAL_BOSS;
+		break;
+	default:
+		// should never reach here
+		textureAsset = TEXTURE_ASSET_ID::FINAL_BOSS;
+		break;
+	}
+
+	createShadow(renderer, entity, textureAsset, GEOMETRY_BUFFER_ID::SPRITE);
+
+	registry.collidables.emplace(entity);
+	registry.renderRequests.insert(
+		entity,
+		{ textureAsset,
+		 EFFECT_ASSET_ID::TEXTURED,
+		 GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+Entity createHealthBar(RenderSystem* renderer, Entity& owner_entity, float y_offset)
 {
 	auto entity = Entity();
 
 	HealthBar& healthBar = registry.healthBars.emplace(entity);
-	healthBar.owner = owner_entity;
 
 	Position& position = registry.positions.emplace(entity);
 	position.scale = vec2(RESOURCE_BAR_WIDTH, RESOURCE_BAR_HEIGHT);
+
+	Follower& follower = registry.followers.emplace(entity);
+	follower.owner = owner_entity;
+	follower.y_offset = y_offset;
 
 	registry.renderRequests.insert(
 		entity,
@@ -184,21 +280,82 @@ Entity createHealthBar(RenderSystem* renderer, Entity& owner_entity)
 	return entity;
 }
 
-Entity createManaBar(RenderSystem* renderer, Entity& owner_entity)
+Entity createManaBar(RenderSystem* renderer, Entity& owner_entity, float y_offset)
 {
 	auto entity = Entity();
 
 	ManaBar& manaBar = registry.manaBars.emplace(entity);
-	manaBar.owner = owner_entity;
 
 	Position& position = registry.positions.emplace(entity);
 	position.scale = vec2(RESOURCE_BAR_WIDTH, RESOURCE_BAR_HEIGHT);
+
+	Follower& follower = registry.followers.emplace(entity);
+	follower.owner = owner_entity;
+	follower.y_offset = y_offset;
 
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::MANA_BAR,
 			EFFECT_ASSET_ID::RESOURCE_BAR,
 			GEOMETRY_BUFFER_ID::RESOURCE_BAR });
+
+	return entity;
+}
+
+
+Entity createShadow(RenderSystem* renderer, Entity& owner_entity, TEXTURE_ASSET_ID texture, GEOMETRY_BUFFER_ID geom)
+{
+	auto entity = Entity();
+
+	Shadow& shadow = registry.shadows.emplace(entity);
+	shadow.owner = owner_entity;
+	shadow.active = false;
+
+	Mesh& mesh = renderer->getMesh(geom);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& owner_position = registry.positions.get(owner_entity);
+	Position& position = registry.positions.emplace(entity);
+	position.position = owner_position.position;
+	position.scale = owner_position.scale;
+	shadow.original_size = position.scale;
+
+	registry.renderRequests.insert(
+		entity,
+		{ texture,
+			EFFECT_ASSET_ID::SHADOW,
+			geom });
+
+	return entity;
+}
+
+Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entity, float y_offset)
+{
+	auto entity = Entity();
+
+	ProjectileSelectDisplay& display = registry.projectileSelectDisplays.emplace(entity);
+
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	CharacterProjectileType& characterProjectileType = registry.characterProjectileTypes.get(owner_entity);
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int) characterProjectileType.projectileType);
+	animation.is_animating = false;
+
+	Position& position = registry.positions.emplace(entity);
+	position.scale = vec2(PROJECTILE_SELECT_DISPLAY_WIDTH, PROJECTILE_SELECT_DISPLAY_HEIGHT);
+
+	Follower& follower = registry.followers.emplace(entity);
+	follower.owner = owner_entity;
+	follower.y_offset = y_offset;
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::PROJECTILE_SELECT_DISPLAY,
+			EFFECT_ASSET_ID::ANIMATED,
+			GEOMETRY_BUFFER_ID::PROJECTILE_SELECT_DISPLAY });
 
 	return entity;
 }
@@ -217,14 +374,14 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
-			EFFECT_ASSET_ID::EXIT_DOOR,
-			GEOMETRY_BUFFER_ID::EXIT_DOOR});
+		{ TEXTURE_ASSET_ID::PORTAL,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE});
 
 	return entity;
 }
 
-Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp) {
+Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp, vec2 pos) {
 	auto entity = Entity();
 
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::EXIT_DOOR);
@@ -239,10 +396,10 @@ Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp) 
 	animation.rainbow_enabled = true;
 
 	Position& position = registry.positions.emplace(entity);
-	position.position = vec2(700, 300);
+	position.position = pos;
 	position.scale = vec2(100.f, 100.f);
 
-	PowerUpBlock& powerUpBlock = registry.powerUpBlock.emplace(entity);
+	PowerUpBlock& powerUpBlock = registry.powerUpBlocks.emplace(entity);
 	powerUpBlock.powerUpText = powerUp->first;
 	powerUpBlock.powerUpToggle = powerUp->second;
 
@@ -275,7 +432,7 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity);
+	resources.healthBar = createHealthBar(renderer, entity, PLAYER_HEALTH_BAR_Y_OFFSET);
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;

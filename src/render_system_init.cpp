@@ -13,6 +13,13 @@
 #include <iostream>
 #include <sstream>
 
+// define our font path
+#ifdef __linux__
+	#define FONT_PATH "data/fonts/PixeloidSans.ttf"
+#else
+	#define FONT_PATH "../../../data/fonts/PixeloidSans.ttf"
+#endif
+
 // World initialization
 bool RenderSystem::init(GLFWwindow* window_arg)
 {
@@ -59,6 +66,7 @@ bool RenderSystem::init(GLFWwindow* window_arg)
 	initializeGlEffects();
 	initializeSpriteSheets(); // must be called before initializeGlGeometryBuffers()
 	initializeGlGeometryBuffers();
+	initializeImGui();
 	initializeFreeType();
 
 	return true;
@@ -76,7 +84,7 @@ void RenderSystem::initializeFreeType() {
 
 	// load font as face
 	FT_Face face;
-	if (FT_New_Face(ft, "../../../data/fonts/PixeloidSans.ttf", 0, &face)) {
+	if (FT_New_Face(ft, FONT_PATH, 0, &face)) {
 		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
 		return;
 	}
@@ -134,6 +142,28 @@ void RenderSystem::initializeFreeType() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
 
 	gl_has_errors();
+}
+
+void RenderSystem::initializeImGui()
+{
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+
+	// Fonts
+	ImFont* DefaultFont = io.Fonts->AddFontFromFileTTF(FONT_PATH, 24.0f);	// index 0
+	ImFont* MainMenuFont = io.Fonts->AddFontFromFileTTF(FONT_PATH, 60.0f); // index 1
+	ImFont* MainMenuButtonFont = io.Fonts->AddFontFromFileTTF(FONT_PATH, 48.0f); // index 1
+
+	// Setup Dear ImGui style
+	//ImGui::StyleColorsDark();
+	//ImGui::StyleColorsClassic();
+
+	// Setup Platform/Renderer backends
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init();
 }
 
 void RenderSystem::initializeGlTextures()
@@ -238,15 +268,32 @@ void RenderSystem::initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, i
 
 void RenderSystem::initializePlayerSpriteSheet()
 {
-	int num_rows = 1;
-	int num_cols = 20;
+	int num_rows = 6;
+	int num_cols = 4;
 	int ss_index = (int)SPRITE_SHEET_DATA_ID::PLAYER;
 	int num_states = (int)PLAYER_SPRITE_STATES::STATE_COUNT;
-	int num_frames_in_state = num_cols / num_states;
+	//int num_frames_in_state = num_cols / num_states;
+	int num_frames_in_state = 4;
 
 	std::vector<AnimState> states(num_states);
 	for (int i = 0; i < num_states; i++) {
 		states[i] = AnimState(i * num_frames_in_state, (i + 1) * num_frames_in_state - 1);
+	}
+
+	sprite_sheets[ss_index].num_rows = num_rows;
+	sprite_sheets[ss_index].num_cols = num_cols;
+	sprite_sheets[ss_index].states = states;
+}
+
+void RenderSystem::initializeProjectileSelectDisplaySpriteSheet()
+{
+	int num_rows = 4;
+	int num_cols = 1;
+	int ss_index = (int)SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY;
+
+	std::vector<AnimState> states((int)ElementType::COUNT);
+	for (int i = 0; i < (int)ElementType::COUNT; i++) {
+		states[i] = AnimState(i, i);
 	}
 
 	sprite_sheets[ss_index].num_rows = num_rows;
@@ -263,23 +310,39 @@ void RenderSystem::initializeSpriteSheets()
 	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET, 1);
 	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET, 1);
 	initializePlayerSpriteSheet();
+	initializeProjectileSelectDisplaySpriteSheet();
 }
 
 // Helper functions for initializing Gl Geometry Buffers
 void RenderSystem::initializePlayerGeometryBuffer()
 {
 	int geom_index = (int)GEOMETRY_BUFFER_ID::PLAYER;
-	
-	std::vector<ColoredVertex> vertices(3);
-	vertices[0].position = { 0.f, -0.5f, 0.f };
-	vertices[1].position = { -0.5f, 0.5f, 0.f };
-	vertices[2].position = { 0.5f, 0.5f, 0.f };
-	
-	const std::vector<uint16_t> vertex_indices = { 0, 1, 2 };
+	int ss_id = (int)SPRITE_SHEET_DATA_ID::PLAYER;
+	int num_rows = sprite_sheets[(int)ss_id].num_rows;
+	int num_cols = sprite_sheets[(int)ss_id].num_cols;
+
+	// square aspect ratio
+	std::vector<TexturedVertex> textured_vertices(4);
+	textured_vertices[0].position = { -1.f / 2, +1.f / 2, 0.f };
+	textured_vertices[1].position = { +1.f / 2, +1.f / 2, 0.f };
+	textured_vertices[2].position = { +1.f / 2, -1.f / 2, 0.f };
+	textured_vertices[3].position = { -1.f / 2, -1.f / 2, 0.f };
+	textured_vertices[0].texcoord = { 0.2f,				1.f / num_rows };
+	textured_vertices[1].texcoord = { 1.f / num_cols - 0.2f,	1.f / num_rows };
+	textured_vertices[2].texcoord = { 1.f / num_cols - 0.2f,	0.f };
+	textured_vertices[3].texcoord = { 0.2f,				0.f };
+
+	const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
+
+	std::vector<ColoredVertex> vertices(4);
+	vertices[0].position = textured_vertices[0].position;
+	vertices[1].position = textured_vertices[1].position;
+	vertices[2].position = textured_vertices[2].position;
+	vertices[3].position = textured_vertices[3].position;
 
 	meshes[geom_index].vertices = vertices;
-	meshes[geom_index].vertex_indices = vertex_indices;
-	bindVBOandIBO(GEOMETRY_BUFFER_ID::PLAYER, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);
+	meshes[geom_index].vertex_indices = textured_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::PLAYER, textured_vertices, textured_indices);
 }
 
 void RenderSystem::initializeSpriteGeometryBuffer()
@@ -453,19 +516,19 @@ void RenderSystem::initializeGlGeometryBuffers()
 	// Index and Vertex buffer data initialization.
 	initializeGlMeshes();
 
-	initializePlayerGeometryBuffer();
 	initializeSpriteGeometryBuffer();
 	initializeDebugLineGeometryBuffer();
 	initializeScreenTriangleGeometryBuffer();
 	initializeTerrainGeometryBuffer();
 	initializeExitDoorGeometryBuffer();
 	// function initializeSpriteSheets must be called before this point
+	initializePlayerGeometryBuffer();
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FIRE_PROJECTILE, SPRITE_SHEET_DATA_ID::FIRE_PROJECTILE);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::WATER_PROJECTILE, SPRITE_SHEET_DATA_ID::WATER_PROJECTILE);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::EARTH_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIGHTNING_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::POWER_UP_BLOCK, SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK);
-	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PLAYER, SPRITE_SHEET_DATA_ID::PLAYER);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PROJECTILE_SELECT_DISPLAY, SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY);
 	initializeResourceBarGeometryBuffer();
 }
 

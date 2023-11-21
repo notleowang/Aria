@@ -73,16 +73,16 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			float filled = 0.0;
 			if (render_request.used_texture == TEXTURE_ASSET_ID::HEALTH_BAR) {
 				assert(registry.healthBars.has(entity));
-				HealthBar& healthBar = registry.healthBars.get(entity);
-				assert(registry.resources.has(healthBar.owner));
-				Resources& resources = registry.resources.get(healthBar.owner);
+				Follower& follower = registry.followers.get(entity);
+				assert(registry.resources.has(follower.owner));
+				Resources& resources = registry.resources.get(follower.owner);
 				filled = resources.currentHealth / resources.maxHealth;
 			}
 			else if (render_request.used_texture == TEXTURE_ASSET_ID::MANA_BAR) {
 				assert(registry.manaBars.has(entity));
-				ManaBar& manaBar = registry.manaBars.get(entity);
-				assert(registry.resources.has(manaBar.owner));
-				Resources& resources = registry.resources.get(manaBar.owner);
+				Follower& follower = registry.followers.get(entity);
+				assert(registry.resources.has(follower.owner));
+				Resources& resources = registry.resources.get(follower.owner);
 				filled = resources.currentMana / resources.maxMana;
 			}
 			glUniform1f(glGetUniformLocation(program, "filled"), filled);
@@ -100,58 +100,6 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			glUniform1i(glGetUniformLocation(program, "rainbow_enabled"), animation.rainbow_enabled);
 			gl_has_errors();
 		}
-	}
-	else if (render_request.used_effect == EFFECT_ASSET_ID::TEXT_2D) {
-		Text& text_component = registry.texts.get(entity);
-		float scale = position.scale.x;
-		std::string text = text_component.text;
-		vec3 color = text_component.color;
-		GLint vertex_loc = glGetAttribLocation(program, "vertex");
-		glEnableVertexAttribArray(vertex_loc);
-		glVertexAttribPointer(vertex_loc, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-
-		glUniform3f(glGetUniformLocation(program, "textColor"), color.x, color.y, color.z);
-		glActiveTexture(GL_TEXTURE0);
-		// iterate through all characters
-		std::string::const_iterator c;
-		float x = position.position.x;
-		float y = position.position.y;
-		for (c = text.begin(); c != text.end(); c++)
-		{
-			Character ch = Characters[*c];
-
-			float xpos = x + ch.Bearing.x * scale;
-			float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
-
-			float w = ch.Size.x * scale;
-			float h = ch.Size.y * scale;
-
-			// update VBO for each character
-			float vertices[6][4] = {
-				{ xpos,     ypos + h,   0.0f, 0.0f },
-				{ xpos,     ypos,       0.0f, 1.0f },
-				{ xpos + w, ypos,       1.0f, 1.0f },
-
-				{ xpos,     ypos + h,   0.0f, 0.0f },
-				{ xpos + w, ypos,       1.0f, 1.0f },
-				{ xpos + w, ypos + h,   1.0f, 0.0f }
-			};
-			// render glyph texture over quad
-			glBindTexture(GL_TEXTURE_2D, ch.TextureID);
-			// update content of VBO memory
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-			glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); // be sure to use glBufferSubData and not glBufferData
-			// render quad
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-			// now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-			x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
-		}
-		GLint currProgram;
-		glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
-		mat4 text_projection = ortho(0.0f, static_cast<float>(window_width_px), 0.0f, static_cast<float>(window_height_px));
-		glUniformMatrix4fv(glGetUniformLocation(currProgram, "projection"), 1, GL_FALSE, (float*)&text_projection);
-		gl_has_errors();
-		return;
 	}
 	else if (render_request.used_effect == EFFECT_ASSET_ID::SALMON || render_request.used_effect == EFFECT_ASSET_ID::PLAYER ||
 		render_request.used_effect == EFFECT_ASSET_ID::TERRAIN || render_request.used_effect == EFFECT_ASSET_ID::EXIT_DOOR)
@@ -181,6 +129,35 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			glUniform3f(change_uloc, color_change.x, color_change.y, color_change.z);
 			gl_has_errors();
 		}
+	}
+	else if (render_request.used_effect == EFFECT_ASSET_ID::SHADOW) {
+		if (!registry.shadows.get(entity).active) return;
+		GLint in_position_loc = glGetAttribLocation(program, "in_position");
+		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+		gl_has_errors();
+		assert(in_texcoord_loc >= 0);
+
+		glEnableVertexAttribArray(in_position_loc);
+		glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+			sizeof(TexturedVertex), (void*)0);
+		gl_has_errors();
+
+		glEnableVertexAttribArray(in_texcoord_loc);
+		glVertexAttribPointer(
+			in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
+			(void*)sizeof(
+				vec3)); // note the stride to skip the preceeding vertex position
+
+		// Enabling and binding texture to slot 0
+		glActiveTexture(GL_TEXTURE0);
+		gl_has_errors();
+
+		assert(registry.renderRequests.has(entity));
+		GLuint texture_id =
+			texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
+
+		glBindTexture(GL_TEXTURE_2D, texture_id);
+		gl_has_errors();
 	}
 	else
 	{
@@ -214,13 +191,12 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	gl_has_errors();
 }
 
-// draw the intermediate texture to the screen, with some distortion to simulate
-// water
+// draw the intermediate texture to the screen
 void RenderSystem::drawToScreen()
 {
 	// Setting shaders
-	// get the water texture, sprite mesh, and program
-	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::WATER]);
+	// get the lighting texture, sprite mesh, and program
+	glUseProgram(effects[(GLuint)EFFECT_ASSET_ID::DARKEN]);
 	gl_has_errors();
 	// Clearing backbuffer
 	int w, h;
@@ -234,7 +210,7 @@ void RenderSystem::drawToScreen()
 	gl_has_errors();
 	// Enabling alpha channel for textures
 	glDisable(GL_BLEND);
-	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_DEPTH_TEST);
 
 	// Draw the screen texture on the quad geometry
@@ -244,12 +220,16 @@ void RenderSystem::drawToScreen()
 		index_buffers[(GLuint)GEOMETRY_BUFFER_ID::SCREEN_TRIANGLE]); // Note, GL_ELEMENT_ARRAY_BUFFER associates
 	// indices to the bound GL_ARRAY_BUFFER
 	gl_has_errors();
-	const GLuint water_program = effects[(GLuint)EFFECT_ASSET_ID::WATER];
+	const GLuint darken_program = effects[(GLuint)EFFECT_ASSET_ID::DARKEN];
+
+	// Pass light radius to the post-processing shader
+	glUniform1f(glGetUniformLocation(darken_program, "light_radius"), light_radius);
+
 	// Set clock
-	GLuint window_size_uloc = glGetUniformLocation(water_program, "window_size");
-	GLuint dead_timer_uloc = glGetUniformLocation(water_program, "screen_darken_factor");
-	GLuint radius_uloc = glGetUniformLocation(water_program, "radius");
-	GLuint apply_spotlight_bool = glGetUniformLocation(water_program, "apply_spotlight");
+	GLuint window_size_uloc = glGetUniformLocation(darken_program, "window_size");
+	GLuint dead_timer_uloc = glGetUniformLocation(darken_program, "screen_darken_factor");
+	GLuint radius_uloc = glGetUniformLocation(darken_program, "radius");
+	GLuint apply_spotlight_bool = glGetUniformLocation(darken_program, "apply_spotlight");
 	
 	ScreenState& screen = registry.screenStates.get(screen_state_entity);
 
@@ -260,7 +240,7 @@ void RenderSystem::drawToScreen()
 	gl_has_errors();
 	// Set the vertex position and vertex texture coordinates (both stored in the
 	// same VBO)
-	GLint in_position_loc = glGetAttribLocation(water_program, "in_position");
+	GLint in_position_loc = glGetAttribLocation(darken_program, "in_position");
 	glEnableVertexAttribArray(in_position_loc);
 	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (void*)0);
 	gl_has_errors();
@@ -278,6 +258,102 @@ void RenderSystem::drawToScreen()
 	gl_has_errors();
 }
 
+void RenderSystem::drawArsenal(Entity entity, const mat3& projection){
+	Position& position = registry.positions.get(entity);
+	Transform transform;
+	transform.translate(position.position);
+	transform.rotate(position.angle);
+	transform.scale(position.scale);
+
+	assert(registry.renderRequests.has(entity));
+	const RenderRequest& render_request = registry.renderRequests.get(entity);
+
+	const GLuint program = (GLuint)effects[(GLuint)EFFECT_ASSET_ID::ANIMATED];
+
+	// Setting shaders
+	glUseProgram(program);
+	gl_has_errors();
+
+	assert(render_request.used_geometry != GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
+	const GLuint vbo = vertex_buffers[(GLuint)render_request.used_geometry];
+	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+	GLint in_position_loc = glGetAttribLocation(program, "in_position");
+	GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
+	gl_has_errors();
+	assert(in_texcoord_loc >= 0);
+
+	glEnableVertexAttribArray(in_position_loc);
+	glVertexAttribPointer(in_position_loc, 3, GL_FLOAT, GL_FALSE,
+		sizeof(TexturedVertex), (void*)0);
+	gl_has_errors();
+
+	glEnableVertexAttribArray(in_texcoord_loc);
+	glVertexAttribPointer(
+		in_texcoord_loc, 2, GL_FLOAT, GL_FALSE, sizeof(TexturedVertex),
+		(void*)sizeof(
+			vec3)); // note the stride to skip the preceeding vertex position
+
+	// Enabling and binding texture to slot 0
+	glActiveTexture(GL_TEXTURE0);
+	gl_has_errors();
+
+	assert(registry.renderRequests.has(entity));
+	GLuint texture_id =
+		texture_gl_handles[(GLuint)registry.renderRequests.get(entity).used_texture];
+
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+	gl_has_errors();
+
+	assert(registry.animations.has(entity));
+	Animation& animation = registry.animations.get(entity);
+	assert(animation.sprite_sheet_ptr != nullptr);
+	glUniform1f(glGetUniformLocation(program, "time"), (float)(glfwGetTime() * 10.0f));
+	glUniform1i(glGetUniformLocation(program, "frame_col"), animation.getColumn());
+	glUniform1i(glGetUniformLocation(program, "frame_row"), animation.getRow());
+	glUniform1f(glGetUniformLocation(program, "frame_width"), animation.sprite_sheet_ptr->getFrameSizeInTexcoords().x);
+	glUniform1f(glGetUniformLocation(program, "frame_height"), animation.sprite_sheet_ptr->getFrameSizeInTexcoords().y);
+	glUniform1i(glGetUniformLocation(program, "rainbow_enabled"), animation.rainbow_enabled);
+	gl_has_errors();
+
+	// Getting uniform locations for glUniform* calls
+	GLint color_uloc = glGetUniformLocation(program, "fcolor");
+	const vec3 color = registry.colors.has(entity) ? registry.colors.get(entity) : vec3(1);
+	glUniform3fv(color_uloc, 1, (float*)&color);
+	gl_has_errors();
+
+	// Get number of indices from index buffer, which has elements uint16_t
+	GLint size = 0;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+	gl_has_errors();
+
+	GLsizei num_indices = size / sizeof(uint16_t);
+	// GLsizei num_triangles = num_indices / 3;
+
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	// Setting uniform values to the currently bound program
+	GLuint transform_loc = glGetUniformLocation(currProgram, "transform");
+	glUniformMatrix3fv(transform_loc, 1, GL_FALSE, (float*)&transform.mat);
+	GLuint projection_loc = glGetUniformLocation(currProgram, "projection");
+	glUniformMatrix3fv(projection_loc, 1, GL_FALSE, (float*)&projection);
+	gl_has_errors();
+	// Drawing of num_indices/3 triangles specified in the index buffer
+	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_SHORT, nullptr);
+	gl_has_errors();
+}
+
+void RenderSystem::drawImGui()
+{
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
 // Render our game world
 // http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-14-render-to-texture/
 void RenderSystem::draw()
@@ -289,10 +365,11 @@ void RenderSystem::draw()
 	// First render to the custom framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
 	gl_has_errors();
+
 	// Clearing backbuffer
 	glViewport(0, 0, w, h);
 	glDepthRange(0.00001, 10);
-	glClearColor(0, 0, 1, 1.0);
+	glClearColor(0.2, 0.2, 0.2, 1.0);
 	glClearDepth(10.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_BLEND);
@@ -311,10 +388,22 @@ void RenderSystem::draw()
 	Camera camera;
 	camera.centerAt(player_pos.position);
 
+	// Handle drawing floors first
+	for (Entity entity : registry.floors.entities) {
+		drawTexturedMesh(entity, camera.projectionMat);
+	}
+
+	// Handle all shadows next
+	for (Entity entity : registry.shadows.entities) {
+		drawTexturedMesh(entity, camera.projectionMat);
+	}
+
 	// Draw all textured meshes that have a position and size component
 	for (Entity entity : registry.renderRequests.entities)
 	{
-		if (!registry.positions.has(entity))
+		if (!registry.positions.has(entity) || registry.texts.has(entity) || 
+			registry.shadows.has(entity) || registry.floors.has(entity) ||
+			registry.projectileSelectDisplays.has(entity))
 			continue;
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize
@@ -324,9 +413,99 @@ void RenderSystem::draw()
 	// Truely render to the screen
 	drawToScreen();
 
+	// We do this after post processing the lighting effect
+	for (Entity entity : registry.texts.entities)
+	{
+		drawText(entity);
+	}
+
+	for (Entity entity : registry.projectileSelectDisplays.entities) {
+		drawArsenal(entity, camera.projectionMat);
+	}
+  
+	// Render ImGui to screen
+	drawImGui();
+
 	// flicker-free display with a double buffer
 	glfwSwapBuffers(window);
 	gl_has_errors();
+}
+
+void RenderSystem::drawText(Entity entity) {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	Position& position = registry.positions.get(entity);
+
+	assert(registry.renderRequests.has(entity));
+	const RenderRequest& render_request = registry.renderRequests.get(entity);
+
+	const GLuint used_effect_enum = (GLuint)render_request.used_effect;
+	assert(used_effect_enum != (GLuint)EFFECT_ASSET_ID::EFFECT_COUNT);
+	const GLuint program = (GLuint)effects[used_effect_enum];
+
+	// Setting shaders
+	glUseProgram(program);
+	gl_has_errors();
+
+	assert(render_request.used_geometry != GEOMETRY_BUFFER_ID::GEOMETRY_COUNT);
+	const GLuint vbo = vertex_buffers[(GLuint)render_request.used_geometry];
+	const GLuint ibo = index_buffers[(GLuint)render_request.used_geometry];
+
+	// Setting vertex and index buffers
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	gl_has_errors();
+
+	Text& text_component = registry.texts.get(entity);
+	float scale = position.scale.x;
+	std::string text = text_component.text;
+	vec3 color = text_component.color;
+	GLint vertex_loc = glGetAttribLocation(program, "vertex");
+	glEnableVertexAttribArray(vertex_loc);
+	glVertexAttribPointer(vertex_loc, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+
+	glUniform3f(glGetUniformLocation(program, "textColor"), color.x, color.y, color.z);
+	glActiveTexture(GL_TEXTURE0);
+	// iterate through all characters
+	std::string::const_iterator c;
+	float x = position.position.x;
+	float y = position.position.y;
+	for (c = text.begin(); c != text.end(); c++)
+	{
+		Character ch = Characters[*c];
+
+		float xpos = x + ch.Bearing.x * scale;
+		float ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+
+		float w = ch.Size.x * scale;
+		float h = ch.Size.y * scale;
+
+		// update VBO for each character
+		float vertices[6][4] = {
+			{ xpos,     ypos + h,   0.0f, 0.0f },
+			{ xpos,     ypos,       0.0f, 1.0f },
+			{ xpos + w, ypos,       1.0f, 1.0f },
+
+			{ xpos,     ypos + h,   0.0f, 0.0f },
+			{ xpos + w, ypos,       1.0f, 1.0f },
+			{ xpos + w, ypos + h,   1.0f, 0.0f }
+		};
+		// render glyph texture over quad
+		glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+		// update content of VBO memory
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices); // be sure to use glBufferSubData and not glBufferData
+		// render quad
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		// now advance cursors for next glyph (note that advance is number of 1/64 pixels)
+		x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
+	}
+	GLint currProgram;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &currProgram);
+	mat4 text_projection = ortho(0.0f, static_cast<float>(window_width_px), 0.0f, static_cast<float>(window_height_px));
+	glUniformMatrix4fv(glGetUniformLocation(currProgram, "projection"), 1, GL_FALSE, (float*)&text_projection);
+	gl_has_errors();
+	return;
 }
 
 void RenderSystem::animation_step(float elapsed_ms)

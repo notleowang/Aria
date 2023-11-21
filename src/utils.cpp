@@ -1,5 +1,6 @@
 #include "utils.hpp"
 #include <cmath>
+#include <random>
 
 /*
         HELPER FUNCTIONS TO DO WITH MOVEMENT:
@@ -68,7 +69,21 @@ bool isWeakTo(ElementType t1, ElementType t2) {
         return t2 == ElementType::FIRE;
     case ElementType::LIGHTNING:
         return t2 == ElementType::EARTH;
+    case ElementType:: COMBO:
+        return t2 == getRandomElementType(); // randomize weakness
     default:
         return false;
     }
+}
+
+// Helper function to get a random element type
+ElementType getRandomElementType() {
+    static const std::vector<ElementType> elementTypes = { ElementType::WATER, ElementType::FIRE, ElementType::EARTH, ElementType::LIGHTNING };
+
+    // Use C++11 random number generation
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> distribution(0, elementTypes.size() - 1);
+
+    return elementTypes[distribution(gen)];
 }

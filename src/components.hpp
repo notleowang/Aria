@@ -9,13 +9,17 @@ using namespace std;
 // Aria component
 struct Player
 {
+
 };
+
 // All data relevant to elements and weaknesses
 enum ElementType {
-	WATER=0,
-	FIRE=1,
-	EARTH= 2,
-	LIGHTNING = 3
+	WATER = 0,
+	FIRE = 1,
+	EARTH = 2,
+	LIGHTNING = 3,
+	COUNT = 4,
+	COMBO = 5 // this is reserved for the final boss only
 };
 
 // Enemy component
@@ -26,6 +30,18 @@ struct Enemy
 	float stamina = 0.5f;
 	float mana = 1.f;
 	ElementType type = ElementType::FIRE; // By default, an enemy is of fire type
+	float isAggravated = true;
+};
+
+// Boss
+struct Boss {
+
+};
+
+// Obstacles
+struct Obstacle
+{
+
 };
 
 // all data relevant to the player's power ups
@@ -40,12 +56,22 @@ struct PowerUp {
 struct PowerUpBlock {
 	string powerUpText;
 	bool* powerUpToggle;
+	Entity textEntity;
 };
 
 // Terrain
 struct Terrain
 {
 	bool moveable = false;
+};
+
+
+// Shadow of the owner entity
+struct Shadow
+{
+	Entity owner;
+	bool active;
+	vec2 original_size;
 };
 
 // Exit door
@@ -74,14 +100,23 @@ struct Resources
 
 struct HealthBar
 {
-	Entity owner;
-	float y_offset = -60.f;
+
 };
 
 struct ManaBar
 {
+
+};
+
+struct ProjectileSelectDisplay
+{
+
+};
+
+struct Follower
+{
 	Entity owner;
-	float y_offset = -75.f;
+	float y_offset = 0.f;
 };
 
 // Structure to store projectile entities
@@ -96,6 +131,7 @@ struct Projectile
 struct CharacterProjectileType
 {
 	ElementType projectileType = ElementType::WATER; //By default, the characters projectile type is water
+	char foo; // just a random extra data type added in the struct to make it a "complete" definition (otherwise compiler throws an error)
 };
 
 // All data relevant to the position of entities
@@ -109,6 +145,10 @@ struct Position {
 // Data relevant to velocity of entities
 struct Velocity {
 	vec2 velocity = { 0.f, 0.f };
+};
+
+struct Floor {
+
 };
 
 
@@ -184,8 +224,7 @@ struct DeathTimer
 // Timer that signifies level change
 struct WinTimer
 {
-	float start_timer_ms = 1500.f;
-	float timer_ms = start_timer_ms;
+	float timer_ms = 3600.f;
 	bool changedLevel = false;
 };
 
@@ -277,9 +316,17 @@ struct Animation
 enum class TEXTURE_ASSET_ID {
 	FISH = 0,
 	LANDSCAPE = FISH + 1,
-	TURTLE = LANDSCAPE + 1,
-	FIRE_ENEMY = TURTLE + 1,
-	WATER_PROJECTILE_SHEET = FIRE_ENEMY + 1,
+	WATER_ENEMY = LANDSCAPE + 1,
+	FIRE_ENEMY = WATER_ENEMY + 1,
+	EARTH_ENEMY = FIRE_ENEMY + 1,
+	LIGHTNING_ENEMY = EARTH_ENEMY + 1,
+	WATER_BOSS = LIGHTNING_ENEMY + 1,
+	FIRE_BOSS = WATER_BOSS + 1,
+	EARTH_BOSS = FIRE_BOSS + 1,
+	LIGHTNING_BOSS = EARTH_BOSS + 1,
+	FINAL_BOSS = LIGHTNING_BOSS + 1,
+	GHOST = FINAL_BOSS + 1,
+	WATER_PROJECTILE_SHEET = GHOST + 1,
 	FIRE_PROJECTILE_SHEET = WATER_PROJECTILE_SHEET + 1,
 	EARTH_PROJECTILE_SHEET = FIRE_PROJECTILE_SHEET + 1,
 	LIGHTNING_PROJECTILE_SHEET = EARTH_PROJECTILE_SHEET + 1,
@@ -288,7 +335,9 @@ enum class TEXTURE_ASSET_ID {
 	MANA_BAR = HEALTH_BAR + 1,
 	POWER_UP_BLOCK = MANA_BAR + 1,
 	PLAYER = POWER_UP_BLOCK + 1,
-	TEXTURE_COUNT = PLAYER + 1
+	PORTAL = PLAYER+1,
+	PROJECTILE_SELECT_DISPLAY = PORTAL + 1,
+	TEXTURE_COUNT = PROJECTILE_SELECT_DISPLAY + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
@@ -297,13 +346,14 @@ enum class EFFECT_ASSET_ID {
 	COLOURED = PLAYER + 1,
 	SALMON = COLOURED + 1,
 	TEXTURED = SALMON + 1,
-	WATER = TEXTURED + 1,
-	TERRAIN = WATER + 1,
+	DARKEN = TEXTURED + 1,
+	TERRAIN = DARKEN + 1,
 	EXIT_DOOR = TERRAIN + 1,
 	RESOURCE_BAR = EXIT_DOOR + 1,
 	TEXT_2D = RESOURCE_BAR + 1,
 	ANIMATED = TEXT_2D + 1,
-	EFFECT_COUNT = ANIMATED + 1
+	SHADOW = ANIMATED + 1,
+	EFFECT_COUNT = SHADOW + 1
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
@@ -322,7 +372,8 @@ enum class GEOMETRY_BUFFER_ID {
 	LIGHTNING_PROJECTILE_SHEET = EARTH_PROJECTILE_SHEET + 1,
 	POWER_UP_BLOCK = LIGHTNING_PROJECTILE_SHEET + 1,
 	PLAYER = POWER_UP_BLOCK + 1,
-	GEOMETRY_COUNT = PLAYER + 1
+	PROJECTILE_SELECT_DISPLAY = PLAYER + 1,
+	GEOMETRY_COUNT = PROJECTILE_SELECT_DISPLAY + 1
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
 
@@ -334,7 +385,8 @@ enum class SPRITE_SHEET_DATA_ID {
 	LIGHTNING_PROJECTILE_SHEET = EARTH_PROJECTILE_SHEET + 1,
 	POWER_UP_BLOCK = LIGHTNING_PROJECTILE_SHEET + 1,
 	PLAYER = POWER_UP_BLOCK + 1,
-	SPRITE_SHEET_COUNT = PLAYER + 1
+	PROJECTILE_SELECT_DISPLAY = PLAYER + 1,
+	SPRITE_SHEET_COUNT = PROJECTILE_SELECT_DISPLAY + 1
 };
 const int sprite_sheet_count = (int)SPRITE_SHEET_DATA_ID::SPRITE_SHEET_COUNT;
 
@@ -357,10 +409,11 @@ enum class PROJECTILE_STATES {
 };
 
 enum class PLAYER_SPRITE_STATES {
-	EAST = 0,
-	SOUTH_EAST = EAST + 1,
-	NORTH_EAST = SOUTH_EAST + 1,
-	NORTH = NORTH_EAST + 1,
+	WEST = 0,
+	EAST = WEST + 1,
+	NORTH_WEST = EAST + 1,
+	NORTH_EAST = NORTH_WEST + 1,
+	NORTH = NORTH_WEST + 1,
 	SOUTH = NORTH + 1,
 	STATE_COUNT = SOUTH + 1
 };

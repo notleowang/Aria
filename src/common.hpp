@@ -16,6 +16,12 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+// imgui
+#define GL_SILENCE_DEPRECATION
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 // The glm library provides vector and matrix operations as in GLSL
 #include <glm/vec2.hpp>				// vec2
 #include <glm/ext/vector_int2.hpp>  // ivec2
@@ -38,6 +44,7 @@ inline std::string mesh_path(const std::string& name) {return data_path() + "/me
 
 const int window_width_px = 1200;
 const int window_height_px = 800;
+const float light_radius = 0.5;
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
