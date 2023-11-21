@@ -27,7 +27,9 @@ New Music (TODO: ADD LINK),
   - [Shadow vertex shader](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/shaders/shadow.vs.glsl), [Shadow fragment shader](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/main/shaders/shadow.fs.glsl)
   - [Dynamic shadow update](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/src/physics_system.cpp#L131)
   - [Dim lights to simulate lighting and shadows](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/shaders/screen_darken.fs.glsl#L43)
-- **Basic Story Elements**
+- **Enemy group behaviour / Cooperative planning**
+  - [Enemies Flank Player](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/e0e34f09731f7c53edfcdf05e690c7d275f4dec4/src/ai_system.cpp#L81)
+  - [Enemies Heal Allies](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/e0e34f09731f7c53edfcdf05e690c7d275f4dec4/src/ai_system.cpp#L76)
 
 ## Development Plan
 Most of the work in this milestone aligned with our development plan for this milestone.
