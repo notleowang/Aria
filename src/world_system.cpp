@@ -25,6 +25,10 @@ WorldSystem::~WorldSystem() {
 	// Destroy music components
 	if (background_music != nullptr)
 		Mix_FreeMusic(background_music);
+	if (boss_music != nullptr)
+		Mix_FreeMusic(boss_music);
+	if (final_boss_music != nullptr)
+		Mix_FreeMusic(final_boss_music);
 	if (projectile_sound != nullptr)
 		Mix_FreeChunk(projectile_sound);
 	if (aria_death_sound != nullptr)
@@ -127,6 +131,8 @@ GLFWwindow* WorldSystem::create_window() {
 	}
 
 	background_music = Mix_LoadMUS(audio_path("fast_pace_background.wav").c_str());
+	boss_music = Mix_LoadMUS(audio_path("boss_battle.wav").c_str());
+	final_boss_music = Mix_LoadMUS(audio_path("final_boss_battle.wav").c_str());
 	projectile_sound = Mix_LoadWAV(audio_path("projectile.wav").c_str());
 	aria_death_sound = Mix_LoadWAV(audio_path("aria_death.wav").c_str());
 	enemy_death_sound = Mix_LoadWAV(audio_path("enemy_death.wav").c_str());
@@ -272,6 +278,7 @@ void WorldSystem::restart_game() {
 
 	GameLevel current_level = this->curr_level;
 	vec2 player_starting_pos = current_level.getPlayerStartingPos();
+	uint curr_level = current_level.getCurrLevel();
 	std::vector<vec2> floor_pos = current_level.getFloorPos();
 	std::vector<std::pair<vec4, bool>> terrains_attrs = current_level.getTerrains();
 	std::vector<std::string> texts = current_level.getTexts();
@@ -279,6 +286,16 @@ void WorldSystem::restart_game() {
 	std::vector<std::pair<vec2, Enemy>> enemies_attrs = current_level.getEnemies();
 	std::vector<std::pair<vec2, Enemy>> bosses_attrs = current_level.getBosses();
 	std::vector<std::array<vec2, OBSTACLE_ATTRIBUTES >> obstacles = current_level.getObstacleAttrs();
+
+	if (curr_level == Level::FIRE_BOSS ||
+		curr_level == Level::EARTH_BOSS ||
+		curr_level == Level::LIGHTNING_BOSS ||
+		curr_level == Level::WATER_BOSS) {
+		Mix_FadeInMusic(boss_music, -1, 500);
+	}
+	else if (curr_level == Level::FINAL_BOSS) {
+		Mix_FadeInMusic(final_boss_music, -1, 500);
+	}
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
 	for (uint i = 0; i < floor_pos.size(); i++) {
@@ -562,7 +579,11 @@ void WorldSystem::handle_collisions() {
 				registry.remove_all_components_of(entity_other);
 				Mix_PlayChannel(-1, enemy_death_sound, 0);
 
-				if (boss) win_level(); // win level if boss died
+				// win level and change background music if boss died
+				if (boss) {
+					win_level();
+					Mix_FadeInMusic(background_music, -1, 1500);
+				}
 			}
 		}
 
