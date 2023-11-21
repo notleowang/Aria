@@ -13,14 +13,14 @@ Below is the documentation for our `README.md` submission for Milestone 3.
 [Spotlight](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/shaders/screen_darken.fs.glsl#L21) and 
 [Rainbow](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/shaders/animated.fs.glsl#L70).
 - **Consistent game resolution** (TODO: ADD LINK)
-- **Basic Integrated Assets**: 
-Player Sprite (TODO: ADD LINK), 
-Enemy Sprites (water, [fire](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/fire_enemy.png), earth, air, ghost; TODO: ADD LINKS),
-Boss Sprites (TODO: ADD LINK),
-New Music (TODO: ADD LINK),
+- **Basic Integrated Assets**:
+Enemy Sprites ([water](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/water_enemy.png), [fire](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/fire_enemy.png), [earth](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/earth_enemy.png), [lightning](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/lightning_enemy.png), [ghost](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/ghost.png)),
+[Boss Sprites](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/fire_boss.png),
 [Power-up Block Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/power_up_block.png),
 [Projectile Select Display Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/projectile-select-display-purple.png),
 [Portal Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/data/textures/portal.png).
+- **Advanced Integrated Assets**:
+[New Music](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/audio/boss_battle.wav), [Player Sprite](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/M3_Submission/data/textures/aria.png)
 - **2D Dynamic Shadows**:
   - [Shadow entity](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/src/components.hpp#L63)
   - [Shadow creation](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/8c1ac9ec1c7e2da38d80536bf5c18bd55f0c68fd/src/world_init.cpp#L245)
