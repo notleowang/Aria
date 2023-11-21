@@ -5,6 +5,7 @@
 #include "world_init.hpp"
 #include "world_system.hpp"
 #include "render_system.hpp"
+#include <chrono>
 #include <utils.hpp>
 
 #define ENEMY_PROJECTILE_SPEED 500
@@ -13,7 +14,6 @@ void AISystem::step(float elapsed_ms)
 {
 	auto& enemy_container = registry.enemies;
 	Entity player = registry.players.entities[0];
-	// Check for collisions with entities that have a velocity
 	for (uint i = 0; i < enemy_container.size(); i++)
 	{
 		Entity entity_i = enemy_container.entities[i];
@@ -27,8 +27,8 @@ void AISystem::step(float elapsed_ms)
 		bool canSprint = enemy.stamina > 0;
 		bool isDodging = false;
 		bool isSprinting = false;
+		bool isFlanking = false;
 
-		// ensure enemy is aggravated to be able to dodge
 		if (enemy.isAggravated) {
 			for (uint i = 0; i < registry.projectiles.size(); i++) {
 				Entity entity_p = registry.projectiles.entities[i];
@@ -42,13 +42,19 @@ void AISystem::step(float elapsed_ms)
 						enemy.stamina -= elapsed_ms / 1000;
 					}
 
-					float c = cosf(90);
-					float s = sinf(90);
+					int deg = 90;
+					// https://stackoverflow.com/questions/16177295/get-time-since-epoch-in-milliseconds-preferably-using-c11-chrono
+					unsigned long milliseconds_since_epoch = std::chrono::system_clock::now().time_since_epoch() / std::chrono::milliseconds(1);
+					if (milliseconds_since_epoch % 10000 > 5000) {
+						deg = -90;
+					}
+					float c = cosf(deg);
+					float s = sinf(deg);
 					mat2 R = {{c, s}, {-s, c}};
 
 					vec2 direction = projectilePos - thisPos;
 					direction /= length(direction);
-					direction *= isSprinting ? 350 : 50; // allow enemies to sprint even faster to dodge
+					direction *= isSprinting ? 300 : 50; // allow enemies to sprint even faster to dodge
 					vel_i.velocity = direction * R;
 				}
 			}
@@ -57,18 +63,48 @@ void AISystem::step(float elapsed_ms)
 		if (enemy.mana < 1.f) {
 			enemy.mana += elapsed_ms / 1000;
 		}
-		if (!isDodging) {
-			if (enemy.isAggravated && dist <= 350) { // ensure enemy is aggravated before chasing/shooting
+
+
+		for (uint j = 0; j < enemy_container.size(); j++) {
+			if (i == j) continue;
+			Entity entity_j = enemy_container.entities[j];
+			Enemy& enemy_j = enemy_container.get(entity_j);
+			if (distance(registry.positions.get(entity_j).position, thisPos) < 250 && registry.resources.get(entity_j).currentHealth < 80 && enemy_j.type != enemy.type) {
+				vec2 direction = registry.positions.get(entity_j).position - thisPos;
+				direction /= length(direction);
+				if (enemy.mana >= 0.75f) {
+					// printf("Attempting to heal injured ally!\n");
+					enemyFireProjectile(entity_i, direction);
+					enemy.mana -= 0.75f;
+				}
+			}
+			// flank the player
+			if (distance(thisPos, registry.positions.get(entity_j).position) < 100 && i > j) {
+				vec2 direction = playerPos - thisPos;
+				direction /= length(direction);
+				direction *= -50;
+				if (distance(thisPos, playerPos) > 100) {
+					vel_i.velocity = direction;
+				}
+				isFlanking = true;
+			}
+		}
+
+		if (!isDodging && !isFlanking) {
+			if (dist <= 350 && dist > 15) {
 				if (canSprint) {
 					isSprinting = true;
 					enemy.stamina -= elapsed_ms / 1000;
 				}
 				vec2 direction = playerPos - thisPos;
 				direction /= length(direction);
-				enemyFireProjectile(entity_i, direction);
-				direction *= isSprinting ? 250 : 50;
+				if (enemy.mana >= 1.f) {
+					enemyFireProjectile(entity_i, direction);
+					enemy.mana -= 1.f;
+				}
+				direction *= isSprinting ? (enemy.isAggravated ? 200 : 150) : 50;
 				vel_i.velocity = direction;
-			} else {
+			} else if (dist > 350) {
 				vel_i.velocity.y = 0;
 				if (abs(vel_i.velocity.x) != 50) {
 					vel_i.velocity.x = 50;
@@ -108,12 +144,6 @@ void AISystem::step(float elapsed_ms)
 }
 
 bool AISystem::enemyFireProjectile(Entity& enemy, vec2 direction) {
-	// check mana
-	if (registry.enemies.get(enemy).mana < 1) {
-		return false;
-	} else {
-		registry.enemies.get(enemy).mana -= 1;
-	}
 
 	vec2 enemyPos = registry.positions.get(enemy).position;
 	vec2 vel;
