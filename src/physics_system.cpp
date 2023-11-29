@@ -155,14 +155,13 @@ void updateShadows() {
 		// M_PI / 2 is to make the shadow upright
 		shadow_pos.angle = atan2(owner_pos.position.y - player_position.position.y, owner_pos.position.x - player_position.position.x) + M_PI/2;
 
-		//float y_dist = abs(owner_pos.position.y - player_position.position.y);
 		float max_dist = 500;
 
 		float dist = abs(distance(owner_pos.position, player_position.position));
 		shadow_pos.scale = owner_pos.scale * (max_dist - dist) / max_dist;
 		shadow_pos.scale.y *= 2;
 
-		shadow_pos.position.x += cos(shadow_pos.angle - M_PI / 2) * (shadow_pos.scale.x);
+		shadow_pos.position.x += cos(shadow_pos.angle - M_PI / 2) * (shadow_pos.scale.y / 2);
 		shadow_pos.position.y += owner_pos.scale.y / 2 + shadow_pos.scale.y / 2 * sin(shadow_pos.angle - M_PI/2);
 	}
 }
