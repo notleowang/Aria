@@ -48,7 +48,7 @@ vec4 dim_light(vec4 in_color) {
         return vec4(0.0, 0.0, 0.0, in_color.a);
     } else {
         // Otherwise, apply lighting based on distance
-        float intensity = 1.0 - (dist / light_radius);
+        float intensity = 1.0 - (dist / light_radius)*0.9;
         return in_color * intensity;
     }
 }
