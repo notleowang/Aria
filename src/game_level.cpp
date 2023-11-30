@@ -112,7 +112,7 @@ bool GameLevel::init(uint level) {
 			}
 		}
 
-		this->player_starting_pos = vec2(200, 200);
+		this->player_starting_pos = vec2(800, 650);
 		this->exit_door_pos = NULL_POS;
 
 		terrains.push_back(std::make_pair(vec4(0, 0, 2800, 100), false));
@@ -168,7 +168,7 @@ bool GameLevel::init(uint level) {
 			}
 		}
 
-		this->player_starting_pos = vec2(200, 200);
+		this->player_starting_pos = vec2(800, 650);
 		this->exit_door_pos = NULL_POS;
 
 		terrains.push_back(std::make_pair(vec4(0, 0, 2800, 100), false));
@@ -224,7 +224,7 @@ bool GameLevel::init(uint level) {
 			}
 		}
 
-		this->player_starting_pos = vec2(200, 200);
+		this->player_starting_pos = vec2(800, 650);
 		this->exit_door_pos = NULL_POS;
 
 		terrains.push_back(std::make_pair(vec4(0, 0, 2800, 100), false));
@@ -291,7 +291,7 @@ bool GameLevel::init(uint level) {
 			}
 		}
 
-		this->player_starting_pos = vec2(200, 200);
+		this->player_starting_pos = vec2(800, 650);
 		this->exit_door_pos = NULL_POS;
 
 		terrains.push_back(std::make_pair(vec4(0, 0, 2800, 100), false));
@@ -309,7 +309,7 @@ bool GameLevel::init(uint level) {
 			}
 		}
 
-		this->player_starting_pos = vec2(200, 200);
+		this->player_starting_pos = vec2(800, 650);
 		this->exit_door_pos = NULL_POS;
 
 		terrains.push_back(std::make_pair(vec4(0, 0, 2800, 100), false));
@@ -327,7 +327,7 @@ bool GameLevel::init(uint level) {
 			}
 		}
 
-		this->player_starting_pos = vec2(500, 500);
+		this->player_starting_pos = vec2(700, 500);
 		this->exit_door_pos = vec2(1200, 700);
 
 		texts.push_back("Shoot the mystery boxes to power up!");
