@@ -41,6 +41,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(enemy_death_sound);
 	if (damage_tick_sound != nullptr)
 		Mix_FreeChunk(damage_tick_sound);
+	if (obstacle_collision_sound != nullptr)
+		Mix_FreeChunk(obstacle_collision_sound);
 	if (end_level_sound != nullptr)
 		Mix_FreeChunk(end_level_sound);
 	if (power_up_sound != nullptr)
