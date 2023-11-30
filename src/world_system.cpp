@@ -106,9 +106,11 @@ GLFWwindow* WorldSystem::create_window() {
 	// http://www.glfw.org/docs/latest/input_guide.html
 	glfwSetWindowUserPointer(window, this);
 	auto key_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2, int _3) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_key(_0, _1, _2, _3); };
+	auto scroll_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_scroll(_0, _1); };
 	auto mouse_button_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_mouse_button(_0, _1, _2); };
 	auto cursor_pos_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_mouse_move({ _0, _1 }); };
 	glfwSetKeyCallback(window, key_redirect);
+	glfwSetScrollCallback(window, scroll_redirect);
 	glfwSetMouseButtonCallback(window, mouse_button_redirect);
 	glfwSetCursorPosCallback(window, cursor_pos_redirect);
 
@@ -729,6 +731,24 @@ bool WorldSystem::is_over() const {
 	return bool(glfwWindowShouldClose(window));
 }
 
+void WorldSystem::on_scroll(double x_offset, double y_offset) {
+	CharacterProjectileType& characterProjectileType = registry.characterProjectileTypes.get(player);
+	int new_element = (int) characterProjectileType.projectileType;
+	if (y_offset < 0) {
+		// Scrolling down
+		if (--new_element < 0) {
+			new_element = ElementType::LIGHTNING;
+		}
+	}
+	else if (y_offset > 0) {
+		// Scrolling up
+		new_element++;
+	}
+	characterProjectileType.projectileType = (ElementType)(new_element % ElementType::COUNT);
+	Animation& select_display = registry.animations.get(projectileSelectDisplay);
+	select_display.setState((int)characterProjectileType.projectileType);
+}
+
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	//Disables keys when death or win timer happening
@@ -911,6 +931,13 @@ void WorldSystem::on_mouse_button(int button, int action, int mod) {
 			Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType, false, player);
 		}
 		Mix_PlayChannel(-1, projectile_sound, 0);
+	}
+
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+		CharacterProjectileType& characterProjectileType = registry.characterProjectileTypes.get(player);
+		characterProjectileType.projectileType = (ElementType)((characterProjectileType.projectileType + 1) % ElementType::COUNT);
+		Animation& select_display = registry.animations.get(projectileSelectDisplay);
+		select_display.setState((int)characterProjectileType.projectileType);
 	}
 }
 
