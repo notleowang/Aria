@@ -41,6 +41,7 @@ class RenderSystem {
 			textures_path("north_dungeon_wall.png"),
 			textures_path("south_dungeon_wall.png"),
 			textures_path("side_dungeon_wall.png"),
+			textures_path("generic_dungeon_wall.png"),
 			textures_path("landscape.png"),
 			textures_path("water_enemy.png"),						// start of regular enemies
 			textures_path("fire_enemy.png") ,

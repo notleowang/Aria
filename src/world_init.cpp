@@ -107,8 +107,11 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, DIRECTION dir,
 		velocity.velocity = { 200.f, 0.f };
 	}
 
-	TEXTURE_ASSET_ID tex = (dir == DIRECTION::N) ? TEXTURE_ASSET_ID::NORTH_TERRAIN : 
-		(dir == DIRECTION::S ? TEXTURE_ASSET_ID::SOUTH_TERRAIN : TEXTURE_ASSET_ID::SIDE_TERRAIN);
+	TEXTURE_ASSET_ID tex = 
+		(dir == DIRECTION::N) ? TEXTURE_ASSET_ID::NORTH_TERRAIN : 
+		(dir == DIRECTION::S ?  TEXTURE_ASSET_ID::SOUTH_TERRAIN : 
+		(dir == DIRECTION::E ?  TEXTURE_ASSET_ID::SIDE_TERRAIN : 
+			                    TEXTURE_ASSET_ID::GENERIC_TERRAIN));
 
 	registry.collidables.emplace(entity); // Marking terrain as collidable
 	registry.renderRequests.insert(

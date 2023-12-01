@@ -106,14 +106,16 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			float y_scale = 1;
 			if (registry.terrain.has(entity)) {
 				switch (registry.directions.get(entity).direction) {
-					case DIRECTION::N:
-					case DIRECTION::S:
+					case DIRECTION::N: // north
+					case DIRECTION::S: // south
 						x_scale = position.scale.x / 100;
 						break;
-					case DIRECTION::E:
-					case DIRECTION::W:
+					case DIRECTION::E: // side
 						y_scale = position.scale.y / 100;
 						break;
+					case DIRECTION::W: // generic
+						x_scale = position.scale.x / 100;
+						y_scale = position.scale.y / 100;
 					default:				
 						break;
 				}

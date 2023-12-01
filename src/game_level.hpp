@@ -50,6 +50,8 @@ const Enemy COMBO_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::COMBO, f
 const Terrain NORTH_STATIONARY = {DIRECTION::N, false};
 const Terrain SIDE_STATIONARY = {DIRECTION::E, false};
 const Terrain SOUTH_STATIONARY = {DIRECTION::S, false};
+const Terrain GENERIC_STATIONARY = {DIRECTION::W, false};
+const Terrain GENERIC_MOVABLE = {DIRECTION::W, true};
 
 class GameLevel
 {
