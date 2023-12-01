@@ -35,6 +35,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeMusic(final_boss_intro_music);
 	if (projectile_sound != nullptr)
 		Mix_FreeChunk(projectile_sound);
+	if (heal_sound != nullptr)
+		Mix_FreeChunk(heal_sound);
 	if (aria_death_sound != nullptr)
 		Mix_FreeChunk(aria_death_sound);
 	if (enemy_death_sound != nullptr)
@@ -131,6 +133,7 @@ GLFWwindow* WorldSystem::create_window() {
 	final_boss_music = Mix_LoadMUS(audio_path("final_boss_battle.wav").c_str());
 	final_boss_intro_music = Mix_LoadMUS(audio_path("final_boss_battle_intro.wav").c_str());
 	projectile_sound = Mix_LoadWAV(audio_path("projectile.wav").c_str());
+	heal_sound = Mix_LoadWAV(audio_path("heal.wav").c_str());
 	aria_death_sound = Mix_LoadWAV(audio_path("aria_death.wav").c_str());
 	enemy_death_sound = Mix_LoadWAV(audio_path("enemy_death.wav").c_str());
 	damage_tick_sound = Mix_LoadWAV(audio_path("damage_tick.wav").c_str());
@@ -736,7 +739,7 @@ void WorldSystem::handle_collisions() {
 
 		// Checking Player - Medkit collision
 		if (registry.players.has(entity) && registry.healthPacks.has(entity_other)) {
-			// TODO: add health gain sound
+			Mix_PlayChannel(-1, heal_sound, 0);
 			Resources& player_resource = registry.resources.get(entity);
 			player_resource.currentHealth = std::min(player_resource.maxHealth, 
 				player_resource.currentHealth + registry.healthPacks.get(entity_other).value);

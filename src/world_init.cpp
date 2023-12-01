@@ -313,7 +313,7 @@ Entity createHealthPack(RenderSystem* renderer, vec2 pos)
 
 	Position& health_pack_position = registry.positions.emplace(entity);
 	health_pack_position.position = pos;
-	health_pack_position.scale = vec2(100.f, 100.f);
+	health_pack_position.scale = vec2(75.f, 75.f);
 
 	registry.collidables.emplace(entity);
 
