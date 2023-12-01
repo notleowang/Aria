@@ -278,6 +278,7 @@ void WorldSystem::restart_game() {
 	uint curr_level = current_level.getCurrLevel();
 	std::vector<vec2> floor_pos = current_level.getFloorPos();
 	std::vector<std::pair<vec4, bool>> terrains_attrs = current_level.getTerrains();
+	std::vector<vec2> health_packs_pos = current_level.getHealthPackPos();
 	std::vector<std::string> texts = current_level.getTexts();
 	std::vector<std::array<float, TEXT_ATTRIBUTES>> text_attrs = current_level.getTextAttrs();
 	std::vector<std::pair<vec2, Enemy>> enemies_attrs = current_level.getEnemies();
@@ -301,6 +302,11 @@ void WorldSystem::restart_game() {
 
 	player = createAria(renderer, player_starting_pos);
 
+	if (curr_level == Level::TUTORIAL) {
+		// Familarize player with health pack
+		registry.resources.get(player).currentHealth = 20.f;
+	}
+
 	// ADD BACK THE PERSISTED COMPONENTS
 	if (persistPowerUps) registry.powerUps.get(player) = persistedPowerUps;
 	if (persistProjectileType) registry.characterProjectileTypes.get(player) = persistedProjectileType;
@@ -309,6 +315,11 @@ void WorldSystem::restart_game() {
 		vec4 terrain_i = terrains_attrs[i].first;
 		bool moveable = terrains_attrs[i].second;
 		createTerrain(renderer, vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]), moveable);
+	}
+
+	for (uint i = 0; i < health_packs_pos.size(); i++) {
+		vec2 pos = health_packs_pos[i];
+		createHealthPack(renderer, pos);
 	}
 
 	for (uint i = 0; i < texts.size(); i++) {
@@ -721,6 +732,16 @@ void WorldSystem::handle_collisions() {
 		// Checking Player - Exit Door collision
 		if (registry.players.has(entity) && registry.exitDoors.has(entity_other)) {
 			win_level();
+		}
+
+		// Checking Player - Medkit collision
+		if (registry.players.has(entity) && registry.healthPacks.has(entity_other)) {
+			// TODO: add health gain sound
+			Resources& player_resource = registry.resources.get(entity);
+			player_resource.currentHealth = std::min(player_resource.maxHealth, 
+				player_resource.currentHealth + registry.healthPacks.get(entity_other).value);
+			printf("Player hp: %f\n", player_resource.currentHealth);
+			registry.remove_all_components_of_no_collision(entity_other);
 		}
 	}
 	registry.collisions.clear();
