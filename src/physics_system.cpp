@@ -155,7 +155,7 @@ void updateShadows() {
 		// M_PI / 2 is to make the shadow upright
 		shadow_pos.angle = atan2(owner_pos.position.y - player_position.position.y, owner_pos.position.x - player_position.position.x) + M_PI/2;
 
-		float max_dist = 500;
+		float max_dist = light_radius*std::max(window_width_px, window_height_px);
 
 		float dist = abs(distance(owner_pos.position, player_position.position));
 		shadow_pos.scale = owner_pos.scale * (max_dist - dist) / max_dist;
