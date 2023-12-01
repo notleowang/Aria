@@ -276,8 +276,8 @@ void WorldSystem::restart_game() {
 	GameLevel current_level = this->curr_level;
 	vec2 player_starting_pos = current_level.getPlayerStartingPos();
 	uint curr_level = current_level.getCurrLevel();
-	std::vector<vec2> floor_pos = current_level.getFloorPos();
-	std::vector<std::pair<vec4, bool>> terrains_attrs = current_level.getTerrains();
+	std::vector<vec4> floors = current_level.getFloorAttrs();
+	std::vector<std::pair<vec4, Terrain>> terrains_attrs = current_level.getTerrains();
 	std::vector<std::string> texts = current_level.getTexts();
 	std::vector<std::array<float, TEXT_ATTRIBUTES>> text_attrs = current_level.getTextAttrs();
 	std::vector<std::pair<vec2, Enemy>> enemies_attrs = current_level.getEnemies();
@@ -295,8 +295,8 @@ void WorldSystem::restart_game() {
 	}
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
-	for (uint i = 0; i < floor_pos.size(); i++) {
-		createFloor(renderer, floor_pos[i]);
+	for (uint i = 0; i < floors.size(); i++) {
+		createFloor(renderer, vec2(floors[i].x, floors[i].y), vec2(floors[i].z, floors[i].w));
 	}
 
 	player = createAria(renderer, player_starting_pos);
@@ -306,9 +306,14 @@ void WorldSystem::restart_game() {
 	if (persistProjectileType) registry.characterProjectileTypes.get(player) = persistedProjectileType;
 
 	for (uint i = 0; i < terrains_attrs.size(); i++) {
-		vec4 terrain_i = terrains_attrs[i].first;
-		bool moveable = terrains_attrs[i].second;
-		createTerrain(renderer, vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]), moveable);
+		vec4 terrain_pos = terrains_attrs[i].first;
+		Terrain terrain_attr = terrains_attrs[i].second;
+
+		createTerrain(renderer, 
+			vec2(terrain_pos[0], terrain_pos[1]), 
+			vec2(terrain_pos[2], terrain_pos[3]), 
+			terrain_attr.direction,
+			terrain_attr.moveable);
 	}
 
 	for (uint i = 0; i < texts.size(); i++) {
