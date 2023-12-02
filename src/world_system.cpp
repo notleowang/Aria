@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include "physics_system.hpp"
+#include "ui_system.hpp"
 using namespace std;
 
 // Game configuration
@@ -375,6 +376,12 @@ void WorldSystem::win_level() {
 	registry.velocities.get(player).velocity = { 0.f,0.f };
 	registry.winTimers.emplace(player);
 	Mix_PlayChannel(-1, end_level_sound, 0);
+}
+
+void WorldSystem::new_game() {
+	if (player != NULL) registry.remove_all_components_of(player);
+	curr_level.init(TUTORIAL);
+	restart_game();
 }
 
 void WorldSystem::display_power_up() {
@@ -853,9 +860,13 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		restart_game();
 	}
 
-	// Close program
-	if (action == GLFW_RELEASE && key == GLFW_KEY_BACKSPACE) {
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	// navigating pause menu and exitting game
+	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
+		UISystem* ui_system = UISystem::getInstance();
+		
+		if (ui_system->getState() == MAIN_MENU) ui_system->setState(QUIT);
+		else if (ui_system->getState() == PAUSE_MENU) ui_system->setState(PLAY_GAME);
+		else ui_system->setState(PAUSE_MENU);
 	}
 
 	// Debugging
@@ -867,9 +878,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	//}
 }
 
-void WorldSystem::on_mouse_button(int button, int action, int mod) {
+void WorldSystem::on_mouse_button(int button, int action, int mod) {	
 	//Disables mouse when death or win timer happening
-	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; }
+	if (UISystem::getInstance()->getState() != PLAY_GAME || registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; }
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		// check mana
