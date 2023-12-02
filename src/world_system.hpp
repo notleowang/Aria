@@ -45,6 +45,7 @@ public:
 private:
 	// Input callback functions
 	void on_key(int key, int, int action, int mod);
+	void on_scroll(double x_offset, double y_offset);
 	void on_mouse_button(int button, int action, int mod);
 	void on_mouse_move(vec2 pos);
 
