@@ -111,7 +111,7 @@ bool GameLevel::init(uint level) {
 	case FIRE_BOSS:
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
-		this->player_starting_pos = vec2(200, 200);
+		this->player_starting_pos = vec2(800, 650);
 		this->exit_door_pos = NULL_POS;
 
 		terrains.push_back(std::make_pair(vec4(25, 0, 2700, default_north_height), NORTH_STATIONARY));
@@ -156,7 +156,7 @@ bool GameLevel::init(uint level) {
 	case EARTH_BOSS:
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
-		this->player_starting_pos = vec2(200, 200);
+		this->player_starting_pos = vec2(800, 650);
 		this->exit_door_pos = NULL_POS;
 
 		terrains.push_back(std::make_pair(vec4(25, 0, 2700, default_north_height), NORTH_STATIONARY));
@@ -201,7 +201,7 @@ bool GameLevel::init(uint level) {
 	case LIGHTNING_BOSS:
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
-		this->player_starting_pos = vec2(200, 200);
+		this->player_starting_pos = vec2(800, 650);
 		this->exit_door_pos = NULL_POS;
 
 		terrains.push_back(std::make_pair(vec4(25, 0, 2700, default_north_height), NORTH_STATIONARY));
@@ -260,7 +260,7 @@ bool GameLevel::init(uint level) {
 	case WATER_BOSS:
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
-		this->player_starting_pos = vec2(200, 200);
+		this->player_starting_pos = vec2(800, 650);
 		this->exit_door_pos = NULL_POS;
 
 		terrains.push_back(std::make_pair(vec4(25, 0, 2700, default_north_height), NORTH_STATIONARY));
@@ -274,7 +274,7 @@ bool GameLevel::init(uint level) {
 	case FINAL_BOSS: // actual final boss (the reaper dude)
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
-		this->player_starting_pos = vec2(200, 200);
+		this->player_starting_pos = vec2(800, 650);
 		this->exit_door_pos = NULL_POS;
 
 		terrains.push_back(std::make_pair(vec4(25, 0, 2700, default_north_height), NORTH_STATIONARY));
@@ -290,6 +290,7 @@ bool GameLevel::init(uint level) {
 		
 		this->player_starting_pos = vec2(500, 500);
 		this->exit_door_pos = vec2(1200, 575);
+
 		texts.push_back("Shoot the mystery boxes to power up!");
 		text_attrs.push_back({ 0.f,150.f,1.0f,1.0f,1.0f,0.f });
 		texts.push_back("Choose wisely... you can only keep one!");
