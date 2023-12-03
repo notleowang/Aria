@@ -62,7 +62,7 @@ bool GameLevel::init(uint level) {
 		floors.push_back(vec4(25, 30, 1300, 650));
 
 		this->player_starting_pos = vec2(200, 200);
-		this->exit_door_pos = vec2(1200, 750);
+		this->exit_door_pos = vec2(1225, 575);
 
 		health_packs_pos.push_back(vec2(400, 300));
 		health_packs_pos.push_back(vec2(600, 400));

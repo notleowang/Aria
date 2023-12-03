@@ -59,13 +59,6 @@ struct PowerUpBlock {
 	Entity textEntity;
 };
 
-// Terrain
-struct Terrain
-{
-  DIRECTION direction = DIRECTION::N;
-	bool moveable = false;
-};
-
 // Health pack
 struct HealthPack
 {
