@@ -430,10 +430,19 @@ void RenderSystem::draw()
 	{
 		if (!registry.positions.has(entity) || registry.texts.has(entity) || 
 			registry.shadows.has(entity) || registry.floors.has(entity) ||
-			registry.projectileSelectDisplays.has(entity))
+			registry.projectileSelectDisplays.has(entity) || registry.healthBars.has(entity) ||
+			registry.manaBars.has(entity))
 			continue;
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize
+		drawTexturedMesh(entity, camera.projectionMat);
+	}
+
+	for (Entity entity : registry.healthBars.entities) {
+		drawTexturedMesh(entity, camera.projectionMat);
+	}
+	
+	for (Entity entity : registry.manaBars.entities) {
 		drawTexturedMesh(entity, camera.projectionMat);
 	}
 
