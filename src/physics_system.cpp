@@ -210,5 +210,6 @@ void PhysicsSystem::step(float elapsed_ms)
 		Position& owner_position = registry.positions.get(follower.owner);
 		position.position = owner_position.position;
 		position.position.y += follower.y_offset;
+		position.position.x += follower.x_offset;
 	}
 }

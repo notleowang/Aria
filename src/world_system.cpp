@@ -358,7 +358,7 @@ void WorldSystem::restart_game() {
 		createObstacle(renderer, pos, scale, vel);
 	}
 
-	projectileSelectDisplay = createProjectileSelectDisplay(renderer, player, PROJECTILE_SELECT_DISPLAY_Y_OFFSET);
+	projectileSelectDisplay = createProjectileSelectDisplay(renderer, player, PROJECTILE_SELECT_DISPLAY_Y_OFFSET, PROJECTILE_SELECT_DISPLAY_X_OFFSET);
 
 	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
 
@@ -566,6 +566,7 @@ void WorldSystem::handle_collisions() {
 			Position& owner_position = registry.positions.get(follower.owner);
 			position.position = owner_position.position;
 			position.position.y += follower.y_offset;
+			position.position.x += follower.x_offset;
 		}
 
 		// Checking Moveable Terrain - Terrain Collisions

@@ -274,7 +274,7 @@ Entity createHealthBar(RenderSystem* renderer, Entity& owner_entity, float y_off
 	HealthBar& healthBar = registry.healthBars.emplace(entity);
 
 	Position& position = registry.positions.emplace(entity);
-	position.scale = vec2(RESOURCE_BAR_WIDTH, RESOURCE_BAR_HEIGHT);
+	position.scale = vec2(111.f, 10.f);
 
 	Follower& follower = registry.followers.emplace(entity);
 	follower.owner = owner_entity;
@@ -296,7 +296,7 @@ Entity createManaBar(RenderSystem* renderer, Entity& owner_entity, float y_offse
 	ManaBar& manaBar = registry.manaBars.emplace(entity);
 
 	Position& position = registry.positions.emplace(entity);
-	position.scale = vec2(RESOURCE_BAR_WIDTH, RESOURCE_BAR_HEIGHT);
+	position.scale = vec2(111.f, 10.f);
 
 	Follower& follower = registry.followers.emplace(entity);
 	follower.owner = owner_entity;
@@ -364,7 +364,7 @@ Entity createShadow(RenderSystem* renderer, Entity& owner_entity, TEXTURE_ASSET_
 	return entity;
 }
 
-Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entity, float y_offset)
+Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entity, float y_offset, float x_offset)
 {
 	auto entity = Entity();
 
@@ -380,11 +380,12 @@ Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entit
 	animation.is_animating = false;
 
 	Position& position = registry.positions.emplace(entity);
-	position.scale = vec2(PROJECTILE_SELECT_DISPLAY_WIDTH, PROJECTILE_SELECT_DISPLAY_HEIGHT);
+	position.scale = vec2(sprite_sheet.frame_width * SCALE_FACTOR, sprite_sheet.frame_height * SCALE_FACTOR);
 
 	Follower& follower = registry.followers.emplace(entity);
 	follower.owner = owner_entity;
 	follower.y_offset = y_offset;
+	follower.x_offset = x_offset;
 
 	registry.renderRequests.insert(
 		entity,
