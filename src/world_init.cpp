@@ -62,13 +62,13 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	return entity;
 }
 
-Entity createFloor(RenderSystem* renderer, vec2 pos)
+Entity createFloor(RenderSystem* renderer, vec2 pos, vec2 size)
 {
 	auto entity = Entity();
 
 	// set initial component values
 	Position& position = registry.positions.emplace(entity);
-	position.scale = vec2(250.f, 250.f);
+	position.scale = size;
 	// pos passed in to createFloor assumes top left corner is (x,y)
 	position.position = vec2(pos.x + position.scale.x/2, pos.y + position.scale.y/2);
 
@@ -77,18 +77,21 @@ Entity createFloor(RenderSystem* renderer, vec2 pos)
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::FLOOR,
-			EFFECT_ASSET_ID::TEXTURED,
+			EFFECT_ASSET_ID::REPEAT,
 			GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
 }
 
-Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, bool moveable)
+Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, DIRECTION dir, bool moveable)
 {
 	auto entity = Entity();
 
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::TERRAIN);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
+
+	Direction& direction = registry.directions.emplace(entity);
+	direction.direction = (DIRECTION)dir;
 
 	// The position passed into createTerrain (x,y) assumes the top left corner
 	// and size corresponds to width and height
@@ -104,12 +107,18 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, bool moveable)
 		velocity.velocity = { 200.f, 0.f };
 	}
 
+	TEXTURE_ASSET_ID tex = 
+		(dir == DIRECTION::N) ? TEXTURE_ASSET_ID::NORTH_TERRAIN : 
+		(dir == DIRECTION::S ?  TEXTURE_ASSET_ID::SOUTH_TERRAIN : 
+		(dir == DIRECTION::E ?  TEXTURE_ASSET_ID::SIDE_TERRAIN : 
+			                    TEXTURE_ASSET_ID::GENERIC_TERRAIN));
+
 	registry.collidables.emplace(entity); // Marking terrain as collidable
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::TEXTURE_COUNT, // TEXTURE_COUNT indicates that no txture is needed
-			EFFECT_ASSET_ID::TERRAIN,
-			GEOMETRY_BUFFER_ID::TERRAIN });
+		{ tex,
+			EFFECT_ASSET_ID::REPEAT,
+			GEOMETRY_BUFFER_ID::SPRITE });
 	
 	return entity;
 }
@@ -550,7 +559,7 @@ Entity createLine(vec2 position, vec2 scale)
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::TEXTURE_COUNT,
-		 EFFECT_ASSET_ID::TERRAIN,
+		 EFFECT_ASSET_ID::TEXTURED,
 		 GEOMETRY_BUFFER_ID::DEBUG_LINE });
 
 	// Create motion

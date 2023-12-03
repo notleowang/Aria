@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include "physics_system.hpp"
+#include "ui_system.hpp"
 using namespace std;
 
 // Game configuration
@@ -41,6 +42,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(enemy_death_sound);
 	if (damage_tick_sound != nullptr)
 		Mix_FreeChunk(damage_tick_sound);
+	if (obstacle_collision_sound != nullptr)
+		Mix_FreeChunk(obstacle_collision_sound);
 	if (end_level_sound != nullptr)
 		Mix_FreeChunk(end_level_sound);
 	if (power_up_sound != nullptr)
@@ -106,9 +109,11 @@ GLFWwindow* WorldSystem::create_window() {
 	// http://www.glfw.org/docs/latest/input_guide.html
 	glfwSetWindowUserPointer(window, this);
 	auto key_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2, int _3) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_key(_0, _1, _2, _3); };
+	auto scroll_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_scroll(_0, _1); };
 	auto mouse_button_redirect = [](GLFWwindow* wnd, int _0, int _1, int _2) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_mouse_button(_0, _1, _2); };
 	auto cursor_pos_redirect = [](GLFWwindow* wnd, double _0, double _1) { ((WorldSystem*)glfwGetWindowUserPointer(wnd))->on_mouse_move({ _0, _1 }); };
 	glfwSetKeyCallback(window, key_redirect);
+	glfwSetScrollCallback(window, scroll_redirect);
 	glfwSetMouseButtonCallback(window, mouse_button_redirect);
 	glfwSetCursorPosCallback(window, cursor_pos_redirect);
 
@@ -274,8 +279,8 @@ void WorldSystem::restart_game() {
 	GameLevel current_level = this->curr_level;
 	vec2 player_starting_pos = current_level.getPlayerStartingPos();
 	uint curr_level = current_level.getCurrLevel();
-	std::vector<vec2> floor_pos = current_level.getFloorPos();
-	std::vector<std::pair<vec4, bool>> terrains_attrs = current_level.getTerrains();
+	std::vector<vec4> floors = current_level.getFloorAttrs();
+	std::vector<std::pair<vec4, Terrain>> terrains_attrs = current_level.getTerrains();
 	std::vector<std::string> texts = current_level.getTexts();
 	std::vector<std::array<float, TEXT_ATTRIBUTES>> text_attrs = current_level.getTextAttrs();
 	std::vector<std::pair<vec2, Enemy>> enemies_attrs = current_level.getEnemies();
@@ -293,8 +298,8 @@ void WorldSystem::restart_game() {
 	}
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
-	for (uint i = 0; i < floor_pos.size(); i++) {
-		createFloor(renderer, floor_pos[i]);
+	for (uint i = 0; i < floors.size(); i++) {
+		createFloor(renderer, vec2(floors[i].x, floors[i].y), vec2(floors[i].z, floors[i].w));
 	}
 
 	player = createAria(renderer, player_starting_pos);
@@ -304,9 +309,14 @@ void WorldSystem::restart_game() {
 	if (persistProjectileType) registry.characterProjectileTypes.get(player) = persistedProjectileType;
 
 	for (uint i = 0; i < terrains_attrs.size(); i++) {
-		vec4 terrain_i = terrains_attrs[i].first;
-		bool moveable = terrains_attrs[i].second;
-		createTerrain(renderer, vec2(terrain_i[0], terrain_i[1]), vec2(terrain_i[2], terrain_i[3]), moveable);
+		vec4 terrain_pos = terrains_attrs[i].first;
+		Terrain terrain_attr = terrains_attrs[i].second;
+
+		createTerrain(renderer, 
+			vec2(terrain_pos[0], terrain_pos[1]), 
+			vec2(terrain_pos[2], terrain_pos[3]), 
+			terrain_attr.direction,
+			terrain_attr.moveable);
 	}
 
 	for (uint i = 0; i < texts.size(); i++) {
@@ -373,6 +383,12 @@ void WorldSystem::win_level() {
 	registry.velocities.get(player).velocity = { 0.f,0.f };
 	registry.winTimers.emplace(player);
 	Mix_PlayChannel(-1, end_level_sound, 0);
+}
+
+void WorldSystem::new_game() {
+	if (player != NULL) registry.remove_all_components_of(player);
+	curr_level.init(TUTORIAL);
+	restart_game();
 }
 
 void WorldSystem::display_power_up() {
@@ -729,6 +745,24 @@ bool WorldSystem::is_over() const {
 	return bool(glfwWindowShouldClose(window));
 }
 
+void WorldSystem::on_scroll(double x_offset, double y_offset) {
+	CharacterProjectileType& characterProjectileType = registry.characterProjectileTypes.get(player);
+	int new_element = (int) characterProjectileType.projectileType;
+	if (y_offset < 0) {
+		// Scrolling down
+		if (--new_element < 0) {
+			new_element = ElementType::LIGHTNING;
+		}
+	}
+	else if (y_offset > 0) {
+		// Scrolling up
+		new_element++;
+	}
+	characterProjectileType.projectileType = (ElementType)(new_element % ElementType::COUNT);
+	Animation& select_display = registry.animations.get(projectileSelectDisplay);
+	select_display.setState((int)characterProjectileType.projectileType);
+}
+
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
 	//Disables keys when death or win timer happening
@@ -851,9 +885,13 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		restart_game();
 	}
 
-	// Close program
-	if (action == GLFW_RELEASE && key == GLFW_KEY_BACKSPACE) {
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	// navigating pause menu and exitting game
+	if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE) {
+		UISystem* ui_system = UISystem::getInstance();
+		
+		if (ui_system->getState() == MAIN_MENU) ui_system->setState(QUIT);
+		else if (ui_system->getState() == PAUSE_MENU) ui_system->setState(PLAY_GAME);
+		else ui_system->setState(PAUSE_MENU);
 	}
 
 	// Debugging
@@ -865,9 +903,9 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	//}
 }
 
-void WorldSystem::on_mouse_button(int button, int action, int mod) {
+void WorldSystem::on_mouse_button(int button, int action, int mod) {	
 	//Disables mouse when death or win timer happening
-	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; }
+	if (UISystem::getInstance()->getState() != PLAY_GAME || registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; }
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		// check mana
@@ -911,6 +949,13 @@ void WorldSystem::on_mouse_button(int button, int action, int mod) {
 			Entity projectile = createProjectile(renderer, proj_position, vel.velocity, elementType, false, player);
 		}
 		Mix_PlayChannel(-1, projectile_sound, 0);
+	}
+
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+		CharacterProjectileType& characterProjectileType = registry.characterProjectileTypes.get(player);
+		characterProjectileType.projectileType = (ElementType)((characterProjectileType.projectileType + 1) % ElementType::COUNT);
+		Animation& select_display = registry.animations.get(projectileSelectDisplay);
+		select_display.setState((int)characterProjectileType.projectileType);
 	}
 }
 

@@ -38,7 +38,10 @@ class RenderSystem {
 
 	// Make sure these paths remain in sync with the associated enumerators.
 	const std::array<std::string, texture_count> texture_paths = {
-			textures_path("fish.png"),								// Currently keeping this so we know how to import our textures
+			textures_path("north_dungeon_wall.png"),
+			textures_path("south_dungeon_wall.png"),
+			textures_path("side_dungeon_wall.png"),
+			textures_path("generic_dungeon_wall.png"),
 			textures_path("landscape.png"),
 			textures_path("water_enemy.png"),						// start of regular enemies
 			textures_path("fire_enemy.png") ,
@@ -54,7 +57,7 @@ class RenderSystem {
 			textures_path("projectile_fire_sprite_sheet.png"),
 			textures_path("projectile_earth.png"),
 			textures_path("projectile_lightning.png"),
-			textures_path("dungeon_tile.png"),
+			textures_path("dungeon_floor.png"),
 			textures_path("health_bar.png"),
 			textures_path("mana_bar.png"),
 			textures_path("power_up_block.png"),
@@ -71,7 +74,7 @@ class RenderSystem {
 		shader_path("salmon"),
 		shader_path("textured"),
 		shader_path("screen_darken"),
-		shader_path("terrain"),
+		shader_path("repeat"),
 		shader_path("exit_door"),
 		shader_path("resource_bar"),
 		shader_path("text_2d"),
