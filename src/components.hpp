@@ -62,6 +62,7 @@ struct PowerUpBlock {
 // Terrain
 struct Terrain
 {
+  DIRECTION direction = DIRECTION::N;
 	bool moveable = false;
 };
 
@@ -184,6 +185,13 @@ struct Collision
 		this->other_entity = other_entity;
 		this->displacement = displacement;
 	};
+};
+
+// Terrain
+struct Terrain
+{
+	DIRECTION direction = DIRECTION::N;
+	bool moveable = false;
 };
 
 // Component container that marks an entity as being collidable
@@ -319,8 +327,11 @@ struct Animation
  */
 
 enum class TEXTURE_ASSET_ID {
-	FISH = 0,
-	LANDSCAPE = FISH + 1,
+	NORTH_TERRAIN = 0,
+	SOUTH_TERRAIN = NORTH_TERRAIN + 1,
+	SIDE_TERRAIN = SOUTH_TERRAIN + 1,
+	GENERIC_TERRAIN = SIDE_TERRAIN + 1,
+	LANDSCAPE = GENERIC_TERRAIN + 1,
 	WATER_ENEMY = LANDSCAPE + 1,
 	FIRE_ENEMY = WATER_ENEMY + 1,
 	EARTH_ENEMY = FIRE_ENEMY + 1,
@@ -353,8 +364,8 @@ enum class EFFECT_ASSET_ID {
 	SALMON = COLOURED + 1,
 	TEXTURED = SALMON + 1,
 	DARKEN = TEXTURED + 1,
-	TERRAIN = DARKEN + 1,
-	EXIT_DOOR = TERRAIN + 1,
+	REPEAT = DARKEN + 1,
+	EXIT_DOOR = REPEAT + 1,
 	RESOURCE_BAR = EXIT_DOOR + 1,
 	TEXT_2D = RESOURCE_BAR + 1,
 	ANIMATED = TEXT_2D + 1,

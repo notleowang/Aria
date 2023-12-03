@@ -1,5 +1,7 @@
 #include "ui_system.hpp"
 
+UISystem* UISystem::instancePtr = NULL;
+
 void UISystem::init() {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
@@ -7,10 +9,11 @@ void UISystem::init() {
 }
 
 void UISystem::showWindows() {
-	static bool show_main_menu = true;
+	static bool show_menu = true;
 	bool show_tutorial = isTutorial;
 
-	if (show_main_menu) showMainMenu(&show_main_menu);
+	if (state == MAIN_MENU) showMainMenu(&show_menu);
+	if (state == PAUSE_MENU) showPauseMenu(&show_menu);
 	if (show_tutorial) showTutorial(&show_tutorial);
 }
 
@@ -45,7 +48,7 @@ void UISystem::showMainMenu(bool* p_open) {
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, spc);
 
 		ImGui::PushFont(MainMenuFont);
-		ImGui::SetCursorPosY(100.f);
+		ImGui::SetCursorPosY(200.f);
 		CenterText("Aria: Whispers Of Darkness");
 		ImGui::PopFont();
 		ImGui::PopStyleVar();
@@ -56,25 +59,93 @@ void UISystem::showMainMenu(bool* p_open) {
 		ImGui::PushFont(ButtonFont);
 		ImGui::SetCursorPosX((w - button_size.x) * 0.5f);
 		if (ImGui::Button("Start Game", button_size)) {
-			state = GAME_START;
+			state = NEW_GAME;
 			*p_open = false;
 		}
 
-		ImGui::SetCursorPosX((w - button_size.x) * 0.5f);
-		if (ImGui::Button("Save Game", button_size)) {
-			state = SAVE;
-			//*p_open = false;
-		}
+		// TODO: uncomment when implementing reloadability
+		//ImGui::SetCursorPosX((w - button_size.x) * 0.5f);
+		//if (ImGui::Button("Save Game", button_size)) {
+		//	state = SAVE;
+		//	//*p_open = false;
+		//}
 
-		ImGui::SetCursorPosX((w - button_size.x) * 0.5f);
-		if (ImGui::Button("Load Game", button_size)) {
-			state = LOAD;
-			//*p_open = false;
-		}
+		//ImGui::SetCursorPosX((w - button_size.x) * 0.5f);
+		//if (ImGui::Button("Load Game", button_size)) {
+		//	state = LOAD;
+		//	//*p_open = false;
+		//}
 
 		ImGui::SetCursorPosX((w - button_size.x) * 0.5f);
 		if (ImGui::Button("Quit Game", button_size)) {
 			state = QUIT;
+			*p_open = false;
+		}
+
+		ImGui::PopStyleVar();
+		ImGui::PopFont();
+	}
+
+	ImGui::End();
+	ImGui::PopStyleColor();
+	ImGui::PopStyleVar(2);
+}
+
+void UISystem::showPauseMenu(bool* p_open) {
+
+
+	ImGuiIO io = ImGui::GetIO();
+	ImFont* MainMenuFont = io.Fonts->Fonts[1];
+	ImFont* ButtonFont = io.Fonts->Fonts[2];
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.WindowBorderSize = 0.0f;
+
+	static ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings;
+
+	const ImGuiViewport* viewport = ImGui::GetMainViewport();							// For setting the pause menu window to fullscreen
+	ImGui::SetNextWindowPos(viewport->Pos);
+	ImGui::SetNextWindowSize(viewport->Size);
+
+	//float w = ImGui::GetWindowWidth(); For some reason this is returning 400.f? Ask TA maybe? - Leo
+	float w = viewport->Size.x;
+	const ImVec2 padding = ImVec2(24.f, 24.f);
+	const ImVec2 button_size = ImVec2(350.f, ButtonFont->FontSize + 20.0f);
+
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.084f, 0.067f, 0.148f, 1.0f));		// Set Window Background Color
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, padding);							// Set Window Padding
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 15.0f);						    // Set Frame Rounding
+
+	if (ImGui::Begin("Pause Menu", p_open, flags))
+	{
+		ImVec2 spc = ImVec2(0.f, 100.f);
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, spc);
+
+		ImGui::PushFont(MainMenuFont);
+		ImGui::SetCursorPosY(150.f);
+		CenterText("Options");
+		ImGui::PopFont();
+		ImGui::PopStyleVar();
+
+		spc = ImVec2(0.f, 20.f);
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, spc);
+
+		ImGui::PushFont(ButtonFont);
+		ImGui::SetCursorPosX((w - button_size.x) * 0.5f);
+		if (ImGui::Button("Resume Game", button_size)) {
+			state = PLAY_GAME;
+			*p_open = false;
+		}
+		
+		ImGui::SetCursorPosX((w - 1000.f) * 0.5f);
+		if (ImGui::SliderInt("Volume", &volume, 0, MIX_MAX_VOLUME)) {
+			Mix_VolumeMusic(volume); // set background music volume
+			Mix_Volume(-1, volume); // set sound effects volume
+		}
+
+		ImGui::SetCursorPosX((w - button_size.x) * 0.5f);
+		if (ImGui::Button("Exit Level", button_size)) {
+			state = MAIN_MENU;
 			*p_open = false;
 		}
 
