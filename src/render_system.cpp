@@ -40,7 +40,8 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 	// Input data location as in the vertex buffer
 	if (render_request.used_effect == EFFECT_ASSET_ID::TEXTURED || 
 		render_request.used_effect == EFFECT_ASSET_ID::RESOURCE_BAR || 
-		render_request.used_effect == EFFECT_ASSET_ID::ANIMATED)
+		render_request.used_effect == EFFECT_ASSET_ID::ANIMATED ||
+		render_request.used_effect == EFFECT_ASSET_ID::REPEAT)
 	{
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_texcoord_loc = glGetAttribLocation(program, "in_texcoord");
@@ -100,9 +101,35 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			glUniform1i(glGetUniformLocation(program, "rainbow_enabled"), animation.rainbow_enabled);
 			gl_has_errors();
 		}
+		else if (render_request.used_effect == EFFECT_ASSET_ID::REPEAT) {
+			float x_scale = 1;
+			float y_scale = 1;
+			if (registry.terrain.has(entity)) {
+				switch (registry.directions.get(entity).direction) {
+					case DIRECTION::N: // north
+					case DIRECTION::S: // south
+						x_scale = position.scale.x / 100;
+						break;
+					case DIRECTION::E: // side
+						y_scale = position.scale.y / 100;
+						break;
+					case DIRECTION::W: // generic
+						x_scale = position.scale.x / 100;
+						y_scale = position.scale.y / 100;
+					default:				
+						break;
+				}
+			}
+			else if (registry.floors.has(entity)) {
+				x_scale = position.scale.x / 100;
+				y_scale = position.scale.y / 100;
+			}
+			glUniform1f(glGetUniformLocation(program, "x_scale"), x_scale);
+			glUniform1f(glGetUniformLocation(program, "y_scale"), y_scale);
+		}
 	}
-	else if (render_request.used_effect == EFFECT_ASSET_ID::SALMON || render_request.used_effect == EFFECT_ASSET_ID::PLAYER ||
-		render_request.used_effect == EFFECT_ASSET_ID::TERRAIN || render_request.used_effect == EFFECT_ASSET_ID::EXIT_DOOR)
+	// This is kind of useless now
+	else if (render_request.used_effect == EFFECT_ASSET_ID::PLAYER || render_request.used_effect == EFFECT_ASSET_ID::EXIT_DOOR)
 	{
 		GLint in_position_loc = glGetAttribLocation(program, "in_position");
 		GLint in_color_loc = glGetAttribLocation(program, "in_color");
@@ -369,7 +396,7 @@ void RenderSystem::draw()
 	// Clearing backbuffer
 	glViewport(0, 0, w, h);
 	glDepthRange(0.00001, 10);
-	glClearColor(0.2, 0.2, 0.2, 1.0);
+	glClearColor(0, 0, 0, 1.0);
 	glClearDepth(10.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_BLEND);
@@ -403,10 +430,19 @@ void RenderSystem::draw()
 	{
 		if (!registry.positions.has(entity) || registry.texts.has(entity) || 
 			registry.shadows.has(entity) || registry.floors.has(entity) ||
-			registry.projectileSelectDisplays.has(entity))
+			registry.projectileSelectDisplays.has(entity) || registry.healthBars.has(entity) ||
+			registry.manaBars.has(entity))
 			continue;
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize
+		drawTexturedMesh(entity, camera.projectionMat);
+	}
+
+	for (Entity entity : registry.healthBars.entities) {
+		drawTexturedMesh(entity, camera.projectionMat);
+	}
+	
+	for (Entity entity : registry.manaBars.entities) {
 		drawTexturedMesh(entity, camera.projectionMat);
 	}
 

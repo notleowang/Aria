@@ -24,7 +24,7 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 Entity createLine(vec2 position, vec2 size);
 
 // creates a terrain with fixed size
-Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, bool moveable);
+Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, DIRECTION dir, bool moveable);
 
 // creates an exit door
 Entity createExitDoor(RenderSystem* renderer, vec2 pos);
@@ -52,7 +52,7 @@ Entity createManaBar(RenderSystem* renderer, Entity& owner_entity, float y_offse
 // creates UI that displays the currently selected projectile element
 Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entity, float y_offset);
 
-Entity createFloor(RenderSystem* renderer, vec2 pos);
+Entity createFloor(RenderSystem* renderer, vec2 pos, vec2 size);
 
 
 Entity createShadow(RenderSystem* renderer, Entity& owner_entity, TEXTURE_ASSET_ID texture, GEOMETRY_BUFFER_ID geom);
