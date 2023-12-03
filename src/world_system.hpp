@@ -72,6 +72,7 @@ private:
 	Mix_Music* final_boss_intro_music;
 	Mix_Chunk* projectile_sound;
 	Mix_Chunk* heal_sound;
+	Mix_Chunk* last_enemy_death_sound;
 	Mix_Chunk* aria_death_sound;
 	Mix_Chunk* enemy_death_sound;
 	Mix_Chunk* damage_tick_sound;

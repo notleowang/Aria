@@ -59,6 +59,7 @@ public:
 	uint curr_level;
 	vec2 player_starting_pos;
 	vec2 exit_door_pos;
+	bool hasEnemies;
 
 	std::vector<vec2> health_packs_pos;
 

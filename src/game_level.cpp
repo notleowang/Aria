@@ -57,6 +57,8 @@ bool GameLevel::init(uint level) {
 	obstacles.clear();
 	bosses.clear();
 
+	this->hasEnemies = false;
+
 	switch (level) {
 	case TUTORIAL:
 		floors.push_back(vec4(25, 30, 1300, 650));
@@ -102,6 +104,7 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(750, 0, default_side_width, 475), SIDE_STATIONARY));
 		terrains.push_back(std::make_pair(vec4(1150, 400, default_side_width, 475), SIDE_STATIONARY));
 
+		this->hasEnemies = true;
 		enemies.push_back(std::make_pair(vec2(350, 250), getRandomNormalEnemy()));
 		enemies.push_back(std::make_pair(vec2(700, 800), getRandomNormalEnemy()));
 		enemies.push_back(std::make_pair(vec2(950, 800), getRandomNormalEnemy()));
@@ -144,7 +147,7 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(775, 450, 50, 50), GENERIC_MOVABLE));
 		terrains.push_back(std::make_pair(vec4(1125, 450, 50, 50), GENERIC_MOVABLE));
 
-
+		this->hasEnemies = true;
 		enemies.push_back(std::make_pair(vec2(350, 250), getRandomNormalEnemy()));
 		enemies.push_back(std::make_pair(vec2(700, 800), getRandomNormalEnemy()));
 		enemies.push_back(std::make_pair(vec2(950, 800), getRandomNormalEnemy()));
@@ -188,7 +191,8 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(525, 450, 50, 50), GENERIC_MOVABLE));
 		terrains.push_back(std::make_pair(vec4(775, 450, 50, 50), GENERIC_MOVABLE));
 		terrains.push_back(std::make_pair(vec4(1125, 450, 50, 50), GENERIC_MOVABLE));
-
+		
+		this->hasEnemies = true;
 		enemies.push_back(std::make_pair(vec2(350, 250), getRandomNormalEnemy()));
 		enemies.push_back(std::make_pair(vec2(700, 800), getRandomNormalEnemy()));
 		enemies.push_back(std::make_pair(vec2(950, 800), getRandomNormalEnemy()));
@@ -235,6 +239,7 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(3600, 800, 75, 75), GENERIC_MOVABLE));
 		terrains.push_back(std::make_pair(vec4(3400, 900, 75, 75), GENERIC_MOVABLE));
 
+		this->hasEnemies = true;
 		// Area 1
 		enemies.push_back(std::make_pair(vec2(1200, 700), getRandomNormalEnemy()));
 		enemies.push_back(std::make_pair(vec2(1500, 500), getRandomNormalEnemy()));
