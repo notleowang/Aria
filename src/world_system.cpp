@@ -319,7 +319,7 @@ void WorldSystem::restart_game() {
 	else if (curr_level == Level::CUTSCENE_1) {
 		Mix_FadeInMusic(cutscene1_background, 0, 500);
 		Mix_PlayChannel(-1, cutscene1_voiceline, 0);
-		Mix_Volume(-1, 45);
+		Mix_Volume(-1, 70);
 	}
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)

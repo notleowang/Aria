@@ -99,7 +99,7 @@ bool GameLevel::init(uint level) {
 		this->exit_door_pos = vec2(9300,200);
 		this->cutscene_player_velocity = { 300.f,0.f };
 
-		lost_souls.push_back({ vec2(6000, 300), LostSoul()});
+		lost_souls.push_back({ vec2(5800, 300), LostSoul()});
 
 		terrains.push_back(std::make_pair(vec4(25, 0, 10000, default_north_height), NORTH_STATIONARY));
 		terrains.push_back(std::make_pair(vec4(25, 400, 10000, default_south_height), SOUTH_STATIONARY));
