@@ -14,6 +14,10 @@
 	CREATING ENEMIES:
 		Push back a pair of pos and enemy attributes to enemies:
 			make_pair(vec2(x_coord, y_coord), ENEMY_OBJECT);
+
+	CREATING HEALTH PACKS:
+		Push back a vec2 to health_packs_pos
+			vec2(x_coord, y_coord)
 */
 
 // Helper function to get a random normal damage enemy
@@ -35,6 +39,7 @@ bool GameLevel::init(uint level) {
 	}
 	this->curr_level = level;
 
+	std::vector<vec2>& health_packs_pos = this->health_packs_pos;
 	std::vector<std::string>& texts = this->texts;
 	std::vector<std::array<float, TEXT_ATTRIBUTES>>& text_attrs = this->text_attrs;
 	std::vector<std::array< vec2, OBSTACLE_ATTRIBUTES>>& obstacles = this->obstacle_attrs;
@@ -43,6 +48,7 @@ bool GameLevel::init(uint level) {
 	std::vector<std::pair<vec2, Enemy>>& enemies = this->enemies_attr;
 	std::vector<std::pair<vec2, Enemy>>& bosses = this->bosses_attr;
 
+	health_packs_pos.clear();
 	texts.clear();
 	text_attrs.clear();
 	floors.clear();
@@ -58,11 +64,18 @@ bool GameLevel::init(uint level) {
 		this->player_starting_pos = vec2(200, 200);
 		this->exit_door_pos = vec2(1225, 575);
 
+		health_packs_pos.push_back(vec2(400, 300));
+		health_packs_pos.push_back(vec2(600, 400));
+		health_packs_pos.push_back(vec2(800, 500));
+		health_packs_pos.push_back(vec2(1000, 600));
+
 		texts.push_back("Use WASD to move around");
-		text_attrs.push_back({0.f,175.f,1.0f,1.0f,1.0f,0.f});
+		text_attrs.push_back({0.f,225.f,1.0f,1.0f,1.0f,0.f});
 		texts.push_back("Use M1 button to shoot");
-		text_attrs.push_back({0.f,125.f,1.0f,1.0f,1.0f,0.f});
+		text_attrs.push_back({0.f,175.f,1.0f,1.0f,1.0f,0.f});
 		texts.push_back("Use 1,2,3,4 to cycle through elements");
+		text_attrs.push_back({0.f,125.f,1.0f,1.0f,1.0f,0.f});		
+		texts.push_back("Collect health packs to heal!");
 		text_attrs.push_back({0.f,75.f,1.0f,1.0f,1.0f,0.f});		
 		texts.push_back("Move to the exit door when ready");
 		text_attrs.push_back({0.f,25.f,1.0f,1.0f,1.0f,0.f});

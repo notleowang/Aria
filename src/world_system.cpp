@@ -36,6 +36,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeMusic(final_boss_intro_music);
 	if (projectile_sound != nullptr)
 		Mix_FreeChunk(projectile_sound);
+	if (heal_sound != nullptr)
+		Mix_FreeChunk(heal_sound);
 	if (aria_death_sound != nullptr)
 		Mix_FreeChunk(aria_death_sound);
 	if (enemy_death_sound != nullptr)
@@ -134,6 +136,7 @@ GLFWwindow* WorldSystem::create_window() {
 	final_boss_music = Mix_LoadMUS(audio_path("final_boss_battle.wav").c_str());
 	final_boss_intro_music = Mix_LoadMUS(audio_path("final_boss_battle_intro.wav").c_str());
 	projectile_sound = Mix_LoadWAV(audio_path("projectile.wav").c_str());
+	heal_sound = Mix_LoadWAV(audio_path("heal.wav").c_str());
 	aria_death_sound = Mix_LoadWAV(audio_path("aria_death.wav").c_str());
 	enemy_death_sound = Mix_LoadWAV(audio_path("enemy_death.wav").c_str());
 	damage_tick_sound = Mix_LoadWAV(audio_path("damage_tick.wav").c_str());
@@ -280,6 +283,7 @@ void WorldSystem::restart_game() {
 	vec2 player_starting_pos = current_level.getPlayerStartingPos();
 	uint curr_level = current_level.getCurrLevel();
 	std::vector<vec4> floors = current_level.getFloorAttrs();
+	std::vector<vec2> health_packs_pos = current_level.getHealthPackPos();
 	std::vector<std::pair<vec4, Terrain>> terrains_attrs = current_level.getTerrains();
 	std::vector<std::string> texts = current_level.getTexts();
 	std::vector<std::array<float, TEXT_ATTRIBUTES>> text_attrs = current_level.getTextAttrs();
@@ -304,6 +308,11 @@ void WorldSystem::restart_game() {
 
 	player = createAria(renderer, player_starting_pos);
 
+	if (curr_level == Level::TUTORIAL) {
+		// Familarize player with health pack
+		registry.resources.get(player).currentHealth = 20.f;
+	}
+
 	// ADD BACK THE PERSISTED COMPONENTS
 	if (persistPowerUps) registry.powerUps.get(player) = persistedPowerUps;
 	if (persistProjectileType) registry.characterProjectileTypes.get(player) = persistedProjectileType;
@@ -317,6 +326,11 @@ void WorldSystem::restart_game() {
 			vec2(terrain_pos[2], terrain_pos[3]), 
 			terrain_attr.direction,
 			terrain_attr.moveable);
+	}
+
+	for (uint i = 0; i < health_packs_pos.size(); i++) {
+		vec2 pos = health_packs_pos[i];
+		createHealthPack(renderer, pos);
 	}
 
 	for (uint i = 0; i < texts.size(); i++) {
@@ -735,6 +749,16 @@ void WorldSystem::handle_collisions() {
 		// Checking Player - Exit Door collision
 		if (registry.players.has(entity) && registry.exitDoors.has(entity_other)) {
 			win_level();
+		}
+
+		// Checking Player - Medkit collision
+		if (registry.players.has(entity) && registry.healthPacks.has(entity_other)) {
+			Mix_PlayChannel(-1, heal_sound, 0);
+			Resources& player_resource = registry.resources.get(entity);
+			player_resource.currentHealth = std::min(player_resource.maxHealth, 
+				player_resource.currentHealth + registry.healthPacks.get(entity_other).value);
+			printf("Player hp: %f\n", player_resource.currentHealth);
+			registry.remove_all_components_of_no_collision(entity_other);
 		}
 	}
 	registry.collisions.clear();

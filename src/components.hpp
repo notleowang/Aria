@@ -59,6 +59,11 @@ struct PowerUpBlock {
 	Entity textEntity;
 };
 
+// Health pack
+struct HealthPack
+{
+	float value = 20;
+};
 
 // Shadow of the owner entity
 struct Shadow
@@ -341,7 +346,8 @@ enum class TEXTURE_ASSET_ID {
 	PLAYER = POWER_UP_BLOCK + 1,
 	PORTAL = PLAYER+1,
 	PROJECTILE_SELECT_DISPLAY = PORTAL + 1,
-	TEXTURE_COUNT = PROJECTILE_SELECT_DISPLAY + 1
+	HEALTH_PACK = PROJECTILE_SELECT_DISPLAY + 1,
+	TEXTURE_COUNT = HEALTH_PACK + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

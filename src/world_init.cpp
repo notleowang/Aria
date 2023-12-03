@@ -311,6 +311,32 @@ Entity createManaBar(RenderSystem* renderer, Entity& owner_entity, float y_offse
 	return entity;
 }
 
+Entity createHealthPack(RenderSystem* renderer, vec2 pos)
+{
+	auto entity = Entity();
+
+	HealthPack& health_pack = registry.healthPacks.emplace(entity);
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& health_pack_position = registry.positions.emplace(entity);
+	health_pack_position.position = pos;
+	health_pack_position.scale = vec2(75.f, 75.f);
+
+	registry.collidables.emplace(entity);
+
+	registry.renderRequests.insert(
+		entity,
+		{
+			TEXTURE_ASSET_ID::HEALTH_PACK,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE
+		}
+	);
+
+	return entity;
+}
 
 Entity createShadow(RenderSystem* renderer, Entity& owner_entity, TEXTURE_ASSET_ID texture, GEOMETRY_BUFFER_ID geom)
 {
@@ -372,7 +398,7 @@ Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entit
 Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	auto entity = Entity();
 
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::EXIT_DOOR);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	Position& position = registry.positions.emplace(entity);
@@ -393,7 +419,7 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp, vec2 pos) {
 	auto entity = Entity();
 
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::EXIT_DOOR);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK);

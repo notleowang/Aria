@@ -34,6 +34,7 @@ public:
 	ComponentContainer<PowerUp> powerUps;
 	ComponentContainer<PowerUpBlock> powerUpBlocks;
 	ComponentContainer<Terrain> terrain;
+	ComponentContainer<HealthPack> healthPacks;
 	ComponentContainer<Shadow> shadows;
 	ComponentContainer<ExitDoor> exitDoors;
 	ComponentContainer<Mesh*> meshPtrs;
@@ -71,6 +72,7 @@ public:
 		registry_list.push_back(&powerUps);
 		registry_list.push_back(&powerUpBlocks);
 		registry_list.push_back(&terrain);
+		registry_list.push_back(&healthPacks);
 		registry_list.push_back(&shadows);
 		registry_list.push_back(&exitDoors);
 		registry_list.push_back(&meshPtrs);

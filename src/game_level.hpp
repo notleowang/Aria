@@ -60,6 +60,8 @@ public:
 	vec2 player_starting_pos;
 	vec2 exit_door_pos;
 
+	std::vector<vec2> health_packs_pos;
+
 	std::vector<std::string> texts;
 
 	// pos_x, pos_y, font_size, r, g, b
@@ -92,6 +94,10 @@ public:
 
 	vec2& getExitDoorPos() {
 		return exit_door_pos;
+	}
+
+	std::vector<vec2>& getHealthPackPos() {
+		return health_packs_pos;
 	}
 
 	std::vector<std::string>& getTexts() {
