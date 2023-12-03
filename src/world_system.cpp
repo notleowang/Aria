@@ -385,6 +385,8 @@ void WorldSystem::restart_game() {
 
 	if (this->curr_level.getIsCutscene()) {
 		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
+		Animation& player_animation = registry.animations.get(player);
+		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
 		createExitDoor(renderer, this->curr_level.getExitDoorPos());
 	}
 
@@ -835,7 +837,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (action == GLFW_PRESS && key == GLFW_KEY_9) win_level();
 
 	//Disables keys when death or win timer happening
-	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; }
+	if (registry.deathTimers.has(player) || registry.winTimers.has(player) || this->curr_level.getIsCutscene()) { return; }
 
 	Velocity& player_velocity = registry.velocities.get(player);
 	Position& player_position = registry.positions.get(player);
