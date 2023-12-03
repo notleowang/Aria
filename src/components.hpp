@@ -33,6 +33,11 @@ struct Enemy
 	float isAggravated = true;
 };
 
+// hooded guy
+struct LostSoul {
+
+};
+
 // Boss
 struct Boss {
 
@@ -347,7 +352,8 @@ enum class TEXTURE_ASSET_ID {
 	PORTAL = PLAYER+1,
 	PROJECTILE_SELECT_DISPLAY = PORTAL + 1,
 	HEALTH_PACK = PROJECTILE_SELECT_DISPLAY + 1,
-	TEXTURE_COUNT = HEALTH_PACK + 1
+	LOST_SOUL = HEALTH_PACK +1,
+	TEXTURE_COUNT = LOST_SOUL + 1
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 

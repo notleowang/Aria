@@ -64,7 +64,9 @@ class RenderSystem {
 			textures_path("aria.png"),
 			textures_path("portal.png"),
 			textures_path("projectile-select-display-purple.png"),
-			textures_path("medkit.png")
+			textures_path("medkit.png"),
+			textures_path("lost_soul.png")
+
 	};
 
 	std::array<GLuint, effect_count> effects;

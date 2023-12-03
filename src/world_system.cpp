@@ -50,6 +50,10 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(end_level_sound);
 	if (power_up_sound != nullptr)
 		Mix_FreeChunk(power_up_sound);
+	if (cutscene1_voiceline != nullptr)
+		Mix_FreeChunk(cutscene1_voiceline);
+	if (cutscene1_background != nullptr)
+		Mix_FreeMusic(cutscene1_background);
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -98,7 +102,7 @@ GLFWwindow* WorldSystem::create_window() {
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 	// To disable fullscreen-mode, change "monitor" to "nullptr" on next line:
-	window = glfwCreateWindow(mode->width, mode->height, "Aria", monitor, nullptr);
+	window = glfwCreateWindow(mode->width, mode->height, "Aria", nullptr, nullptr);
 
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
@@ -143,6 +147,8 @@ GLFWwindow* WorldSystem::create_window() {
 	obstacle_collision_sound = Mix_LoadWAV(audio_path("obstacle_collision.wav").c_str());
 	end_level_sound = Mix_LoadWAV(audio_path("portal.wav").c_str());
 	power_up_sound = Mix_LoadWAV(audio_path("power_up.wav").c_str());
+	cutscene1_voiceline = Mix_LoadWAV(audio_path("cutscene_1_voiceline.wav").c_str());
+	cutscene1_background = Mix_LoadMUS(audio_path("cutscene_1_background.wav").c_str());
 
 	if (background_music == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
@@ -289,16 +295,22 @@ void WorldSystem::restart_game() {
 	std::vector<std::array<float, TEXT_ATTRIBUTES>> text_attrs = current_level.getTextAttrs();
 	std::vector<std::pair<vec2, Enemy>> enemies_attrs = current_level.getEnemies();
 	std::vector<std::pair<vec2, Enemy>> bosses_attrs = current_level.getBosses();
+	std::vector<std::pair<vec2, LostSoul>> lost_soul_attrs = current_level.getLostSouls();
 	std::vector<std::array<vec2, OBSTACLE_ATTRIBUTES >> obstacles = current_level.getObstacleAttrs();
 
 	if (curr_level == Level::FIRE_BOSS ||
 		curr_level == Level::EARTH_BOSS ||
 		curr_level == Level::LIGHTNING_BOSS ||
 		curr_level == Level::WATER_BOSS) {
-		Mix_FadeInMusic(boss_intro_music, 1, 500);
+		Mix_FadeInMusic(boss_intro_music, 0, 500);
 	}
 	else if (curr_level == Level::FINAL_BOSS) {
-		Mix_FadeInMusic(final_boss_intro_music, 1, 500);
+		Mix_FadeInMusic(final_boss_intro_music, 0, 500);
+	} 
+	else if (curr_level == Level::CUTSCENE_1) {
+		Mix_FadeInMusic(cutscene1_background, 0, 500);
+		Mix_PlayChannel(-1, cutscene1_voiceline, 0);
+		Mix_Volume(-1, 45);
 	}
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
@@ -361,6 +373,16 @@ void WorldSystem::restart_game() {
 	projectileSelectDisplay = createProjectileSelectDisplay(renderer, player, PROJECTILE_SELECT_DISPLAY_Y_OFFSET);
 
 	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
+
+	if (this->curr_level.getIsCutscene()) {
+		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
+		createExitDoor(renderer, this->curr_level.getExitDoorPos());
+	}
+
+	for (uint i = 0; i < lost_soul_attrs.size(); i++) {
+		vec2 pos = lost_soul_attrs[i].first;
+		createLostSoul(renderer, pos);
+	}
 
 	// Debugging for memory/component leaks
 	registry.list_all_components();
@@ -748,6 +770,10 @@ void WorldSystem::handle_collisions() {
 
 		// Checking Player - Exit Door collision
 		if (registry.players.has(entity) && registry.exitDoors.has(entity_other)) {
+			if (curr_level.curr_level == Level::CUTSCENE_1) {
+				Mix_FadeInMusic(background_music, -1, 1500);
+				registry.velocities.get(registry.lostSouls.entities[0]).velocity = vec2(0, 0);
+			}
 			win_level();
 		}
 
@@ -760,6 +786,14 @@ void WorldSystem::handle_collisions() {
 			printf("Player hp: %f\n", player_resource.currentHealth);
 			registry.remove_all_components_of_no_collision(entity_other);
 		}
+
+		// Checking Player - Lost Soul collision
+		if (registry.players.has(entity) && registry.lostSouls.has(entity_other)) {
+			Velocity& ls_velocity = registry.velocities.get(entity_other);
+			Velocity& player_velocity = registry.velocities.get(entity);
+			ls_velocity.velocity = player_velocity.velocity;
+		}
+
 	}
 	registry.collisions.clear();
 }
@@ -789,6 +823,8 @@ void WorldSystem::on_scroll(double x_offset, double y_offset) {
 
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
+	if (action == GLFW_PRESS && key == GLFW_KEY_9) win_level();
+
 	//Disables keys when death or win timer happening
 	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; }
 
@@ -862,9 +898,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		case GLFW_KEY_4:
 			characterProjectileType.projectileType = ElementType::LIGHTNING;
 			break;
-		case GLFW_KEY_9:
-			win_level();
-			break;
 		case GLFW_KEY_0:
 			registry.resources.get(player).maxHealth = 10000.f;
 			registry.resources.get(player).currentHealth = 10000.f;
@@ -929,8 +962,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 void WorldSystem::on_mouse_button(int button, int action, int mod) {	
 	//Disables mouse when death or win timer happening
-	if (UISystem::getInstance()->getState() != PLAY_GAME || registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; }
-
+	if (UISystem::getInstance()->getState() != PLAY_GAME || registry.deathTimers.has(player) || registry.winTimers.has(player) || curr_level.getIsCutscene()) { return; }
+	
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		// check mana
 		if (registry.resources.get(player).currentMana < 1) {

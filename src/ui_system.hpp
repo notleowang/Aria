@@ -55,7 +55,7 @@ private:
 	State state = MAIN_MENU;
 
 	// Volume
-	int volume = MIX_MAX_VOLUME;
+	int volume = 1;
 
 	// bools
 	bool isTutorial = false;

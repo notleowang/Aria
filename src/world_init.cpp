@@ -150,6 +150,36 @@ Entity createObstacle(RenderSystem* renderer, vec2 pos, vec2 size, vec2 vel) {
 	return entity;
 }
 
+Entity createLostSoul(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+
+	registry.lostSouls.emplace(entity);
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity = { 0.f,0.f };
+
+	position.scale = vec2(100, 100);
+
+	registry.collidables.emplace(entity); // Marking obstacle as collidable
+
+	createShadow(renderer, entity, TEXTURE_ASSET_ID::LOST_SOUL, GEOMETRY_BUFFER_ID::SPRITE);
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::LOST_SOUL,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
+
 Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 {
 	// TODO: change enemy implementation to include different enemy types

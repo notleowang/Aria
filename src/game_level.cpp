@@ -1,5 +1,6 @@
 #include "game_level.hpp" 
 #include <random>
+#include <tiny_ecs_registry.hpp>
 
 /*
 	CREATING WALLS:
@@ -38,6 +39,7 @@ bool GameLevel::init(uint level) {
 		return false;
 	}
 	this->curr_level = level;
+	this->is_cutscene = false;
 
 	std::vector<vec2>& health_packs_pos = this->health_packs_pos;
 	std::vector<std::string>& texts = this->texts;
@@ -47,6 +49,7 @@ bool GameLevel::init(uint level) {
 	std::vector<std::pair<vec4, Terrain>>& terrains = this->terrains_attr;
 	std::vector<std::pair<vec2, Enemy>>& enemies = this->enemies_attr;
 	std::vector<std::pair<vec2, Enemy>>& bosses = this->bosses_attr;
+	std::vector<std::pair<vec2, LostSoul>>& lost_souls = this->lost_souls_attr;
 
 	health_packs_pos.clear();
 	texts.clear();
@@ -87,6 +90,23 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(1325, 0, default_side_width, 700), SIDE_STATIONARY));
 		break;
 
+	case CUTSCENE_1:
+		this->is_cutscene = true;
+		floors.push_back(vec4(25, 25, 10000, 400));
+
+		this->player_starting_pos = vec2(50, 300);
+		this->exit_door_pos = vec2(9300,200);
+		this->cutscene_player_velocity = { 300.f,0.f };
+
+		lost_souls.push_back({ vec2(6000, 300), LostSoul()});
+
+		terrains.push_back(std::make_pair(vec4(25, 0, 10000, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 400, 10000, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 425), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(10025, 0, default_side_width, 425), SIDE_STATIONARY));
+		
+
+		break;
 	case LEVEL_1:
 		this->player_starting_pos = vec2(200, 700);
 		this->exit_door_pos = vec2(1450, 775);

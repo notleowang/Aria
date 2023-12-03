@@ -19,7 +19,8 @@ const vec2 NULL_POS = vec2(-1, -1);
 // enum for each level type
 enum Level {
 	TUTORIAL = 0,
-	LEVEL_1 = TUTORIAL + 1,
+	CUTSCENE_1 = TUTORIAL+1,
+	LEVEL_1 = CUTSCENE_1 + 1,
 	FIRE_BOSS = LEVEL_1 + 1,
 	LEVEL_2 = FIRE_BOSS + 1,
 	EARTH_BOSS = LEVEL_2 + 1,
@@ -59,6 +60,8 @@ public:
 	uint curr_level;
 	vec2 player_starting_pos;
 	vec2 exit_door_pos;
+	bool is_cutscene;
+	vec2 cutscene_player_velocity;
 
 	std::vector<vec2> health_packs_pos;
 
@@ -81,11 +84,18 @@ public:
 
 	// pos_x, pos_y, vel_x, vel_y, scale_x, scale_y
 	std::vector<std::pair<vec2, Enemy>> bosses_attr;
+	
+	// pos_x, pos_y, vel_x, vel_y, scale_x, scale_y
+	std::vector<std::pair<vec2, LostSoul>> lost_souls_attr;
 
 	bool init(uint level);
 
 	uint getCurrLevel() {
 		return curr_level;
+	}
+	
+	bool getIsCutscene() {
+		return is_cutscene;
 	}
 
 	vec2& getPlayerStartingPos() {
@@ -126,5 +136,9 @@ public:
 
 	std::vector<std::pair<vec2, Enemy>>& getBosses() {
 		return bosses_attr;
+	}
+
+	std::vector<std::pair<vec2, LostSoul>>& getLostSouls() {
+		return lost_souls_attr;
 	}
 };

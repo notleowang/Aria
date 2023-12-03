@@ -78,6 +78,8 @@ private:
 	Mix_Chunk* obstacle_collision_sound;
 	Mix_Chunk* end_level_sound;
 	Mix_Chunk* power_up_sound;
+	Mix_Chunk* cutscene1_voiceline;
+	Mix_Music* cutscene1_background;
 
 	// C++ random number generator
 	std::default_random_engine rng;
