@@ -39,6 +39,7 @@ public:
 	// Should the game be over ?
 	bool is_over()const;
 
+	void new_game();
 	void win_level();
 	void display_power_up();
 	GameLevel getLevel() { return curr_level; }

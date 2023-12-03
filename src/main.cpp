@@ -23,7 +23,7 @@ int main()
 	AISystem ai_system;
 
 	// UI system
-	UISystem ui_system;
+	UISystem* ui_system = UISystem::getInstance();
 
 	// Initializing window
 	GLFWwindow* window = world_system.create_window();
@@ -52,7 +52,7 @@ int main()
 		glfwPollEvents();
 
 		// initialize UI system
-		ui_system.init();
+		ui_system->init();
 
 		// Calculating elapsed times in milliseconds from the previous iteration
 		auto now = Clock::now();
@@ -62,16 +62,21 @@ int main()
 		t = now;
 
 		// handles what UI elements to show
-		ui_system.showWindows();
+		ui_system->showWindows();
 		//ImGui::ShowDemoWindow();
 
-		if (ui_system.getState() == GAME_START) {
+		if (ui_system->getState() == NEW_GAME || ui_system->getState() == PLAY_GAME) {
+			if (ui_system->getState() == NEW_GAME) {
+				world_system.new_game();
+				ui_system->setState(PLAY_GAME);
+			}
+
 			curr_level = world_system.getLevel();
 			if (curr_level.curr_level == TUTORIAL) {
-				ui_system.setTutorialFlag(true);
+				ui_system->setTutorialFlag(true);
 			}
 			else {
-				ui_system.setTutorialFlag(false);
+				ui_system->setTutorialFlag(false);
 			}
 			world_system.step(elapsed_ms);
 			physics_system.step(elapsed_ms);
@@ -81,7 +86,7 @@ int main()
 			world_system.handle_collisions();
 		}
 
-		if (ui_system.getState() == QUIT) {
+		if (ui_system->getState() == QUIT) {
 			glfwSetWindowShouldClose(window, GLFW_TRUE);
 		}
 
