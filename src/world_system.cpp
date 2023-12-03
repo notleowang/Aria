@@ -282,7 +282,7 @@ void WorldSystem::restart_game() {
 	GameLevel current_level = this->curr_level;
 	vec2 player_starting_pos = current_level.getPlayerStartingPos();
 	uint curr_level = current_level.getCurrLevel();
-	std::vector<vec2> floor_pos = current_level.getFloorPos();
+	std::vector<vec4> floors = current_level.getFloorAttrs();
 	std::vector<vec2> health_packs_pos = current_level.getHealthPackPos();
 	std::vector<std::pair<vec4, Terrain>> terrains_attrs = current_level.getTerrains();
 	std::vector<std::string> texts = current_level.getTexts();
