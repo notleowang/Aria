@@ -40,6 +40,7 @@ bool GameLevel::init(uint level) {
 	}
 	this->curr_level = level;
 	this->is_cutscene = false;
+	this->is_boss_level = false;
 
 	std::vector<vec2>& health_packs_pos = this->health_packs_pos;
 	std::vector<std::string>& texts = this->texts;
@@ -129,6 +130,7 @@ bool GameLevel::init(uint level) {
 		break;
 	
 	case FIRE_BOSS:
+		this->is_boss_level = true;
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
 		this->player_starting_pos = vec2(800, 650);
@@ -174,6 +176,7 @@ bool GameLevel::init(uint level) {
 		break;
 
 	case EARTH_BOSS:
+		this->is_boss_level = true;
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
 		this->player_starting_pos = vec2(800, 650);
@@ -219,6 +222,7 @@ bool GameLevel::init(uint level) {
 		break;
 
 	case LIGHTNING_BOSS:
+		this->is_boss_level = true;
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
 		this->player_starting_pos = vec2(800, 650);
@@ -277,7 +281,9 @@ bool GameLevel::init(uint level) {
 
 		break;
 
+
 	case WATER_BOSS:
+		this->is_boss_level = true;
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
 		this->player_starting_pos = vec2(800, 650);
@@ -292,6 +298,7 @@ bool GameLevel::init(uint level) {
 		break;
 
 	case FINAL_BOSS: // actual final boss (the reaper dude)
+		this->is_boss_level = true;
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
 		this->player_starting_pos = vec2(800, 650);

@@ -26,6 +26,8 @@ WorldSystem::~WorldSystem() {
 	// Destroy music components
 	if (background_music != nullptr)
 		Mix_FreeMusic(background_music);
+	if (main_menu_music != nullptr)
+		Mix_FreeMusic(main_menu_music);
 	if (boss_music != nullptr)
 		Mix_FreeMusic(boss_music);
 	if (boss_intro_music != nullptr)
@@ -135,6 +137,7 @@ GLFWwindow* WorldSystem::create_window() {
 	}
 
 	background_music = Mix_LoadMUS(audio_path("fast_pace_background.wav").c_str());
+	main_menu_music = Mix_LoadMUS(audio_path("eerie_ambience.wav").c_str());
 	boss_music = Mix_LoadMUS(audio_path("boss_battle.wav").c_str());
 	boss_intro_music = Mix_LoadMUS(audio_path("boss_battle_intro.wav").c_str());
 	final_boss_music = Mix_LoadMUS(audio_path("final_boss_battle.wav").c_str());
@@ -163,7 +166,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, GameLevel level) {
 	this->renderer = renderer_arg;
 	this->curr_level = level;
 	// Playing background music indefinitely
-	Mix_PlayMusic(background_music, -1);
+	Mix_PlayMusic(main_menu_music, -1);
 	fprintf(stderr, "Loaded music\n");
 
 	// Set all states to default
@@ -232,12 +235,18 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			// Change level here
 			if (!timer.changedLevel) {
 				timer.changedLevel = true;
-				if (this->curr_level.getCurrLevel() != POWER_UP) {
+				if (this->curr_level.getIsBossLevel()) {
 					this->next_level = this->curr_level.getCurrLevel() + 1;
 					this->curr_level.init(POWER_UP);
 				}
 				else {
-					this->curr_level.init(this->next_level);
+					if (this->next_level != NULL) {
+						this->curr_level.init(this->next_level);
+						this->next_level = NULL;
+					}
+					else {
+						this->curr_level.init(this->curr_level.getCurrLevel() + 1);
+					}
 				}
 				restart_game();
 			}
@@ -423,7 +432,7 @@ void WorldSystem::win_level() {
 
 void WorldSystem::new_game() {
 	if (player != NULL) registry.remove_all_components_of(player);
-	curr_level.init(TUTORIAL);
+	curr_level.init(CUTSCENE_1);
 	restart_game();
 }
 

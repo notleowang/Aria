@@ -18,9 +18,9 @@ const vec2 NULL_POS = vec2(-1, -1);
 
 // enum for each level type
 enum Level {
-	TUTORIAL = 0,
-	CUTSCENE_1 = TUTORIAL+1,
-	LEVEL_1 = CUTSCENE_1 + 1,
+	CUTSCENE_1 = 0,
+	TUTORIAL = CUTSCENE_1+1,
+	LEVEL_1 = TUTORIAL + 1,
 	FIRE_BOSS = LEVEL_1 + 1,
 	LEVEL_2 = FIRE_BOSS + 1,
 	EARTH_BOSS = LEVEL_2 + 1,
@@ -61,6 +61,7 @@ public:
 	vec2 player_starting_pos;
 	vec2 exit_door_pos;
 	bool is_cutscene;
+	bool is_boss_level;
 	vec2 cutscene_player_velocity;
 
 	std::vector<vec2> health_packs_pos;
@@ -96,6 +97,10 @@ public:
 	
 	bool getIsCutscene() {
 		return is_cutscene;
+	}
+
+	bool getIsBossLevel() {
+		return is_boss_level;
 	}
 
 	vec2& getPlayerStartingPos() {

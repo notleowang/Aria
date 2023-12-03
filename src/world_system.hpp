@@ -62,10 +62,11 @@ private:
 	Entity projectileSelectDisplay;
 
 	GameLevel curr_level;
-	uint next_level;
+	uint next_level = NULL;
 
 	// music references
 	Mix_Music* background_music; // TODO: change background music for our game
+	Mix_Music* main_menu_music;
 	Mix_Music* boss_music;
 	Mix_Music* boss_intro_music;
 	Mix_Music* final_boss_music;
