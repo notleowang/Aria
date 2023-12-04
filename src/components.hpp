@@ -121,6 +121,7 @@ struct Follower
 {
 	Entity owner;
 	float y_offset = 0.f;
+	float x_offset = 0.f;
 };
 
 // Structure to store projectile entities
@@ -280,6 +281,8 @@ struct SpriteSheet
 	std::vector<AnimState> states;
 	int num_rows;
 	int num_cols;
+	float frame_height;
+	float frame_width;
 	vec2 getFrameSizeInTexcoords();
 	int getNumFrames();
 	static int getPlayerStateFromDirection(DIRECTION dir);

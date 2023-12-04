@@ -287,8 +287,8 @@ void RenderSystem::initializePlayerSpriteSheet()
 
 void RenderSystem::initializeProjectileSelectDisplaySpriteSheet()
 {
-	int num_rows = 4;
-	int num_cols = 1;
+	int num_rows = 1;
+	int num_cols = 4;
 	int ss_index = (int)SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY;
 
 	std::vector<AnimState> states((int)ElementType::COUNT);
@@ -299,12 +299,13 @@ void RenderSystem::initializeProjectileSelectDisplaySpriteSheet()
 	sprite_sheets[ss_index].num_rows = num_rows;
 	sprite_sheets[ss_index].num_cols = num_cols;
 	sprite_sheets[ss_index].states = states;
+	sprite_sheets[ss_index].frame_height = 123.f;
+	sprite_sheets[ss_index].frame_width = 33.f;
 }
 
 void RenderSystem::initializeSpriteSheets()
 {
 	initializePowerUpBlockSpriteSheet();
-	// !!! LEO: change the num_cols parameter here based on the sprite sheet
 	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::WATER_PROJECTILE, 4);
 	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::FIRE_PROJECTILE, 5);
 	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET, 1);

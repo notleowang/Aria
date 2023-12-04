@@ -51,7 +51,7 @@ class RenderSystem {
 			textures_path("fire_boss.png") ,
 			textures_path("earth_enemy.png"),
 			textures_path("lightning_enemy.png"),
-			textures_path("ghost.png"),								// final boss
+			textures_path("lost_soul.png"),								// final boss
 			textures_path("ghost.png"),
 			textures_path("projectile_water_sprite_sheet.png"),
 			textures_path("projectile_fire_sprite_sheet.png"),
@@ -63,10 +63,9 @@ class RenderSystem {
 			textures_path("power_up_block.png"),
 			textures_path("aria.png"),
 			textures_path("portal.png"),
-			textures_path("projectile-select-display-purple.png"),
+			textures_path("projectile_select_display_vertical.png"),
 			textures_path("medkit.png"),
 			textures_path("lost_soul.png")
-
 	};
 
 	std::array<GLuint, effect_count> effects;
