@@ -162,7 +162,7 @@ Entity createLostSoul(RenderSystem* renderer, vec2 pos) {
 	position.position = pos;
 
 	Velocity& velocity = registry.velocities.emplace(entity);
-	velocity.velocity = { 0.f,0.f };
+	velocity.velocity = { 0, 0 };
 
 	position.scale = vec2(100, 100);
 

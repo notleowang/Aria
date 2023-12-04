@@ -71,6 +71,7 @@ private:
 	Mix_Music* boss_intro_music;
 	Mix_Music* final_boss_music;
 	Mix_Music* final_boss_intro_music;
+	Mix_Music* cutscene1_background;
 	Mix_Chunk* projectile_sound;
 	Mix_Chunk* heal_sound;
 	Mix_Chunk* aria_death_sound;
@@ -80,7 +81,14 @@ private:
 	Mix_Chunk* end_level_sound;
 	Mix_Chunk* power_up_sound;
 	Mix_Chunk* cutscene1_voiceline;
-	Mix_Music* cutscene1_background;
+	Mix_Chunk* cutscene2_voiceline;
+
+	// lost soul voicelines (lsvl)
+	Mix_Chunk* fire_boss_lsvl;
+	Mix_Chunk* earth_boss_lsvl;
+	Mix_Chunk* lightning_boss_lsvl;
+	Mix_Chunk* water_boss_lsvl;
+	Mix_Chunk* final_boss_lsvl;
 
 	// C++ random number generator
 	std::default_random_engine rng;

@@ -36,6 +36,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeMusic(final_boss_music);
 	if (final_boss_intro_music != nullptr)
 		Mix_FreeMusic(final_boss_intro_music);
+	if (cutscene1_background != nullptr)
+		Mix_FreeMusic(cutscene1_background);
 	if (projectile_sound != nullptr)
 		Mix_FreeChunk(projectile_sound);
 	if (heal_sound != nullptr)
@@ -54,8 +56,19 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(power_up_sound);
 	if (cutscene1_voiceline != nullptr)
 		Mix_FreeChunk(cutscene1_voiceline);
-	if (cutscene1_background != nullptr)
-		Mix_FreeMusic(cutscene1_background);
+	if (cutscene2_voiceline != nullptr)
+		Mix_FreeChunk(cutscene2_voiceline);
+	if (fire_boss_lsvl != nullptr)
+		Mix_FreeChunk(fire_boss_lsvl);
+	if (water_boss_lsvl != nullptr)
+		Mix_FreeChunk(water_boss_lsvl);
+	if (earth_boss_lsvl != nullptr)
+		Mix_FreeChunk(earth_boss_lsvl);
+	if (lightning_boss_lsvl != nullptr)
+		Mix_FreeChunk(lightning_boss_lsvl);
+	if (final_boss_lsvl != nullptr)
+		Mix_FreeChunk(final_boss_lsvl);
+
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -142,6 +155,7 @@ GLFWwindow* WorldSystem::create_window() {
 	boss_intro_music = Mix_LoadMUS(audio_path("boss_battle_intro.wav").c_str());
 	final_boss_music = Mix_LoadMUS(audio_path("final_boss_battle.wav").c_str());
 	final_boss_intro_music = Mix_LoadMUS(audio_path("final_boss_battle_intro.wav").c_str());
+	cutscene1_background = Mix_LoadMUS(audio_path("cutscene_1_background.wav").c_str());
 	projectile_sound = Mix_LoadWAV(audio_path("projectile.wav").c_str());
 	heal_sound = Mix_LoadWAV(audio_path("heal.wav").c_str());
 	aria_death_sound = Mix_LoadWAV(audio_path("aria_death.wav").c_str());
@@ -151,7 +165,14 @@ GLFWwindow* WorldSystem::create_window() {
 	end_level_sound = Mix_LoadWAV(audio_path("portal.wav").c_str());
 	power_up_sound = Mix_LoadWAV(audio_path("power_up.wav").c_str());
 	cutscene1_voiceline = Mix_LoadWAV(audio_path("cutscene_1_voiceline.wav").c_str());
-	cutscene1_background = Mix_LoadMUS(audio_path("cutscene_1_background.wav").c_str());
+	cutscene2_voiceline = Mix_LoadWAV(audio_path("cutscene_2_voiceline.wav").c_str());
+
+	// lost soul voicelines (lsvl)
+	fire_boss_lsvl = Mix_LoadWAV(audio_path("fire_boss_lsvl.wav").c_str());
+	earth_boss_lsvl = Mix_LoadWAV(audio_path("earth_boss_lsvl.wav").c_str());
+	lightning_boss_lsvl = Mix_LoadWAV(audio_path("lightning_boss_lsvl.wav").c_str());
+	water_boss_lsvl = Mix_LoadWAV(audio_path("water_boss_lsvl.wav").c_str());
+	final_boss_lsvl = Mix_LoadWAV(audio_path("final_boss_lsvl.wav").c_str());
 
 	if (background_music == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
@@ -263,6 +284,53 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		this->curr_level.getExitDoorPos() != NULL_POS)
 		createExitDoor(renderer, this->curr_level.getExitDoorPos());
 
+	if (this->curr_level.curr_level == CUTSCENE_2) {
+		//First turn downwards
+		float initial_speed = this->curr_level.cutscene_player_velocity.x;
+		Position& player_position = registry.positions.get(player);
+		Entity& lost_soul = registry.lostSouls.entities[0];
+		vec2 player_pos = registry.positions.get(player).position;
+		vec2 lost_soul_pos = registry.positions.get(lost_soul).position;
+		if (player_pos.x > 2960 && player_pos.y > 200 && player_pos.y < 300) {
+			registry.velocities.get(player).velocity = { 0,initial_speed };
+			Animation& player_animation = registry.animations.get(player);
+			player_animation.setState(player_animation.sprite_sheet_ptr->getPlayerStateFromDirection(DIRECTION::S));
+		}
+		//Second turn to the left
+		if (player_pos.x > 2950 && player_pos.x < 3000 && player_pos.y >2700) {
+			registry.velocities.get(player).velocity = { -initial_speed,0.f };
+			Animation& player_animation = registry.animations.get(player);
+			player_animation.setState(player_animation.sprite_sheet_ptr->getPlayerStateFromDirection(DIRECTION::W));
+			if (player_position.scale.x > 0) player_position.scale.x *= -1;
+		}
+		printf("x:%f\n", player_pos.x);
+		printf("y:%f\n", player_pos.y);
+		
+		//Lost soul pathing
+		if (0 < lost_soul_pos.x && lost_soul_pos.x < 2960 && lost_soul_pos.y < 500.f) {
+			if (lost_soul_pos.y<175.f) {
+				registry.velocities.get(lost_soul).velocity = { initial_speed,50.f};
+			} else if (lost_soul_pos.y>250.f)
+				registry.velocities.get(lost_soul).velocity = { initial_speed,-50.f };
+		}
+		if (lost_soul_pos.x > 2960 && lost_soul_pos.y > 150 && lost_soul_pos.y < 300) {
+			registry.velocities.get(lost_soul).velocity = { 0.f,initial_speed };
+		}
+
+		if (lost_soul_pos.x > 2960 && lost_soul_pos.y > 2700 && lost_soul_pos.y < 3000) {
+			registry.velocities.get(lost_soul).velocity = { -initial_speed,-50.f };
+		}
+		if (0 < lost_soul_pos.x && lost_soul_pos.x < 2950 && lost_soul_pos.y > 2500) {
+			if (lost_soul_pos.y < 2650.f) {
+				registry.velocities.get(lost_soul).velocity = { -initial_speed,50.f };
+			}
+			else if (lost_soul_pos.y > 2750)
+				registry.velocities.get(lost_soul).velocity = { -initial_speed,-50.f };
+			if (lost_soul_pos.x < 200) {
+				registry.velocities.get(lost_soul).velocity *= vec2(0.7,1);
+			}
+		}
+	}
 	return true;
 }
 
@@ -307,18 +375,28 @@ void WorldSystem::restart_game() {
 	std::vector<std::pair<vec2, LostSoul>> lost_soul_attrs = current_level.getLostSouls();
 	std::vector<std::array<vec2, OBSTACLE_ATTRIBUTES >> obstacles = current_level.getObstacleAttrs();
 
-	if (curr_level == Level::FIRE_BOSS ||
-		curr_level == Level::EARTH_BOSS ||
-		curr_level == Level::LIGHTNING_BOSS ||
-		curr_level == Level::WATER_BOSS) {
+	if (this->curr_level.getIsBossLevel()) {
 		Mix_FadeInMusic(boss_intro_music, 0, 500);
+		Mix_VolumeMusic(50);
+
+		if (curr_level == FIRE_BOSS) Mix_PlayChannel(-1, fire_boss_lsvl, 0);
+		else if (curr_level == EARTH_BOSS) Mix_PlayChannel(-1, earth_boss_lsvl, 0);
+		else if (curr_level == LIGHTNING_BOSS) Mix_PlayChannel(-1, lightning_boss_lsvl, 0);
+		else if (curr_level == WATER_BOSS) Mix_PlayChannel(-1, water_boss_lsvl, 0);
 	}
-	else if (curr_level == Level::FINAL_BOSS) {
+	else if (curr_level == FINAL_BOSS) {
 		Mix_FadeInMusic(final_boss_intro_music, 0, 500);
+		Mix_VolumeMusic(50);
+		Mix_PlayChannel(-1, final_boss_lsvl, 0);
 	} 
-	else if (curr_level == Level::CUTSCENE_1) {
+	else if (curr_level == CUTSCENE_1) {
 		Mix_FadeInMusic(cutscene1_background, 0, 500);
 		Mix_PlayChannel(-1, cutscene1_voiceline, 0);
+		Mix_Volume(-1, 70);
+	}
+	else if (curr_level == CUTSCENE_2) {
+		Mix_FadeInMusic(cutscene1_background, 0, 500);
+		Mix_PlayChannel(-1, cutscene2_voiceline, 0);
 		Mix_Volume(-1, 70);
 	}
 
@@ -383,7 +461,13 @@ void WorldSystem::restart_game() {
 
 	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
 
-	if (this->curr_level.getIsCutscene()) {
+	if (this->curr_level.getCurrLevel() == CUTSCENE_1) {
+		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
+		Animation& player_animation = registry.animations.get(player);
+		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
+		createExitDoor(renderer, this->curr_level.getExitDoorPos());
+	}
+	else if (this->curr_level.getCurrLevel() == CUTSCENE_2) {
 		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
 		Animation& player_animation = registry.animations.get(player);
 		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
@@ -392,7 +476,11 @@ void WorldSystem::restart_game() {
 
 	for (uint i = 0; i < lost_soul_attrs.size(); i++) {
 		vec2 pos = lost_soul_attrs[i].first;
-		createLostSoul(renderer, pos);
+		Entity lost_soul = createLostSoul(renderer, pos);
+
+		if (this->curr_level.curr_level == CUTSCENE_2) {
+			registry.velocities.get(lost_soul).velocity = { 225.f,300.f };
+		}
 	}
 
 	// Debugging for memory/component leaks
@@ -434,7 +522,7 @@ void WorldSystem::win_level() {
 
 void WorldSystem::new_game() {
 	if (player != NULL) registry.remove_all_components_of(player);
-	curr_level.init(CUTSCENE_1);
+	curr_level.init(FIRE_BOSS);
 	restart_game();
 }
 
@@ -506,9 +594,11 @@ void WorldSystem::handle_collisions() {
 						curr_level == Level::LIGHTNING_BOSS ||
 						curr_level == Level::WATER_BOSS) {
 						Mix_FadeInMusic(boss_music, -1, 250);
+						Mix_VolumeMusic(50);
 					}
 					else if (curr_level == Level::FINAL_BOSS) {
 						Mix_FadeInMusic(final_boss_music, -1, 250);
+						Mix_VolumeMusic(50);
 					}
 				}
 			}
@@ -801,9 +891,11 @@ void WorldSystem::handle_collisions() {
 
 		// Checking Player - Lost Soul collision
 		if (registry.players.has(entity) && registry.lostSouls.has(entity_other)) {
-			Velocity& ls_velocity = registry.velocities.get(entity_other);
-			Velocity& player_velocity = registry.velocities.get(entity);
-			ls_velocity.velocity = player_velocity.velocity;
+			if (this->curr_level.getCurrLevel() == CUTSCENE_1) {
+				Velocity& ls_velocity = registry.velocities.get(entity_other);
+				Velocity& player_velocity = registry.velocities.get(entity);
+				ls_velocity.velocity = player_velocity.velocity;
+			}
 		}
 
 	}
