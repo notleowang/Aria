@@ -392,23 +392,31 @@ bool collidedBottom(Position& pos_i, Position& pos_j)
 		((pos_i.position.y - abs(pos_i.scale.y / 2)) <= (pos_j.position.y + abs(pos_j.scale.y/2))));
 }
 
-void collision_displace(Position& pos_i, Position& pos_j) {
+// This function moves entity related to pos_i 'displacement' units away from entity related to pos_j
+bool collision_displace(Position& pos_i, Position& pos_j) {
+	bool resolved = false;
 	if (collidedLeft(pos_i, pos_j)) {
 		float penetration = (pos_j.position.x - abs(pos_j.scale.x / 2)) - (pos_i.position.x + abs(pos_i.scale.x / 2));
 		pos_i.position.x += penetration;
+		resolved = true;
 	}
 	if (collidedRight(pos_i, pos_j)) {
 		float penetration = (pos_j.position.x + abs(pos_j.scale.x / 2)) - (pos_i.position.x - abs(pos_i.scale.x / 2));
 		pos_i.position.x += penetration;
+		resolved = true;
 	}
 	if (collidedTop(pos_i, pos_j)) {
 		float penetration = (pos_j.position.y - abs(pos_j.scale.y / 2)) - (pos_i.position.y + abs(pos_i.scale.y / 2));
 		pos_i.position.y += penetration;
+		resolved = true;
 	}
 	if (collidedBottom(pos_i, pos_j)) {
 		float penetration = (pos_j.position.y + abs(pos_j.scale.y / 2)) - (pos_i.position.y - abs(pos_i.scale.y / 2));
 		pos_i.position.y += penetration;
+		resolved = true;
 	}
+
+	return resolved;
 }
 
 void WorldSystem::win_level() {
@@ -527,15 +535,13 @@ void WorldSystem::handle_collisions() {
 
 		// Checking Player - Terrain Collisions
 		if (registry.players.has(entity) && registry.terrain.has(entity_other)) {
-			
-			////TODO: do something special when collision with moving wall?
-			//if (registry.terrain.get(entity_other).moveable) {
-			//}
-
 			Position& player_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
 
-			collision_displace(player_position, terrain_position);
+			bool resolved = collision_displace(player_position, terrain_position);
+			if (!resolved) {
+				player_position.position += collisionsRegistry.components[i].displacement;
+			}
 		}
 		
 		
@@ -544,7 +550,10 @@ void WorldSystem::handle_collisions() {
 			Position& enemy_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
 
-			collision_displace(enemy_position, terrain_position);
+			bool resolved = collision_displace(enemy_position, terrain_position);
+			if (!resolved) {
+				enemy_position.position += collisionsRegistry.components[i].displacement;
+			}
 		}
 
 		// update position of entities that follow player or enemies to remove jitter
