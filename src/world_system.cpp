@@ -543,12 +543,6 @@ void WorldSystem::handle_collisions() {
 		if (registry.enemies.has(entity) && registry.terrain.has(entity_other)) {
 			Position& enemy_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
-      
-			// TODO: make sure enemy has all this stuff and this wont be awful
-			// TODO: REFACTOR
-			Resources& resources = registry.resources.get(entity);
-			HealthBar& health_bar = registry.healthBars.get(resources.healthBar);
-			Position& health_bar_position = registry.positions.get(resources.healthBar);
 
 			collision_displace(enemy_position, terrain_position);
 		}
@@ -573,11 +567,9 @@ void WorldSystem::handle_collisions() {
 				Position& terrain_2_position = registry.positions.get(entity_other);
 
 				if (collidedLeft(terrain_1_position, terrain_2_position) || collidedRight(terrain_1_position, terrain_2_position)) {
-					//terrain_1_position.position.x = terrain_1_position.prev_position.x; <- might help
 					terrain_1_velocity.velocity[0] = -terrain_1_velocity.velocity[0]; // switch x direction
 				}
 				if (collidedTop(terrain_1_position, terrain_2_position) || collidedBottom(terrain_1_position, terrain_2_position)) {
-					//terrain_1_position.position.y = terrain_1_position.prev_position.y; <- might help
 					terrain_1_velocity.velocity[1] = -terrain_1_velocity.velocity[1]; // switch y direction
 				}
 			}
