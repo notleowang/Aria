@@ -366,28 +366,49 @@ void WorldSystem::restart_game() {
 	registry.list_all_components();
 }
 
+// These collision checks check if previously they weren't overlapping from a certain direction
+// then they started to overlap after having stepped from the physics system
 bool collidedLeft(Position& pos_i, Position& pos_j) 
 {
-	return (((pos_i.prev_position.x + abs(pos_i.scale.x / 2)) <= (pos_j.position.x - abs(pos_j.scale.x / 2))) &&
+	return (((pos_i.prev_position.x + abs(pos_i.scale.x / 2)) <= (pos_j.prev_position.x - abs(pos_j.scale.x / 2))) &&
 		((pos_i.position.x + abs(pos_i.scale.x / 2)) >= (pos_j.position.x - abs(pos_j.scale.x/2))));
 }
 
 bool collidedRight(Position& pos_i, Position& pos_j) 
 {
-	return (((pos_i.prev_position.x - abs(pos_i.scale.x / 2)) >= (pos_j.position.x + abs(pos_j.scale.x / 2))) &&
+	return (((pos_i.prev_position.x - abs(pos_i.scale.x / 2)) >= (pos_j.prev_position.x + abs(pos_j.scale.x / 2))) &&
 		((pos_i.position.x - abs(pos_i.scale.x / 2)) <= (pos_j.position.x + abs(pos_j.scale.x/2))));
 }
 
 bool collidedTop(Position& pos_i, Position& pos_j) 
 {
-	return (((pos_i.prev_position.y + abs(pos_i.scale.y / 2)) <= (pos_j.position.y - abs(pos_j.scale.y / 2))) &&
+	return (((pos_i.prev_position.y + abs(pos_i.scale.y / 2)) <= (pos_j.prev_position.y - abs(pos_j.scale.y / 2))) &&
 		((pos_i.position.y + abs(pos_i.scale.y / 2)) >= (pos_j.position.y - abs(pos_j.scale.y/2))));
 }
 
 bool collidedBottom(Position& pos_i, Position& pos_j) 
 {
-	return (((pos_i.prev_position.y - abs(pos_i.scale.y / 2)) >= (pos_j.position.y + abs(pos_j.scale.y / 2))) &&
-		((pos_i.position.y - abs(pos_i.scale.x / 2)) <= (pos_j.position.x + abs(pos_j.scale.x/2))));
+	return (((pos_i.prev_position.y - abs(pos_i.scale.y / 2)) >= (pos_j.prev_position.y + abs(pos_j.scale.y / 2))) &&
+		((pos_i.position.y - abs(pos_i.scale.y / 2)) <= (pos_j.position.y + abs(pos_j.scale.y/2))));
+}
+
+void collision_displace(Position& pos_i, Position& pos_j) {
+	if (collidedLeft(pos_i, pos_j)) {
+		float penetration = (pos_j.position.x - abs(pos_j.scale.x / 2)) - (pos_i.position.x + abs(pos_i.scale.x / 2));
+		pos_i.position.x += penetration;
+	}
+	if (collidedRight(pos_i, pos_j)) {
+		float penetration = (pos_j.position.x + abs(pos_j.scale.x / 2)) - (pos_i.position.x - abs(pos_i.scale.x / 2));
+		pos_i.position.x += penetration;
+	}
+	if (collidedTop(pos_i, pos_j)) {
+		float penetration = (pos_j.position.y - abs(pos_j.scale.y / 2)) - (pos_i.position.y + abs(pos_i.scale.y / 2));
+		pos_i.position.y += penetration;
+	}
+	if (collidedBottom(pos_i, pos_j)) {
+		float penetration = (pos_j.position.y + abs(pos_j.scale.y / 2)) - (pos_i.position.y - abs(pos_i.scale.y / 2));
+		pos_i.position.y += penetration;
+	}
 }
 
 void WorldSystem::win_level() {
@@ -513,20 +534,8 @@ void WorldSystem::handle_collisions() {
 
 			Position& player_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
-			bool resolved = false;
 
-			if (collidedLeft(player_position, terrain_position) || collidedRight(player_position, terrain_position)) {
-				player_position.position.x = player_position.prev_position.x;
-				resolved = true;
-
-			}
-			if (collidedTop(player_position, terrain_position) || collidedBottom(player_position, terrain_position)) {
-				player_position.position.y = player_position.prev_position.y;
-				resolved = true;
-			}
-			if (!resolved) {
-				player_position.position += collisionsRegistry.components[i].displacement;
-			}
+			collision_displace(player_position, terrain_position);
 		}
 		
 		
@@ -534,28 +543,14 @@ void WorldSystem::handle_collisions() {
 		if (registry.enemies.has(entity) && registry.terrain.has(entity_other)) {
 			Position& enemy_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
-			Velocity& enemy_velocity = registry.velocities.get(entity);
       
 			// TODO: make sure enemy has all this stuff and this wont be awful
 			// TODO: REFACTOR
 			Resources& resources = registry.resources.get(entity);
 			HealthBar& health_bar = registry.healthBars.get(resources.healthBar);
 			Position& health_bar_position = registry.positions.get(resources.healthBar);
-			bool resolved = false;
 
-			if (collidedLeft(enemy_position, terrain_position) || collidedRight(enemy_position, terrain_position)) {
-				enemy_position.position.x = enemy_position.prev_position.x;
-				enemy_velocity.velocity.x *= -1;
-				resolved = true;
-			}
-			if (collidedTop(enemy_position, terrain_position) || collidedBottom(enemy_position, terrain_position)) {
-				enemy_position.position.y = enemy_position.prev_position.y;
-				enemy_velocity.velocity.y *= -1;
-				resolved = true;
-			}
-			if (!resolved) {
-				enemy_position.position += collisionsRegistry.components[i].displacement;
-			}
+			collision_displace(enemy_position, terrain_position);
 		}
 
 		// update position of entities that follow player or enemies to remove jitter
