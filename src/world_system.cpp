@@ -377,7 +377,7 @@ void WorldSystem::restart_game() {
 
 	if (this->curr_level.getIsBossLevel()) {
 		Mix_FadeInMusic(boss_intro_music, 0, 500);
-		Mix_VolumeMusic(50);
+		Mix_VolumeMusic(30);
 
 		if (curr_level == FIRE_BOSS) Mix_PlayChannel(-1, fire_boss_lsvl, 0);
 		else if (curr_level == EARTH_BOSS) Mix_PlayChannel(-1, earth_boss_lsvl, 0);
@@ -386,7 +386,7 @@ void WorldSystem::restart_game() {
 	}
 	else if (curr_level == FINAL_BOSS) {
 		Mix_FadeInMusic(final_boss_intro_music, 0, 500);
-		Mix_VolumeMusic(50);
+		Mix_VolumeMusic(30);
 		Mix_PlayChannel(-1, final_boss_lsvl, 0);
 	} 
 	else if (curr_level == CUTSCENE_1) {
@@ -522,7 +522,7 @@ void WorldSystem::win_level() {
 
 void WorldSystem::new_game() {
 	if (player != NULL) registry.remove_all_components_of(player);
-	curr_level.init(FIRE_BOSS);
+	curr_level.init(CUTSCENE_1);
 	restart_game();
 }
 
@@ -594,11 +594,11 @@ void WorldSystem::handle_collisions() {
 						curr_level == Level::LIGHTNING_BOSS ||
 						curr_level == Level::WATER_BOSS) {
 						Mix_FadeInMusic(boss_music, -1, 250);
-						Mix_VolumeMusic(50);
+						Mix_VolumeMusic(20);
 					}
 					else if (curr_level == Level::FINAL_BOSS) {
 						Mix_FadeInMusic(final_boss_music, -1, 250);
-						Mix_VolumeMusic(50);
+						Mix_VolumeMusic(20);
 					}
 				}
 			}
@@ -872,7 +872,7 @@ void WorldSystem::handle_collisions() {
 
 		// Checking Player - Exit Door collision
 		if (registry.players.has(entity) && registry.exitDoors.has(entity_other)) {
-			if (curr_level.curr_level == Level::CUTSCENE_1) {
+			if (curr_level.getIsCutscene()) {
 				Mix_FadeInMusic(background_music, -1, 1500);
 				registry.velocities.get(registry.lostSouls.entities[0]).velocity = vec2(0, 0);
 			}
