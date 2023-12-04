@@ -10,8 +10,8 @@ const float PLAYER_HEALTH_BAR_Y_OFFSET = -60.f;
 const float ENEMY_HEALTH_BAR_Y_OFFSET = -50.f;
 const float BOSS_HEALTH_BAR_Y_OFFSET = -110.f;
 const float PLAYER_MANA_BAR_Y_OFFSET = -75.f;
-const float PROJECTILE_SELECT_DISPLAY_Y_OFFSET = -50.f; // so it doesn't cover tutorial text
-const float PROJECTILE_SELECT_DISPLAY_X_OFFSET = -550.f;
+const float PROJECTILE_SELECT_DISPLAY_Y_OFFSET = 0.f;
+const float PROJECTILE_SELECT_DISPLAY_X_OFFSET = 550.f;
 
 // the player
 Entity createAria(RenderSystem* renderer, vec2 pos);

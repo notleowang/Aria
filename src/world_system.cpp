@@ -775,13 +775,13 @@ void WorldSystem::on_scroll(double x_offset, double y_offset) {
 	int new_element = (int) characterProjectileType.projectileType;
 	if (y_offset < 0) {
 		// Scrolling down
-		if (--new_element < 0) {
-			new_element = ElementType::LIGHTNING;
-		}
+		new_element++;
 	}
 	else if (y_offset > 0) {
 		// Scrolling up
-		new_element++;
+		if (--new_element < 0) {
+			new_element = ElementType::LIGHTNING;
+		}
 	}
 	characterProjectileType.projectileType = (ElementType)(new_element % ElementType::COUNT);
 	Animation& select_display = registry.animations.get(projectileSelectDisplay);
