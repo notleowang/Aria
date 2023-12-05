@@ -71,7 +71,7 @@ private:
 	Mix_Music* boss_intro_music;
 	Mix_Music* final_boss_music;
 	Mix_Music* final_boss_intro_music;
-	Mix_Music* cutscene1_background;
+	Mix_Music* cutscene_background;
 	Mix_Chunk* projectile_sound;
 	Mix_Chunk* heal_sound;
 	Mix_Chunk* aria_death_sound;
@@ -80,8 +80,11 @@ private:
 	Mix_Chunk* obstacle_collision_sound;
 	Mix_Chunk* end_level_sound;
 	Mix_Chunk* power_up_sound;
+
+	// cutscene voicelines
 	Mix_Chunk* cutscene1_voiceline;
 	Mix_Chunk* cutscene2_voiceline;
+	Mix_Chunk* cutscene3_voiceline;
 
 	// lost soul voicelines (lsvl)
 	Mix_Chunk* fire_boss_lsvl;
