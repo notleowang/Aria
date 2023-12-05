@@ -70,6 +70,16 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(final_boss_lsvl);
 	if (aria_death_lsvl != nullptr)
 		Mix_FreeChunk(aria_death_lsvl);
+	if (first_shard_avl != nullptr)
+		Mix_FreeChunk(first_shard_avl);
+	if (second_shard_avl != nullptr)
+		Mix_FreeChunk(second_shard_avl);
+	if (third_shard_avl != nullptr)
+		Mix_FreeChunk(third_shard_avl);
+	if (deceived_avl != nullptr)
+		Mix_FreeChunk(deceived_avl);
+	if (final_cutscene_avl != nullptr)
+		Mix_FreeChunk(final_cutscene_avl);
 
 	Mix_CloseAudio();
 
@@ -176,6 +186,13 @@ GLFWwindow* WorldSystem::create_window() {
 	water_boss_lsvl = Mix_LoadWAV(audio_path("water_boss_lsvl.wav").c_str());
 	final_boss_lsvl = Mix_LoadWAV(audio_path("final_boss_lsvl.wav").c_str());
 	aria_death_lsvl = Mix_LoadWAV(audio_path("aria_death_lsvl.wav").c_str());
+
+	// aria voicelines (avl)
+	first_shard_avl = Mix_LoadWAV(audio_path("aria_first_shard.wav").c_str());
+	second_shard_avl = Mix_LoadWAV(audio_path("aria_second_shard.wav").c_str());
+	third_shard_avl = Mix_LoadWAV(audio_path("aria_third_shard.wav").c_str());
+	deceived_avl = Mix_LoadWAV(audio_path("aria_deceived.wav").c_str());
+	final_cutscene_avl = Mix_LoadWAV(audio_path("aria_final_cutscene.wav").c_str());
 
 	if (background_music == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
@@ -619,7 +636,7 @@ void WorldSystem::handle_collisions() {
 					registry.deathTimers.emplace(entity);
 					registry.velocities.get(player).velocity = { 0.f, 0.f };
 					Mix_PlayChannel(-1, aria_death_sound, 0);
-					Mix_PlayChannel(-1, aria_death_lsvl, 0);
+					if (this->curr_level.getCurrLevel() != FINAL_BOSS) Mix_PlayChannel(-1, aria_death_lsvl, 0);
 				}
 			}
 		}
@@ -631,7 +648,7 @@ void WorldSystem::handle_collisions() {
 				registry.deathTimers.emplace(entity);
 				registry.velocities.get(player).velocity = { 0.f, 0.f };
 				Mix_PlayChannel(-1, aria_death_sound, 0);
-				Mix_PlayChannel(-1, aria_death_lsvl, 0);
+				if (this->curr_level.getCurrLevel() != FINAL_BOSS) Mix_PlayChannel(-1, aria_death_lsvl, 0);
 			}
 		}
 
@@ -789,8 +806,18 @@ void WorldSystem::handle_collisions() {
 
 					// drop a life orb shard and change background music if boss died
 					if (boss) {
-						createLifeOrb(renderer, boss_position, this->curr_level.getLifeOrbPiece());
 						Mix_FadeInMusic(background_music, -1, 1500);
+						
+						// fire boss does not drop a shard, so win level and return
+						if (this->curr_level.getCurrLevel() == FIRE_BOSS) {
+							win_level();
+							return;
+						}
+						
+						createLifeOrb(renderer, boss_position, this->curr_level.getLifeOrbPiece());
+						if (this->curr_level.getLifeOrbPiece() == 1) Mix_PlayChannel(-1, first_shard_avl, 0);
+						if (this->curr_level.getLifeOrbPiece() == 2) Mix_PlayChannel(-1, second_shard_avl, 0);
+						if (this->curr_level.getLifeOrbPiece() == 3) Mix_PlayChannel(-1, third_shard_avl, 0);
 					}
 				}
 			}
@@ -811,7 +838,7 @@ void WorldSystem::handle_collisions() {
 				registry.deathTimers.emplace(entity_other);
 				registry.velocities.get(player).velocity = vec2(0.f, 0.f);
 				Mix_PlayChannel(-1, aria_death_sound, 0);
-				Mix_PlayChannel(-1, aria_death_lsvl, 0);
+				if (this->curr_level.getCurrLevel() != FINAL_BOSS) Mix_PlayChannel(-1, aria_death_lsvl, 0);
 			}
 			registry.remove_all_components_of_no_collision(entity);
 		}

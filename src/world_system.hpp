@@ -91,6 +91,14 @@ private:
 	Mix_Chunk* final_boss_lsvl;
 	Mix_Chunk* aria_death_lsvl;
 
+	// aria voice lines (avl)
+	Mix_Chunk* first_shard_avl;
+	Mix_Chunk* second_shard_avl;
+	Mix_Chunk* third_shard_avl;
+	Mix_Chunk* deceived_avl;
+	Mix_Chunk* final_cutscene_avl;
+
+
 	// C++ random number generator
 	std::default_random_engine rng;
 	std::uniform_real_distribution<float> uniform_dist; // number between 0..1
