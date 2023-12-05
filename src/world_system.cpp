@@ -195,6 +195,7 @@ GLFWwindow* WorldSystem::create_window() {
 	cutscene1_voiceline = Mix_LoadWAV(audio_path("cutscene_1_voiceline.wav").c_str());
 	cutscene2_voiceline = Mix_LoadWAV(audio_path("cutscene_2_voiceline.wav").c_str());
 	cutscene3_voiceline = Mix_LoadWAV(audio_path("cutscene_3_voiceline.wav").c_str());
+	Mix_VolumeChunk(cutscene3_voiceline, 100);
 	cutscene4_voiceline = Mix_LoadWAV(audio_path("aria_second_shard.wav").c_str());
 	cutscene5_voiceline = Mix_LoadWAV(audio_path("cutscene_5_voiceline.wav").c_str());
 
@@ -375,14 +376,13 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		Entity& life_orb = registry.lifeOrbs.entities[0];
 		vec2 lost_soul_pos = registry.positions.get(lost_soul).position;
 		vec2 life_orb_pos = registry.positions.get(life_orb).position;
-		if (life_orb_pos.y > lost_soul_pos.y) {
+		if (life_orb_pos.y > lost_soul_pos.y && registry.velocities.get(player).velocity == vec2(0, 0)) {
 			registry.velocities.get(life_orb).velocity = { 0.f,0.f };
 			registry.velocities.get(lost_soul).velocity = { 50.f,0.f };
 			registry.velocities.get(player).velocity = { -100.f,0.f };
+			Mix_FadeInMusic(background_music, -1, 1500);
 			win_level();
 		}
-
-
 	}
 	if (registry.lifeOrbs.entities.size() > 0) {
 		createShadow(renderer, player, TEXTURE_ASSET_ID::PLAYER, GEOMETRY_BUFFER_ID::PLAYER);
