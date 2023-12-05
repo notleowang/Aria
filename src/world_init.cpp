@@ -13,6 +13,10 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PLAYER);
 	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
 
+	registry.characterProjectileTypes.emplace(entity);
+	registry.players.emplace(entity);
+	registry.collidables.emplace(entity);
+
 	Animation& animation = registry.animations.emplace(entity);
 	animation.sprite_sheet_ptr = &sprite_sheet;
 	animation.setState((int)PLAYER_SPRITE_STATES::EAST);
@@ -50,9 +54,7 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	powerUp.bounceOffWalls[ElementType::LIGHTNING] = true;*/
 
 	//createShadow(renderer, entity, TEXTURE_ASSET_ID::PLAYER, GEOMETRY_BUFFER_ID::PLAYER);
-	registry.characterProjectileTypes.emplace(entity);
-	registry.players.emplace(entity);
-	registry.collidables.emplace(entity);
+
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::PLAYER,
