@@ -93,13 +93,15 @@ struct Resources
 	float currentHealth = 100.f;
 	float maxMana = 10.f;
 	float currentMana = 10.f;
+	float logoRatio = 0.f;
+	float barRatio = 1.f;
 	Entity healthBar;
 	Entity manaBar;
 };
 
 struct HealthBar
 {
-
+	
 };
 
 struct ManaBar

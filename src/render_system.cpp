@@ -71,22 +71,30 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		gl_has_errors();
 
 		if (render_request.used_effect == EFFECT_ASSET_ID::RESOURCE_BAR) {
-			float filled = 0.0;
+			float fraction = 0.0;
+			float logoRatio = 0.0;
+			float barRatio = 1.0;
 			if (render_request.used_texture == TEXTURE_ASSET_ID::HEALTH_BAR) {
 				assert(registry.healthBars.has(entity));
 				Follower& follower = registry.followers.get(entity);
 				assert(registry.resources.has(follower.owner));
 				Resources& resources = registry.resources.get(follower.owner);
-				filled = resources.currentHealth / resources.maxHealth;
+				fraction = resources.currentHealth / resources.maxHealth;
+				logoRatio = resources.logoRatio;
+				barRatio = resources.barRatio;
 			}
 			else if (render_request.used_texture == TEXTURE_ASSET_ID::MANA_BAR) {
 				assert(registry.manaBars.has(entity));
 				Follower& follower = registry.followers.get(entity);
 				assert(registry.resources.has(follower.owner));
 				Resources& resources = registry.resources.get(follower.owner);
-				filled = resources.currentMana / resources.maxMana;
+				fraction = resources.currentMana / resources.maxMana;
+				logoRatio = resources.logoRatio;
+				barRatio = resources.barRatio;
 			}
-			glUniform1f(glGetUniformLocation(program, "filled"), filled);
+			glUniform1f(glGetUniformLocation(program, "fraction"), fraction);
+			glUniform1f(glGetUniformLocation(program, "logoRatio"), logoRatio);
+			glUniform1f(glGetUniformLocation(program, "barRatio"), barRatio);
 			gl_has_errors();
 		}
 		else if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATED) {

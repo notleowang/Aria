@@ -27,8 +27,8 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity, PLAYER_HEALTH_BAR_Y_OFFSET);
-	resources.manaBar = createManaBar(renderer, entity, PLAYER_MANA_BAR_Y_OFFSET);
+	resources.healthBar = createHealthBar(renderer, entity, PLAYER_HEALTH_BAR_Y_OFFSET, PLAYER_BAR_X_OFFSET);
+	resources.manaBar = createManaBar(renderer, entity, PLAYER_MANA_BAR_Y_OFFSET, PLAYER_BAR_X_OFFSET);
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
@@ -168,7 +168,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	velocity.velocity.x = 50;
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity, ENEMY_HEALTH_BAR_Y_OFFSET);
+	resources.healthBar = createHealthBar(renderer, entity, ENEMY_HEALTH_BAR_Y_OFFSET, 0.f);
 
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy = enemyAttributes;
@@ -226,7 +226,7 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	Resources& resources = registry.resources.emplace(entity);
 	resources.maxHealth = 1500.f;
 	resources.currentHealth = 1500.f;
-	resources.healthBar = createHealthBar(renderer, entity, BOSS_HEALTH_BAR_Y_OFFSET);
+	resources.healthBar = createHealthBar(renderer, entity, BOSS_HEALTH_BAR_Y_OFFSET, 0.f);
 
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy = enemyAttributes;
@@ -267,44 +267,90 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	return entity;
 }
 
-Entity createHealthBar(RenderSystem* renderer, Entity& owner_entity, float y_offset)
+Entity createHealthBar(RenderSystem* renderer, Entity& owner_entity, float y_offset, float x_offset)
 {
 	auto entity = Entity();
 
 	HealthBar& healthBar = registry.healthBars.emplace(entity);
 
-	Position& position = registry.positions.emplace(entity);
-	position.scale = vec2(111.f, 10.f);
-
 	Follower& follower = registry.followers.emplace(entity);
 	follower.owner = owner_entity;
 	follower.y_offset = y_offset;
+	follower.x_offset = x_offset;
+
+	float width;
+	float height;
+	float scale_factor;
+	TEXTURE_ASSET_ID texture_asset;
+
+	if (registry.players.has(owner_entity)) {
+		width = RESOURCE_BAR_SHORT_WIDTH;
+		height = RESOURCE_BAR_SHORT_HEIGHT;
+		scale_factor = 3.f;
+		texture_asset = TEXTURE_ASSET_ID::HEALTH_BAR;
+	}
+	else {
+		width = RESOURCE_BAR_SHORT_WIDTH;
+		height = RESOURCE_BAR_SHORT_HEIGHT;
+		scale_factor = 2.f;
+		texture_asset = TEXTURE_ASSET_ID::HEALTH_BAR;
+	}
+
+	Resources& resources = registry.resources.get(owner_entity);
+	resources.barRatio = (width - RESOURCE_BAR_ICON_WIDTH) / width;
+	resources.logoRatio = RESOURCE_BAR_ICON_WIDTH / width;
+
+	Position& position = registry.positions.emplace(entity);
+	position.scale = vec2(scale_factor * width, scale_factor * height);
 
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::HEALTH_BAR,
+		{ texture_asset,
 			EFFECT_ASSET_ID::RESOURCE_BAR,
 			GEOMETRY_BUFFER_ID::RESOURCE_BAR });
 
 	return entity;
 }
 
-Entity createManaBar(RenderSystem* renderer, Entity& owner_entity, float y_offset)
+Entity createManaBar(RenderSystem* renderer, Entity& owner_entity, float y_offset, float x_offset)
 {
 	auto entity = Entity();
 
 	ManaBar& manaBar = registry.manaBars.emplace(entity);
 
-	Position& position = registry.positions.emplace(entity);
-	position.scale = vec2(111.f, 10.f);
-
 	Follower& follower = registry.followers.emplace(entity);
 	follower.owner = owner_entity;
 	follower.y_offset = y_offset;
+	follower.x_offset = x_offset;
+
+	float width;
+	float height;
+	float scale_factor;
+	TEXTURE_ASSET_ID texture_asset;
+
+	if (registry.players.has(owner_entity)) {
+		width = RESOURCE_BAR_SHORT_WIDTH;
+		height = RESOURCE_BAR_SHORT_HEIGHT;
+		scale_factor = 3.f;
+		texture_asset = TEXTURE_ASSET_ID::MANA_BAR;
+	}
+	else {
+		width = RESOURCE_BAR_SHORT_WIDTH;
+		height = RESOURCE_BAR_SHORT_HEIGHT;
+		scale_factor = 2.f;
+		texture_asset = TEXTURE_ASSET_ID::MANA_BAR;
+	}
+
+	Resources& resources = registry.resources.get(owner_entity);
+	resources.barRatio = (width - RESOURCE_BAR_ICON_WIDTH) / width;
+	resources.logoRatio = RESOURCE_BAR_ICON_WIDTH / width;
+
+	Position& position = registry.positions.emplace(entity);
+	position.scale = vec2(scale_factor * width, scale_factor * height);
 
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::MANA_BAR,
+		{ texture_asset,
 			EFFECT_ASSET_ID::RESOURCE_BAR,
 			GEOMETRY_BUFFER_ID::RESOURCE_BAR });
 
@@ -468,7 +514,7 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity, PLAYER_HEALTH_BAR_Y_OFFSET);
+	resources.healthBar = createHealthBar(renderer, entity, PLAYER_HEALTH_BAR_Y_OFFSET, 0.f);
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
