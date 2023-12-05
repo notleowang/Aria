@@ -162,7 +162,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 
-	position.scale = vec2({ 50, 50 });
+	position.scale = vec2({ 100, 100 });
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity.x = 50;
@@ -218,7 +218,7 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 
-	position.scale = vec2({ 135, 200 });
+	position.scale = vec2({ 230, 200 });
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity.x = 25;
@@ -402,7 +402,7 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	Position& position = registry.positions.emplace(entity);
-	position.scale = vec2(100.f, 100.f);
+	position.scale = vec2(100.f, 120.f);
 	position.position = vec2(pos.x + position.scale.x/2, pos.y + position.scale.y/2);
 
 	registry.exitDoors.emplace(entity);
