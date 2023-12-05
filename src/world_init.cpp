@@ -49,10 +49,10 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	powerUp.bounceOffWalls[ElementType::EARTH] = true;
 	powerUp.bounceOffWalls[ElementType::LIGHTNING] = true;*/
 
-	//createShadow(renderer, entity, TEXTURE_ASSET_ID::PLAYER, GEOMETRY_BUFFER_ID::PLAYER);
 	registry.characterProjectileTypes.emplace(entity);
 	registry.players.emplace(entity);
 	registry.collidables.emplace(entity);
+
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::PLAYER,
@@ -643,6 +643,9 @@ Entity createLifeOrb(RenderSystem* renderer, vec2 pos, int piece_number) {
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 	position.scale = vec2(2 * 23.f, 2 * 23.f);
+	
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity = { 0.f,0.f };
 
 	registry.collidables.emplace(entity);
 
