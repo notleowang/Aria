@@ -545,6 +545,7 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 	registry.collidables.emplace(entity);
   if (!hostile) {
 	  PowerUp& powerUp = registry.powerUps.get(player);
+	  if (powerUp.tripleShot[elementType]) projectile.damage *= 0.5f; // triple shot projectiles are decreased damage
 	  if (powerUp.increasedDamage[elementType]) projectile.damage *= 1.5; // increase damage by factor of 1.5
 	  if (powerUp.bounceOffWalls[elementType]) projectile.bounces = 2; // allow 2 bounces off walls
   }
