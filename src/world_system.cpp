@@ -15,6 +15,7 @@ using namespace std;
 // Game configuration
 float PLAYER_SPEED = 300.f;
 const float PROJECTILE_SPEED = 700.f;
+const int VOLUME = 30;
 
 // Create the world
 WorldSystem::WorldSystem() {
@@ -36,8 +37,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeMusic(final_boss_music);
 	if (final_boss_intro_music != nullptr)
 		Mix_FreeMusic(final_boss_intro_music);
-	if (cutscene1_background != nullptr)
-		Mix_FreeMusic(cutscene1_background);
+	if (cutscene_background != nullptr)
+		Mix_FreeMusic(cutscene_background);
 	if (projectile_sound != nullptr)
 		Mix_FreeChunk(projectile_sound);
 	if (heal_sound != nullptr)
@@ -58,6 +59,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(cutscene1_voiceline);
 	if (cutscene2_voiceline != nullptr)
 		Mix_FreeChunk(cutscene2_voiceline);
+	if (cutscene3_voiceline != nullptr)
+		Mix_FreeChunk(cutscene3_voiceline);
 	if (fire_boss_lsvl != nullptr)
 		Mix_FreeChunk(fire_boss_lsvl);
 	if (water_boss_lsvl != nullptr)
@@ -167,7 +170,7 @@ GLFWwindow* WorldSystem::create_window() {
 	boss_intro_music = Mix_LoadMUS(audio_path("boss_battle_intro.wav").c_str());
 	final_boss_music = Mix_LoadMUS(audio_path("final_boss_battle.wav").c_str());
 	final_boss_intro_music = Mix_LoadMUS(audio_path("final_boss_battle_intro.wav").c_str());
-	cutscene1_background = Mix_LoadMUS(audio_path("cutscene_1_background.wav").c_str());
+	cutscene_background = Mix_LoadMUS(audio_path("cutscene_1_background.wav").c_str());
 	projectile_sound = Mix_LoadWAV(audio_path("projectile.wav").c_str());
 	heal_sound = Mix_LoadWAV(audio_path("heal.wav").c_str());
 	aria_death_sound = Mix_LoadWAV(audio_path("aria_death.wav").c_str());
@@ -176,8 +179,20 @@ GLFWwindow* WorldSystem::create_window() {
 	obstacle_collision_sound = Mix_LoadWAV(audio_path("obstacle_collision.wav").c_str());
 	end_level_sound = Mix_LoadWAV(audio_path("portal.wav").c_str());
 	power_up_sound = Mix_LoadWAV(audio_path("power_up.wav").c_str());
+	
+	Mix_VolumeChunk(projectile_sound, VOLUME);
+	Mix_VolumeChunk(heal_sound, VOLUME);
+	Mix_VolumeChunk(aria_death_sound, VOLUME);
+	Mix_VolumeChunk(enemy_death_sound, VOLUME);
+	Mix_VolumeChunk(end_level_sound, VOLUME);
+	Mix_VolumeChunk(power_up_sound, VOLUME);
+	Mix_VolumeChunk(obstacle_collision_sound, VOLUME);
+	Mix_VolumeChunk(damage_tick_sound, VOLUME);
+
+	// voicelines
 	cutscene1_voiceline = Mix_LoadWAV(audio_path("cutscene_1_voiceline.wav").c_str());
 	cutscene2_voiceline = Mix_LoadWAV(audio_path("cutscene_2_voiceline.wav").c_str());
+	cutscene3_voiceline = Mix_LoadWAV(audio_path("cutscene_3_voiceline.wav").c_str());
 
 	// lost soul voicelines (lsvl)
 	fire_boss_lsvl = Mix_LoadWAV(audio_path("fire_boss_lsvl.wav").c_str());
@@ -208,6 +223,7 @@ void WorldSystem::init(RenderSystem* renderer_arg, GameLevel level) {
 	this->curr_level = level;
 	// Playing background music indefinitely
 	Mix_PlayMusic(main_menu_music, -1);
+	Mix_VolumeMusic(VOLUME);
 	fprintf(stderr, "Loaded music\n");
 
 	// Set all states to default
@@ -411,7 +427,6 @@ void WorldSystem::restart_game() {
 
 	if (this->curr_level.getIsBossLevel()) {
 		Mix_FadeInMusic(boss_intro_music, 0, 500);
-		Mix_VolumeMusic(30);
 
 		if (curr_level == FIRE_BOSS) Mix_PlayChannel(-1, fire_boss_lsvl, 0);
 		else if (curr_level == EARTH_BOSS) Mix_PlayChannel(-1, earth_boss_lsvl, 0);
@@ -420,18 +435,19 @@ void WorldSystem::restart_game() {
 	}
 	else if (curr_level == FINAL_BOSS) {
 		Mix_FadeInMusic(final_boss_intro_music, 0, 500);
-		Mix_VolumeMusic(30);
 		Mix_PlayChannel(-1, final_boss_lsvl, 0);
 	} 
 	else if (curr_level == CUTSCENE_1) {
-		Mix_FadeInMusic(cutscene1_background, 0, 500);
+		Mix_FadeInMusic(cutscene_background, 0, 500);
 		Mix_PlayChannel(-1, cutscene1_voiceline, 0);
-		Mix_Volume(-1, 70);
 	}
 	else if (curr_level == CUTSCENE_2) {
-		Mix_FadeInMusic(cutscene1_background, 0, 500);
+		Mix_FadeInMusic(cutscene_background, 0, 500);
 		Mix_PlayChannel(-1, cutscene2_voiceline, 0);
-		Mix_Volume(-1, 70);
+	}
+	else if (curr_level == CUTSCENE_3) {
+		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_PlayChannel(-1, cutscene3_voiceline, 0);
 	}
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
@@ -642,11 +658,9 @@ void WorldSystem::handle_collisions() {
 						curr_level == Level::LIGHTNING_BOSS ||
 						curr_level == Level::WATER_BOSS) {
 						Mix_FadeInMusic(boss_music, -1, 250);
-						Mix_VolumeMusic(20);
 					}
 					else if (curr_level == Level::FINAL_BOSS) {
 						Mix_FadeInMusic(final_boss_music, -1, 250);
-						Mix_VolumeMusic(20);
 					}
 				}
 			}
