@@ -636,7 +636,7 @@ void WorldSystem::handle_collisions() {
 					registry.deathTimers.emplace(entity);
 					registry.velocities.get(player).velocity = { 0.f, 0.f };
 					Mix_PlayChannel(-1, aria_death_sound, 0);
-					if (this->curr_level.getCurrLevel() != FINAL_BOSS) Mix_PlayChannel(-1, aria_death_lsvl, 0);
+					if (this->curr_level.getCurrLevel() != FINAL_BOSS && !this->curr_level.getIsBossLevel()) Mix_PlayChannel(-1, aria_death_lsvl, 0);
 				}
 			}
 		}
@@ -648,7 +648,7 @@ void WorldSystem::handle_collisions() {
 				registry.deathTimers.emplace(entity);
 				registry.velocities.get(player).velocity = { 0.f, 0.f };
 				Mix_PlayChannel(-1, aria_death_sound, 0);
-				if (this->curr_level.getCurrLevel() != FINAL_BOSS) Mix_PlayChannel(-1, aria_death_lsvl, 0);
+				if (this->curr_level.getCurrLevel() != FINAL_BOSS && !this->curr_level.getIsBossLevel()) Mix_PlayChannel(-1, aria_death_lsvl, 0);
 			}
 		}
 
@@ -838,7 +838,7 @@ void WorldSystem::handle_collisions() {
 				registry.deathTimers.emplace(entity_other);
 				registry.velocities.get(player).velocity = vec2(0.f, 0.f);
 				Mix_PlayChannel(-1, aria_death_sound, 0);
-				if (this->curr_level.getCurrLevel() != FINAL_BOSS) Mix_PlayChannel(-1, aria_death_lsvl, 0);
+				if (this->curr_level.getCurrLevel() != FINAL_BOSS && !this->curr_level.getIsBossLevel()) Mix_PlayChannel(-1, aria_death_lsvl, 0);
 			}
 			registry.remove_all_components_of_no_collision(entity);
 		}
