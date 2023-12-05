@@ -34,7 +34,7 @@ void AISystem::step(float elapsed_ms)
 			if (boss.phaseTimer > 0.f) {
 				boss.phaseTimer -= elapsed_ms;
 			} else {
-				printf("Resolving phase %d:%d\n", boss.phase, boss.subphase);
+				// printf("Resolving phase %d:%d\n", boss.phase, boss.subphase);
 				switch (boss.phase) {
 					case 0:
 						if (boss.subphase == 48) {
@@ -85,7 +85,7 @@ void AISystem::step(float elapsed_ms)
 							boss.phaseTimer = 1500.f;
 							boss.subphase = 0;
 						} else {
-							registry.resources.get(entity_i).currentHealth += 25;
+							registry.resources.get(entity_i).currentHealth = min(registry.resources.get(entity_i).currentHealth + 25, registry.resources.get(entity_i).maxHealth);
 							boss.subphase += 1;
 							boss.phaseTimer = 50.f;
 						}
