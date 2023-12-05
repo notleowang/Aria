@@ -257,6 +257,143 @@ bool GameLevel::init(uint level) {
 
 		break;
 
+	case LEVEL_LEO:
+		this->player_starting_pos = vec2(1000, 400);
+		this->exit_door_pos = vec2(3900, 1875);
+
+		// Spawn Area
+		terrains.push_back(std::make_pair(vec4(500, 0, 1000, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(475, 0, default_side_width, 200), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(475, 500, default_side_width, 300), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(500, 775, 1000, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1500, 0, default_side_width, 200), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1500, 500, default_side_width, 300), SIDE_STATIONARY));
+		floors.push_back(vec4(500, 0, 1000, 800));
+
+		// Left Elbow Hallway from Spawn
+		terrains.push_back(std::make_pair(vec4(-200, 200, 700, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(0, 500, 500, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(-225, 200, default_side_width, 700), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(0, 500, default_side_width, 500), SIDE_STATIONARY));
+		floors.push_back(vec4(-200, 200, 700, 300));
+		floors.push_back(vec4(-200, 500, 200, 500));
+
+		// Room Under Left Elbow Hallway
+		terrains.push_back(std::make_pair(vec4(0, 900, 500, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(500, 900, default_side_width, 300), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(500, 1400, default_side_width, 300), SIDE_STATIONARY));
+
+		terrains.push_back(std::make_pair(vec4(-700, 900, 500, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(-725, 900, default_side_width, 800), SIDE_STATIONARY));
+
+		terrains.push_back(std::make_pair(vec4(-700, 1675, 1200, default_south_height), SOUTH_STATIONARY));
+		
+		floors.push_back(vec4(-700, 900, 1200, 800));
+
+		enemies.push_back(std::make_pair(vec2(-500, 1600), WATER_NORMAL));
+		enemies.push_back(std::make_pair(vec2(-300, 1600), WATER_NORMAL));
+		enemies.push_back(std::make_pair(vec2(-100, 1600), WATER_NORMAL));
+		enemies.push_back(std::make_pair(vec2(200, 1600), WATER_NORMAL));
+
+		// Right hallway
+		terrains.push_back(std::make_pair(vec4(500, 1100, 200, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(500, 1375, 400, default_south_height), SOUTH_STATIONARY));
+		floors.push_back(vec4(500, 1100, 400, 300));
+
+		// Healthpack Area for Right hallway
+		terrains.push_back(std::make_pair(vec4(700, 900, 200, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(675, 900, default_side_width, 200), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(900, 900, default_side_width, 500), SIDE_STATIONARY));
+		floors.push_back(vec4(700, 1000, 200, 200));
+		health_packs_pos.push_back(vec2(800, 1100));
+		
+		// Right Hallway from Spawn
+		terrains.push_back(std::make_pair(vec4(1500, 200, 700, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1500, 500, 700, default_south_height), SOUTH_STATIONARY));
+		floors.push_back(vec4(1500, 300, 700, 200));
+
+		// Top Right Room
+		terrains.push_back(std::make_pair(vec4(2200, -200, 1000, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(2175, -200, default_side_width, 400), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(2175, 500, default_side_width, 1000), SIDE_STATIONARY)); // extends down
+		terrains.push_back(std::make_pair(vec4(2400, 1075, 800, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(3200, -200, default_side_width, 1300), SIDE_STATIONARY));
+
+		enemies.push_back(std::make_pair(vec2(3000, 100), FIRE_NORMAL));
+		enemies.push_back(std::make_pair(vec2(3000, 300), FIRE_NORMAL));
+		enemies.push_back(std::make_pair(vec2(3000, 500), FIRE_NORMAL));
+		enemies.push_back(std::make_pair(vec2(3000, 700), FIRE_NORMAL));
+		enemies.push_back(std::make_pair(vec2(3000, 900), FIRE_NORMAL));
+
+		floors.push_back(vec4(2200, -200, 1000, 1300));
+
+		// Hallway down from Top Right Room
+		terrains.push_back(std::make_pair(vec4(2400, 1100, default_side_width, 400), SIDE_STATIONARY));
+		floors.push_back(vec4(2200, 1100, 200, 1800)); // extends down
+		terrains.push_back(std::make_pair(vec4(2400, 1700, default_side_width, 1100), SIDE_STATIONARY)); // extends down
+
+		// Weird Maze Thing with Health pack
+		terrains.push_back(std::make_pair(vec4(2175, 1700, default_side_width, 400), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1600, 1400, 600, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1800, 1675, 400, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1575, 1400, default_side_width, 900), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1800, 1700, default_side_width, 400), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1800, 2000, 400, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1600, 2275, 600, default_south_height), SOUTH_STATIONARY));
+
+		floors.push_back(vec4(1600, 1500, 600, 200));
+		floors.push_back(vec4(1600, 1700, 200, 600));
+		floors.push_back(vec4(1800, 2100, 400, 200));
+
+		health_packs_pos.push_back(vec2(1710, 2175));
+
+		// Hallway from maze to small right room
+		terrains.push_back(std::make_pair(vec4(2400, 1400, 1000, default_north_height), NORTH_STATIONARY)); // extends right
+		terrains.push_back(std::make_pair(vec4(2400, 1675, 400, default_south_height), SOUTH_STATIONARY));
+		
+		floors.push_back(vec4(2400, 1500, 400, 200));
+
+		// Small right room
+		terrains.push_back(std::make_pair(vec4(3400, 1400, default_side_width, 800), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(2775, 1700, default_side_width, 500), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(2800, 2175, 600, default_south_height), SOUTH_STATIONARY));
+
+		enemies.push_back(std::make_pair(vec2(3000, 2000), WATER_NORMAL));
+
+		floors.push_back(vec4(2800, 1500, 600, 700));
+
+		// Hallway from maze down to bottom right room
+		terrains.push_back(std::make_pair(vec4(2175, 2300, default_side_width, 500), SIDE_STATIONARY));
+
+		this->player_starting_pos = vec2(2300, 3500);
+
+		// Bottom right room
+		terrains.push_back(std::make_pair(vec4(2900, 2800, default_side_width, 1200), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1700, 2800, 500, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(2400, 2800, 500, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1675, 2800, default_side_width, 500), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1675, 3500, default_side_width, 500), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1700, 3975, 500, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(2400, 3975, 500, default_south_height), SOUTH_STATIONARY));
+
+		floors.push_back(vec4(1700, 2900, 1200, 1100));
+
+		// mini room below Bottom right room with health pack
+		terrains.push_back(std::make_pair(vec4(2175, 4000, default_side_width, 300), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(2400, 4000, default_side_width, 300), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(2200, 4275, 200, default_south_height), SOUTH_STATIONARY));
+
+		enemies.push_back(std::make_pair(vec2(1800, 3800), EARTH_NORMAL));
+		enemies.push_back(std::make_pair(vec2(2100, 3800), EARTH_NORMAL));
+		enemies.push_back(std::make_pair(vec2(2400, 3800), EARTH_NORMAL));
+		enemies.push_back(std::make_pair(vec2(2700, 3800), EARTH_NORMAL));
+
+		floors.push_back(vec4(2200, 4000, 200, 300));
+
+		health_packs_pos.push_back(vec2(2300, 4150));
+
+		break;
+
 	case WATER_BOSS:
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
