@@ -73,14 +73,14 @@ void AISystem::step(float elapsed_ms)
 							// vec2 position = registry.positions.get(entity_i).position;
 							vec2 adjust = {0, (boss.phase - 4) * 50};
 							vec2 subadjust = {0, ((boss.subphase % 5) + 1) * 75 + 40};
-							enemyFireProjectile(entity_i, direction, 0.4f, thisPos - adjust + subadjust);
-							enemyFireProjectile(entity_i, direction, 0.4f, thisPos - adjust - subadjust);
+							enemyFireProjectile(entity_i, direction, 0.5f, thisPos - adjust + subadjust);
+							enemyFireProjectile(entity_i, direction, 0.5f, thisPos - adjust - subadjust);
 							boss.subphase += 1;
 							boss.phaseTimer = 25.f;
 						}
 						break;
 					case 8:
-						if (boss.subphase == 12) {
+						if (boss.subphase == 20) {
 							boss.phase += 1;
 							boss.phaseTimer = 1500.f;
 							boss.subphase = 0;
@@ -150,20 +150,23 @@ void AISystem::step(float elapsed_ms)
 						boss.subphase = 0;
 						break;
 					case 15:
-						// clear projectiles
+					case 16:
 						for (uint i = 0; i < registry.projectiles.size(); i++) {
 							Entity thisProj = registry.projectiles.entities[i];
 							if (!registry.projectiles.get(thisProj).hostile) continue;
 							Velocity& thisProjVel = registry.velocities.get(thisProj);
 							Position& thisProjPos = registry.positions.get(thisProj);
 							thisProjVel.velocity = normalize(thisProjPos.position - playerPos);
-							thisProjVel.velocity *= 75;
+							thisProjVel.velocity *= 100;
+							if (boss.phase == 15) {
+								thisProjVel.velocity *= -0.5;
+							}
 						}
 						boss.phase += 1;
 						boss.phaseTimer = 1000.f;
 						boss.subphase = 0;
 						break;
-					case 16:
+					case 17:
 						while (0 != registry.projectiles.size()) {
 							registry.remove_all_components_of_no_collision(registry.projectiles.entities[0]);
 						}
