@@ -61,6 +61,10 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(cutscene2_voiceline);
 	if (cutscene3_voiceline != nullptr)
 		Mix_FreeChunk(cutscene3_voiceline);
+	if (cutscene4_voiceline != nullptr)
+		Mix_FreeChunk(cutscene4_voiceline);
+	if (cutscene5_voiceline != nullptr)
+		Mix_FreeChunk(cutscene5_voiceline);
 	if (fire_boss_lsvl != nullptr)
 		Mix_FreeChunk(fire_boss_lsvl);
 	if (water_boss_lsvl != nullptr)
@@ -75,8 +79,6 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(aria_death_lsvl);
 	if (first_shard_avl != nullptr)
 		Mix_FreeChunk(first_shard_avl);
-	if (second_shard_avl != nullptr)
-		Mix_FreeChunk(second_shard_avl);
 	if (third_shard_avl != nullptr)
 		Mix_FreeChunk(third_shard_avl);
 	if (deceived_avl != nullptr)
@@ -193,6 +195,8 @@ GLFWwindow* WorldSystem::create_window() {
 	cutscene1_voiceline = Mix_LoadWAV(audio_path("cutscene_1_voiceline.wav").c_str());
 	cutscene2_voiceline = Mix_LoadWAV(audio_path("cutscene_2_voiceline.wav").c_str());
 	cutscene3_voiceline = Mix_LoadWAV(audio_path("cutscene_3_voiceline.wav").c_str());
+	cutscene4_voiceline = Mix_LoadWAV(audio_path("aria_second_shard.wav").c_str());
+	cutscene5_voiceline = Mix_LoadWAV(audio_path("cutscene_5_voiceline.wav").c_str());
 
 	// lost soul voicelines (lsvl)
 	fire_boss_lsvl = Mix_LoadWAV(audio_path("fire_boss_lsvl.wav").c_str());
@@ -204,7 +208,6 @@ GLFWwindow* WorldSystem::create_window() {
 
 	// aria voicelines (avl)
 	first_shard_avl = Mix_LoadWAV(audio_path("aria_first_shard.wav").c_str());
-	second_shard_avl = Mix_LoadWAV(audio_path("aria_second_shard.wav").c_str());
 	third_shard_avl = Mix_LoadWAV(audio_path("aria_third_shard.wav").c_str());
 	deceived_avl = Mix_LoadWAV(audio_path("aria_deceived.wav").c_str());
 	final_cutscene_avl = Mix_LoadWAV(audio_path("aria_final_cutscene.wav").c_str());
@@ -435,6 +438,14 @@ void WorldSystem::restart_game() {
 		Mix_FadeInMusic(cutscene_background, 0, 500);
 		Mix_PlayChannel(-1, cutscene3_voiceline, 0);
 	}
+	else if (curr_level == CUTSCENE_4) {
+		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_PlayChannel(-1, cutscene4_voiceline, 0);
+	}
+	else if (curr_level == CUTSCENE_5) {
+		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_PlayChannel(-1, cutscene5_voiceline, 0);
+	}
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
 	for (uint i = 0; i < floors.size(); i++) {
@@ -570,7 +581,7 @@ void WorldSystem::display_power_up() {
 
 	// figure out what power ups are available
 	vector<pair<string, bool*>> availPowerUps;
-
+	
 	if (!powerUp.fasterMovement) availPowerUps.push_back(make_pair("Faster Movement Speed", &powerUp.fasterMovement));
 
 	for (int element = ElementType::WATER; element <= ElementType::LIGHTNING; element++) {
@@ -830,7 +841,6 @@ void WorldSystem::handle_collisions() {
 						
 						createLifeOrb(renderer, boss_position, this->curr_level.getLifeOrbPiece());
 						if (this->curr_level.getLifeOrbPiece() == 1) Mix_PlayChannel(-1, first_shard_avl, 0);
-						if (this->curr_level.getLifeOrbPiece() == 2) Mix_PlayChannel(-1, second_shard_avl, 0);
 						if (this->curr_level.getLifeOrbPiece() == 3) Mix_PlayChannel(-1, third_shard_avl, 0);
 					}
 				}

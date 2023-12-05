@@ -85,6 +85,8 @@ private:
 	Mix_Chunk* cutscene1_voiceline;
 	Mix_Chunk* cutscene2_voiceline;
 	Mix_Chunk* cutscene3_voiceline;
+	Mix_Chunk* cutscene4_voiceline;
+	Mix_Chunk* cutscene5_voiceline;
 
 	// lost soul voicelines (lsvl)
 	Mix_Chunk* fire_boss_lsvl;
@@ -96,7 +98,6 @@ private:
 
 	// aria voice lines (avl)
 	Mix_Chunk* first_shard_avl;
-	Mix_Chunk* second_shard_avl;
 	Mix_Chunk* third_shard_avl;
 	Mix_Chunk* deceived_avl;
 	Mix_Chunk* final_cutscene_avl;
