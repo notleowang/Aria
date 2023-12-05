@@ -85,7 +85,10 @@ void AISystem::step(float elapsed_ms)
 							boss.phaseTimer = 1500.f;
 							boss.subphase = 0;
 						} else {
-							registry.resources.get(entity_i).currentHealth = min(registry.resources.get(entity_i).currentHealth + 25, registry.resources.get(entity_i).maxHealth);
+							registry.resources.get(entity_i).currentHealth += 25;
+							if (registry.resources.get(entity_i).currentHealth > registry.resources.get(entity_i).maxHealth) {
+								registry.resources.get(entity_i).currentHealth = registry.resources.get(entity_i).maxHealth;
+							}
 							boss.subphase += 1;
 							boss.phaseTimer = 50.f;
 						}
