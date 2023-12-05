@@ -80,7 +80,7 @@ void AISystem::step(float elapsed_ms)
 						}
 						break;
 					case 8:
-						if (boss.subphase == 20) {
+						if (boss.subphase == 25) {
 							boss.phase += 1;
 							boss.phaseTimer = 1500.f;
 							boss.subphase = 0;
