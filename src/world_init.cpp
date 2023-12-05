@@ -162,7 +162,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 
-	position.scale = vec2({ 100, 100 });
+	position.scale = vec2({ 80, 80 });
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity.x = 50;
