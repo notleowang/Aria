@@ -446,6 +446,10 @@ void RenderSystem::draw()
 		drawTexturedMesh(entity, camera.projectionMat);
 	}
 
+	// Truely render to the screen
+	drawToScreen();
+
+	// We do this after post processing the lighting effect
 	for (Entity entity : registry.healthBars.entities) {
 		drawTexturedMesh(entity, camera.projectionMat);
 	}
@@ -454,10 +458,6 @@ void RenderSystem::draw()
 		drawTexturedMesh(entity, camera.projectionMat);
 	}
 
-	// Truely render to the screen
-	drawToScreen();
-
-	// We do this after post processing the lighting effect
 	for (Entity entity : registry.texts.entities)
 	{
 		drawText(entity);
