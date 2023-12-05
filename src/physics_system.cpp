@@ -130,7 +130,11 @@ bool shouldIgnoreCollision(Entity& entity_i, Entity& entity_j)
 
 void updateShadows() {
 	Entity player_entity = registry.players.entities[0];
-	Position& player_position = registry.positions.get(player_entity);
+	
+	Position& light_source_pos = (registry.lifeOrbs.entities.size() > 0)
+		? registry.positions.get(registry.lifeOrbs.entities[0])
+		: registry.positions.get(player_entity); //
+
 	for (uint i = 0; i < registry.shadows.entities.size(); i++) {
 		Entity entity = registry.shadows.entities[i];
 		Shadow& shadow = registry.shadows.get(entity);
@@ -146,18 +150,18 @@ void updateShadows() {
 		shadow.active = true;
 
 		if (distance((shadow_pos.position / vec2(window_width_px, window_height_px)), 
-			(player_position.position / vec2(window_width_px, window_height_px))) > light_radius) {
+			(light_source_pos.position / vec2(window_width_px, window_height_px))) > light_radius) {
 			shadow.active = false;
 		}
 
 		shadow_pos.position = owner_pos.position;
 
 		// M_PI / 2 is to make the shadow upright
-		shadow_pos.angle = atan2(owner_pos.position.y - player_position.position.y, owner_pos.position.x - player_position.position.x) + M_PI/2;
+		shadow_pos.angle = atan2(owner_pos.position.y - light_source_pos.position.y, owner_pos.position.x - light_source_pos.position.x) + M_PI/2;
 
 		float max_dist = light_radius*std::max(window_width_px, window_height_px);
 
-		float dist = abs(distance(owner_pos.position, player_position.position));
+		float dist = abs(distance(owner_pos.position, light_source_pos.position));
 		shadow_pos.scale = owner_pos.scale * (max_dist - dist) / max_dist;
 		shadow_pos.scale.y *= 2;
 

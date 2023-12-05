@@ -425,7 +425,7 @@ void RenderSystem::initializeTerrainGeometryBuffer()
 	vertices[3].position = { 0.5, -0.5, -0.1 };
 
 	const std::vector<uint16_t> vertex_indices = { 0, 1, 2, 0, 2, 3 };
-
+	
 	meshes[geom_index].vertices = vertices;
 	meshes[geom_index].vertex_indices = vertex_indices;
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::TERRAIN, meshes[geom_index].vertices, meshes[geom_index].vertex_indices);

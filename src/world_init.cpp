@@ -49,10 +49,10 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	powerUp.bounceOffWalls[ElementType::EARTH] = true;
 	powerUp.bounceOffWalls[ElementType::LIGHTNING] = true;*/
 
-	//createShadow(renderer, entity, TEXTURE_ASSET_ID::PLAYER, GEOMETRY_BUFFER_ID::PLAYER);
 	registry.characterProjectileTypes.emplace(entity);
 	registry.players.emplace(entity);
 	registry.collidables.emplace(entity);
+
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::PLAYER,
@@ -149,6 +149,36 @@ Entity createObstacle(RenderSystem* renderer, vec2 pos, vec2 size, vec2 vel) {
 
 	return entity;
 }
+
+Entity createLostSoul(RenderSystem* renderer, vec2 pos) {
+	auto entity = Entity();
+
+	registry.lostSouls.emplace(entity);
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity = { 0, 0 };
+
+	position.scale = vec2(100, 100);
+
+	registry.collidables.emplace(entity); // Marking obstacle as collidable
+
+	createShadow(renderer, entity, TEXTURE_ASSET_ID::LOST_SOUL, GEOMETRY_BUFFER_ID::SPRITE);
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::LOST_SOUL,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}
+
 
 Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 {
@@ -600,5 +630,40 @@ Entity createLine(vec2 position, vec2 scale)
 	*/
 
 	registry.debugComponents.emplace(entity);
+	return entity;
+}
+
+Entity createLifeOrb(RenderSystem* renderer, vec2 pos, int piece_number) {
+	auto entity = Entity();
+
+	LifeOrb& life_orb = registry.lifeOrbs.emplace(entity);
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	position.scale = vec2(2 * 23.f, 2 * 23.f);
+	
+	Velocity& velocity = registry.velocities.emplace(entity);
+	velocity.velocity = { 0.f,0.f };
+
+	registry.collidables.emplace(entity);
+
+	TEXTURE_ASSET_ID asset = TEXTURE_ASSET_ID::LIFE_ORB;
+	if (piece_number == 1) {
+		asset = TEXTURE_ASSET_ID::LIFE_ORB_PIECE_1;
+	} else if (piece_number == 2) {
+		asset = TEXTURE_ASSET_ID::LIFE_ORB_PIECE_2;
+	} else if (piece_number == 3) {
+		asset =	TEXTURE_ASSET_ID::LIFE_ORB_PIECE_3;
+	}
+
+	registry.renderRequests.insert(
+		entity,
+		{ asset,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE });
+
 	return entity;
 }

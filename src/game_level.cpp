@@ -1,5 +1,6 @@
 #include "game_level.hpp" 
 #include <random>
+#include <tiny_ecs_registry.hpp>
 
 /*
 	CREATING WALLS:
@@ -38,6 +39,8 @@ bool GameLevel::init(uint level) {
 		return false;
 	}
 	this->curr_level = level;
+	this->is_cutscene = false;
+	this->is_boss_level = false;
 
 	std::vector<vec2>& health_packs_pos = this->health_packs_pos;
 	std::vector<std::string>& texts = this->texts;
@@ -47,6 +50,7 @@ bool GameLevel::init(uint level) {
 	std::vector<std::pair<vec4, Terrain>>& terrains = this->terrains_attr;
 	std::vector<std::pair<vec2, Enemy>>& enemies = this->enemies_attr;
 	std::vector<std::pair<vec2, Enemy>>& bosses = this->bosses_attr;
+	std::vector<std::pair<vec2, LostSoul>>& lost_souls = this->lost_souls_attr;
 
 	health_packs_pos.clear();
 	texts.clear();
@@ -56,6 +60,7 @@ bool GameLevel::init(uint level) {
 	enemies.clear();
 	obstacles.clear();
 	bosses.clear();
+	lost_souls.clear();
 
 	switch (level) {
 	case TUTORIAL:
@@ -87,6 +92,22 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(1325, 0, default_side_width, 700), SIDE_STATIONARY));
 		break;
 
+	case CUTSCENE_1:
+		this->is_cutscene = true;
+		floors.push_back(vec4(25, 25, 10000, 400));
+
+		this->player_starting_pos = vec2(50, 300);
+		this->exit_door_pos = vec2(9300,200);
+		this->cutscene_player_velocity = { 300.f,0.f };
+
+		lost_souls.push_back({ vec2(5800, 300), LostSoul()});
+
+		terrains.push_back(std::make_pair(vec4(25, 0, 10000, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 400, 10000, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 425), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(10025, 0, default_side_width, 425), SIDE_STATIONARY));
+		
+		break;
 	case LEVEL_1:
 		this->player_starting_pos = vec2(200, 700);
 		this->exit_door_pos = vec2(1450, 775);
@@ -109,6 +130,9 @@ bool GameLevel::init(uint level) {
 		break;
 	
 	case FIRE_BOSS:
+		this->is_boss_level = true;
+		this->life_orb_piece = NULL;
+
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
 		this->player_starting_pos = vec2(800, 650);
@@ -120,6 +144,84 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(2725, 0, default_side_width, 1400), SIDE_STATIONARY));
 
 		bosses.push_back(std::make_pair(vec2(1400, 700), FIRE_HIGH_DAMAGE));
+		break;
+
+	case CUTSCENE_2:
+		this->is_cutscene = true;
+
+
+		terrains.push_back(std::make_pair(vec4(25, 0, 3000, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 400, 2900, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 0, default_side_width, 400), SIDE_STATIONARY));
+		floors.push_back(vec4(25, 25, 3000, 400));
+
+		terrains.push_back(std::make_pair(vec4(2900, 400, default_side_width, 2200), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(3000, 0, default_side_width, 1000), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(3000, 1200, default_side_width, 1600), SIDE_STATIONARY));
+
+		floors.push_back(vec4(2900, 400, 100, 2400));
+
+		//extra room
+		terrains.push_back(std::make_pair(vec4(3000, 1000, 1000, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(3000, 1200, 1000, default_south_height), SOUTH_STATIONARY));
+		floors.push_back(vec4(3000, 1000, 1000, 200));
+
+
+		terrains.push_back(std::make_pair(vec4(25, 2500, 2900, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 2800, 3000, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 2500, default_side_width, 300), SIDE_STATIONARY));
+		floors.push_back(vec4(25, 2500, 3000, 300));
+
+		this->player_starting_pos = vec2(25, 300);
+		//POSSIBLE MEMORY LEAK IN LOSTSOUL()
+		lost_souls.push_back({ vec2(200, 200), LostSoul()});
+
+		this->exit_door_pos = vec2(125, 2650);
+		this->cutscene_player_velocity = { 220,0.f };
+
+		// add a bunch of enemies outside the map walls
+		// above top
+		for (int i = 25; i <= 2800; i += 100) {
+			Enemy enemy = getRandomNormalEnemy();
+			enemy.isAggravated = false;
+			enemies.push_back(std::make_pair(vec2(i, -50), enemy));
+		}
+		// under top
+		for (int i = 25; i <= 2800; i += 100) {
+			Enemy enemy = getRandomNormalEnemy();
+			enemy.isAggravated = false;
+			enemies.push_back(std::make_pair(vec2(i, 500), enemy));
+		}
+		// far right
+		for (int i = 0; i <= 900; i += 100) {
+			Enemy enemy = getRandomNormalEnemy();
+			enemy.isAggravated = false;
+			enemies.push_back(std::make_pair(vec2(3050, i), enemy));
+		}
+		for (int i = 1300; i <= 2800; i += 100) {
+			Enemy enemy = getRandomNormalEnemy();
+			enemy.isAggravated = false;
+			enemies.push_back(std::make_pair(vec2(3050, i), enemy));
+		}
+		// inside right
+		for (int i = 700; i <= 2600; i += 100) {
+			Enemy enemy = getRandomNormalEnemy();
+			enemy.isAggravated = false;
+			enemies.push_back(std::make_pair(vec2(2850, i), enemy));
+		}
+		//// above bottom
+		for (int i = 100; i <= 2000; i += 100) {
+			Enemy enemy = getRandomNormalEnemy();
+			enemy.isAggravated = false;
+			enemies.push_back(std::make_pair(vec2(i, 2500), enemy));
+		}
+		// under bottom
+		for (int i = 100; i <= 2000; i += 100) {
+			Enemy enemy = getRandomNormalEnemy();
+			enemy.isAggravated = false;
+			enemies.push_back(std::make_pair(vec2(i, 2900), enemy));
+		}
+
 		break;
 	
 	case LEVEL_2: // Same as level 1 but with moving walls
@@ -154,6 +256,8 @@ bool GameLevel::init(uint level) {
 		break;
 
 	case EARTH_BOSS:
+		this->is_boss_level = true;
+		this->life_orb_piece = 1;
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
 		this->player_starting_pos = vec2(800, 650);
@@ -165,6 +269,24 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(2725, 0, default_side_width, 1400), SIDE_STATIONARY));
 
 		bosses.push_back(std::make_pair(vec2(1400, 700), EARTH_HIGH_DAMAGE));
+		break;
+
+	case CUTSCENE_3:
+		this->is_cutscene = true;
+		floors.push_back(vec4(25, 25, 700, 400));
+		this->life_orb_piece = 1;
+
+		this->player_starting_pos = vec2(562, 280);
+		this->exit_door_pos = vec2(4800, 200);
+		this->cutscene_player_velocity = { 0.f,0.f };
+
+		lost_souls.push_back({ vec2(162, 280), LostSoul() });
+
+		terrains.push_back(std::make_pair(vec4(25, 0, 700, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 400, 700, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 425), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(725, 0, default_side_width, 425), SIDE_STATIONARY));
+
 		break;
 
 	case LEVEL_3: // Same as level 1 but with moving walls
@@ -199,6 +321,8 @@ bool GameLevel::init(uint level) {
 		break;
 
 	case LIGHTNING_BOSS:
+		this->is_boss_level = true;
+		this->life_orb_piece = 2;
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
 		this->player_starting_pos = vec2(800, 650);
@@ -210,6 +334,23 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(2725, 0, default_side_width, 1400), SIDE_STATIONARY));
 
 		bosses.push_back(std::make_pair(vec2(1400, 700), LIGHTNING_HIGH_DAMAGE));
+		break;
+
+	case CUTSCENE_4:
+		this->is_cutscene = true;
+		floors.push_back(vec4(25, 25, 5000, 400));
+
+		this->player_starting_pos = vec2(50, 300);
+		this->exit_door_pos = vec2(4800, 200);
+		this->cutscene_player_velocity = { 300.f,0.f };
+
+		lost_souls.push_back({ vec2(200, 300), LostSoul() });
+
+		terrains.push_back(std::make_pair(vec4(25, 0, 5000, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 400, 5000, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 425), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(5025, 0, default_side_width, 425), SIDE_STATIONARY));
+
 		break;
 
 	case LEVEL_4:
@@ -257,7 +398,10 @@ bool GameLevel::init(uint level) {
 
 		break;
 
+
 	case WATER_BOSS:
+		this->is_boss_level = true;
+		this->life_orb_piece = 3;
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
 		this->player_starting_pos = vec2(800, 650);
@@ -269,6 +413,23 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(2725, 0, default_side_width, 1400), SIDE_STATIONARY));
 
 		bosses.push_back(std::make_pair(vec2(1400, 700), WATER_HIGH_DAMAGE));
+		break;
+
+	case CUTSCENE_5:
+		this->is_cutscene = true;
+		floors.push_back(vec4(25, 25, 5000, 400));
+
+		this->player_starting_pos = vec2(50, 300);
+		this->exit_door_pos = vec2(4800, 200);
+		this->cutscene_player_velocity = { 300.f,0.f };
+
+		lost_souls.push_back({ vec2(200, 300), LostSoul() });
+
+		terrains.push_back(std::make_pair(vec4(25, 0, 5000, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 400, 5000, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 425), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(5025, 0, default_side_width, 425), SIDE_STATIONARY));
+
 		break;
 
 	case FINAL_BOSS: // actual final boss (the reaper dude)
