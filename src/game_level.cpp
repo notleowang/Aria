@@ -276,11 +276,11 @@ bool GameLevel::init(uint level) {
 		floors.push_back(vec4(25, 25, 700, 400));
 		this->life_orb_piece = 1;
 
-		this->player_starting_pos = vec2(462, 220);
+		this->player_starting_pos = vec2(562, 280);
 		this->exit_door_pos = vec2(4800, 200);
 		this->cutscene_player_velocity = { 0.f,0.f };
 
-		lost_souls.push_back({ vec2(262, 200), LostSoul() });
+		lost_souls.push_back({ vec2(162, 280), LostSoul() });
 
 		terrains.push_back(std::make_pair(vec4(25, 0, 700, default_north_height), NORTH_STATIONARY));
 		terrains.push_back(std::make_pair(vec4(25, 400, 700, default_south_height), SOUTH_STATIONARY));

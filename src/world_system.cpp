@@ -374,6 +374,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		vec2 life_orb_pos = registry.positions.get(life_orb).position;
 		if (life_orb_pos.y > lost_soul_pos.y) {
 			registry.velocities.get(life_orb).velocity = { 0.f,0.f };
+			registry.velocities.get(lost_soul).velocity = { 50.f,0.f };
+			registry.velocities.get(player).velocity = { -100.f,0.f };
+			win_level();
 		}
 
 
@@ -528,7 +531,7 @@ void WorldSystem::restart_game() {
 		createExitDoor(renderer, this->curr_level.getExitDoorPos());
 	} 
 	else if (this->curr_level.getCurrLevel() == CUTSCENE_3) {
-		Entity life_orb = createLifeOrb(renderer, {362,25}, this->curr_level.getLifeOrbPiece());
+		Entity life_orb = createLifeOrb(renderer, {362,-100}, this->curr_level.getLifeOrbPiece());
 		registry.velocities.get(life_orb).velocity = { 0.f,20.f };
 		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
 		Position& player_position = registry.positions.get(player);
@@ -573,9 +576,6 @@ bool collidedBottom(Position& pos_i, Position& pos_j)
 }
 
 void WorldSystem::win_level() {
-	//if (curr_level.getCurrLevel() == CUTSCENE_3) {
-	//	center_on_orb = true;
-	//}
 	if (registry.winTimers.has(player)) return;
 
 	printf("hooray you won the level\n"); 
