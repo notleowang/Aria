@@ -47,10 +47,10 @@ class RenderSystem {
 			textures_path("fire_enemy.png") ,
 			textures_path("earth_enemy.png"),
 			textures_path("lightning_enemy.png"),
-			textures_path("water_enemy.png"),						// start of bosses
+			textures_path("water_boss.png"),						// start of bosses
 			textures_path("fire_boss.png") ,
-			textures_path("earth_enemy.png"),
-			textures_path("lightning_enemy.png"),
+			textures_path("earth_boss.png"),
+			textures_path("lightning_boss.png"),
 			textures_path("ghost.png"),								// final boss
 			textures_path("ghost.png"),
 			textures_path("projectile_water_sprite_sheet.png"),
