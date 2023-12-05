@@ -123,28 +123,25 @@ void AISystem::step(float elapsed_ms)
 								case 10:
 									// make sure the circle does not lead back into the boss
 									thisProjVel.velocity = normalize(playerPos - thisPos);
-									thisProjVel.velocity *= 100;
+									thisProjVel.velocity *= 200;
 									break;
 								case 11:
-									thisProjVel.velocity = {-100, 0};
+									thisProjVel.velocity = {-150, 0};
 									break;
 								case 12:
-									thisProjVel.velocity = {0, 100};
+									thisProjVel.velocity = {0, 150};
 									break;
 								case 13:
-									thisProjVel.velocity = {100, 0};
+									thisProjVel.velocity = {150, 0};
 									break;
 								case 14:
-									thisProjVel.velocity = {0, -100};
+									thisProjVel.velocity = {0, -150};
 									break;
 							}
 						}
-						boss.phaseTimer = 500.f;
+						boss.phaseTimer = 750.f;
 						if (boss.phase == 10) {
 							boss.phaseTimer = 1000.f;
-						}
-						if (boss.phase == 14) {
-							boss.phaseTimer = 2500.f;
 						}
 						boss.phase += 1;
 						boss.subphase = 0;
@@ -159,7 +156,7 @@ void AISystem::step(float elapsed_ms)
 							thisProjVel.velocity = normalize(thisProjPos.position - playerPos);
 							thisProjVel.velocity *= 100;
 							if (boss.phase == 15) {
-								thisProjVel.velocity *= -0.5;
+								thisProjVel.velocity *= -0.75;
 							}
 						}
 						boss.phase += 1;
