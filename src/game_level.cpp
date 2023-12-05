@@ -273,18 +273,19 @@ bool GameLevel::init(uint level) {
 
 	case CUTSCENE_3:
 		this->is_cutscene = true;
-		floors.push_back(vec4(25, 25, 5000, 400));
+		floors.push_back(vec4(25, 25, 700, 400));
+		this->life_orb_piece = 1;
 
-		this->player_starting_pos = vec2(50, 300);
+		this->player_starting_pos = vec2(562, 280);
 		this->exit_door_pos = vec2(4800, 200);
-		this->cutscene_player_velocity = { 300.f,0.f };
+		this->cutscene_player_velocity = { 0.f,0.f };
 
-		lost_souls.push_back({ vec2(200, 300), LostSoul() });
+		lost_souls.push_back({ vec2(162, 280), LostSoul() });
 
-		terrains.push_back(std::make_pair(vec4(25, 0, 5000, default_north_height), NORTH_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(25, 400, 5000, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 0, 700, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 400, 700, default_south_height), SOUTH_STATIONARY));
 		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 425), SIDE_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(5025, 0, default_side_width, 425), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(725, 0, default_side_width, 425), SIDE_STATIONARY));
 
 		break;
 

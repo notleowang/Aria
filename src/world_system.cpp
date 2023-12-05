@@ -370,6 +370,23 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 	}
+	if (this->curr_level.curr_level == CUTSCENE_3) {
+		Entity& lost_soul = registry.lostSouls.entities[0];
+		Entity& life_orb = registry.lifeOrbs.entities[0];
+		vec2 lost_soul_pos = registry.positions.get(lost_soul).position;
+		vec2 life_orb_pos = registry.positions.get(life_orb).position;
+		if (life_orb_pos.y > lost_soul_pos.y) {
+			registry.velocities.get(life_orb).velocity = { 0.f,0.f };
+			registry.velocities.get(lost_soul).velocity = { 50.f,0.f };
+			registry.velocities.get(player).velocity = { -100.f,0.f };
+			win_level();
+		}
+
+
+	}
+	if (registry.lifeOrbs.entities.size() > 0) {
+		createShadow(renderer, player, TEXTURE_ASSET_ID::PLAYER, GEOMETRY_BUFFER_ID::PLAYER);
+	}
 	return true;
 }
 
@@ -452,6 +469,8 @@ void WorldSystem::restart_game() {
 		createFloor(renderer, vec2(floors[i].x, floors[i].y), vec2(floors[i].z, floors[i].w));
 	}
 
+
+
 	player = createAria(renderer, player_starting_pos);
 
 	if (curr_level == Level::TUTORIAL) {
@@ -509,7 +528,6 @@ void WorldSystem::restart_game() {
 	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
 
 	if (this->curr_level.getCurrLevel() == CUTSCENE_1 ||
-		this->curr_level.getCurrLevel() == CUTSCENE_3 ||
 		this->curr_level.getCurrLevel() == CUTSCENE_4 ||
 		this->curr_level.getCurrLevel() == CUTSCENE_5) {
 		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
@@ -522,6 +540,13 @@ void WorldSystem::restart_game() {
 		Animation& player_animation = registry.animations.get(player);
 		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
 		createExitDoor(renderer, this->curr_level.getExitDoorPos());
+	} 
+	else if (this->curr_level.getCurrLevel() == CUTSCENE_3) {
+		Entity life_orb = createLifeOrb(renderer, {362,-100}, this->curr_level.getLifeOrbPiece());
+		registry.velocities.get(life_orb).velocity = { 0.f,20.f };
+		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
+		Position& player_position = registry.positions.get(player);
+		if (player_position.scale.x > 0) player_position.scale.x *= -1;
 	}
 
 	for (uint i = 0; i < lost_soul_attrs.size(); i++) {
@@ -572,7 +597,7 @@ void WorldSystem::win_level() {
 
 void WorldSystem::new_game() {
 	if (player != NULL) registry.remove_all_components_of(player);
-	curr_level.init(CUTSCENE_1);
+	curr_level.init(CUTSCENE_3);
 	restart_game();
 }
 
