@@ -68,6 +68,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(lightning_boss_lsvl);
 	if (final_boss_lsvl != nullptr)
 		Mix_FreeChunk(final_boss_lsvl);
+	if (aria_death_lsvl != nullptr)
+		Mix_FreeChunk(aria_death_lsvl);
 
 	Mix_CloseAudio();
 
@@ -173,6 +175,7 @@ GLFWwindow* WorldSystem::create_window() {
 	lightning_boss_lsvl = Mix_LoadWAV(audio_path("lightning_boss_lsvl.wav").c_str());
 	water_boss_lsvl = Mix_LoadWAV(audio_path("water_boss_lsvl.wav").c_str());
 	final_boss_lsvl = Mix_LoadWAV(audio_path("final_boss_lsvl.wav").c_str());
+	aria_death_lsvl = Mix_LoadWAV(audio_path("aria_death_lsvl.wav").c_str());
 
 	if (background_music == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
@@ -461,7 +464,10 @@ void WorldSystem::restart_game() {
 
 	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
 
-	if (this->curr_level.getCurrLevel() == CUTSCENE_1) {
+	if (this->curr_level.getCurrLevel() == CUTSCENE_1 ||
+		this->curr_level.getCurrLevel() == CUTSCENE_3 ||
+		this->curr_level.getCurrLevel() == CUTSCENE_4 ||
+		this->curr_level.getCurrLevel() == CUTSCENE_5) {
 		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
 		Animation& player_animation = registry.animations.get(player);
 		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
@@ -613,6 +619,7 @@ void WorldSystem::handle_collisions() {
 					registry.deathTimers.emplace(entity);
 					registry.velocities.get(player).velocity = { 0.f, 0.f };
 					Mix_PlayChannel(-1, aria_death_sound, 0);
+					Mix_PlayChannel(-1, aria_death_lsvl, 0);
 				}
 			}
 		}
@@ -624,6 +631,7 @@ void WorldSystem::handle_collisions() {
 				registry.deathTimers.emplace(entity);
 				registry.velocities.get(player).velocity = { 0.f, 0.f };
 				Mix_PlayChannel(-1, aria_death_sound, 0);
+				Mix_PlayChannel(-1, aria_death_lsvl, 0);
 			}
 		}
 
@@ -772,13 +780,16 @@ void WorldSystem::handle_collisions() {
 				// remove enemy if health <= 0
 				if (enemy_resource.currentHealth <= 0) {
 					bool boss = registry.bosses.has(entity_other); // store bool before removing all components
+					vec2 boss_position;
+					if (boss) boss_position = registry.positions.get(entity_other).position; // store in case boss died so we can spawn life orb
+
 					registry.remove_all_components_of(enemy_resource.healthBar);
 					registry.remove_all_components_of_no_collision(entity_other);
 					Mix_PlayChannel(-1, enemy_death_sound, 0);
 
-					// win level and change background music if boss died
+					// drop a life orb shard and change background music if boss died
 					if (boss) {
-						win_level();
+						createLifeOrb(renderer, boss_position, this->curr_level.getLifeOrbPiece());
 						Mix_FadeInMusic(background_music, -1, 1500);
 					}
 				}
@@ -800,6 +811,7 @@ void WorldSystem::handle_collisions() {
 				registry.deathTimers.emplace(entity_other);
 				registry.velocities.get(player).velocity = vec2(0.f, 0.f);
 				Mix_PlayChannel(-1, aria_death_sound, 0);
+				Mix_PlayChannel(-1, aria_death_lsvl, 0);
 			}
 			registry.remove_all_components_of_no_collision(entity);
 		}
@@ -889,9 +901,19 @@ void WorldSystem::handle_collisions() {
 			registry.remove_all_components_of_no_collision(entity_other);
 		}
 
+		// Player - Life Orb collision
+		if (registry.players.has(entity) && registry.lifeOrbs.has(entity_other)) {
+			// play a sound??
+			registry.remove_all_components_of_no_collision(entity_other); 
+			win_level();
+		}
+
 		// Checking Player - Lost Soul collision
 		if (registry.players.has(entity) && registry.lostSouls.has(entity_other)) {
-			if (this->curr_level.getCurrLevel() == CUTSCENE_1) {
+			if (this->curr_level.getCurrLevel() == CUTSCENE_1 ||
+				this->curr_level.getCurrLevel() == CUTSCENE_3 ||
+				this->curr_level.getCurrLevel() == CUTSCENE_4 ||
+				this->curr_level.getCurrLevel() == CUTSCENE_5) {
 				Velocity& ls_velocity = registry.velocities.get(entity_other);
 				Velocity& player_velocity = registry.velocities.get(entity);
 				ls_velocity.velocity = player_velocity.velocity;
@@ -908,6 +930,8 @@ bool WorldSystem::is_over() const {
 }
 
 void WorldSystem::on_scroll(double x_offset, double y_offset) {
+	if (registry.deathTimers.has(player) || registry.winTimers.has(player) || this->curr_level.getIsCutscene()) { return; }
+
 	CharacterProjectileType& characterProjectileType = registry.characterProjectileTypes.get(player);
 	int new_element = (int) characterProjectileType.projectileType;
 	if (y_offset < 0) {

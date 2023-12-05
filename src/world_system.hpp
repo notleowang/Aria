@@ -89,6 +89,7 @@ private:
 	Mix_Chunk* lightning_boss_lsvl;
 	Mix_Chunk* water_boss_lsvl;
 	Mix_Chunk* final_boss_lsvl;
+	Mix_Chunk* aria_death_lsvl;
 
 	// C++ random number generator
 	std::default_random_engine rng;

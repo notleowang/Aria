@@ -38,6 +38,7 @@ public:
 	ComponentContainer<HealthPack> healthPacks;
 	ComponentContainer<Shadow> shadows;
 	ComponentContainer<ExitDoor> exitDoors;
+	ComponentContainer<LifeOrb> lifeOrbs;
 	ComponentContainer<Mesh*> meshPtrs;
 	ComponentContainer<SpriteSheet*> spriteSheetPtrs;
 	ComponentContainer<Animation> animations;
@@ -77,6 +78,7 @@ public:
 		registry_list.push_back(&healthPacks);
 		registry_list.push_back(&shadows);
 		registry_list.push_back(&exitDoors);
+		registry_list.push_back(&lifeOrbs);
 		registry_list.push_back(&meshPtrs);
 		registry_list.push_back(&spriteSheetPtrs);
 		registry_list.push_back(&animations);

@@ -53,6 +53,10 @@ class RenderSystem {
 			textures_path("lightning_enemy.png"),
 			textures_path("lost_soul.png"),								// final boss
 			textures_path("ghost.png"),
+			textures_path("life_orb_full.png"),
+			textures_path("life_orb_1.png"),
+            textures_path("life_orb_2.png"),
+            textures_path("life_orb_3.png"),
 			textures_path("projectile_water_sprite_sheet.png"),
 			textures_path("projectile_fire_sprite_sheet.png"),
 			textures_path("projectile_earth.png"),

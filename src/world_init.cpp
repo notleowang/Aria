@@ -631,3 +631,35 @@ Entity createLine(vec2 position, vec2 scale)
 	registry.debugComponents.emplace(entity);
 	return entity;
 }
+
+Entity createLifeOrb(RenderSystem* renderer, vec2 pos, int piece_number) {
+	auto entity = Entity();
+
+	LifeOrb& life_orb = registry.lifeOrbs.emplace(entity);
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& position = registry.positions.emplace(entity);
+	position.position = pos;
+	position.scale = vec2(2 * 23.f, 2 * 23.f);
+
+	registry.collidables.emplace(entity);
+
+	TEXTURE_ASSET_ID asset = TEXTURE_ASSET_ID::LIFE_ORB;
+	if (piece_number == 1) {
+		asset = TEXTURE_ASSET_ID::LIFE_ORB_PIECE_1;
+	} else if (piece_number == 2) {
+		asset = TEXTURE_ASSET_ID::LIFE_ORB_PIECE_2;
+	} else if (piece_number == 3) {
+		asset =	TEXTURE_ASSET_ID::LIFE_ORB_PIECE_3;
+	}
+
+	registry.renderRequests.insert(
+		entity,
+		{ asset,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE });
+
+	return entity;
+}

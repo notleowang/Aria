@@ -131,6 +131,8 @@ bool GameLevel::init(uint level) {
 	
 	case FIRE_BOSS:
 		this->is_boss_level = true;
+		this->life_orb_piece = NULL;
+
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
 		this->player_starting_pos = vec2(800, 650);
@@ -255,6 +257,7 @@ bool GameLevel::init(uint level) {
 
 	case EARTH_BOSS:
 		this->is_boss_level = true;
+		this->life_orb_piece = 1;
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
 		this->player_starting_pos = vec2(800, 650);
@@ -266,6 +269,23 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(2725, 0, default_side_width, 1400), SIDE_STATIONARY));
 
 		bosses.push_back(std::make_pair(vec2(1400, 700), EARTH_HIGH_DAMAGE));
+		break;
+
+	case CUTSCENE_3:
+		this->is_cutscene = true;
+		floors.push_back(vec4(25, 25, 5000, 400));
+
+		this->player_starting_pos = vec2(50, 300);
+		this->exit_door_pos = vec2(4800, 200);
+		this->cutscene_player_velocity = { 300.f,0.f };
+
+		lost_souls.push_back({ vec2(200, 300), LostSoul() });
+
+		terrains.push_back(std::make_pair(vec4(25, 0, 5000, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 400, 5000, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 425), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(5025, 0, default_side_width, 425), SIDE_STATIONARY));
+
 		break;
 
 	case LEVEL_3: // Same as level 1 but with moving walls
@@ -301,6 +321,7 @@ bool GameLevel::init(uint level) {
 
 	case LIGHTNING_BOSS:
 		this->is_boss_level = true;
+		this->life_orb_piece = 2;
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
 		this->player_starting_pos = vec2(800, 650);
@@ -312,6 +333,23 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(2725, 0, default_side_width, 1400), SIDE_STATIONARY));
 
 		bosses.push_back(std::make_pair(vec2(1400, 700), LIGHTNING_HIGH_DAMAGE));
+		break;
+
+	case CUTSCENE_4:
+		this->is_cutscene = true;
+		floors.push_back(vec4(25, 25, 5000, 400));
+
+		this->player_starting_pos = vec2(50, 300);
+		this->exit_door_pos = vec2(4800, 200);
+		this->cutscene_player_velocity = { 300.f,0.f };
+
+		lost_souls.push_back({ vec2(200, 300), LostSoul() });
+
+		terrains.push_back(std::make_pair(vec4(25, 0, 5000, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 400, 5000, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 425), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(5025, 0, default_side_width, 425), SIDE_STATIONARY));
+
 		break;
 
 	case LEVEL_4:
@@ -362,6 +400,7 @@ bool GameLevel::init(uint level) {
 
 	case WATER_BOSS:
 		this->is_boss_level = true;
+		this->life_orb_piece = 3;
 		floors.push_back(vec4(25, 25, 2700, 1375));
 
 		this->player_starting_pos = vec2(800, 650);
@@ -373,6 +412,23 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(2725, 0, default_side_width, 1400), SIDE_STATIONARY));
 
 		bosses.push_back(std::make_pair(vec2(1400, 700), WATER_HIGH_DAMAGE));
+		break;
+
+	case CUTSCENE_5:
+		this->is_cutscene = true;
+		floors.push_back(vec4(25, 25, 5000, 400));
+
+		this->player_starting_pos = vec2(50, 300);
+		this->exit_door_pos = vec2(4800, 200);
+		this->cutscene_player_velocity = { 300.f,0.f };
+
+		lost_souls.push_back({ vec2(200, 300), LostSoul() });
+
+		terrains.push_back(std::make_pair(vec4(25, 0, 5000, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 400, 5000, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 425), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(5025, 0, default_side_width, 425), SIDE_STATIONARY));
+
 		break;
 
 	case FINAL_BOSS: // actual final boss (the reaper dude)

@@ -60,3 +60,5 @@ Entity createShadow(RenderSystem* renderer, Entity& owner_entity, TEXTURE_ASSET_
 // test entity
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos);
 
+// create life orb
+Entity createLifeOrb(RenderSystem* renderer, vec2 pos, int piece_number);
