@@ -346,6 +346,34 @@ void RenderSystem::initializePlayerGeometryBuffer()
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::PLAYER, textured_vertices, textured_indices);
 }
 
+void RenderSystem::initializeSmallEnemyGeometryBuffer()
+{
+	int geom_index = (int)GEOMETRY_BUFFER_ID::ENEMY_SMALL;
+
+	std::vector<TexturedVertex> textured_vertices(4);
+	textured_vertices[0].position = { -1.f / 2, +1.f / 2, 0.f };
+	textured_vertices[1].position = { +1.f / 2, +1.f / 2, 0.f };
+	textured_vertices[2].position = { +1.f / 2, -1.f / 2, 0.f };
+	textured_vertices[3].position = { -1.f / 2, -1.f / 2, 0.f };
+	textured_vertices[0].texcoord = { 0.1f, 0.9f };
+	textured_vertices[1].texcoord = { 0.9f, 0.9f };
+	textured_vertices[2].texcoord = { 0.9f, 0.1f };
+	textured_vertices[3].texcoord = { 0.1f, 0.1f };
+
+	// Counterclockwise as it's the default opengl front winding direction.
+	const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
+
+	std::vector<ColoredVertex> vertices(4);
+	vertices[0].position = textured_vertices[0].position;
+	vertices[1].position = textured_vertices[1].position;
+	vertices[2].position = textured_vertices[2].position;
+	vertices[3].position = textured_vertices[3].position;
+
+	meshes[geom_index].vertices = vertices;
+	meshes[geom_index].vertex_indices = textured_indices;
+	bindVBOandIBO(GEOMETRY_BUFFER_ID::ENEMY_SMALL, textured_vertices, textured_indices);
+}
+
 void RenderSystem::initializeSpriteGeometryBuffer()
 {
 	int geom_index = (int)GEOMETRY_BUFFER_ID::SPRITE;
@@ -524,6 +552,7 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeExitDoorGeometryBuffer();
 	// function initializeSpriteSheets must be called before this point
 	initializePlayerGeometryBuffer();
+	initializeSmallEnemyGeometryBuffer();
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FIRE_PROJECTILE, SPRITE_SHEET_DATA_ID::FIRE_PROJECTILE);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::WATER_PROJECTILE, SPRITE_SHEET_DATA_ID::WATER_PROJECTILE);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::EARTH_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET);

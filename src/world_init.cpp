@@ -156,7 +156,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	auto entity = Entity();
 
 	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::ENEMY_SMALL);
 	registry.meshPtrs.emplace(entity, &mesh);
 
 	Position& position = registry.positions.emplace(entity);
@@ -193,14 +193,14 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 		break;
 	}
 
-	createShadow(renderer, entity, textureAsset, GEOMETRY_BUFFER_ID::SPRITE);
+	createShadow(renderer, entity, textureAsset, GEOMETRY_BUFFER_ID::ENEMY_SMALL);
 
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
 		{textureAsset,
 		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE });
+		 GEOMETRY_BUFFER_ID::ENEMY_SMALL });
 
 	return entity;
 }
