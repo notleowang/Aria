@@ -145,6 +145,7 @@ private:
 
 	// Helper functions for initializeGlGeometryBuffers()
 	void initializePlayerGeometryBuffer();
+	void initializeSmallEnemyGeometryBuffer();
 	void initializeSpriteGeometryBuffer();
 	void initializeDebugLineGeometryBuffer();
 	void initializeScreenTriangleGeometryBuffer();

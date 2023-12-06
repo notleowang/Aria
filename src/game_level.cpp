@@ -32,6 +32,15 @@ const Enemy& getRandomNormalEnemy() {
 	return normalEnemies[distribution(gen)];
 }
 
+const double getRandomSpeed() {
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	std::uniform_real_distribution<double> distribution(75, 100);
+	std::uniform_int_distribution<int> int_distribution(0, 1);
+
+	return distribution(gen) * (int_distribution(gen) * 2 - 1);
+}
+
 bool GameLevel::init(uint level) {
 	printf("Initializing game for level: %i\n", level);
 	if (level < 0) {
@@ -123,34 +132,75 @@ bool GameLevel::init(uint level) {
 		break;
 	
 	case LEVEL_2: // Same as level 1 but with moving walls
-		this->player_starting_pos = vec2(200, 700);
+		this->player_starting_pos = vec2(100, 3750);
 
 		texts.push_back("Don't get haunted by the ghosts!");
-		text_attrs.push_back({ 0.f,80.f,1.0f,1.0f,1.0f,0.f });
+		text_attrs.push_back({ 0.f,50.f,1.0f,1.0f,1.0f,0.f });
 		
-		obstacles.push_back({ vec2(150, 450), vec2(80,80), vec2(100.f,0.f) });
+		floors.push_back(vec4(1500, 800, 500, 3000));
+		floors.push_back(vec4(0, 500, 2000, 300));
+		floors.push_back(vec4(0, 3575, 2000, 450));
+		
+		// Outer maze walls
+		terrains.push_back(std::make_pair(vec4(0, 475, 2000, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(0, 4000, 2000, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(-25, 475, default_side_width, 350), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(-25, 3475, default_side_width, 550), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(2000, 475, default_side_width, 3550), SIDE_STATIONARY));
 
-		floors.push_back(vec4(25, 25, 1800, 875));
+		// Beginning obstacles
+		obstacles.push_back({ vec2(400, 3650), vec2(80,80), vec2(getRandomSpeed(),getRandomSpeed())});
+		obstacles.push_back({ vec2(600, 3800), vec2(80,80), vec2(getRandomSpeed(),getRandomSpeed())});
+		obstacles.push_back({ vec2(800, 3650), vec2(80,80), vec2(getRandomSpeed(),getRandomSpeed())});
+		obstacles.push_back({ vec2(1000, 3800), vec2(80,80), vec2(getRandomSpeed(),getRandomSpeed())});
 
-		terrains.push_back(std::make_pair(vec4(25, 0, 1800, default_north_height), NORTH_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(25, 875, 1800, default_south_height), SOUTH_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 900), SIDE_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(1825, 0, default_side_width, 900), SIDE_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(350, 400, default_side_width, 475), SIDE_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(750, 0, default_side_width, 475), SIDE_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(1150, 400, default_side_width, 475), SIDE_STATIONARY));
+		// Bottom right L
+		terrains.push_back(std::make_pair(vec4(0, 3475, 1475, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1475, 800, default_side_width, 3100), SIDE_STATIONARY));
 
-		terrains.push_back(std::make_pair(vec4(525, 450, 50, 50), GENERIC_MOVABLE));
-		terrains.push_back(std::make_pair(vec4(775, 450, 50, 50), GENERIC_MOVABLE));
-		terrains.push_back(std::make_pair(vec4(1125, 450, 50, 50), GENERIC_MOVABLE));
+		// Enemies in right hallway
+		enemies.push_back(std::make_pair(vec2(1775, 2100), getRandomNormalEnemy()));
+		enemies.push_back(std::make_pair(vec2(1655, 2600), getRandomNormalEnemy()));
+		enemies.push_back(std::make_pair(vec2(1875, 3000), getRandomNormalEnemy()));
+		enemies.push_back(std::make_pair(vec2(1700, 3600), getRandomNormalEnemy()));
 
+		// North walls in right hallway
+		terrains.push_back(std::make_pair(vec4(1800, 1900, 200, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1500, 1900, 200, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1500, 2200, 400, default_north_height), NORTH_STATIONARY));
+		obstacles.push_back({vec2(1750, 2450), vec2(150, 150), vec2(75.f, 75.f)});
+		terrains.push_back(std::make_pair(vec4(1600, 2700, 400, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1500, 3000, 300, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1600, 3300, 400, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1500, 3600, 200, default_north_height), NORTH_STATIONARY));
 
-		enemies.push_back(std::make_pair(vec2(350, 250), getRandomNormalEnemy()));
-		enemies.push_back(std::make_pair(vec2(700, 800), getRandomNormalEnemy()));
-		enemies.push_back(std::make_pair(vec2(950, 800), getRandomNormalEnemy()));
-		enemies.push_back(std::make_pair(vec2(1100, 250), EARTH_NORMAL)); // last enemy must be earth
+		// Obstacle ghost timing
+		terrains.push_back(std::make_pair(vec4(1675, 1600, default_side_width, 300), SIDE_STATIONARY));
+		obstacles.push_back({vec2(1675, 1565), vec2(70, 70), vec2(150.f, 0.f)});
+		terrains.push_back(std::make_pair(vec4(1800, 1600, default_side_width, 300), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1675, 1320, default_side_width, 200), SIDE_STATIONARY));
+		obstacles.push_back({vec2(1700, 1285), vec2(70, 70), vec2(175.f, 0.f)});
+		terrains.push_back(std::make_pair(vec4(1800, 1320, default_side_width, 200), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1675, 1040, default_side_width, 200), SIDE_STATIONARY));
+		obstacles.push_back({vec2(1725, 1005), vec2(70, 70), vec2(200.f, 0.f)});
+		terrains.push_back(std::make_pair(vec4(1800, 1040, default_side_width, 200), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1675, 860, default_side_width, 100), SIDE_STATIONARY));
+		obstacles.push_back({vec2(1750, 825), vec2(70, 70), vec2(250.f, 0.f)});
+		terrains.push_back(std::make_pair(vec4(1800, 860, default_side_width, 100), SIDE_STATIONARY));
 
-		this->exit_door_pos = vec2(1450, 780);
+		// Health packs!
+		health_packs_pos.push_back(vec2(1750, 2450));
+		health_packs_pos.push_back(vec2(1750, 2900));
+
+		// Top inner wall
+		terrains.push_back(std::make_pair(vec4(0, 800, 1475, default_south_height), SOUTH_STATIONARY));
+		
+		// Enemies top left corner
+		enemies.push_back(std::make_pair(vec2(1300, 650), getRandomNormalEnemy()));
+		enemies.push_back(std::make_pair(vec2(700, 650), getRandomNormalEnemy()));
+		enemies.push_back(std::make_pair(vec2(350, 650), getRandomNormalEnemy()));
+
+		this->exit_door_pos = vec2(50, 675);
 		break;
 
 	case EARTH_BOSS:
@@ -185,9 +235,9 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(750, 0, default_side_width, 475), SIDE_STATIONARY));
 		terrains.push_back(std::make_pair(vec4(1150, 400, default_side_width, 475), SIDE_STATIONARY));
 
-		terrains.push_back(std::make_pair(vec4(525, 450, 50, 50), GENERIC_MOVABLE));
-		terrains.push_back(std::make_pair(vec4(775, 450, 50, 50), GENERIC_MOVABLE));
-		terrains.push_back(std::make_pair(vec4(1125, 450, 50, 50), GENERIC_MOVABLE));
+		terrains.push_back(std::make_pair(vec4(525, 450, 50, 50), GENERIC_MOVABLE_SLOW));
+		terrains.push_back(std::make_pair(vec4(775, 450, 50, 50), GENERIC_MOVABLE_SLOW));
+		terrains.push_back(std::make_pair(vec4(1125, 450, 50, 50), GENERIC_MOVABLE_SLOW));
 
 		enemies.push_back(std::make_pair(vec2(350, 250), getRandomNormalEnemy()));
 		enemies.push_back(std::make_pair(vec2(700, 800), getRandomNormalEnemy()));
@@ -231,9 +281,9 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(1700, 700, 1600, 400), GENERIC_STATIONARY));
 		terrains.push_back(std::make_pair(vec4(2200, 1400, 1800, 100), NORTH_STATIONARY));
 
-		terrains.push_back(std::make_pair(vec4(3800, 700, 75, 75), GENERIC_MOVABLE));
-		terrains.push_back(std::make_pair(vec4(3600, 800, 75, 75), GENERIC_MOVABLE));
-		terrains.push_back(std::make_pair(vec4(3400, 900, 75, 75), GENERIC_MOVABLE));
+		terrains.push_back(std::make_pair(vec4(3800, 700, 75, 75), GENERIC_MOVABLE_SLOW));
+		terrains.push_back(std::make_pair(vec4(3600, 800, 75, 75), GENERIC_MOVABLE_SLOW));
+		terrains.push_back(std::make_pair(vec4(3400, 900, 75, 75), GENERIC_MOVABLE_SLOW));
 
 		// Area 1
 		enemies.push_back(std::make_pair(vec2(1200, 700), getRandomNormalEnemy()));

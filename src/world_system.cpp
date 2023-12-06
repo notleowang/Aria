@@ -325,6 +325,7 @@ void WorldSystem::restart_game() {
 			vec2(terrain_pos[0], terrain_pos[1]), 
 			vec2(terrain_pos[2], terrain_pos[3]), 
 			terrain_attr.direction,
+			terrain_attr.speed,
 			terrain_attr.moveable);
 	}
 
@@ -531,6 +532,31 @@ void WorldSystem::handle_collisions() {
 				registry.velocities.get(player).velocity = { 0.f, 0.f };
 				Mix_PlayChannel(-1, aria_death_sound, 0);
 			}
+		}
+
+		// Checking obstacle - obstacle collisions
+		if (registry.obstacles.has(entity) && registry.obstacles.has(entity_other)) {
+			Position& pos_1 = registry.positions.get(entity);
+			Position& pos_2 = registry.positions.get(entity_other);
+			Velocity& vel_1 = registry.velocities.get(entity);
+			Velocity& vel_2 = registry.velocities.get(entity_other);
+
+			vec2 delt_v = vel_2.velocity - vel_1.velocity;
+			vec2 delt_p = pos_2.position - pos_1.position;
+
+			if (dot(delt_v, delt_p) <= 0) {
+				vec2 pi = pos_1.position;
+				vec2 pj = pos_2.position;
+				vec2 vi = vel_1.velocity;
+				vec2 vj = vel_2.velocity;
+				vec2 new_vi = vi - dot(vi - vj, pi - pj) / dot(pi - pj, pi - pj) * (pi - pj);
+				vec2 new_vj = vj - dot(vj - vi, pj - pi) / dot(pj - pi, pj - pi) * (pj - pi);
+
+				vel_1.velocity.x = new_vi.x;
+				vel_1.velocity.y = new_vi.y;
+				vel_2.velocity.x = new_vj.x;
+				vel_2.velocity.y = new_vj.y;
+			};
 		}
 
 		// Checking Player - Terrain Collisions

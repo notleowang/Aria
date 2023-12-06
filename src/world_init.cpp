@@ -85,7 +85,7 @@ Entity createFloor(RenderSystem* renderer, vec2 pos, vec2 size)
 	return entity;
 }
 
-Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, DIRECTION dir, bool moveable)
+Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, DIRECTION dir, float speed, bool moveable)
 {
 	auto entity = Entity();
 
@@ -106,7 +106,7 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, DIRECTION dir,
 	if (moveable) {
 		terrain.moveable = true;
 		Velocity& velocity = registry.velocities.emplace(entity);
-		velocity.velocity = { 200.f, 0.f };
+		velocity.velocity = { speed , 0.f };
 	}
 
 	TEXTURE_ASSET_ID tex = 
@@ -157,14 +157,9 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	// TODO: change enemy implementation to include different enemy types
 	auto entity = Entity();
 
-	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(entity, &mesh);
-
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 
-	position.scale = vec2({ 100, 100 });
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity.x = 50;
@@ -176,33 +171,49 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	enemy = enemyAttributes;
 	
 	TEXTURE_ASSET_ID textureAsset;
+	GEOMETRY_BUFFER_ID geomBuffer;
+	float x_scale = 80.f;
+	float y_scale = 80.f;
 	switch (enemy.type) {
 	case ElementType::WATER:
 		textureAsset = TEXTURE_ASSET_ID::WATER_ENEMY;
+		geomBuffer = GEOMETRY_BUFFER_ID::SMALL_WATER_ENEMY;
 		break;
 	case ElementType::FIRE:
 		textureAsset = TEXTURE_ASSET_ID::FIRE_ENEMY;
+		geomBuffer = GEOMETRY_BUFFER_ID::SMALL_FIRE_ENEMY;
 		break;
 	case ElementType::EARTH:
+		y_scale = 70.f;
 		textureAsset = TEXTURE_ASSET_ID::EARTH_ENEMY;
+		geomBuffer = GEOMETRY_BUFFER_ID::SMALL_EARTH_ENEMY;
 		break;
 	case ElementType::LIGHTNING:
+		y_scale = 70.f;
 		textureAsset = TEXTURE_ASSET_ID::LIGHTNING_ENEMY;
+		geomBuffer = GEOMETRY_BUFFER_ID::SMALL_LIGHTNING_ENEMY;
 		break;
 	default:
 		//Should never reach here
 		textureAsset = TEXTURE_ASSET_ID::FIRE_ENEMY;
+		geomBuffer = GEOMETRY_BUFFER_ID::SMALL_FIRE_ENEMY;
 		break;
 	}
 
-	createShadow(renderer, entity, textureAsset, GEOMETRY_BUFFER_ID::SPRITE);
+	position.scale = vec2({ x_scale, y_scale});
+
+	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
+	Mesh& mesh = renderer->getMesh(geomBuffer);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	createShadow(renderer, entity, textureAsset, geomBuffer);
 
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
 		{textureAsset,
 		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE });
+		 geomBuffer });
 
 	return entity;
 }
