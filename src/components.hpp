@@ -240,6 +240,12 @@ struct WinTimer
 	bool changedLevel = false;
 };
 
+struct WeaknessTimer
+{
+	float timer_ms = 3000.f;
+	ElementType weakTo = ElementType::FIRE;
+};
+
 // Single Vertex Buffer element for non-textured meshes (coloured.vs.glsl & salmon.vs.glsl)
 struct ColoredVertex
 {
