@@ -302,7 +302,7 @@ Entity createHealthBar(RenderSystem* renderer, Entity& resource_entity, Entity& 
 	else if (registry.bosses.has(resource_entity)) {
 		width = BOSS_BAR_WIDTH;
 		height = BOSS_BAR_HEIGHT;
-		scale_factor = 4.f;
+		scale_factor = 3.5f;
 		texture_asset = TEXTURE_ASSET_ID::BOSS_HEALTH_BAR;
 	}
 	else {

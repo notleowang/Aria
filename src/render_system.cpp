@@ -447,15 +447,18 @@ void RenderSystem::draw()
 		// albeit iterating through all Sprites in sequence. A good point to optimize
 		drawTexturedMesh(entity, camera.projectionMat);
 	}
-
+	
 	// Truely render to the screen
 	drawToScreen();
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// We do this after post processing the lighting effect
 	for (Entity entity : registry.healthBars.entities) {
 		drawTexturedMesh(entity, camera.projectionMat);
 	}
-	
+
 	for (Entity entity : registry.manaBars.entities) {
 		drawTexturedMesh(entity, camera.projectionMat);
 	}
