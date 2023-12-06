@@ -448,9 +448,6 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (timer_x_pos >= 545 && registry.winTimers.size()==0) {
 			win_level();
 		}
-	
-
-
 	}
 
 
@@ -532,6 +529,10 @@ void WorldSystem::restart_game() {
 	else if (curr_level == CUTSCENE_5) {
 		Mix_FadeInMusic(cutscene_background, 0, 500);
 		Mix_PlayChannel(-1, cutscene5_voiceline, 0);
+	}
+	else if (curr_level == CUTSCENE_6) {
+		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_PlayChannel(-1, cutscene4_voiceline, 0);
 	}
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
@@ -625,6 +626,17 @@ void WorldSystem::restart_game() {
 		
 		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
 	}
+	else if (this->curr_level.getCurrLevel() == CUTSCENE_6) {
+		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
+		Animation& player_animation = registry.animations.get(player);
+		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
+		createExitDoor(renderer, this->curr_level.getExitDoorPos());
+	}
+	else if (this->curr_level.getCurrLevel() == THE_END) {
+		Animation& player_animation = registry.animations.get(player);
+		player_animation.setState(player_animation.sprite_sheet_ptr->getPlayerStateFromDirection(DIRECTION::S));
+		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
+	}
 
 	for (uint i = 0; i < lost_soul_attrs.size(); i++) {
 		vec2 pos = lost_soul_attrs[i].first;
@@ -703,7 +715,7 @@ void WorldSystem::win_level() {
 
 void WorldSystem::new_game() {
 	if (player != NULL) registry.remove_all_components_of(player);
-	curr_level.init(CUTSCENE_5);
+	curr_level.init(CUTSCENE_1);
 	restart_game();
 }
 
@@ -1060,7 +1072,7 @@ void WorldSystem::handle_collisions() {
 		if (registry.players.has(entity) && registry.exitDoors.has(entity_other)) {
 			if (curr_level.getIsCutscene()) {
 				Mix_FadeInMusic(background_music, -1, 1500);
-				registry.velocities.get(registry.lostSouls.entities[0]).velocity = vec2(0, 0);
+				if (registry.lostSouls.size() > 0) registry.velocities.get(registry.lostSouls.entities[0]).velocity = vec2(0, 0);
 			}
 			win_level();
 		}

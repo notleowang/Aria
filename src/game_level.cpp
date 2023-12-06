@@ -511,6 +511,29 @@ bool GameLevel::init(uint level) {
 		bosses.push_back(std::make_pair(vec2(1400, 700), FINAL_BOSS_ATTRS));
 		break;
 
+	case CUTSCENE_6:
+		this->is_cutscene = true;
+		floors.push_back(vec4(25, 25, 2500, 400));
+
+		this->player_starting_pos = vec2(50, 300);
+		this->exit_door_pos = vec2(2300, 200);
+		this->cutscene_player_velocity = { 300.f,0.f };
+		this->life_orb_piece = 0; // full piece
+
+		terrains.push_back(std::make_pair(vec4(25, 0, 2500, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 400, 2500, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 425), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(2525, 0, default_side_width, 425), SIDE_STATIONARY));
+		break;
+
+	case THE_END:
+		this->is_cutscene = true;
+		this->player_starting_pos = vec2(600, 400);
+		texts.push_back("THE END");
+		text_attrs.push_back({ 500.f,307.f,1.0f,1.0f,1.0f,0.f });
+
+
+		break;
 	case POWER_UP:
 		floors.push_back(vec4(25, 30, 1300, 650));
 		

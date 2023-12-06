@@ -33,7 +33,9 @@ enum Level {
 	WATER_BOSS = LEVEL_4 + 1,
 	CUTSCENE_5 = WATER_BOSS + 1,
 	FINAL_BOSS = CUTSCENE_5 + 1,
-	POWER_UP = FINAL_BOSS + 1,
+	CUTSCENE_6 = FINAL_BOSS+1,
+	THE_END = CUTSCENE_6 + 1,
+	POWER_UP = THE_END +1,
 };
 
 //Enemy types to re-use later
