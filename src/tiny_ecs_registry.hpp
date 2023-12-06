@@ -52,7 +52,6 @@ public:
 	ECSRegistry()
 	{
 		registry_list.push_back(&deathTimers);
-		registry_list.push_back(&winTimers);
 		registry_list.push_back(&weaknessTimers);
 		registry_list.push_back(&projectiles);
 		registry_list.push_back(&texts);
