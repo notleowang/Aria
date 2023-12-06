@@ -563,28 +563,57 @@ void WorldSystem::restart_game() {
 	registry.list_all_components();
 }
 
+// These collision checks check if previously they weren't overlapping from a certain direction
+// then they started to overlap after having stepped from the physics system
 bool collidedLeft(Position& pos_i, Position& pos_j) 
 {
-	return (((pos_i.prev_position.x + abs(pos_i.scale.x / 2)) <= (pos_j.position.x - abs(pos_j.scale.x / 2))) &&
+	return (((pos_i.prev_position.x + abs(pos_i.scale.x / 2)) <= (pos_j.prev_position.x - abs(pos_j.scale.x / 2))) &&
 		((pos_i.position.x + abs(pos_i.scale.x / 2)) >= (pos_j.position.x - abs(pos_j.scale.x/2))));
 }
 
 bool collidedRight(Position& pos_i, Position& pos_j) 
 {
-	return (((pos_i.prev_position.x - abs(pos_i.scale.x / 2)) >= (pos_j.position.x + abs(pos_j.scale.x / 2))) &&
+	return (((pos_i.prev_position.x - abs(pos_i.scale.x / 2)) >= (pos_j.prev_position.x + abs(pos_j.scale.x / 2))) &&
 		((pos_i.position.x - abs(pos_i.scale.x / 2)) <= (pos_j.position.x + abs(pos_j.scale.x/2))));
 }
 
 bool collidedTop(Position& pos_i, Position& pos_j) 
 {
-	return (((pos_i.prev_position.y + abs(pos_i.scale.y / 2)) <= (pos_j.position.y - abs(pos_j.scale.y / 2))) &&
+	return (((pos_i.prev_position.y + abs(pos_i.scale.y / 2)) <= (pos_j.prev_position.y - abs(pos_j.scale.y / 2))) &&
 		((pos_i.position.y + abs(pos_i.scale.y / 2)) >= (pos_j.position.y - abs(pos_j.scale.y/2))));
 }
 
 bool collidedBottom(Position& pos_i, Position& pos_j) 
 {
-	return (((pos_i.prev_position.y - abs(pos_i.scale.y / 2)) >= (pos_j.position.y + abs(pos_j.scale.y / 2))) &&
-		((pos_i.position.y - abs(pos_i.scale.x / 2)) <= (pos_j.position.x + abs(pos_j.scale.x/2))));
+	return (((pos_i.prev_position.y - abs(pos_i.scale.y / 2)) >= (pos_j.prev_position.y + abs(pos_j.scale.y / 2))) &&
+		((pos_i.position.y - abs(pos_i.scale.y / 2)) <= (pos_j.position.y + abs(pos_j.scale.y/2))));
+}
+
+// This function moves entity related to pos_i 'displacement' units away from entity related to pos_j
+bool collision_displace(Position& pos_i, Position& pos_j) {
+	bool resolved = false;
+	if (collidedLeft(pos_i, pos_j)) {
+		float penetration = (pos_j.position.x - abs(pos_j.scale.x / 2)) - (pos_i.position.x + abs(pos_i.scale.x / 2));
+		pos_i.position.x += penetration;
+		resolved = true;
+	}
+	if (collidedRight(pos_i, pos_j)) {
+		float penetration = (pos_j.position.x + abs(pos_j.scale.x / 2)) - (pos_i.position.x - abs(pos_i.scale.x / 2));
+		pos_i.position.x += penetration;
+		resolved = true;
+	}
+	if (collidedTop(pos_i, pos_j)) {
+		float penetration = (pos_j.position.y - abs(pos_j.scale.y / 2)) - (pos_i.position.y + abs(pos_i.scale.y / 2));
+		pos_i.position.y += penetration;
+		resolved = true;
+	}
+	if (collidedBottom(pos_i, pos_j)) {
+		float penetration = (pos_j.position.y + abs(pos_j.scale.y / 2)) - (pos_i.position.y - abs(pos_i.scale.y / 2));
+		pos_i.position.y += penetration;
+		resolved = true;
+	}
+
+	return resolved;
 }
 
 void WorldSystem::win_level() {
@@ -705,24 +734,10 @@ void WorldSystem::handle_collisions() {
 
 		// Checking Player - Terrain Collisions
 		if (registry.players.has(entity) && registry.terrain.has(entity_other)) {
-			
-			////TODO: do something special when collision with moving wall?
-			//if (registry.terrain.get(entity_other).moveable) {
-			//}
-
 			Position& player_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
-			bool resolved = false;
 
-			if (collidedLeft(player_position, terrain_position) || collidedRight(player_position, terrain_position)) {
-				player_position.position.x = player_position.prev_position.x;
-				resolved = true;
-
-			}
-			if (collidedTop(player_position, terrain_position) || collidedBottom(player_position, terrain_position)) {
-				player_position.position.y = player_position.prev_position.y;
-				resolved = true;
-			}
+			bool resolved = collision_displace(player_position, terrain_position);
 			if (!resolved) {
 				player_position.position += collisionsRegistry.components[i].displacement;
 			}
@@ -733,25 +748,8 @@ void WorldSystem::handle_collisions() {
 		if (registry.enemies.has(entity) && registry.terrain.has(entity_other)) {
 			Position& enemy_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
-			Velocity& enemy_velocity = registry.velocities.get(entity);
-      
-			// TODO: make sure enemy has all this stuff and this wont be awful
-			// TODO: REFACTOR
-			Resources& resources = registry.resources.get(entity);
-			HealthBar& health_bar = registry.healthBars.get(resources.healthBar);
-			Position& health_bar_position = registry.positions.get(resources.healthBar);
-			bool resolved = false;
 
-			if (collidedLeft(enemy_position, terrain_position) || collidedRight(enemy_position, terrain_position)) {
-				enemy_position.position.x = enemy_position.prev_position.x;
-				enemy_velocity.velocity.x *= -1;
-				resolved = true;
-			}
-			if (collidedTop(enemy_position, terrain_position) || collidedBottom(enemy_position, terrain_position)) {
-				enemy_position.position.y = enemy_position.prev_position.y;
-				enemy_velocity.velocity.y *= -1;
-				resolved = true;
-			}
+			bool resolved = collision_displace(enemy_position, terrain_position);
 			if (!resolved) {
 				enemy_position.position += collisionsRegistry.components[i].displacement;
 			}
@@ -778,11 +776,9 @@ void WorldSystem::handle_collisions() {
 				Position& terrain_2_position = registry.positions.get(entity_other);
 
 				if (collidedLeft(terrain_1_position, terrain_2_position) || collidedRight(terrain_1_position, terrain_2_position)) {
-					//terrain_1_position.position.x = terrain_1_position.prev_position.x; <- might help
 					terrain_1_velocity.velocity[0] = -terrain_1_velocity.velocity[0]; // switch x direction
 				}
 				if (collidedTop(terrain_1_position, terrain_2_position) || collidedBottom(terrain_1_position, terrain_2_position)) {
-					//terrain_1_position.position.y = terrain_1_position.prev_position.y; <- might help
 					terrain_1_velocity.velocity[1] = -terrain_1_velocity.velocity[1]; // switch y direction
 				}
 			}

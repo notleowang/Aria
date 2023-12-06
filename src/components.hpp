@@ -45,7 +45,9 @@ struct LifeOrb {
 
 // Boss
 struct Boss {
-
+	int phase = 0;
+	int subphase = 0;
+	float phaseTimer = 250.f;
 };
 
 // Obstacles

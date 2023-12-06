@@ -67,7 +67,7 @@ bool GameLevel::init(uint level) {
 		floors.push_back(vec4(25, 30, 1300, 650));
 
 		this->player_starting_pos = vec2(200, 200);
-		this->exit_door_pos = vec2(1225, 575);
+		this->exit_door_pos = vec2(1225, 580);
 
 		health_packs_pos.push_back(vec2(400, 300));
 		health_packs_pos.push_back(vec2(600, 400));
@@ -252,7 +252,7 @@ bool GameLevel::init(uint level) {
 		enemies.push_back(std::make_pair(vec2(950, 800), getRandomNormalEnemy()));
 		enemies.push_back(std::make_pair(vec2(1100, 250), EARTH_NORMAL)); // last enemy must be earth
 
-		this->exit_door_pos = vec2(1450, 775);
+		this->exit_door_pos = vec2(1450, 780);
 		break;
 
 	case EARTH_BOSS:
@@ -317,7 +317,7 @@ bool GameLevel::init(uint level) {
 		enemies.push_back(std::make_pair(vec2(1100, 250), LIGHTNING_NORMAL)); // last enemy must be lightning
 
 
-		this->exit_door_pos = vec2(1450, 775);
+		this->exit_door_pos = vec2(1450, 780);
 		break;
 
 	case LIGHTNING_BOSS:
@@ -355,7 +355,7 @@ bool GameLevel::init(uint level) {
 
 	case LEVEL_4:
 		this->player_starting_pos = vec2(200, 200);
-		this->exit_door_pos = vec2(3900, 1875);
+		this->exit_door_pos = vec2(3900, 1880);
 
 		floors.push_back(vec4(0, 0, 4000, 2000));
 
@@ -450,7 +450,7 @@ bool GameLevel::init(uint level) {
 		floors.push_back(vec4(25, 30, 1300, 650));
 		
 		this->player_starting_pos = vec2(500, 500);
-		this->exit_door_pos = vec2(1200, 575);
+		this->exit_door_pos = vec2(1228, 580);
 
 		texts.push_back("Shoot the mystery boxes to power up!");
 		text_attrs.push_back({ 0.f,150.f,1.0f,1.0f,1.0f,0.f });
