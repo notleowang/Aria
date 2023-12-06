@@ -47,11 +47,12 @@ const Enemy LIGHTNING_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::LIGH
 const Enemy COMBO_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::COMBO, false };
 
 // Terrain types
-const Terrain NORTH_STATIONARY = {DIRECTION::N, false};
-const Terrain SIDE_STATIONARY = {DIRECTION::E, false};
-const Terrain SOUTH_STATIONARY = {DIRECTION::S, false};
-const Terrain GENERIC_STATIONARY = {DIRECTION::W, false};
-const Terrain GENERIC_MOVABLE = {DIRECTION::W, true};
+const Terrain NORTH_STATIONARY = {DIRECTION::N, 0.f, false};
+const Terrain SIDE_STATIONARY = {DIRECTION::E, 0.f, false};
+const Terrain SOUTH_STATIONARY = {DIRECTION::S, 0.f, false};
+const Terrain GENERIC_STATIONARY = {DIRECTION::W, 0.f, false};
+const Terrain GENERIC_MOVABLE_SLOW = {DIRECTION::W, 150.f, true};
+const Terrain GENERIC_MOVABLE_FAST = {DIRECTION::W, 200.f, true};
 
 class GameLevel
 {
