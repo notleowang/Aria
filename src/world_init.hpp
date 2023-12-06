@@ -5,18 +5,18 @@
 #include "render_system.hpp"
 using namespace std;
 
-const float SCALE_FACTOR = 2.f;
-const float PLAYER_HEALTH_BAR_Y_OFFSET = -370.f;
-const float PLAYER_MANA_BAR_Y_OFFSET = -350.f;
-const float PLAYER_BAR_X_OFFSET = -500.f;
+const float PLAYER_HEALTH_BAR_Y_OFFSET = -375.f;
+const float PLAYER_MANA_BAR_Y_OFFSET = -338.f;
+const float PLAYER_BAR_X_OFFSET = -480.f;
 const float ENEMY_HEALTH_BAR_Y_OFFSET = -50.f;
 const float BOSS_HEALTH_BAR_Y_OFFSET = -110.f;
 const float PROJECTILE_SELECT_DISPLAY_Y_OFFSET = 274.f;
 const float PROJECTILE_SELECT_DISPLAY_X_OFFSET = 565.f;
 
-const float RESOURCE_BAR_SHORT_WIDTH = 41.f;
-const float RESOURCE_BAR_SHORT_HEIGHT = 9.f;
-const float RESOURCE_BAR_ICON_WIDTH = 7.f;
+const float PLAYER_BAR_WIDTH = 75.f;
+const float PLAYER_BAR_HEIGHT = 11.f;
+const float ENEMY_BAR_WIDTH = 41.f;
+const float ENEMY_BAR_HEIGHT = 9.f;
 
 // the player
 Entity createAria(RenderSystem* renderer, vec2 pos);

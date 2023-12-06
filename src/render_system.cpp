@@ -74,7 +74,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 			float fraction = 0.0;
 			float logoRatio = 0.0;
 			float barRatio = 1.0;
-			if (render_request.used_texture == TEXTURE_ASSET_ID::HEALTH_BAR) {
+			if (render_request.used_texture == TEXTURE_ASSET_ID::PLAYER_HEALTH_BAR || render_request.used_texture == TEXTURE_ASSET_ID::ENEMY_HEALTH_BAR) {
 				assert(registry.healthBars.has(entity));
 				Follower& follower = registry.followers.get(entity);
 				assert(registry.resources.has(follower.owner));
@@ -83,7 +83,7 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 				logoRatio = resources.logoRatio;
 				barRatio = resources.barRatio;
 			}
-			else if (render_request.used_texture == TEXTURE_ASSET_ID::MANA_BAR) {
+			else if (render_request.used_texture == TEXTURE_ASSET_ID::PLAYER_MANA_BAR || render_request.used_texture == TEXTURE_ASSET_ID::ENEMY_MANA_BAR) {
 				assert(registry.manaBars.has(entity));
 				Follower& follower = registry.followers.get(entity);
 				assert(registry.resources.has(follower.owner));

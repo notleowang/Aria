@@ -286,21 +286,21 @@ Entity createHealthBar(RenderSystem* renderer, Entity& owner_entity, float y_off
 	TEXTURE_ASSET_ID texture_asset;
 
 	if (registry.players.has(owner_entity)) {
-		width = RESOURCE_BAR_SHORT_WIDTH;
-		height = RESOURCE_BAR_SHORT_HEIGHT;
+		width = PLAYER_BAR_WIDTH;
+		height = PLAYER_BAR_HEIGHT;
 		scale_factor = 3.f;
-		texture_asset = TEXTURE_ASSET_ID::HEALTH_BAR;
+		texture_asset = TEXTURE_ASSET_ID::PLAYER_HEALTH_BAR;
 	}
 	else {
-		width = RESOURCE_BAR_SHORT_WIDTH;
-		height = RESOURCE_BAR_SHORT_HEIGHT;
+		width = ENEMY_BAR_WIDTH;
+		height = ENEMY_BAR_HEIGHT;
 		scale_factor = 2.f;
-		texture_asset = TEXTURE_ASSET_ID::HEALTH_BAR;
+		texture_asset = TEXTURE_ASSET_ID::ENEMY_HEALTH_BAR;
 	}
 
 	Resources& resources = registry.resources.get(owner_entity);
-	resources.barRatio = (width - RESOURCE_BAR_ICON_WIDTH) / width;
-	resources.logoRatio = RESOURCE_BAR_ICON_WIDTH / width;
+	resources.barRatio = (width - height) / width;
+	resources.logoRatio = height / width;
 
 	Position& position = registry.positions.emplace(entity);
 	position.scale = vec2(scale_factor * width, scale_factor * height);
@@ -331,21 +331,21 @@ Entity createManaBar(RenderSystem* renderer, Entity& owner_entity, float y_offse
 	TEXTURE_ASSET_ID texture_asset;
 
 	if (registry.players.has(owner_entity)) {
-		width = RESOURCE_BAR_SHORT_WIDTH;
-		height = RESOURCE_BAR_SHORT_HEIGHT;
+		width = PLAYER_BAR_WIDTH;
+		height = PLAYER_BAR_HEIGHT;
 		scale_factor = 3.f;
-		texture_asset = TEXTURE_ASSET_ID::MANA_BAR;
+		texture_asset = TEXTURE_ASSET_ID::PLAYER_MANA_BAR;
 	}
 	else {
-		width = RESOURCE_BAR_SHORT_WIDTH;
-		height = RESOURCE_BAR_SHORT_HEIGHT;
+		width = ENEMY_BAR_WIDTH;
+		height = ENEMY_BAR_HEIGHT;
 		scale_factor = 2.f;
-		texture_asset = TEXTURE_ASSET_ID::MANA_BAR;
+		texture_asset = TEXTURE_ASSET_ID::ENEMY_MANA_BAR;
 	}
 
 	Resources& resources = registry.resources.get(owner_entity);
-	resources.barRatio = (width - RESOURCE_BAR_ICON_WIDTH) / width;
-	resources.logoRatio = RESOURCE_BAR_ICON_WIDTH / width;
+	resources.barRatio = (width - height) / width;
+	resources.logoRatio = height / width;
 
 	Position& position = registry.positions.emplace(entity);
 	position.scale = vec2(scale_factor * width, scale_factor * height);
@@ -428,7 +428,8 @@ Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entit
 	animation.is_animating = false;
 
 	Position& position = registry.positions.emplace(entity);
-	position.scale = vec2(sprite_sheet.frame_width * SCALE_FACTOR, sprite_sheet.frame_height * SCALE_FACTOR);
+	float scale_factor = 2.f;
+	position.scale = vec2(scale_factor * sprite_sheet.frame_width, scale_factor * sprite_sheet.frame_height);
 
 	Follower& follower = registry.followers.emplace(entity);
 	follower.owner = owner_entity;
