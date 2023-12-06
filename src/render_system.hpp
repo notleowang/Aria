@@ -50,7 +50,8 @@ class RenderSystem {
 			textures_path("fire_boss.png") ,
 			textures_path("earth_boss.png"),
 			textures_path("lightning_boss.png"),
-			textures_path("ghost.png"),								// final boss
+			textures_path("FINAL_BOSS_AWAKENED_SPRITESHEET.png"),	// final boss
+			textures_path("final_boss_frame.png"),
 			textures_path("ghost.png"),
 			textures_path("projectile_water_sprite_sheet.png"),
 			textures_path("projectile_fire_sprite_sheet.png"),
@@ -141,6 +142,7 @@ private:
 	void initializePowerUpBlockSpriteSheet();
 	void initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols);
 	void initializePlayerSpriteSheet();
+	void initializeFinalBossSpriteSheet();
 	void initializeProjectileSelectDisplaySpriteSheet();
 
 	// Helper functions for initializeGlGeometryBuffers()
@@ -151,7 +153,7 @@ private:
 	void initializeTerrainGeometryBuffer();
 	void initializeExitDoorGeometryBuffer();
 	void initializeResourceBarGeometryBuffer();
-	void initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID goem_buffer_id, SPRITE_SHEET_DATA_ID ss_id);
+	void initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID geom_buffer_id, SPRITE_SHEET_DATA_ID ss_id);
 
 	// Window handle
 	GLFWwindow* window;

@@ -213,10 +213,6 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 
 	registry.bosses.emplace(entity);
 
-	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(entity, &mesh);
-
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 
@@ -241,37 +237,70 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	enemy = enemyAttributes;
 
 	TEXTURE_ASSET_ID textureAsset;
+	TEXTURE_ASSET_ID shadowTextureAsset;
+	EFFECT_ASSET_ID effectAsset;
+	GEOMETRY_BUFFER_ID geomBuffer;
 	switch (enemy.type) {
 	case ElementType::WATER:
 		textureAsset = TEXTURE_ASSET_ID::WATER_BOSS;
+		shadowTextureAsset = textureAsset;
+		effectAsset = EFFECT_ASSET_ID::TEXTURED;
+		geomBuffer = GEOMETRY_BUFFER_ID::SPRITE;
 		break;
-
 	case ElementType::FIRE:
 		textureAsset = TEXTURE_ASSET_ID::FIRE_BOSS;
+		shadowTextureAsset = textureAsset;
+		effectAsset = EFFECT_ASSET_ID::TEXTURED;
+		geomBuffer = GEOMETRY_BUFFER_ID::SPRITE;
 		break;
 	case ElementType::EARTH:
 		textureAsset = TEXTURE_ASSET_ID::EARTH_BOSS;
+		shadowTextureAsset = textureAsset;
+		effectAsset = EFFECT_ASSET_ID::TEXTURED;
+		geomBuffer = GEOMETRY_BUFFER_ID::SPRITE;
 		break;
 	case ElementType::LIGHTNING:
 		textureAsset = TEXTURE_ASSET_ID::LIGHTNING_BOSS;
+		shadowTextureAsset = textureAsset;
+		effectAsset = EFFECT_ASSET_ID::TEXTURED;
+		geomBuffer = GEOMETRY_BUFFER_ID::SPRITE;
 		break;
 	case ElementType::COMBO:
 		textureAsset = TEXTURE_ASSET_ID::FINAL_BOSS;
+		shadowTextureAsset = TEXTURE_ASSET_ID::FINAL_BOSS_SHADOW;
+		effectAsset = EFFECT_ASSET_ID::ANIMATED;
+		geomBuffer = GEOMETRY_BUFFER_ID::FINAL_BOSS;
 		break;
 	default:
 		// should never reach here
-		textureAsset = TEXTURE_ASSET_ID::FINAL_BOSS;
+		textureAsset = TEXTURE_ASSET_ID::WATER_BOSS;
+		shadowTextureAsset = textureAsset;
+		effectAsset = EFFECT_ASSET_ID::TEXTURED;
+		geomBuffer = GEOMETRY_BUFFER_ID::SPRITE;
 		break;
 	}
 
-	createShadow(renderer, entity, textureAsset, GEOMETRY_BUFFER_ID::SPRITE);
+	Mesh& mesh = renderer->getMesh(geomBuffer);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	if (enemy.type == ElementType::COMBO) {
+		SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::FINAL_BOSS);
+		registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+		Animation& animation = registry.animations.emplace(entity);
+		animation.sprite_sheet_ptr = &sprite_sheet;
+		animation.setState((int)FINAL_BOSS_SPRITE_STATES::WEST);
+		animation.is_animating = false;
+	}
+
+	createShadow(renderer, entity, shadowTextureAsset, GEOMETRY_BUFFER_ID::SPRITE);
 
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
 		{ textureAsset,
-		 EFFECT_ASSET_ID::TEXTURED,
-		 GEOMETRY_BUFFER_ID::SPRITE });
+		 effectAsset,
+		 geomBuffer });
 
 	return entity;
 }

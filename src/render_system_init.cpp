@@ -285,6 +285,27 @@ void RenderSystem::initializePlayerSpriteSheet()
 	sprite_sheets[ss_index].states = states;
 }
 
+void RenderSystem::initializeFinalBossSpriteSheet()
+{
+	int num_rows = 6;
+	int num_cols = 2;
+	int ss_index = (int)SPRITE_SHEET_DATA_ID::FINAL_BOSS;
+
+	std::vector<AnimState> states((int)FINAL_BOSS_SPRITE_STATES::STATE_COUNT);
+	states[(int)FINAL_BOSS_SPRITE_STATES::EAST] = AnimState(0, 1);
+	states[(int)FINAL_BOSS_SPRITE_STATES::WEST] = AnimState(2, 3);
+	states[(int)FINAL_BOSS_SPRITE_STATES::WATER] = AnimState(4, 4);
+	states[(int)FINAL_BOSS_SPRITE_STATES::EARTH] = AnimState(5, 5);
+	states[(int)FINAL_BOSS_SPRITE_STATES::FIRE] = AnimState(6, 6);
+	states[(int)FINAL_BOSS_SPRITE_STATES::LIGHTNING] = AnimState(7, 7);
+
+	sprite_sheets[ss_index].num_rows = num_rows;
+	sprite_sheets[ss_index].num_cols = num_cols;
+	sprite_sheets[ss_index].states = states;
+	sprite_sheets[ss_index].frame_height = 128.f;
+	sprite_sheets[ss_index].frame_width = 128.f;
+}
+
 void RenderSystem::initializeProjectileSelectDisplaySpriteSheet()
 {
 	int num_rows = 1;
@@ -311,6 +332,7 @@ void RenderSystem::initializeSpriteSheets()
 	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET, 1);
 	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET, 1);
 	initializePlayerSpriteSheet();
+	initializeFinalBossSpriteSheet();
 	initializeProjectileSelectDisplaySpriteSheet();
 }
 
@@ -530,6 +552,7 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIGHTNING_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::POWER_UP_BLOCK, SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PROJECTILE_SELECT_DISPLAY, SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FINAL_BOSS, SPRITE_SHEET_DATA_ID::FINAL_BOSS);
 	initializeResourceBarGeometryBuffer();
 }
 
