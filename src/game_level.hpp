@@ -29,6 +29,7 @@ enum Level {
 	WATER_BOSS = LEVEL_4 + 1,
 	FINAL_BOSS = WATER_BOSS + 1,
 	POWER_UP = FINAL_BOSS + 1,
+	LEVEL_LEO = POWER_UP + 1
 };
 
 //Enemy types to re-use later
