@@ -159,7 +159,7 @@ void updateShadows() {
 
 		float dist = abs(distance(owner_pos.position, player_position.position));
 		shadow_pos.scale = owner_pos.scale * (max_dist - dist) / max_dist;
-		shadow_pos.scale.y *= 2;
+		shadow_pos.scale.y *= 1.5;
 
 		shadow_pos.position.x += cos(shadow_pos.angle - M_PI / 2) * (shadow_pos.scale.y / 2);
 		shadow_pos.position.y += owner_pos.scale.y / 2 + shadow_pos.scale.y / 2 * sin(shadow_pos.angle - M_PI/2);
@@ -210,5 +210,6 @@ void PhysicsSystem::step(float elapsed_ms)
 		Position& owner_position = registry.positions.get(follower.owner);
 		position.position = owner_position.position;
 		position.position.y += follower.y_offset;
+		position.position.x += follower.x_offset;
 	}
 }

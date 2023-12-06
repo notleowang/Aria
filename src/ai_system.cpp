@@ -29,7 +29,160 @@ void AISystem::step(float elapsed_ms)
 		bool isSprinting = false;
 		bool isFlanking = false;
 
-		if (enemy.isAggravated) {
+		if (registry.bosses.has(entity_i) && enemy.isAggravated) {
+			Boss& boss = registry.bosses.get(entity_i);
+			if (boss.phaseTimer > 0.f) {
+				boss.phaseTimer -= elapsed_ms;
+			} else {
+				// printf("Resolving phase %d:%d\n", boss.phase, boss.subphase);
+				switch (boss.phase) {
+					case 0:
+						if (boss.subphase == 48) {
+							boss.phase += 1;
+							boss.phaseTimer = 5000.f;
+							boss.subphase = 0;
+						} else {
+							for (int deg = boss.subphase * 2; deg < 360 + boss.subphase * 2; deg += 120) {
+								float rad = deg * 180 / 3.14;
+								vec2 direction = {cosf(rad), sinf(rad)};
+								enemyFireProjectile(entity_i, direction, 0.5f);
+							}
+							boss.subphase += 1;
+							boss.phaseTimer = 50.f;
+						}
+						break;
+					case 1:
+					case 2:
+					case 3:
+					case 4:
+					case 5:
+					case 6:
+					case 7:
+						if (boss.subphase == 10) {
+							boss.phaseTimer = 50.f;
+							if (boss.phase == 7) {
+								boss.phaseTimer = 1500.f;
+							}
+							boss.phase += 1;
+							boss.subphase = 0;
+						} else {
+							vec2 direction = {1.f, 0.f};
+							if (boss.subphase >= 5) {
+								direction = {-1.f, 0.f};
+							}
+							// vec2 position = registry.positions.get(entity_i).position;
+							vec2 adjust = {0, (boss.phase - 4) * 50};
+							vec2 subadjust = {0, ((boss.subphase % 5) + 1) * 75 + 40};
+							enemyFireProjectile(entity_i, direction, 0.5f, thisPos - adjust + subadjust);
+							enemyFireProjectile(entity_i, direction, 0.5f, thisPos - adjust - subadjust);
+							boss.subphase += 1;
+							boss.phaseTimer = 25.f;
+						}
+						break;
+					case 8:
+						if (boss.subphase == 25) {
+							boss.phase += 1;
+							boss.phaseTimer = 1500.f;
+							boss.subphase = 0;
+						} else {
+							registry.resources.get(entity_i).currentHealth += 25;
+							if (registry.resources.get(entity_i).currentHealth > registry.resources.get(entity_i).maxHealth) {
+								registry.resources.get(entity_i).currentHealth = registry.resources.get(entity_i).maxHealth;
+							}
+							boss.subphase += 1;
+							boss.phaseTimer = 50.f;
+						}
+						break;
+					case 9:
+						if (boss.subphase == 4) {
+							boss.phase += 1;
+							boss.phaseTimer = 1000.f;
+							boss.subphase = 0;
+						} else {
+							for (int deg = 0; deg < 360; deg += 10) {
+								float rad = deg * 180 / 3.14;
+								vec2 direction = {cosf(rad), sinf(rad)};
+								if (boss.subphase == 0) {
+									direction *= 200;
+								} else {
+									direction *= 150 * (boss.subphase + 1);
+								}
+								enemyFireProjectile(entity_i, - direction, 0.0f, playerPos + direction);
+							}
+							boss.subphase += 1;
+							boss.phaseTimer = 100.f;
+						}
+						break;
+					case 10:
+					case 11:
+					case 12:
+					case 13:
+					case 14:
+						for (uint i = 0; i < registry.projectiles.size(); i++) {
+							Entity thisProj = registry.projectiles.entities[i];
+							if (!registry.projectiles.get(thisProj).hostile) continue;
+							Velocity& thisProjVel = registry.velocities.get(thisProj);
+							switch (boss.phase) {
+								case 10:
+									// make sure the circle does not lead back into the boss
+									thisProjVel.velocity = normalize(playerPos - thisPos);
+									thisProjVel.velocity *= 200;
+									break;
+								case 11:
+									thisProjVel.velocity = {-150, 0};
+									break;
+								case 12:
+									thisProjVel.velocity = {0, 150};
+									break;
+								case 13:
+									thisProjVel.velocity = {150, 0};
+									break;
+								case 14:
+									thisProjVel.velocity = {0, -150};
+									break;
+							}
+						}
+						boss.phaseTimer = 750.f;
+						if (boss.phase == 10) {
+							boss.phaseTimer = 1000.f;
+						}
+						boss.phase += 1;
+						boss.subphase = 0;
+						break;
+					case 15:
+					case 16:
+						for (uint i = 0; i < registry.projectiles.size(); i++) {
+							Entity thisProj = registry.projectiles.entities[i];
+							if (!registry.projectiles.get(thisProj).hostile) continue;
+							Velocity& thisProjVel = registry.velocities.get(thisProj);
+							Position& thisProjPos = registry.positions.get(thisProj);
+							thisProjVel.velocity = normalize(thisProjPos.position - playerPos);
+							thisProjVel.velocity *= 100;
+							if (boss.phase == 15) {
+								thisProjVel.velocity *= -0.75;
+							}
+						}
+						boss.phase += 1;
+						boss.phaseTimer = 1000.f;
+						boss.subphase = 0;
+						break;
+					case 17:
+						while (0 != registry.projectiles.size()) {
+							registry.remove_all_components_of_no_collision(registry.projectiles.entities[0]);
+						}
+						boss.phase += 1;
+						boss.phaseTimer = 1500.f;
+						boss.subphase = 0;
+						break;
+					default:
+						boss.phaseTimer = 2500.f;
+						boss.phase = 0; // reset to first phase
+						break;
+				}
+			}
+		}
+
+		if (!registry.bosses.has(entity_i)) { // bosses never dodge
 			for (uint i = 0; i < registry.projectiles.size(); i++) {
 				Entity entity_p = registry.projectiles.entities[i];
 				Projectile& projectile = registry.projectiles.get(entity_p);
@@ -73,7 +226,6 @@ void AISystem::step(float elapsed_ms)
 				vec2 direction = registry.positions.get(entity_j).position - thisPos;
 				direction /= length(direction);
 				if (enemy.mana >= 0.75f) {
-					// printf("Attempting to heal injured ally!\n");
 					enemyFireProjectile(entity_i, direction);
 					enemy.mana -= 0.75f;
 				}
@@ -90,7 +242,8 @@ void AISystem::step(float elapsed_ms)
 			}
 		}
 
-		if (!isDodging && !isFlanking) {
+		if (!isDodging && !isFlanking && !registry.bosses.has(entity_i)) {
+			// bosses never give chase
 			if (dist <= 350 && dist > 15 && enemy.isAggravated) {
 				if (canSprint) {
 					isSprinting = true;
@@ -123,7 +276,11 @@ void AISystem::step(float elapsed_ms)
 			enemy.stamina += elapsed_ms / 1000;
 		}
 
-
+		if (registry.bosses.has(entity_i)) {
+			// idk why bosses still move but set their velo to 0 here
+			registry.velocities.get(entity_i).velocity.x = 0;
+			registry.velocities.get(entity_i).velocity.y = 0;
+		}
 
 		// Decision tree:
 		// Is there a player-made projectile within 50 pixels?
@@ -140,24 +297,34 @@ void AISystem::step(float elapsed_ms)
 		//           Yes -> Flip direction
 		//           No -> Continue moving
 	}
-	(void)elapsed_ms; // placeholder to silence unused warning until implemented
 }
 
-bool AISystem::enemyFireProjectile(Entity& enemy, vec2 direction) {
 
-	vec2 enemyPos = registry.positions.get(enemy).position;
+
+
+bool AISystem::enemyFireProjectile(Entity& enemy, vec2 direction, float speedMultiplier, vec2 position) {
+
+	// vec2 enemyPos = registry.positions.get(enemy).position;
 	vec2 vel;
-	vel.x = direction.x * ENEMY_PROJECTILE_SPEED;
-	vel.y = direction.y * ENEMY_PROJECTILE_SPEED;
+	vel.x = direction.x * ENEMY_PROJECTILE_SPEED * speedMultiplier;
+	vel.y = direction.y * ENEMY_PROJECTILE_SPEED * speedMultiplier;
 
 	// Get current player projectile type
 	ElementType elementType = registry.enemies.get(enemy).type;
 	if (elementType == ElementType::COMBO) elementType = getRandomElementType();
 
-	createProjectile(renderer, enemyPos, vel, elementType, true, enemy);
+	createProjectile(renderer, position, vel, elementType, true, enemy);
 	//															 ^^^^^ doesnt matter as ignored by the hostile = true
 	// Mix_PlayChannel(-1, projectile_sound, 0);
 	return true;
+}
+
+bool AISystem::enemyFireProjectile(Entity& enemy, vec2 direction, float speedMultiplier) {
+	return enemyFireProjectile(enemy, direction, speedMultiplier, registry.positions.get(enemy).position);
+}
+
+bool AISystem::enemyFireProjectile(Entity& enemy, vec2 direction) {
+	return enemyFireProjectile(enemy, direction, 1.f);
 }
 
 void AISystem::init(RenderSystem* renderer_arg) {

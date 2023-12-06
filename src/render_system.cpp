@@ -71,22 +71,32 @@ void RenderSystem::drawTexturedMesh(Entity entity,
 		gl_has_errors();
 
 		if (render_request.used_effect == EFFECT_ASSET_ID::RESOURCE_BAR) {
-			float filled = 0.0;
-			if (render_request.used_texture == TEXTURE_ASSET_ID::HEALTH_BAR) {
+			float fraction = 0.0;
+			float logoRatio = 0.0;
+			float barRatio = 1.0;
+			if (render_request.used_texture == TEXTURE_ASSET_ID::PLAYER_HEALTH_BAR || 
+				render_request.used_texture == TEXTURE_ASSET_ID::ENEMY_HEALTH_BAR || 
+				render_request.used_texture == TEXTURE_ASSET_ID::BOSS_HEALTH_BAR) {
 				assert(registry.healthBars.has(entity));
-				Follower& follower = registry.followers.get(entity);
-				assert(registry.resources.has(follower.owner));
-				Resources& resources = registry.resources.get(follower.owner);
-				filled = resources.currentHealth / resources.maxHealth;
+				HealthBar& healthBar = registry.healthBars.get(entity);
+				assert(registry.resources.has(healthBar.owner));
+				Resources& resources = registry.resources.get(healthBar.owner);
+				fraction = resources.currentHealth / resources.maxHealth;
+				logoRatio = resources.logoRatio;
+				barRatio = resources.barRatio;
 			}
-			else if (render_request.used_texture == TEXTURE_ASSET_ID::MANA_BAR) {
+			else if (render_request.used_texture == TEXTURE_ASSET_ID::PLAYER_MANA_BAR || render_request.used_texture == TEXTURE_ASSET_ID::ENEMY_MANA_BAR) {
 				assert(registry.manaBars.has(entity));
-				Follower& follower = registry.followers.get(entity);
-				assert(registry.resources.has(follower.owner));
-				Resources& resources = registry.resources.get(follower.owner);
-				filled = resources.currentMana / resources.maxMana;
+				ManaBar& manaBar = registry.manaBars.get(entity);
+				assert(registry.resources.has(manaBar.owner));
+				Resources& resources = registry.resources.get(manaBar.owner);
+				fraction = resources.currentMana / resources.maxMana;
+				logoRatio = resources.logoRatio;
+				barRatio = resources.barRatio;
 			}
-			glUniform1f(glGetUniformLocation(program, "filled"), filled);
+			glUniform1f(glGetUniformLocation(program, "fraction"), fraction);
+			glUniform1f(glGetUniformLocation(program, "logoRatio"), logoRatio);
+			glUniform1f(glGetUniformLocation(program, "barRatio"), barRatio);
 			gl_has_errors();
 		}
 		else if (render_request.used_effect == EFFECT_ASSET_ID::ANIMATED) {
@@ -437,19 +447,22 @@ void RenderSystem::draw()
 		// albeit iterating through all Sprites in sequence. A good point to optimize
 		drawTexturedMesh(entity, camera.projectionMat);
 	}
+	
+	// Truely render to the screen
+	drawToScreen();
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// We do this after post processing the lighting effect
 	for (Entity entity : registry.healthBars.entities) {
 		drawTexturedMesh(entity, camera.projectionMat);
 	}
-	
+
 	for (Entity entity : registry.manaBars.entities) {
 		drawTexturedMesh(entity, camera.projectionMat);
 	}
 
-	// Truely render to the screen
-	drawToScreen();
-
-	// We do this after post processing the lighting effect
 	for (Entity entity : registry.texts.entities)
 	{
 		drawText(entity);
