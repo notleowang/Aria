@@ -291,13 +291,25 @@ void RenderSystem::initializeFinalBossSpriteSheet()
 	int num_cols = 2;
 	int ss_index = (int)SPRITE_SHEET_DATA_ID::FINAL_BOSS;
 
+	/*
+	* Final boss sprite sheet frames:
+	* 
+	* | 0 | 1 |
+	* | 2 | 3 |
+	* | 4 | x |
+	* | 6 | x |
+	* | 8 | x |
+	* |10 | x |
+	* 
+	* NOTE: x's are blanks
+	*/
 	std::vector<AnimState> states((int)FINAL_BOSS_SPRITE_STATES::STATE_COUNT);
 	states[(int)FINAL_BOSS_SPRITE_STATES::EAST] = AnimState(0, 1);
 	states[(int)FINAL_BOSS_SPRITE_STATES::WEST] = AnimState(2, 3);
 	states[(int)FINAL_BOSS_SPRITE_STATES::WATER] = AnimState(4, 4);
-	states[(int)FINAL_BOSS_SPRITE_STATES::EARTH] = AnimState(5, 5);
-	states[(int)FINAL_BOSS_SPRITE_STATES::FIRE] = AnimState(6, 6);
-	states[(int)FINAL_BOSS_SPRITE_STATES::LIGHTNING] = AnimState(7, 7);
+	states[(int)FINAL_BOSS_SPRITE_STATES::EARTH] = AnimState(6, 6);
+	states[(int)FINAL_BOSS_SPRITE_STATES::FIRE] = AnimState(8, 8);
+	states[(int)FINAL_BOSS_SPRITE_STATES::LIGHTNING] = AnimState(10, 10);
 
 	sprite_sheets[ss_index].num_rows = num_rows;
 	sprite_sheets[ss_index].num_cols = num_cols;
