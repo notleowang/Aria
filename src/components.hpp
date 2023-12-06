@@ -127,6 +127,14 @@ struct ManaBar
 
 struct ProjectileSelectDisplay
 {
+	Entity fasterMovement;
+	Entity increasedDamage[4];
+	Entity tripleShot[4];
+	Entity bounceOffWalls[4];
+};
+
+struct PowerUpIndicator
+{
 
 };
 
@@ -135,6 +143,7 @@ struct Follower
 	Entity owner;
 	float y_offset = 0.f;
 	float x_offset = 0.f;
+	bool adjust = true;
 };
 
 // Structure to store projectile entities
@@ -375,6 +384,10 @@ enum class TEXTURE_ASSET_ID {
 	PLAYER,
 	PORTAL,
 	PROJECTILE_SELECT_DISPLAY,
+	FASTER_MOVEMENT,
+	DAMAGE_ARROW,
+	TRIPLE_SHOT,
+	BOUNCE,
 	HEALTH_PACK,
 	LOST_SOUL,
 	TEXTURE_COUNT

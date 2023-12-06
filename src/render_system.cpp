@@ -446,7 +446,7 @@ void RenderSystem::draw()
 		if (!registry.positions.has(entity) || registry.texts.has(entity) || 
 			registry.shadows.has(entity) || registry.floors.has(entity) ||
 			registry.projectileSelectDisplays.has(entity) || registry.healthBars.has(entity) ||
-			registry.manaBars.has(entity))
+			registry.manaBars.has(entity) || registry.powerUpIndicators.has(entity))
 			continue;
 		// Note, its not very efficient to access elements indirectly via the entity
 		// albeit iterating through all Sprites in sequence. A good point to optimize
@@ -478,6 +478,16 @@ void RenderSystem::draw()
 	if (registry.cutscenes.size() == 0) {
 		for (Entity entity : registry.projectileSelectDisplays.entities) {
 			drawArsenal(entity, camera.projectionMat);
+
+			ProjectileSelectDisplay& selectDisplay = registry.projectileSelectDisplays.get(entity);
+			PowerUp& powerUp = registry.powerUps.components[0]; // lowkey unsafe
+
+			if (powerUp.fasterMovement) drawTexturedMesh(selectDisplay.fasterMovement, camera.projectionMat);
+			for (int i = 0; i < 4; i++) {
+				if (powerUp.increasedDamage[i]) drawTexturedMesh(selectDisplay.increasedDamage[i], camera.projectionMat);
+				if (powerUp.tripleShot[i]) drawTexturedMesh(selectDisplay.tripleShot[i], camera.projectionMat);
+				if (powerUp.bounceOffWalls[i]) drawTexturedMesh(selectDisplay.bounceOffWalls[i], camera.projectionMat);
+			}
 		}
 	}
   
