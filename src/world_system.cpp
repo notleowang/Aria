@@ -597,7 +597,7 @@ void WorldSystem::win_level() {
 
 void WorldSystem::new_game() {
 	if (player != NULL) registry.remove_all_components_of(player);
-	curr_level.init(CUTSCENE_3);
+	curr_level.init(CUTSCENE_1);
 	restart_game();
 }
 
