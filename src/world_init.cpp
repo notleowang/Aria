@@ -13,6 +13,10 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PLAYER);
 	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
 
+	registry.characterProjectileTypes.emplace(entity);
+	registry.players.emplace(entity);
+	registry.collidables.emplace(entity);
+
 	Animation& animation = registry.animations.emplace(entity);
 	animation.sprite_sheet_ptr = &sprite_sheet;
 	animation.setState((int)PLAYER_SPRITE_STATES::EAST);
@@ -27,8 +31,8 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity, PLAYER_HEALTH_BAR_Y_OFFSET);
-	resources.manaBar = createManaBar(renderer, entity, PLAYER_MANA_BAR_Y_OFFSET);
+	resources.healthBar = createHealthBar(renderer, entity, entity, PLAYER_HEALTH_BAR_Y_OFFSET, PLAYER_BAR_X_OFFSET);
+	resources.manaBar = createManaBar(renderer, entity, entity, PLAYER_MANA_BAR_Y_OFFSET, PLAYER_BAR_X_OFFSET);
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
@@ -50,9 +54,7 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	powerUp.bounceOffWalls[ElementType::LIGHTNING] = true;*/
 
 	//createShadow(renderer, entity, TEXTURE_ASSET_ID::PLAYER, GEOMETRY_BUFFER_ID::PLAYER);
-	registry.characterProjectileTypes.emplace(entity);
-	registry.players.emplace(entity);
-	registry.collidables.emplace(entity);
+
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::PLAYER,
@@ -168,7 +170,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	velocity.velocity.x = 50;
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity, ENEMY_HEALTH_BAR_Y_OFFSET);
+	resources.healthBar = createHealthBar(renderer, entity, entity, ENEMY_HEALTH_BAR_Y_OFFSET, 0.f);
 
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy = enemyAttributes;
@@ -226,7 +228,14 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	Resources& resources = registry.resources.emplace(entity);
 	resources.maxHealth = 1500.f;
 	resources.currentHealth = 1500.f;
-	resources.healthBar = createHealthBar(renderer, entity, BOSS_HEALTH_BAR_Y_OFFSET);
+
+	if (registry.players.entities.size() > 0) {
+		Entity player = registry.players.entities[0];
+		resources.healthBar = createHealthBar(renderer, entity, player, BOSS_HEALTH_BAR_Y_OFFSET, 0.f);
+	}
+	else {
+		resources.healthBar = createHealthBar(renderer, entity, entity, -110.f, 0.f);
+	}
 
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy = enemyAttributes;
@@ -267,44 +276,98 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	return entity;
 }
 
-Entity createHealthBar(RenderSystem* renderer, Entity& owner_entity, float y_offset)
+Entity createHealthBar(RenderSystem* renderer, Entity& resource_entity, Entity& position_entity, float y_offset, float x_offset)
 {
 	auto entity = Entity();
 
 	HealthBar& healthBar = registry.healthBars.emplace(entity);
-
-	Position& position = registry.positions.emplace(entity);
-	position.scale = vec2(111.f, 10.f);
+	healthBar.owner = resource_entity;
 
 	Follower& follower = registry.followers.emplace(entity);
-	follower.owner = owner_entity;
+	follower.owner = position_entity;
 	follower.y_offset = y_offset;
+	follower.x_offset = x_offset;
+
+	float width;
+	float height;
+	float scale_factor;
+	TEXTURE_ASSET_ID texture_asset;
+
+	if (registry.players.has(resource_entity)) {
+		width = PLAYER_BAR_WIDTH;
+		height = PLAYER_BAR_HEIGHT;
+		scale_factor = 3.f;
+		texture_asset = TEXTURE_ASSET_ID::PLAYER_HEALTH_BAR;
+	}
+	else if (registry.bosses.has(resource_entity)) {
+		width = BOSS_BAR_WIDTH;
+		height = BOSS_BAR_HEIGHT;
+		scale_factor = 3.5f;
+		texture_asset = TEXTURE_ASSET_ID::BOSS_HEALTH_BAR;
+	}
+	else {
+		width = ENEMY_BAR_WIDTH;
+		height = ENEMY_BAR_HEIGHT;
+		scale_factor = 2.f;
+		texture_asset = TEXTURE_ASSET_ID::ENEMY_HEALTH_BAR;
+	}
+
+	Resources& resources = registry.resources.get(resource_entity);
+	resources.barRatio = (width - height) / width;
+	resources.logoRatio = height / width;
+
+	Position& position = registry.positions.emplace(entity);
+	position.scale = vec2(scale_factor * width, scale_factor * height);
 
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::HEALTH_BAR,
+		{ texture_asset,
 			EFFECT_ASSET_ID::RESOURCE_BAR,
 			GEOMETRY_BUFFER_ID::RESOURCE_BAR });
 
 	return entity;
 }
 
-Entity createManaBar(RenderSystem* renderer, Entity& owner_entity, float y_offset)
+Entity createManaBar(RenderSystem* renderer, Entity& resource_entity, Entity& position_entity, float y_offset, float x_offset)
 {
 	auto entity = Entity();
 
 	ManaBar& manaBar = registry.manaBars.emplace(entity);
-
-	Position& position = registry.positions.emplace(entity);
-	position.scale = vec2(111.f, 10.f);
+	manaBar.owner = resource_entity;
 
 	Follower& follower = registry.followers.emplace(entity);
-	follower.owner = owner_entity;
+	follower.owner = position_entity;
 	follower.y_offset = y_offset;
+	follower.x_offset = x_offset;
+
+	float width;
+	float height;
+	float scale_factor;
+	TEXTURE_ASSET_ID texture_asset;
+
+	if (registry.players.has(resource_entity)) {
+		width = PLAYER_BAR_WIDTH;
+		height = PLAYER_BAR_HEIGHT;
+		scale_factor = 3.f;
+		texture_asset = TEXTURE_ASSET_ID::PLAYER_MANA_BAR;
+	}
+	else {
+		width = ENEMY_BAR_WIDTH;
+		height = ENEMY_BAR_HEIGHT;
+		scale_factor = 2.f;
+		texture_asset = TEXTURE_ASSET_ID::ENEMY_MANA_BAR;
+	}
+
+	Resources& resources = registry.resources.get(resource_entity);
+	resources.barRatio = (width - height) / width;
+	resources.logoRatio = height / width;
+
+	Position& position = registry.positions.emplace(entity);
+	position.scale = vec2(scale_factor * width, scale_factor * height);
 
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::MANA_BAR,
+		{ texture_asset,
 			EFFECT_ASSET_ID::RESOURCE_BAR,
 			GEOMETRY_BUFFER_ID::RESOURCE_BAR });
 
@@ -380,7 +443,8 @@ Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entit
 	animation.is_animating = false;
 
 	Position& position = registry.positions.emplace(entity);
-	position.scale = vec2(sprite_sheet.frame_width * SCALE_FACTOR, sprite_sheet.frame_height * SCALE_FACTOR);
+	float scale_factor = 2.f;
+	position.scale = vec2(scale_factor * sprite_sheet.frame_width, scale_factor * sprite_sheet.frame_height);
 
 	Follower& follower = registry.followers.emplace(entity);
 	follower.owner = owner_entity;
@@ -468,7 +532,7 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity, PLAYER_HEALTH_BAR_Y_OFFSET);
+	resources.healthBar = createHealthBar(renderer, entity, entity, PLAYER_HEALTH_BAR_Y_OFFSET, 0.f);
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
