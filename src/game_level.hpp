@@ -33,9 +33,10 @@ enum Level {
 	WATER_BOSS = LEVEL_4 + 1,
 	CUTSCENE_5 = WATER_BOSS + 1,
 	FINAL_BOSS = CUTSCENE_5 + 1,
-	CUTSCENE_6 = FINAL_BOSS+1,
+	CUTSCENE_6 = FINAL_BOSS + 1,
 	THE_END = CUTSCENE_6 + 1,
-	POWER_UP = THE_END +1,
+	POWER_UP = THE_END + 1,
+	LEVEL_LEO = POWER_UP + 1,
 };
 
 //Enemy types to re-use later
@@ -71,6 +72,7 @@ public:
 	bool is_boss_level;
 	vec2 cutscene_player_velocity;
 	int life_orb_piece;
+	bool hasEnemies;
 
 	std::vector<vec2> health_packs_pos;
 

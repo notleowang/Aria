@@ -43,6 +43,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(projectile_sound);
 	if (heal_sound != nullptr)
 		Mix_FreeChunk(heal_sound);
+	if (last_enemy_death_sound != nullptr)
+		Mix_FreeChunk(last_enemy_death_sound);
 	if (aria_death_sound != nullptr)
 		Mix_FreeChunk(aria_death_sound);
 	if (enemy_death_sound != nullptr)
@@ -175,6 +177,7 @@ GLFWwindow* WorldSystem::create_window() {
 	cutscene_background = Mix_LoadMUS(audio_path("cutscene_1_background.wav").c_str());
 	projectile_sound = Mix_LoadWAV(audio_path("projectile.wav").c_str());
 	heal_sound = Mix_LoadWAV(audio_path("heal.wav").c_str());
+	last_enemy_death_sound = Mix_LoadWAV(audio_path("last_enemy_death.wav").c_str());
 	aria_death_sound = Mix_LoadWAV(audio_path("aria_death.wav").c_str());
 	enemy_death_sound = Mix_LoadWAV(audio_path("enemy_death.wav").c_str());
 	damage_tick_sound = Mix_LoadWAV(audio_path("damage_tick.wav").c_str());
@@ -263,7 +266,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (player_resource.currentMana > 10.f) player_resource.currentMana = 10.f;
 	}
 
-    float min_death_timer_ms = 3000.f;
+    float min_death_timer_ms = 2700.f;
 	for (Entity entity : registry.deathTimers.entities) {
 		DeathTimer& timer = registry.deathTimers.get(entity);
 		timer.timer_ms -= elapsed_ms_since_last_update;
@@ -278,7 +281,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			return true;
 		}
 	}
-	screen.screen_darken_factor = 1 - min_death_timer_ms / 3000;
+	screen.screen_darken_factor = 1 - min_death_timer_ms / 2700;
 
 	float min_win_timer_ms = 3600.f;
 	for (Entity entity : registry.winTimers.entities) {
@@ -319,10 +322,15 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
 	// create exit door once all enemies are dead
-	if (registry.enemies.entities.size() == 0 && 
-		registry.exitDoors.entities.size() == 0 && 
+	if (registry.enemies.entities.size() == 0 &&
+		registry.exitDoors.entities.size() == 0 &&
 		this->curr_level.getExitDoorPos() != NULL_POS)
+	{
+		if (this->curr_level.hasEnemies) {
+			Mix_PlayChannel(-1, last_enemy_death_sound, 0);
+		}
 		createExitDoor(renderer, this->curr_level.getExitDoorPos());
+	}
 
 	if (this->curr_level.curr_level == CUTSCENE_2) {
 		//First turn downwards
@@ -815,6 +823,7 @@ void WorldSystem::handle_collisions() {
 				registry.invulnerableTimers.emplace(entity);
 				registry.deathTimers.emplace(entity);
 				registry.velocities.get(player).velocity = { 0.f, 0.f };
+				// ADD ARIA DEATH SOUND
 				Mix_PlayChannel(-1, aria_death_sound, 0);
 				if (this->curr_level.getCurrLevel() != FINAL_BOSS && !this->curr_level.getIsBossLevel()) Mix_PlayChannel(-1, aria_death_lsvl, 0);
 			}

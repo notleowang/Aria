@@ -244,7 +244,7 @@ struct InvulnerableTimer
 // A timer that will be associated to an entity dying
 struct DeathTimer
 {
-	float timer_ms = 3000.f;
+	float timer_ms = 2700.f;
 };
 
 // Timer that signifies level change
