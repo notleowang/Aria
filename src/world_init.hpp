@@ -9,7 +9,7 @@ const float PLAYER_HEALTH_BAR_Y_OFFSET = -375.f;
 const float PLAYER_MANA_BAR_Y_OFFSET = -338.f;
 const float PLAYER_BAR_X_OFFSET = -480.f;
 const float ENEMY_HEALTH_BAR_Y_OFFSET = -50.f;
-const float BOSS_HEALTH_BAR_Y_OFFSET = -110.f;
+const float BOSS_HEALTH_BAR_Y_OFFSET = 375.f;
 const float PROJECTILE_SELECT_DISPLAY_Y_OFFSET = 274.f;
 const float PROJECTILE_SELECT_DISPLAY_X_OFFSET = 565.f;
 
@@ -17,6 +17,8 @@ const float PLAYER_BAR_WIDTH = 75.f;
 const float PLAYER_BAR_HEIGHT = 11.f;
 const float ENEMY_BAR_WIDTH = 41.f;
 const float ENEMY_BAR_HEIGHT = 9.f;
+const float BOSS_BAR_WIDTH = 80.f;
+const float BOSS_BAR_HEIGHT = 9.f;
 
 // the player
 Entity createAria(RenderSystem* renderer, vec2 pos);
@@ -45,10 +47,10 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes);
 Entity createObstacle(RenderSystem* renderer, vec2 pos, vec2 size, vec2 vel);
 
 // creates a health bar associated with an owner entity
-Entity createHealthBar(RenderSystem* renderer, Entity &owner_entity, float y_offset, float x_offset);
+Entity createHealthBar(RenderSystem* renderer, Entity& resource_entity, Entity& position_entity, float y_offset, float x_offset);
 
 // creates a mana bar associated with an owner entity
-Entity createManaBar(RenderSystem* renderer, Entity& owner_entity, float y_offset, float x_offset);
+Entity createManaBar(RenderSystem* renderer, Entity& resource_entity, Entity& position_entity, float y_offset, float x_offset);
 
 // creates UI that displays the currently selected projectile element
 Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entity, float y_offset, float x_offset);

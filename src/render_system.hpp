@@ -57,6 +57,7 @@ class RenderSystem {
 			textures_path("projectile_earth.png"),
 			textures_path("projectile_lightning.png"),
 			textures_path("dungeon_floor.png"),
+			textures_path("boss_health_bar.png"),
 			textures_path("enemy_health_bar.png"),
 			textures_path("enemy_mana_bar.png"),
 			textures_path("player_health_bar.png"),
