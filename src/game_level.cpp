@@ -274,7 +274,7 @@ bool GameLevel::init(uint level) {
 	case CUTSCENE_3:
 		this->is_cutscene = true;
 		floors.push_back(vec4(25, 25, 700, 400));
-		this->life_orb_piece = 1;
+		this->life_orb_piece = 0; // full piece
 
 		this->player_starting_pos = vec2(562, 280);
 		this->exit_door_pos = vec2(4800, 200);

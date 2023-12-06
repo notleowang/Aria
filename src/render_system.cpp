@@ -411,9 +411,14 @@ void RenderSystem::draw()
 	Entity entity = registry.players.entities[0];
 	Position& player_pos = registry.positions.get(entity);
 
-	// center the camera on the player
+	// center the camera on the player (or life orb if specified)
 	Camera camera;
-	camera.centerAt(player_pos.position);
+	if (registry.lifeOrbs.size() > 0 && registry.lifeOrbs.components[0].centered_on_screen) {
+		camera.centerAt(registry.positions.get(registry.lifeOrbs.entities[0]).position);
+	}
+	else {
+		camera.centerAt(player_pos.position);
+	}
 
 	// Handle drawing floors first
 	for (Entity entity : registry.floors.entities) {

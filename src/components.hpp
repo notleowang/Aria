@@ -40,7 +40,7 @@ struct LostSoul {
 
 // life orb
 struct LifeOrb {
-
+	bool centered_on_screen = false;
 };
 
 // Boss

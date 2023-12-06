@@ -543,6 +543,7 @@ void WorldSystem::restart_game() {
 	} 
 	else if (this->curr_level.getCurrLevel() == CUTSCENE_3) {
 		Entity life_orb = createLifeOrb(renderer, {362,-100}, this->curr_level.getLifeOrbPiece());
+		registry.lifeOrbs.get(life_orb).centered_on_screen = true;
 		registry.velocities.get(life_orb).velocity = { 0.f,20.f };
 		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
 		Position& player_position = registry.positions.get(player);
@@ -597,7 +598,7 @@ void WorldSystem::win_level() {
 
 void WorldSystem::new_game() {
 	if (player != NULL) registry.remove_all_components_of(player);
-	curr_level.init(CUTSCENE_1);
+	curr_level.init(CUTSCENE_3);
 	restart_game();
 }
 
