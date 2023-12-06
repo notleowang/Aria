@@ -471,8 +471,6 @@ Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entit
 {
 	auto entity = Entity();
 
-	ProjectileSelectDisplay& display = registry.projectileSelectDisplays.emplace(entity);
-
 	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY);
 	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
 
@@ -491,11 +489,47 @@ Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entit
 	follower.y_offset = y_offset;
 	follower.x_offset = x_offset;
 
+
+	ProjectileSelectDisplay& display = registry.projectileSelectDisplays.emplace(entity);
+	display.fasterMovement =			createPowerUpIndicator(renderer, entity, vec2(29.f, 29.f), TEXTURE_ASSET_ID::FASTER_MOVEMENT, -160.f, 0.f);
+	for (int i = 0; i < 4; i++) {
+		display.increasedDamage[i] = createPowerUpIndicator(renderer, entity, vec2(5.f, 6.f), TEXTURE_ASSET_ID::DAMAGE_ARROW, (i * 60.f) - 75.f, 16.f);
+		display.tripleShot[i] = createPowerUpIndicator(renderer, entity, vec2(9.f, 9.f), TEXTURE_ASSET_ID::TRIPLE_SHOT, (i * 60.f) - 108.f, -45.f);
+		display.bounceOffWalls[i] = createPowerUpIndicator(renderer, entity, vec2(9.f, 9.f), TEXTURE_ASSET_ID::BOUNCE, (i * 60.f) - 83.f, -45.f);
+	}
+
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::PROJECTILE_SELECT_DISPLAY,
 			EFFECT_ASSET_ID::ANIMATED,
 			GEOMETRY_BUFFER_ID::PROJECTILE_SELECT_DISPLAY });
+
+	return entity;
+}
+
+Entity createPowerUpIndicator(RenderSystem* renderer, Entity& owner_entity, vec2 size, TEXTURE_ASSET_ID texture, float y_offset, float x_offset)
+{
+	auto entity = Entity();
+
+	registry.powerUpIndicators.emplace(entity);
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	Position& position = registry.positions.emplace(entity);
+	float scale_factor = 2.f;
+	position.scale = vec2(scale_factor * size.x, scale_factor * size.y);
+
+	Follower& follower = registry.followers.emplace(entity);
+	follower.owner = owner_entity;
+	follower.y_offset = y_offset;
+	follower.x_offset = x_offset;
+
+	registry.renderRequests.insert(
+		entity,
+		{ texture,
+			EFFECT_ASSET_ID::TEXTURED,
+			GEOMETRY_BUFFER_ID::SPRITE });
 
 	return entity;
 }

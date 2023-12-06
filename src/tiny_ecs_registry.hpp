@@ -19,6 +19,7 @@ public:
 	ComponentContainer<Projectile> projectiles;
 	ComponentContainer<CharacterProjectileType> characterProjectileTypes;
 	ComponentContainer<ProjectileSelectDisplay> projectileSelectDisplays;
+	ComponentContainer<PowerUpIndicator> powerUpIndicators;
 	ComponentContainer<Follower> followers;
 	ComponentContainer<Text> texts;
 	ComponentContainer<InvulnerableTimer> invulnerableTimers;
@@ -58,6 +59,7 @@ public:
 		registry_list.push_back(&manaBars);
 		registry_list.push_back(&characterProjectileTypes);
 		registry_list.push_back(&projectileSelectDisplays);
+		registry_list.push_back(&powerUpIndicators);
 		registry_list.push_back(&followers);
 		registry_list.push_back(&invulnerableTimers);
 		registry_list.push_back(&positions);

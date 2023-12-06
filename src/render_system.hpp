@@ -67,6 +67,10 @@ class RenderSystem {
 			textures_path("aria.png"),
 			textures_path("portal.png"),
 			textures_path("projectile_select_display_vertical.png"),
+			textures_path("faster_movement.png"),
+			textures_path("power_up_increase_damage_arrow.png"),
+			textures_path("power_up_triple_shot_icon.png"),
+			textures_path("power_up_bounce_icon.png"),
 			textures_path("medkit.png")
 	};
 

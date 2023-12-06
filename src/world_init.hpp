@@ -55,6 +55,8 @@ Entity createManaBar(RenderSystem* renderer, Entity& resource_entity, Entity& po
 // creates UI that displays the currently selected projectile element
 Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entity, float y_offset, float x_offset);
 
+Entity createPowerUpIndicator(RenderSystem* renderer, Entity& owner_entity, vec2 size, TEXTURE_ASSET_ID texture, float y_offset, float x_offset);
+
 Entity createFloor(RenderSystem* renderer, vec2 pos, vec2 size);
 
 Entity createHealthPack(RenderSystem* renderer, vec2 pos);
