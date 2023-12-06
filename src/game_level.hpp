@@ -49,7 +49,7 @@ const Enemy EARTH_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::EARTH, f
 const Enemy LIGHTNING_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING, true };
 const Enemy LIGHTNING_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING, false };
 
-const Enemy COMBO_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::COMBO, false };
+const Enemy FINAL_BOSS_ATTRS = { 20.f, 3000.f, 0.5f, 1.f, ElementType::COMBO, false };
 
 // Terrain types
 const Terrain NORTH_STATIONARY = {DIRECTION::N, false};

@@ -285,7 +285,7 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 		break;
 	}
 
-	createShadow(renderer, entity, textureAsset, GEOMETRY_BUFFER_ID::SPRITE);
+	if (enemy.type != ElementType::COMBO) createShadow(renderer, entity, textureAsset, GEOMETRY_BUFFER_ID::SPRITE);
 
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(

@@ -417,18 +417,33 @@ bool GameLevel::init(uint level) {
 
 	case CUTSCENE_5:
 		this->is_cutscene = true;
-		floors.push_back(vec4(25, 25, 5000, 400));
+		floors.push_back(vec4(-400, 0, 800, 300));
+		floors.push_back(vec4(400, -200, 1000, 700));
 
-		this->player_starting_pos = vec2(50, 300);
+		this->player_starting_pos = vec2(-200, 200);
 		this->exit_door_pos = vec2(4800, 200);
-		this->cutscene_player_velocity = { 300.f,0.f };
+		this->cutscene_player_velocity = { 0.f,0.f };
 
-		lost_souls.push_back({ vec2(200, 300), LostSoul() });
+		this->life_orb_piece = 0; // full piece
 
-		terrains.push_back(std::make_pair(vec4(25, 0, 5000, default_north_height), NORTH_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(25, 400, 5000, default_south_height), SOUTH_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 425), SIDE_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(5025, 0, default_side_width, 425), SIDE_STATIONARY));
+		lost_souls.push_back({ vec2(0, 200), LostSoul() });
+
+		terrains.push_back(std::make_pair(vec4(-400, 0, 825, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(-400, 300, 800, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(-400, 0, default_side_width, 300), SIDE_STATIONARY));
+
+		terrains.push_back(std::make_pair(vec4(400, -200, 1000, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(0, 300, 400, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(400, 500, 1000, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(400, -200, default_side_width, 200), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(400, 300, default_side_width, 200), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1400, -200, default_side_width, 725), SIDE_STATIONARY));
+
+
+		//TIMER 
+		obstacles.push_back({ vec2(0, -300), vec2(30,30), vec2(10.f,0.f) });
+
+
 
 		break;
 
@@ -443,7 +458,7 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 1400), SIDE_STATIONARY));
 		terrains.push_back(std::make_pair(vec4(2725, 0, default_side_width, 1400), SIDE_STATIONARY));
 
-		bosses.push_back(std::make_pair(vec2(1400, 700), COMBO_HIGH_DAMAGE));
+		bosses.push_back(std::make_pair(vec2(1400, 700), FINAL_BOSS_ATTRS));
 		break;
 
 	case POWER_UP:

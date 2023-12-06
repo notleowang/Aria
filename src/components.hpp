@@ -38,6 +38,10 @@ struct LostSoul {
 
 };
 
+struct Cutscene {
+
+};
+
 // life orb
 struct LifeOrb {
 	bool centered_on_screen = false;

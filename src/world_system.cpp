@@ -371,7 +371,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 	}
-	if (this->curr_level.curr_level == CUTSCENE_3) {
+	else if (this->curr_level.curr_level == CUTSCENE_3) {
 		Entity& lost_soul = registry.lostSouls.entities[0];
 		Entity& life_orb = registry.lifeOrbs.entities[0];
 		vec2 lost_soul_pos = registry.positions.get(lost_soul).position;
@@ -384,6 +384,76 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			win_level();
 		}
 	}
+	else if (this->curr_level.curr_level == CUTSCENE_5) {
+		Entity& timer = registry.obstacles.entities[0];
+		float timer_x_pos = registry.positions.get(timer).position.x;
+		Entity& life_orb = registry.lifeOrbs.entities[0];
+		Position& player_position = registry.positions.get(player);
+
+		//Velocity
+		Velocity& player_vel = registry.velocities.get(player);
+		Velocity& life_orb_vel = registry.velocities.get(life_orb);
+
+		//Animation
+		Animation& player_animation = registry.animations.get(player);
+		//150
+		if (timer_x_pos > 130 && timer_x_pos < 150) {
+			Entity& lost_soul = registry.lostSouls.entities[0];
+			Velocity& lost_soul_vel = registry.velocities.get(lost_soul);
+			lost_soul_vel.velocity = { 400.f,0.f };
+			life_orb_vel.velocity = { 400.f,0.f };
+		}
+
+		// delete lost soul and spawn final boss
+		if (timer_x_pos > 200 && registry.bosses.size() == 0) {
+			registry.remove_all_components_of(registry.lostSouls.entities[0]);
+			registry.remove_all_components_of(registry.lifeOrbs.entities[0]);
+
+			Entity orb = createLifeOrb(renderer, vec2(1050.f, 150.f), 0); // light source should be behind boss so it looks like boss is glowing
+			registry.positions.get(orb).scale = { 0, 0 };
+			Entity final_boss = createBoss(renderer, vec2(1050.f, 200.f), FINAL_BOSS_ATTRS);
+			// set direction of boss to left
+		}
+
+		//200 
+		if (timer_x_pos >= 195 && timer_x_pos < 235) {
+			//aria walk towards boss
+			player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
+			player_vel.velocity = {250.f,0.f};
+		}
+		if (timer_x_pos >= 235 && timer_x_pos<= 270) {
+			player_vel.velocity = { 0.f,0.f };
+			player_animation.is_animating = false; // default direction is East so setting this true makes Aria walk
+		}
+		if (timer_x_pos >= 320 && timer_x_pos<=450 ) {
+			player_animation.is_animating = false; // default direction is East so setting this true makes Aria walk
+			if (int(timer_x_pos) % 2 ==0 ) {
+				player_vel.velocity = { -250.f,0.f };
+			}
+			else {
+				player_vel.velocity = { 250.f,0.f };
+			}
+			registry.velocities.get(registry.bosses.entities[0]).velocity = player_vel.velocity;
+			registry.velocities.get(registry.lifeOrbs.entities[0]).velocity = player_vel.velocity;
+		}
+		if (timer_x_pos >= 450) {
+			player_vel.velocity = { 0.f, 0.f };
+			registry.velocities.get(registry.bosses.entities[0]).velocity = player_vel.velocity;
+			registry.velocities.get(registry.lifeOrbs.entities[0]).velocity = player_vel.velocity;
+		}
+		
+
+		//453
+		//winLevel
+		if (timer_x_pos >= 545 && registry.winTimers.size()==0) {
+			win_level();
+		}
+	
+
+
+	}
+
+
 	if (registry.lifeOrbs.entities.size() > 0) {
 		createShadow(renderer, player, TEXTURE_ASSET_ID::PLAYER, GEOMETRY_BUFFER_ID::PLAYER);
 	}
@@ -472,6 +542,7 @@ void WorldSystem::restart_game() {
 
 
 	player = createAria(renderer, player_starting_pos);
+	if (this->curr_level.getIsCutscene()) registry.cutscenes.emplace(player);
 
 	if (curr_level == Level::TUTORIAL) {
 		// Familarize player with health pack
@@ -528,8 +599,7 @@ void WorldSystem::restart_game() {
 	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
 
 	if (this->curr_level.getCurrLevel() == CUTSCENE_1 ||
-		this->curr_level.getCurrLevel() == CUTSCENE_4 ||
-		this->curr_level.getCurrLevel() == CUTSCENE_5) {
+		this->curr_level.getCurrLevel() == CUTSCENE_4) {
 		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
 		Animation& player_animation = registry.animations.get(player);
 		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
@@ -548,6 +618,11 @@ void WorldSystem::restart_game() {
 		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
 		Position& player_position = registry.positions.get(player);
 		if (player_position.scale.x > 0) player_position.scale.x *= -1;
+	}
+	else if (this->curr_level.getCurrLevel() == CUTSCENE_5) {
+		Entity life_orb = createLifeOrb(renderer, { 55, 200 }, this->curr_level.getLifeOrbPiece());
+		
+		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
 	}
 
 	for (uint i = 0; i < lost_soul_attrs.size(); i++) {
@@ -627,7 +702,7 @@ void WorldSystem::win_level() {
 
 void WorldSystem::new_game() {
 	if (player != NULL) registry.remove_all_components_of(player);
-	curr_level.init(CUTSCENE_3);
+	curr_level.init(CUTSCENE_5);
 	restart_game();
 }
 

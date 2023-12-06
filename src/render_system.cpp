@@ -443,12 +443,14 @@ void RenderSystem::draw()
 		drawTexturedMesh(entity, camera.projectionMat);
 	}
 
-	for (Entity entity : registry.healthBars.entities) {
-		drawTexturedMesh(entity, camera.projectionMat);
-	}
-	
-	for (Entity entity : registry.manaBars.entities) {
-		drawTexturedMesh(entity, camera.projectionMat);
+	if (registry.cutscenes.size() == 0) {
+		for (Entity entity : registry.healthBars.entities) {
+			drawTexturedMesh(entity, camera.projectionMat);
+		}
+
+		for (Entity entity : registry.manaBars.entities) {
+			drawTexturedMesh(entity, camera.projectionMat);
+		}
 	}
 
 	// Truely render to the screen
@@ -460,8 +462,10 @@ void RenderSystem::draw()
 		drawText(entity);
 	}
 
-	for (Entity entity : registry.projectileSelectDisplays.entities) {
-		drawArsenal(entity, camera.projectionMat);
+	if (registry.cutscenes.size() == 0) {
+		for (Entity entity : registry.projectileSelectDisplays.entities) {
+			drawArsenal(entity, camera.projectionMat);
+		}
 	}
   
 	// Render ImGui to screen
