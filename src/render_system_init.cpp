@@ -294,12 +294,12 @@ void RenderSystem::initializeFinalBossSpriteSheet()
 	/*
 	* Final boss sprite sheet frames:
 	* 
-	* | 0 | 1 |
-	* | 2 | 3 |
-	* | 4 | x |
-	* | 6 | x |
-	* | 8 | x |
-	* |10 | x |
+	* | 0 | 1 |		EAST
+	* | 2 | 3 |		WEST
+	* | 4 | x |		WATER
+	* | 6 | x |		EARTH
+	* | 8 | x |		FIRE
+	* |10 | x |		LIGHTNING
 	* 
 	* NOTE: x's are blanks
 	*/
