@@ -168,7 +168,9 @@ void AISystem::step(float elapsed_ms)
 						break;
 					case 17:
 						while (0 != registry.projectiles.size()) {
-							registry.remove_all_components_of_no_collision(registry.projectiles.entities[0]);
+							if (registry.projectiles.entities.size() != 0) {
+								registry.remove_all_components_of_no_collision(registry.projectiles.entities[0]);
+							}
 						}
 						boss.phase += 1;
 						boss.phaseTimer = 1500.f;
@@ -242,9 +244,9 @@ void AISystem::step(float elapsed_ms)
 			}
 		}
 
-		if (!isDodging && !isFlanking && !registry.bosses.has(entity_i)) {
+		if (!isDodging && !isFlanking) {
 			// bosses never give chase
-			if (dist <= 350 && dist > 15 && enemy.isAggravated) {
+			if (dist <= 350 && dist > 15 && !registry.bosses.has(entity_i)) {
 				if (canSprint) {
 					isSprinting = true;
 					enemy.stamina -= elapsed_ms / 1000;
@@ -274,12 +276,6 @@ void AISystem::step(float elapsed_ms)
 		if (!isSprinting) {
 			// replenish 1 stamina per second if not sprinting
 			enemy.stamina += elapsed_ms / 1000;
-		}
-
-		if (registry.bosses.has(entity_i)) {
-			// idk why bosses still move but set their velo to 0 here
-			registry.velocities.get(entity_i).velocity.x = 0;
-			registry.velocities.get(entity_i).velocity.y = 0;
 		}
 
 		// Decision tree:
