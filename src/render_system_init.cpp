@@ -253,7 +253,7 @@ void RenderSystem::initializePowerUpBlockSpriteSheet()
 	sprite_sheets[ss_index].states = states;
 }
 
-void RenderSystem::initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols)
+void RenderSystem::initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, float frame_height, float frame_width)
 {
 	int num_rows = 1;
 	int ss_index = (int)ss_id;
@@ -264,6 +264,8 @@ void RenderSystem::initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, i
 	sprite_sheets[ss_index].num_rows = num_rows;
 	sprite_sheets[ss_index].num_cols = num_cols;
 	sprite_sheets[ss_index].states = states;
+	sprite_sheets[ss_index].frame_height = frame_height;
+	sprite_sheets[ss_index].frame_width = frame_width;
 }
 
 void RenderSystem::initializePlayerSpriteSheet()
@@ -339,10 +341,10 @@ void RenderSystem::initializeProjectileSelectDisplaySpriteSheet()
 void RenderSystem::initializeSpriteSheets()
 {
 	initializePowerUpBlockSpriteSheet();
-	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::WATER_PROJECTILE, 4);
-	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::FIRE_PROJECTILE, 5);
-	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET, 1);
-	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET, 1);
+	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::WATER_PROJECTILE, 4, 16.f, 26.f);
+	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::FIRE_PROJECTILE, 4, 16.f, 26.f);
+	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET, 6, 16.f, 26.f);
+	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET, 6, 16.f, 26.f);
 	initializePlayerSpriteSheet();
 	initializeFinalBossSpriteSheet();
 	initializeProjectileSelectDisplaySpriteSheet();
