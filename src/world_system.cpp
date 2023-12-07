@@ -1098,6 +1098,7 @@ void WorldSystem::handle_collisions() {
 		// Checking Projectile - Player collisions
 		if (registry.players.has(entity_other) && registry.projectiles.has(entity) && registry.projectiles.get(entity).hostile) {
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
+			assert(registry.resources.has(entity_other));
 			Resources& player_resource = registry.resources.get(entity_other);
 			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
 			/* TODO: Can the player be weak to any element?
@@ -1107,10 +1108,12 @@ void WorldSystem::handle_collisions() {
 			player_resource.currentHealth -= damage_dealt;
 			printf("Player hp: %f\n", player_resource.currentHealth);
 			if (player_resource.currentHealth <= 0) {
-				registry.deathTimers.emplace(entity_other);
-				registry.velocities.get(player).velocity = vec2(0.f, 0.f);
-				Mix_PlayChannel(-1, aria_death_sound, 0);
-				if (this->curr_level.getCurrLevel() != FINAL_BOSS && !this->curr_level.getIsBossLevel()) Mix_PlayChannel(-1, aria_death_lsvl, 0);
+				if (!registry.deathTimers.has(entity_other)) {
+					registry.deathTimers.emplace(entity_other);
+					registry.velocities.get(player).velocity = vec2(0.f, 0.f);
+					Mix_PlayChannel(-1, aria_death_sound, 0);
+					if (this->curr_level.getCurrLevel() != FINAL_BOSS && !this->curr_level.getIsBossLevel()) Mix_PlayChannel(-1, aria_death_lsvl, 0);
+				}
 			}
 			registry.remove_all_components_of_no_collision(entity);
 		}
