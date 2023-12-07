@@ -47,7 +47,7 @@ The fact that enemies are healed by their own element was often overlooked.\
 ### Advanced Integrated Assets
 - Wide variety of custom sprites (all except those listed below)
 - Custom voice lines (see cutscenes)
-- Original music (link)
+- [Original music](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/commit/80679e84a270223560993bac1a3ad5ee82e85859)
 
 Below we have included sources for all assets used in the game that were not custom made by one of our team members (replacement of unusable assets as well as proper attributions are incoming for cross-play)
 
