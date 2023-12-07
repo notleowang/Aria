@@ -4,14 +4,14 @@ In the eerie village of Grimhaven, shrouded in perpetual mist and shadows, Aria'
 # Milestone 4
 Below is the documentation for our `README.md` submission for Milestone 4.
 
-## Entry Points
-
-## Advanced Integrated Assets
-### Assets created by the team
-### Assets from other sources
-
 ## User-game interactions
 ### Changes implemented + rationale
+
+## Entry Points
+### Advanced Integrated Assets
+- Assets created by the team
+- Assets from other sources
+### Advanced Story Elements
 
 ## Game balance
 ### Changes implemented + rationale
