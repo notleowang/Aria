@@ -38,6 +38,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(projectile_sound);
 	if (heal_sound != nullptr)
 		Mix_FreeChunk(heal_sound);
+	if (last_enemy_death_sound != nullptr)
+		Mix_FreeChunk(last_enemy_death_sound);
 	if (aria_death_sound != nullptr)
 		Mix_FreeChunk(aria_death_sound);
 	if (enemy_death_sound != nullptr)
@@ -137,6 +139,7 @@ GLFWwindow* WorldSystem::create_window() {
 	final_boss_intro_music = Mix_LoadMUS(audio_path("final_boss_battle_intro.wav").c_str());
 	projectile_sound = Mix_LoadWAV(audio_path("projectile.wav").c_str());
 	heal_sound = Mix_LoadWAV(audio_path("heal.wav").c_str());
+	last_enemy_death_sound = Mix_LoadWAV(audio_path("last_enemy_death.wav").c_str());
 	aria_death_sound = Mix_LoadWAV(audio_path("aria_death.wav").c_str());
 	enemy_death_sound = Mix_LoadWAV(audio_path("enemy_death.wav").c_str());
 	damage_tick_sound = Mix_LoadWAV(audio_path("damage_tick.wav").c_str());
@@ -178,6 +181,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	assert(registry.screenStates.components.size() <= 1);
 	ScreenState& screen = registry.screenStates.components[0];
 
+	if (this->curr_level.getCurrLevel() == TUTORIAL_2) {
+		for (Enemy& enemy : registry.enemies.components) {
+			enemy.isAggravated = false;
+		}
+	}
+
 	for (Entity entity : registry.invulnerableTimers.entities) {
 		InvulnerableTimer& timer = registry.invulnerableTimers.get(entity);
 		timer.timer_ms -= elapsed_ms_since_last_update;
@@ -193,7 +202,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (player_resource.currentMana > 10.f) player_resource.currentMana = 10.f;
 	}
 
-    float min_death_timer_ms = 3000.f;
+    float min_death_timer_ms = 2700.f;
 	for (Entity entity : registry.deathTimers.entities) {
 		DeathTimer& timer = registry.deathTimers.get(entity);
 		timer.timer_ms -= elapsed_ms_since_last_update;
@@ -208,7 +217,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			return true;
 		}
 	}
-	screen.screen_darken_factor = 1 - min_death_timer_ms / 3000;
+	screen.screen_darken_factor = 1 - min_death_timer_ms / 2700;
 
 	float min_win_timer_ms = 3600.f;
 	for (Entity entity : registry.winTimers.entities) {
@@ -242,12 +251,53 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
-	// create exit door once all enemies are dead
-	if (registry.enemies.entities.size() == 0 && 
-		registry.exitDoors.entities.size() == 0 && 
-		this->curr_level.getExitDoorPos() != NULL_POS)
-		createExitDoor(renderer, this->curr_level.getExitDoorPos());
+	for (Entity entity : registry.weaknessTimers.entities) {
+		WeaknessTimer& timer = registry.weaknessTimers.get(entity);
+		timer.timer_ms -= elapsed_ms_since_last_update;
+		if (timer.timer_ms <= 0.f) {
+			// Weakness to this element has expired
+			float max_timer = 5000.f;
+			float curr_timer = max_timer * uniform_dist(rng);
 
+			ElementType elementType = getRandomElementType();
+
+			timer.timer_ms = curr_timer;
+			timer.weakTo = elementType;
+			
+			Animation& animation = registry.animations.get(entity);
+			FINAL_BOSS_SPRITE_STATES state;
+			switch (elementType) {
+				case (ElementType::WATER):
+					state = FINAL_BOSS_SPRITE_STATES::WATER;
+					break;
+				case (ElementType::FIRE):
+					state = FINAL_BOSS_SPRITE_STATES::FIRE;
+					break;
+				case (ElementType::EARTH):
+					state = FINAL_BOSS_SPRITE_STATES::EARTH;
+					break;
+				case (ElementType::LIGHTNING):
+					state = FINAL_BOSS_SPRITE_STATES::LIGHTNING;
+					break;
+				default:
+					state = FINAL_BOSS_SPRITE_STATES::WEST;
+					break;
+			}
+			animation.setState((int)state);
+			animation.is_animating = false;
+		}
+	}
+
+	// create exit door once all enemies are dead
+	if (registry.enemies.entities.size() == 0 &&
+		registry.exitDoors.entities.size() == 0 &&
+		this->curr_level.getExitDoorPos() != NULL_POS)
+	{
+		if (this->curr_level.hasEnemies) {
+			Mix_PlayChannel(-1, last_enemy_death_sound, 0);
+		}
+		createExitDoor(renderer, this->curr_level.getExitDoorPos());
+	}
 	return true;
 }
 
@@ -325,6 +375,7 @@ void WorldSystem::restart_game() {
 			vec2(terrain_pos[0], terrain_pos[1]), 
 			vec2(terrain_pos[2], terrain_pos[3]), 
 			terrain_attr.direction,
+			terrain_attr.speed,
 			terrain_attr.moveable);
 	}
 
@@ -361,33 +412,67 @@ void WorldSystem::restart_game() {
 	projectileSelectDisplay = createProjectileSelectDisplay(renderer, player, PROJECTILE_SELECT_DISPLAY_Y_OFFSET, PROJECTILE_SELECT_DISPLAY_X_OFFSET);
 
 	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
+	if (this->curr_level.getCurrLevel() == FINAL_BOSS) {
+		if (registry.bosses.size() > 0) {
+			registry.weaknessTimers.emplace(registry.bosses.entities[0]);
+		}
+	}
 
 	// Debugging for memory/component leaks
 	registry.list_all_components();
 }
 
+// These collision checks check if previously they weren't overlapping from a certain direction
+// then they started to overlap after having stepped from the physics system
 bool collidedLeft(Position& pos_i, Position& pos_j) 
 {
-	return (((pos_i.prev_position.x + abs(pos_i.scale.x / 2)) <= (pos_j.position.x - abs(pos_j.scale.x / 2))) &&
+	return (((pos_i.prev_position.x + abs(pos_i.scale.x / 2)) <= (pos_j.prev_position.x - abs(pos_j.scale.x / 2))) &&
 		((pos_i.position.x + abs(pos_i.scale.x / 2)) >= (pos_j.position.x - abs(pos_j.scale.x/2))));
 }
 
 bool collidedRight(Position& pos_i, Position& pos_j) 
 {
-	return (((pos_i.prev_position.x - abs(pos_i.scale.x / 2)) >= (pos_j.position.x + abs(pos_j.scale.x / 2))) &&
+	return (((pos_i.prev_position.x - abs(pos_i.scale.x / 2)) >= (pos_j.prev_position.x + abs(pos_j.scale.x / 2))) &&
 		((pos_i.position.x - abs(pos_i.scale.x / 2)) <= (pos_j.position.x + abs(pos_j.scale.x/2))));
 }
 
 bool collidedTop(Position& pos_i, Position& pos_j) 
 {
-	return (((pos_i.prev_position.y + abs(pos_i.scale.y / 2)) <= (pos_j.position.y - abs(pos_j.scale.y / 2))) &&
+	return (((pos_i.prev_position.y + abs(pos_i.scale.y / 2)) <= (pos_j.prev_position.y - abs(pos_j.scale.y / 2))) &&
 		((pos_i.position.y + abs(pos_i.scale.y / 2)) >= (pos_j.position.y - abs(pos_j.scale.y/2))));
 }
 
 bool collidedBottom(Position& pos_i, Position& pos_j) 
 {
-	return (((pos_i.prev_position.y - abs(pos_i.scale.y / 2)) >= (pos_j.position.y + abs(pos_j.scale.y / 2))) &&
-		((pos_i.position.y - abs(pos_i.scale.x / 2)) <= (pos_j.position.x + abs(pos_j.scale.x/2))));
+	return (((pos_i.prev_position.y - abs(pos_i.scale.y / 2)) >= (pos_j.prev_position.y + abs(pos_j.scale.y / 2))) &&
+		((pos_i.position.y - abs(pos_i.scale.y / 2)) <= (pos_j.position.y + abs(pos_j.scale.y/2))));
+}
+
+// This function moves entity related to pos_i 'displacement' units away from entity related to pos_j
+bool collision_displace(Position& pos_i, Position& pos_j) {
+	bool resolved = false;
+	if (collidedLeft(pos_i, pos_j)) {
+		float penetration = (pos_j.position.x - abs(pos_j.scale.x / 2)) - (pos_i.position.x + abs(pos_i.scale.x / 2));
+		pos_i.position.x += penetration;
+		resolved = true;
+	}
+	if (collidedRight(pos_i, pos_j)) {
+		float penetration = (pos_j.position.x + abs(pos_j.scale.x / 2)) - (pos_i.position.x - abs(pos_i.scale.x / 2));
+		pos_i.position.x += penetration;
+		resolved = true;
+	}
+	if (collidedTop(pos_i, pos_j)) {
+		float penetration = (pos_j.position.y - abs(pos_j.scale.y / 2)) - (pos_i.position.y + abs(pos_i.scale.y / 2));
+		pos_i.position.y += penetration;
+		resolved = true;
+	}
+	if (collidedBottom(pos_i, pos_j)) {
+		float penetration = (pos_j.position.y + abs(pos_j.scale.y / 2)) - (pos_i.position.y - abs(pos_i.scale.y / 2));
+		pos_i.position.y += penetration;
+		resolved = true;
+	}
+
+	return resolved;
 }
 
 void WorldSystem::win_level() {
@@ -500,30 +585,42 @@ void WorldSystem::handle_collisions() {
 				registry.invulnerableTimers.emplace(entity);
 				registry.deathTimers.emplace(entity);
 				registry.velocities.get(player).velocity = { 0.f, 0.f };
+				// ADD ARIA DEATH SOUND
 				Mix_PlayChannel(-1, aria_death_sound, 0);
 			}
 		}
 
+		// Checking obstacle - obstacle collisions
+		if (registry.obstacles.has(entity) && registry.obstacles.has(entity_other)) {
+			Position& pos_1 = registry.positions.get(entity);
+			Position& pos_2 = registry.positions.get(entity_other);
+			Velocity& vel_1 = registry.velocities.get(entity);
+			Velocity& vel_2 = registry.velocities.get(entity_other);
+
+			vec2 delt_v = vel_2.velocity - vel_1.velocity;
+			vec2 delt_p = pos_2.position - pos_1.position;
+
+			if (dot(delt_v, delt_p) <= 0) {
+				vec2 pi = pos_1.position;
+				vec2 pj = pos_2.position;
+				vec2 vi = vel_1.velocity;
+				vec2 vj = vel_2.velocity;
+				vec2 new_vi = vi - dot(vi - vj, pi - pj) / dot(pi - pj, pi - pj) * (pi - pj);
+				vec2 new_vj = vj - dot(vj - vi, pj - pi) / dot(pj - pi, pj - pi) * (pj - pi);
+
+				vel_1.velocity.x = new_vi.x;
+				vel_1.velocity.y = new_vi.y;
+				vel_2.velocity.x = new_vj.x;
+				vel_2.velocity.y = new_vj.y;
+			};
+		}
+
 		// Checking Player - Terrain Collisions
 		if (registry.players.has(entity) && registry.terrain.has(entity_other)) {
-			
-			////TODO: do something special when collision with moving wall?
-			//if (registry.terrain.get(entity_other).moveable) {
-			//}
-
 			Position& player_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
-			bool resolved = false;
 
-			if (collidedLeft(player_position, terrain_position) || collidedRight(player_position, terrain_position)) {
-				player_position.position.x = player_position.prev_position.x;
-				resolved = true;
-
-			}
-			if (collidedTop(player_position, terrain_position) || collidedBottom(player_position, terrain_position)) {
-				player_position.position.y = player_position.prev_position.y;
-				resolved = true;
-			}
+			bool resolved = collision_displace(player_position, terrain_position);
 			if (!resolved) {
 				player_position.position += collisionsRegistry.components[i].displacement;
 			}
@@ -534,25 +631,8 @@ void WorldSystem::handle_collisions() {
 		if (registry.enemies.has(entity) && registry.terrain.has(entity_other)) {
 			Position& enemy_position = registry.positions.get(entity);
 			Position& terrain_position = registry.positions.get(entity_other);
-			Velocity& enemy_velocity = registry.velocities.get(entity);
-      
-			// TODO: make sure enemy has all this stuff and this wont be awful
-			// TODO: REFACTOR
-			Resources& resources = registry.resources.get(entity);
-			HealthBar& health_bar = registry.healthBars.get(resources.healthBar);
-			Position& health_bar_position = registry.positions.get(resources.healthBar);
-			bool resolved = false;
 
-			if (collidedLeft(enemy_position, terrain_position) || collidedRight(enemy_position, terrain_position)) {
-				enemy_position.position.x = enemy_position.prev_position.x;
-				enemy_velocity.velocity.x *= -1;
-				resolved = true;
-			}
-			if (collidedTop(enemy_position, terrain_position) || collidedBottom(enemy_position, terrain_position)) {
-				enemy_position.position.y = enemy_position.prev_position.y;
-				enemy_velocity.velocity.y *= -1;
-				resolved = true;
-			}
+			bool resolved = collision_displace(enemy_position, terrain_position);
 			if (!resolved) {
 				enemy_position.position += collisionsRegistry.components[i].displacement;
 			}
@@ -579,11 +659,9 @@ void WorldSystem::handle_collisions() {
 				Position& terrain_2_position = registry.positions.get(entity_other);
 
 				if (collidedLeft(terrain_1_position, terrain_2_position) || collidedRight(terrain_1_position, terrain_2_position)) {
-					//terrain_1_position.position.x = terrain_1_position.prev_position.x; <- might help
 					terrain_1_velocity.velocity[0] = -terrain_1_velocity.velocity[0]; // switch x direction
 				}
 				if (collidedTop(terrain_1_position, terrain_2_position) || collidedBottom(terrain_1_position, terrain_2_position)) {
-					//terrain_1_position.position.y = terrain_1_position.prev_position.y; <- might help
 					terrain_1_velocity.velocity[1] = -terrain_1_velocity.velocity[1]; // switch y direction
 				}
 			}
@@ -636,7 +714,13 @@ void WorldSystem::handle_collisions() {
 					enemy_resource.currentHealth = std::min(enemy_resource.maxHealth, enemy_resource.currentHealth + damage_dealt / 2);
 				}
 				else {
-					if (isWeakTo(registry.enemies.get(entity_other).type, registry.projectiles.get(entity).type)) {
+					ElementType projectile_type = registry.projectiles.get(entity).type;
+					ElementType enemy_type = registry.enemies.get(entity_other).type;
+					if (enemy_type == ElementType::COMBO) {
+						enemy_type = registry.weaknessTimers.get(entity_other).weakTo;
+					}
+
+					if (isWeakTo(enemy_type, projectile_type)) {
 						damage_dealt *= 3;
 					}
 					enemy_resource.currentHealth -= damage_dealt;
@@ -655,6 +739,7 @@ void WorldSystem::handle_collisions() {
 
 					// win level and change background music if boss died
 					if (boss) {
+						registry.weaknessTimers.clear();
 						win_level();
 						Mix_FadeInMusic(background_music, -1, 1500);
 					}
@@ -864,7 +949,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			characterProjectileType.projectileType = ElementType::LIGHTNING;
 			break;
 		case GLFW_KEY_9:
-			win_level();
+			registry.winTimers.emplace(player);
+			registry.winTimers.get(player).timer_ms = 0;
 			break;
 		case GLFW_KEY_0:
 			registry.resources.get(player).maxHealth = 10000.f;

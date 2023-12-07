@@ -72,6 +72,7 @@ private:
 	Mix_Music* final_boss_intro_music;
 	Mix_Chunk* projectile_sound;
 	Mix_Chunk* heal_sound;
+	Mix_Chunk* last_enemy_death_sound;
 	Mix_Chunk* aria_death_sound;
 	Mix_Chunk* enemy_death_sound;
 	Mix_Chunk* damage_tick_sound;
@@ -81,5 +82,5 @@ private:
 
 	// C++ random number generator
 	std::default_random_engine rng;
-	std::uniform_real_distribution<float> uniform_dist; // number between 0..1
+	std::uniform_real_distribution<float> uniform_dist{0.5, 1}; // number between 0.5 ..1
 };

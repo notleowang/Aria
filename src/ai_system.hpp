@@ -17,5 +17,7 @@ public:
 	void init(RenderSystem* renderer);
 private:
 	bool enemyFireProjectile(Entity& enemy, vec2 direction);
+	bool enemyFireProjectile(Entity& enemy, vec2 direction, float speedMultiplier);
+	bool enemyFireProjectile(Entity& enemy, vec2 direction, float speedMultiplier, vec2 position);
 	RenderSystem* renderer;
 };
