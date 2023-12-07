@@ -75,64 +75,6 @@ bool GameLevel::init(uint level) {
 	this->power_up_next_level = false;
 
 	switch (level) {
-	case TUTORIAL:
-		floors.push_back(vec4(25, 30, 1300, 650));
-
-		this->player_starting_pos = vec2(200, 200);
-		this->exit_door_pos = vec2(1225, 580);
-		this->power_up_next_level = true;
-
-		health_packs_pos.push_back(vec2(400, 300));
-		health_packs_pos.push_back(vec2(600, 400));
-		health_packs_pos.push_back(vec2(800, 500));
-		health_packs_pos.push_back(vec2(1000, 600));
-
-		texts.push_back("Use WASD to move around");
-		text_attrs.push_back({ 0.f,225.f,1.0f,1.0f,1.0f,0.f });
-		texts.push_back("Use M1 button to shoot");
-		text_attrs.push_back({ 0.f,175.f,1.0f,1.0f,1.0f,0.f });
-		texts.push_back("Use 1,2,3,4 to cycle through elements");
-		text_attrs.push_back({ 0.f,125.f,1.0f,1.0f,1.0f,0.f });
-		texts.push_back("Collect health packs to heal!");
-		text_attrs.push_back({ 0.f,75.f,1.0f,1.0f,1.0f,0.f });
-		texts.push_back("Move to the exit door when ready");
-		text_attrs.push_back({ 0.f,25.f,1.0f,1.0f,1.0f,0.f });
-
-
-		terrains.push_back(std::make_pair(vec4(25, 0, 1300, default_north_height), NORTH_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(25, 675, 1300, default_south_height), SOUTH_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 700), SIDE_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(1325, 0, default_side_width, 700), SIDE_STATIONARY));
-		break;
-
-	case TUTORIAL_2:
-		floors.push_back(vec4(25, 30, 1300, 650));
-
-		this->player_starting_pos = vec2(650, 300);
-		this->exit_door_pos = vec2(1225, 580);
-
-		texts.push_back("Enemies are weak to certain elements");
-		text_attrs.push_back({ 0,225.f,0.8f,1.0f,1.0f,0.f });
-		texts.push_back("Fire is weak to Water, Water is weak to Lightning");
-		text_attrs.push_back({ 0.f,175.f,0.8f,1.0f,1.0f,0.f });
-		texts.push_back("Lightning is weak to Earth, Earth is weak to Fire");
-		text_attrs.push_back({ 0.f,125.f,0.8f,1.0f,1.0f,0.f });
-		texts.push_back("Same elements will heal enemies");
-		text_attrs.push_back({ 0.f,75.f,0.8f,1.0f,1.0f,0.f });
-		texts.push_back("Try it out!");
-		text_attrs.push_back({ 0.f,25.f,0.8f,1.0f,1.0f,0.f });
-
-		enemies.push_back(std::make_pair(vec2(200, 200), FIRE_NORMAL)); // last enemy must be fire
-		enemies.push_back(std::make_pair(vec2(200, 550), WATER_NORMAL)); // last enemy must be fire
-		enemies.push_back(std::make_pair(vec2(900, 200), LIGHTNING_NORMAL)); // last enemy must be fire
-		enemies.push_back(std::make_pair(vec2(900, 550), EARTH_NORMAL)); // last enemy must be fire
-
-		terrains.push_back(std::make_pair(vec4(25, 0, 1300, default_north_height), NORTH_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(25, 675, 1300, default_south_height), SOUTH_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 700), SIDE_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(1325, 0, default_side_width, 700), SIDE_STATIONARY));
-		break;
-
 	case CUTSCENE_1:
 		this->is_cutscene = true;
 		floors.push_back(vec4(25, 25, 10000, 400));
@@ -147,6 +89,68 @@ bool GameLevel::init(uint level) {
 		terrains.push_back(std::make_pair(vec4(25, 400, 10000, default_south_height), SOUTH_STATIONARY));
 		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 425), SIDE_STATIONARY));
 		terrains.push_back(std::make_pair(vec4(10025, 0, default_side_width, 425), SIDE_STATIONARY));
+		break;
+
+	case TUTORIAL:
+		floors.push_back(vec4(25, 30, 1300, 650));
+
+		this->player_starting_pos = vec2(200, 200);
+		this->exit_door_pos = vec2(1225, 580);
+
+		health_packs_pos.push_back(vec2(400, 300));
+		health_packs_pos.push_back(vec2(600, 400));
+		health_packs_pos.push_back(vec2(800, 500));
+		health_packs_pos.push_back(vec2(1000, 600));
+
+		texts.push_back("Use WASD to move around");
+		text_attrs.push_back({ 0.f,220.f,0.8f,1.0f,1.0f,0.f });
+		texts.push_back("Use M1 button to shoot");
+		text_attrs.push_back({ 0.f,180.f,0.8f,1.0f,1.0f,0.f });
+		texts.push_back("Use 1,2,3,4 to cycle through elements");
+		text_attrs.push_back({ 0.f,140.f,0.8f,1.0f,1.0f,0.f });		
+		texts.push_back("and also scroll-wheel and M2");
+		text_attrs.push_back({ 0.f,100.f,0.8f,1.0f,1.0f,0.f });
+		texts.push_back("Collect health packs to heal!");
+		text_attrs.push_back({ 0.f,60.f,0.8f,1.0f,1.0f,0.f });
+		texts.push_back("Move to the exit door when ready");
+		text_attrs.push_back({ 0.f,20.f,0.8f,1.0f,1.0f,0.f });
+
+
+		terrains.push_back(std::make_pair(vec4(25, 0, 1300, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 675, 1300, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 700), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1325, 0, default_side_width, 700), SIDE_STATIONARY));
+		break;
+
+	case TUTORIAL_2:
+		floors.push_back(vec4(25, 30, 1300, 650));
+
+		this->player_starting_pos = vec2(650, 300);
+		this->exit_door_pos = vec2(1225, 580);
+		this->power_up_next_level = true;
+
+		texts.push_back("Enemies are weak to certain elements");
+		text_attrs.push_back({ 0,220.f,0.8f,1.0f,1.0f,0.f });
+		texts.push_back("Fire is weak to Water, Water is weak to Lightning");
+		text_attrs.push_back({ 0.f,180.f,0.8f,1.0f,1.0f,0.f });
+		texts.push_back("Lightning is weak to Earth, Earth is weak to Fire");
+		text_attrs.push_back({ 0.f,140.f,0.8f,1.0f,1.0f,0.f });
+		texts.push_back("Same elements will heal enemies");
+		text_attrs.push_back({ 0.f,100.f,0.8f,1.0f,1.0f,0.f });
+		texts.push_back("Try it out!");
+		text_attrs.push_back({ 0.f,60.f,0.8f,1.0f,1.0f,0.f });		
+		texts.push_back("Make sure to kill all enemies in the level");
+		text_attrs.push_back({ 0.f,20.f,0.8f,1.0f,1.0f,0.f });
+
+		enemies.push_back(std::make_pair(vec2(200, 200), FIRE_NORMAL)); // last enemy must be fire
+		enemies.push_back(std::make_pair(vec2(200, 550), WATER_NORMAL)); // last enemy must be fire
+		enemies.push_back(std::make_pair(vec2(900, 200), LIGHTNING_NORMAL)); // last enemy must be fire
+		enemies.push_back(std::make_pair(vec2(900, 550), EARTH_NORMAL)); // last enemy must be fire
+
+		terrains.push_back(std::make_pair(vec4(25, 0, 1300, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 675, 1300, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 700), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(1325, 0, default_side_width, 700), SIDE_STATIONARY));
 		break;
 	case LEVEL_1:
 		this->player_starting_pos = vec2(200, 700);
