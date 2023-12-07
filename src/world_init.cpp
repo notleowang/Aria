@@ -678,7 +678,7 @@ Entity createProjectile(RenderSystem* renderer, vec2 pos, vec2 vel, ElementType 
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 	position.angle = atan2(vel.y, vel.x);
-	position.scale = vec2(30.f, 30.f);
+	position.scale = vec2(sprite_sheet.frame_width, sprite_sheet.frame_height);
 
 	registry.collidables.emplace(entity);
   if (!hostile) {
