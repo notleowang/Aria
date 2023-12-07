@@ -709,6 +709,8 @@ bool GameLevel::init(uint level) {
 	case THE_END:
 		this->is_cutscene = true;
 		this->player_starting_pos = vec2(600, 400);
+		this->exit_door_pos = NULL_POS;
+
 		texts.push_back("THE END");
 		text_attrs.push_back({ 500.f,307.f,1.0f,1.0f,1.0f,0.f });
 

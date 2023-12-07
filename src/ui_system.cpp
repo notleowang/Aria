@@ -122,7 +122,7 @@ void UISystem::showPauseMenu(bool* p_open) {
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, spc);
 
 		ImGui::PushFont(MainMenuFont);
-		ImGui::SetCursorPosY(150.f);
+		ImGui::SetCursorPosY(200.f);
 		CenterText("Options");
 		ImGui::PopFont();
 		ImGui::PopStyleVar();

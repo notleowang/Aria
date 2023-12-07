@@ -600,31 +600,31 @@ void WorldSystem::restart_game() {
 		Mix_PlayChannel(-1, final_boss_lsvl, 0);
 	} 
 	else if (curr_level == CUTSCENE_1) {
-		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_FadeInMusic(cutscene_background, -1, 500);
 		Mix_PlayChannel(-1, cutscene1_voiceline, 0);
 	}
 	else if (curr_level == CUTSCENE_2) {
-		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_FadeInMusic(cutscene_background, -1, 500);
 		Mix_PlayChannel(-1, cutscene2_voiceline, 0);
 	}
 	else if (curr_level == CUTSCENE_3) {
-		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_FadeInMusic(cutscene_background, -1, 500);
 		Mix_PlayChannel(-1, cutscene3_voiceline, 0);
 	}
 	else if (curr_level == CUTSCENE_4) {
-		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_FadeInMusic(cutscene_background, -1, 500);
 		Mix_PlayChannel(-1, cutscene4_voiceline, 0);
 	}
 	else if (curr_level == CUTSCENE_5) {
-		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_FadeInMusic(cutscene_background, -1, 500);
 		Mix_PlayChannel(-1, cutscene5_voiceline, 0);
 	}
 	else if (curr_level == CUTSCENE_6) {
-		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_FadeInMusic(cutscene_background, -1, 500);
 		Mix_PlayChannel(-1, cutscene6_voiceline, 0);
 	}
 	else if (curr_level == THE_END) {
-		Mix_FadeInMusic(background_music, 0, 500);
+		Mix_FadeInMusic(background_music, -1, 500);
 	}
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
@@ -1253,7 +1253,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 	if (action == GLFW_PRESS && key == GLFW_KEY_9) win_level();
 
 	//Disables keys when death or win timer happening
-	if (registry.deathTimers.has(player) || registry.winTimers.has(player) || this->curr_level.getIsCutscene()) { return; }
+	if (registry.deathTimers.has(player) || registry.winTimers.has(player) || (this->curr_level.getIsCutscene() && this->curr_level.curr_level != THE_END)) { return; }
 
 	Velocity& player_velocity = registry.velocities.get(player);
 	Position& player_position = registry.positions.get(player);
@@ -1389,7 +1389,7 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 void WorldSystem::on_mouse_button(int button, int action, int mod) {	
 	//Disables mouse when death or win timer happening
-	if (UISystem::getInstance()->getState() != PLAY_GAME || registry.deathTimers.has(player) || registry.winTimers.has(player) || curr_level.getIsCutscene()) { return; }
+	if (UISystem::getInstance()->getState() != PLAY_GAME || registry.deathTimers.has(player) || registry.winTimers.has(player) || this->curr_level.getIsCutscene()) { return; }
 	
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		// check mana
