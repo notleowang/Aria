@@ -99,6 +99,21 @@ Their health values were quite low which made fighting the boss not really feel 
 **Observation**: We noticed that players would sometimes die during a level as enemies slowly dwindled down the player’s health and players had no form of gaining back health.\
 **Change**: We implemented health packs throughout some difficult levels so the player can be more successful in completing the level.
 
+**Observation**: User's had too much difficulty hitting enemies
+**Change**: Enemies' speed was reduced when they were dodging the player's projectiles. Change made in [this commit](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/commit/3b575567193e4f74545f4c330c49f724153f0bf8#diff-3000781566c743b7082cc7fb39eb123341cd39ad26b73ead94f7c4e0c5623335R57), which reduced the speed from 350 to 300. Initially the speed was set to 200, then I discovered that the enemies were too easy, so I adjusted it to 350. Then the enemies were too frustrating to beat as they dodged too quickly, so I reduced it to 300. 
+
+**Observation**: Projectiles shot by the bosses were very fast and thus difficult to dodge at full speed.
+**Change**: The speed of the projectiles shot by the bosses had to be decreased. It was set to 0.4x the normal speed initially, then I updated it to 0.5x the normal speed in [this commit](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/commit/a198d13eea120e3f4007b7cf36be950903ad1cc50), as I experienced a loss of the game's momentum at 0.4x speed (i.e. it felt boring).
+
+**Observation**: Boss health at the end of M3 was too low for an interesting battle.
+**Change**: A lot of adjustments were made for the amount that the bosses heal. I originally envisioned players being able to kill a boss with no power ups after one cycle of the bosses' phases. I did not want players to be able to easily kill the bosses before the first cycle is over, so that they can experience all the attacking patterns the bosses have. However, the player must also be able to do net damage each cycle, otherwise the bosses are simply not beatable. I eventually arrived at a sweet spot of healing 625 HP over 1250ms in [this commit](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/commit/d89c36e2c21041abf3c8eba956afde08d7069f6d).
+
+**Observation**: At the end of M3 bosses throw very few projectiles and they are very easy to dodge
+**Change**: Now some phases require precise movement from the players to dodge the projectiles. I had to also adjust the width of the opening during some phases so that the players must navigate carefully (but should not take damage if they move correctly). In the phase where the bosses generate projectiles around the player, I had to try different values for the size of the opening and the speed at which the projectiles move, and eventually I arrived at a maximum velocity of 200 initially then slowing down to 150, in [this commit](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/commit/7bf22ea6eec6ac26eeedcdbadf018feaff0d3164).
+
+**Observation**: With new boss attack patterns, player position is very restricted and when bosses can dodge projectiles the player is very unlikely to hit their target.
+**Change**: Boss movement was made simpler - and the bosses will never chase the players either.
+
 ## Development Plan
 Most of the work in this milestone aligned with our development plan for this milestone.
 
