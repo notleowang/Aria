@@ -6,15 +6,15 @@ Below is the documentation for our `README.md` submission for Milestone 4.
 
 ## User-game interactions
 ### Changes implemented + rationale
-**Observation**: Users found it difficult to remember which power-ups were currently active and there was no visual indicator at all for �increase damage� power-ups.\
+**Observation**: Users found it difficult to remember which power-ups were currently active and there was no visual indicator at all for “increase damage” power-ups.\
 **Change**: Added visual indicator icons for the active power-ups to the element selection display
 
 **Observation**: The information about which enemies are weak to which element was not something our users were able to intuitively guess. 
 The fact that enemies are healed by their own element was often overlooked.\
 **Change**: Added new tutorial level with description of the weaknesses and an infographic showing which element to use on which. It also includes 4 enemies on which to test the elemental projectiles on such that the user can see the differences in damage dealt and enemies healing.
 
-**Observation**: Some users felt that using 1,2,3,4 as hotkeys to change the player�s attack element was sometimes awkward as they use the same hand to move the player using WASD.\
-**Change**: In addition to the 1,2,3,4 hotkeys, we provide two additional means of changing the attack element: scroll wheel will cycle through the elements and right-click will increment the player�s current attack element.
+**Observation**: Some users felt that using 1,2,3,4 as hotkeys to change the player’s attack element was sometimes awkward as they use the same hand to move the player using WASD.\
+**Change**: In addition to the 1,2,3,4 hotkeys, we provide two additional means of changing the attack element: scroll wheel will cycle through the elements and right-click will increment the player’s current attack element.
 
 **Observation**: Player health and mana bars cluttered the screen.\
 **Change**: Moved the player health and mana bars to the top-left hand corner so as not to obscure the action in the middle of the screen.
@@ -26,25 +26,28 @@ The fact that enemies are healed by their own element was often overlooked.\
 **Change**: Added pause menu (ESC)
 
 **Observation**:  To restart the game, it was necessary to kill the program and completely restart it in Visual Studio.\
-**Change**: Added pause menu (bound to ESC key) which allows user to exit to the main menu and click �Start Game� for a fresh restart
+**Change**: Added pause menu (bound to ESC key) which allows user to exit to the main menu and click “Start Game” for a fresh restart
 
-**Observation**:  Exiting the program was previously bound to �backspace� key, which felt inelegant and was not obvious.\
-**Change**: Added pause menu which allows user to exit to the main menu and click �Quit Game� to stop the program.
+**Observation**:  Exiting the program was previously bound to “backspace” key, which felt inelegant and was not obvious.\
+**Change**: Added pause menu which allows user to exit to the main menu and click “Quit Game” to stop the program.
 
 **Observation**: Gloomy lighting effect caused visibility issues during gameplay. It was difficult to see enemies on the edges of the screen and overall too dim to be visually appealing.\
 **Change**: Increased the radius of visibility on the lighting effect.
 
-**Observation**: No indicator to the player once they have killed the last enemy that the exit door has now appeared if they player isn�t in view of the door.\
+**Observation**: No indicator to the player once they have killed the last enemy that the exit door has now appeared if they player isn’t in view of the door.\
 **Change**: Added a sound effect when exit door appears
 
 ## Entry Points
 ### Advanced Story Elements
-- Cutscenes (LINKS HERE TODO)
-
+- Cutscenes 
+  - Map design of CUTSCENE_1 found here: https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/969e0bbd470317f4744cb5617073b674269e771c/src/game_level.cpp#L78 
+    All other cutscenes are labeled via the  ```case``` statements
+  - Cutscene auto-movements and logic found here: https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/blob/31efb9fcc0ace2dc7dcf40acce53b7e863fb5478/src/world_system.cpp#L385
+  - Audio files and voice recordings are labeled ```voiceline```, ```lsvl``` (lost_soul voice line), or similarily in https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/tree/main/data/audio
 ### Advanced Integrated Assets
 - Wide variety of custom sprites (all except those listed below)
 - Custom voice lines (see cutscenes)
-- [Original music](https://github.students.cs.ubc.ca/CPSC427-2023W-T1/Team06Aria/commit/80679e84a270223560993bac1a3ad5ee82e85859)
+- Original music (link)
 
 Below we have included sources for all assets used in the game that were not custom made by one of our team members (replacement of unusable assets as well as proper attributions are incoming for cross-play)
 
@@ -93,7 +96,7 @@ the time required to kill enemies relative to the other power-ups.\
 Their health values were quite low which made fighting the boss not really feel like fighting a boss. In addition to this, the boss AI was too easy (similar to small enemies).\
 **Change**: We increased the amount of health the bosses had and we also made bosses have different ai than smaller enemies by implementing attack patterns.
 
-**Observation**: We noticed that players would sometimes die during a level as enemies slowly dwindled down the player�s health and players had no form of gaining back health.\
+**Observation**: We noticed that players would sometimes die during a level as enemies slowly dwindled down the player’s health and players had no form of gaining back health.\
 **Change**: We implemented health packs throughout some difficult levels so the player can be more successful in completing the level.
 
 ## Development Plan
