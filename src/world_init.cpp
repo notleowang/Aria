@@ -520,7 +520,7 @@ Entity createPowerUpIndicator(RenderSystem* renderer, Entity& owner_entity, vec2
 	float scale_factor = 2.f;
 	position.scale = vec2(scale_factor * size.x, scale_factor * size.y);
 
-	Follower& follower = registry.followers.emplace(entity);
+	SecondaryFollower& follower = registry.secondaryFollowers.emplace(entity);
 	follower.owner = owner_entity;
 	follower.y_offset = y_offset;
 	follower.x_offset = x_offset;
