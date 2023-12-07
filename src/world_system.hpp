@@ -82,5 +82,5 @@ private:
 
 	// C++ random number generator
 	std::default_random_engine rng;
-	std::uniform_real_distribution<float> uniform_dist; // number between 0..1
+	std::uniform_real_distribution<float> uniform_dist{0.5, 1}; // number between 0.5 ..1
 };
