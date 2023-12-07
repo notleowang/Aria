@@ -259,9 +259,8 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	ScreenState& screen = registry.screenStates.components[0];
 
 	if (this->curr_level.getCurrLevel() == TUTORIAL_2) {
-		for (Enemy& enemy : registry.enemies.components) {
-			enemy.isAggravated = false;
-		}
+		Resources& resource = registry.resources.get(player);
+		resource.currentHealth = 100000.f;
 	}
 
 	for (Entity entity : registry.invulnerableTimers.entities) {
