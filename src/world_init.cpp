@@ -170,6 +170,9 @@ Entity createLostSoul(RenderSystem* renderer, vec2 pos) {
 
 	createShadow(renderer, entity, TEXTURE_ASSET_ID::LOST_SOUL, GEOMETRY_BUFFER_ID::SPRITE);
 
+	//flag to render
+	if (registry.cutscenes.size() > 0 && registry.cutscenes.components[0].is_cutscene_6) return entity;
+
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::LOST_SOUL,

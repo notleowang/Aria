@@ -39,7 +39,7 @@ struct LostSoul {
 };
 
 struct Cutscene {
-
+	bool is_cutscene_6 = false;
 };
 
 // life orb

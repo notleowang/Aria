@@ -72,6 +72,7 @@ bool GameLevel::init(uint level) {
 	lost_souls.clear();
 
 	this->hasEnemies = false;
+	this->power_up_next_level = false;
 
 	switch (level) {
 	case TUTORIAL:
@@ -79,6 +80,7 @@ bool GameLevel::init(uint level) {
 
 		this->player_starting_pos = vec2(200, 200);
 		this->exit_door_pos = vec2(1225, 580);
+		this->power_up_next_level = true;
 
 		health_packs_pos.push_back(vec2(400, 300));
 		health_packs_pos.push_back(vec2(600, 400));
@@ -122,6 +124,7 @@ bool GameLevel::init(uint level) {
 	case LEVEL_1:
 		this->player_starting_pos = vec2(200, 700);
 		this->exit_door_pos = vec2(1450, 775);
+		this->power_up_next_level = true;
 
 		floors.push_back(vec4(25, 25, 1800, 875));
 
@@ -238,6 +241,7 @@ bool GameLevel::init(uint level) {
 	
 	case LEVEL_2: // Same as level 1 but with moving walls
 		this->player_starting_pos = vec2(100, 3750);
+		this->power_up_next_level = true;
 
 		texts.push_back("Don't get haunted by the ghosts!");
 		text_attrs.push_back({ 0.f,50.f,1.0f,1.0f,1.0f,0.f });
@@ -343,8 +347,9 @@ bool GameLevel::init(uint level) {
 
 		break;
 
-	case LEVEL_3: // Same as level 1 but with moving walls
+	case LEVEL_LEO: // Same as level 1 but with moving walls
 		this->player_starting_pos = vec2(200, 700);
+		this->power_up_next_level = true;
 
 		texts.push_back("Don't get haunted by the ghosts!");
 		text_attrs.push_back({ 0.f,80.f,1.0f,1.0f,1.0f,0.f });
@@ -411,6 +416,7 @@ bool GameLevel::init(uint level) {
 	case LEVEL_4:
 		this->player_starting_pos = vec2(200, 200);
 		this->exit_door_pos = vec2(3900, 1880);
+		this->power_up_next_level = true;
 
 		floors.push_back(vec4(0, 0, 4000, 2000));
 
@@ -454,9 +460,10 @@ bool GameLevel::init(uint level) {
 
 		break;
 
-	case LEVEL_LEO:
+	case LEVEL_3:
 		this->player_starting_pos = vec2(1000, 400);
 		this->exit_door_pos = vec2(-100, 3325);
+		this->power_up_next_level = true;
 
 		// Spawn Area
 		terrains.push_back(std::make_pair(vec4(500, 0, 1000, default_north_height), NORTH_STATIONARY));
@@ -687,17 +694,24 @@ bool GameLevel::init(uint level) {
 
 	case CUTSCENE_6:
 		this->is_cutscene = true;
-		floors.push_back(vec4(25, 25, 2500, 400));
+
+		floors.push_back(vec4(25, 25, 12000, 400));
 
 		this->player_starting_pos = vec2(50, 300);
-		this->exit_door_pos = vec2(2300, 200);
+		this->exit_door_pos = vec2(2300, 1000); // render outside for now
 		this->cutscene_player_velocity = { 300.f,0.f };
 		this->life_orb_piece = 0; // full piece
 
-		terrains.push_back(std::make_pair(vec4(25, 0, 2500, default_north_height), NORTH_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(25, 400, 2500, default_south_height), SOUTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 0, 12000, default_north_height), NORTH_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(25, 400, 12000, default_south_height), SOUTH_STATIONARY));
 		terrains.push_back(std::make_pair(vec4(0, 0, default_side_width, 425), SIDE_STATIONARY));
-		terrains.push_back(std::make_pair(vec4(2525, 0, default_side_width, 425), SIDE_STATIONARY));
+		terrains.push_back(std::make_pair(vec4(12025, 0, default_side_width, 425), SIDE_STATIONARY));
+		lost_souls.push_back({ vec2(115, 200), LostSoul() });
+
+		
+		//TIMER 
+		obstacles.push_back({ vec2(0, -300), vec2(30,30), vec2(10.f,0.f) });
+
 		break;
 
 	case THE_END:

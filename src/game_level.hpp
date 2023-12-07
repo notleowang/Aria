@@ -73,6 +73,7 @@ public:
 	vec2 cutscene_player_velocity;
 	int life_orb_piece;
 	bool hasEnemies;
+	bool power_up_next_level = false;
 
 	std::vector<vec2> health_packs_pos;
 
@@ -111,6 +112,10 @@ public:
 
 	bool getIsBossLevel() {
 		return is_boss_level;
+	}
+
+	bool getPowerUpNextLevel() {
+		return power_up_next_level;
 	}
 
 	vec2& getPlayerStartingPos() {

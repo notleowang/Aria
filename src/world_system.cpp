@@ -56,7 +56,9 @@ WorldSystem::~WorldSystem() {
 	if (end_level_sound != nullptr)
 		Mix_FreeChunk(end_level_sound);
 	if (power_up_sound != nullptr)
-		Mix_FreeChunk(power_up_sound);
+		Mix_FreeChunk(power_up_sound); 
+	if (final_boss_death_sound != nullptr)
+		Mix_FreeChunk(final_boss_death_sound);
 	if (cutscene1_voiceline != nullptr)
 		Mix_FreeChunk(cutscene1_voiceline);
 	if (cutscene2_voiceline != nullptr)
@@ -67,6 +69,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(cutscene4_voiceline);
 	if (cutscene5_voiceline != nullptr)
 		Mix_FreeChunk(cutscene5_voiceline);
+	if (cutscene6_voiceline != nullptr)
+		Mix_FreeChunk(cutscene6_voiceline);
 	if (fire_boss_lsvl != nullptr)
 		Mix_FreeChunk(fire_boss_lsvl);
 	if (water_boss_lsvl != nullptr)
@@ -184,6 +188,7 @@ GLFWwindow* WorldSystem::create_window() {
 	obstacle_collision_sound = Mix_LoadWAV(audio_path("obstacle_collision.wav").c_str());
 	end_level_sound = Mix_LoadWAV(audio_path("portal.wav").c_str());
 	power_up_sound = Mix_LoadWAV(audio_path("power_up.wav").c_str());
+	final_boss_death_sound = Mix_LoadWAV(audio_path("final_boss_death_sound.wav").c_str());
 	
 	Mix_VolumeChunk(projectile_sound, VOLUME);
 	Mix_VolumeChunk(heal_sound, VOLUME);
@@ -193,6 +198,7 @@ GLFWwindow* WorldSystem::create_window() {
 	Mix_VolumeChunk(power_up_sound, VOLUME);
 	Mix_VolumeChunk(obstacle_collision_sound, VOLUME);
 	Mix_VolumeChunk(damage_tick_sound, VOLUME);
+	//Mix_VolumeChunk(final_boss_death_sound, VOLUME);
 
 	// voicelines
 	cutscene1_voiceline = Mix_LoadWAV(audio_path("cutscene_1_voiceline.wav").c_str());
@@ -201,6 +207,7 @@ GLFWwindow* WorldSystem::create_window() {
 	Mix_VolumeChunk(cutscene3_voiceline, 100);
 	cutscene4_voiceline = Mix_LoadWAV(audio_path("aria_second_shard.wav").c_str());
 	cutscene5_voiceline = Mix_LoadWAV(audio_path("cutscene_5_voiceline.wav").c_str());
+	cutscene6_voiceline = Mix_LoadWAV(audio_path("cutscene_6_voiceline.wav").c_str());
 
 	// lost soul voicelines (lsvl)
 	fire_boss_lsvl = Mix_LoadWAV(audio_path("fire_boss_lsvl.wav").c_str());
@@ -299,7 +306,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			// Change level here
 			if (!timer.changedLevel) {
 				timer.changedLevel = true;
-				if (this->curr_level.getIsBossLevel()) {
+				if (this->curr_level.getPowerUpNextLevel()) {
 					this->next_level = this->curr_level.getCurrLevel() + 1;
 					this->curr_level.init(POWER_UP);
 				}
@@ -458,6 +465,37 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 	}
 
+	else if (this->curr_level.curr_level == CUTSCENE_6) {
+		if (registry.lifeOrbs.size() == 0) return true;
+		Entity& timer = registry.obstacles.entities[0];
+		float timer_x_pos = registry.positions.get(timer).position.x;
+		Entity& life_orb = registry.lifeOrbs.entities[0];
+		Position& player_position = registry.positions.get(player);
+		
+		//Velocity
+		Velocity& player_vel = registry.velocities.get(player);
+		Velocity& life_orb_vel = registry.velocities.get(life_orb);
+
+		if (timer_x_pos < 150){
+			Entity& lost_soul = registry.lostSouls.entities[0];
+
+			Velocity& lost_soul_vel = registry.velocities.get(lost_soul);
+
+			lost_soul_vel = player_vel;
+			life_orb_vel = player_vel;
+		}
+		else if (timer_x_pos < 330) {
+			if (registry.lostSouls.size()>0){
+				registry.remove_all_components_of((registry.lostSouls.entities[0]));
+			}
+		}
+		else if (timer_x_pos >= 330) {
+			win_level();
+			registry.velocities.get(life_orb).velocity = vec2{ 0.f,0.f };
+		}
+
+	}
+
 
 	if (registry.lifeOrbs.entities.size() > 0) {
 		createShadow(renderer, player, TEXTURE_ASSET_ID::PLAYER, GEOMETRY_BUFFER_ID::PLAYER);
@@ -540,7 +578,10 @@ void WorldSystem::restart_game() {
 	}
 	else if (curr_level == CUTSCENE_6) {
 		Mix_FadeInMusic(cutscene_background, 0, 500);
-		Mix_PlayChannel(-1, cutscene4_voiceline, 0);
+		Mix_PlayChannel(-1, cutscene6_voiceline, 0);
+	}
+	else if (curr_level == THE_END) {
+		Mix_FadeInMusic(background_music, 0, 500);
 	}
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
@@ -551,7 +592,11 @@ void WorldSystem::restart_game() {
 
 
 	player = createAria(renderer, player_starting_pos);
-	if (this->curr_level.getIsCutscene()) registry.cutscenes.emplace(player);
+	if (this->curr_level.getIsCutscene()) {
+		Cutscene& cutscene = registry.cutscenes.emplace(player);
+		if (this->curr_level.curr_level == CUTSCENE_6) cutscene.is_cutscene_6 = true;
+	}
+
 
 	if (curr_level == Level::TUTORIAL) {
 		// Familarize player with health pack
@@ -635,6 +680,7 @@ void WorldSystem::restart_game() {
 		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
 	}
 	else if (this->curr_level.getCurrLevel() == CUTSCENE_6) {
+		Entity life_orb = createLifeOrb(renderer, {115,305}, this->curr_level.getLifeOrbPiece());
 		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
 		Animation& player_animation = registry.animations.get(player);
 		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
@@ -981,6 +1027,10 @@ void WorldSystem::handle_collisions() {
 						if (this->curr_level.getCurrLevel() == FIRE_BOSS) {
 							win_level();
 							return;
+						}
+
+						if (this->curr_level.getCurrLevel() == FINAL_BOSS) {
+							Mix_PlayChannel(-1, final_boss_death_sound, 0);
 						}
 						
 						createLifeOrb(renderer, boss_position, this->curr_level.getLifeOrbPiece());
