@@ -19,7 +19,8 @@ const vec2 NULL_POS = vec2(-1, -1);
 // enum for each level type
 enum Level {
 	TUTORIAL = 0,
-	LEVEL_1 = TUTORIAL + 1,
+	TUTORIAL_2 = TUTORIAL + 1,
+	LEVEL_1 = TUTORIAL_2 + 1,
 	FIRE_BOSS = LEVEL_1 + 1,
 	LEVEL_2 = FIRE_BOSS + 1,
 	EARTH_BOSS = LEVEL_2 + 1,
@@ -28,8 +29,7 @@ enum Level {
 	LEVEL_4 = LIGHTNING_BOSS + 1,
 	WATER_BOSS = LEVEL_4 + 1,
 	FINAL_BOSS = WATER_BOSS + 1,
-	POWER_UP = FINAL_BOSS + 1,
-	LEVEL_LEO = POWER_UP + 1
+	POWER_UP = FINAL_BOSS + 1
 };
 
 //Enemy types to re-use later
