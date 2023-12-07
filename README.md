@@ -6,6 +6,16 @@ Below is the documentation for our `README.md` submission for Milestone 4.
 
 ## Entry Points
 
+## Advanced Integrated Assets
+### Assets created by the team
+### Assets from other sources
+
+## User-game interactions
+### Changes implemented + rationale
+
+## Game balance
+### Changes implemented + rationale
+
 ## Development Plan
 Most of the work in this milestone aligned with our development plan for this milestone.
 
