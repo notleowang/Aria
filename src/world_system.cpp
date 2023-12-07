@@ -258,6 +258,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	assert(registry.screenStates.components.size() <= 1);
 	ScreenState& screen = registry.screenStates.components[0];
 
+	if (this->curr_level.getCurrLevel() == TUTORIAL_2) {
+		for (Enemy& enemy : registry.enemies.components) {
+			enemy.isAggravated = false;
+		}
+	}
+
 	for (Entity entity : registry.invulnerableTimers.entities) {
 		InvulnerableTimer& timer = registry.invulnerableTimers.get(entity);
 		timer.timer_ms -= elapsed_ms_since_last_update;
@@ -325,6 +331,43 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (timer.timer_ms <= -4000.f) {
 			registry.winTimers.remove(entity);
 			screen.apply_spotlight = false;
+		}
+	}
+
+	for (Entity entity : registry.weaknessTimers.entities) {
+		WeaknessTimer& timer = registry.weaknessTimers.get(entity);
+		timer.timer_ms -= elapsed_ms_since_last_update;
+		if (timer.timer_ms <= 0.f) {
+			// Weakness to this element has expired
+			float max_timer = 5000.f;
+			float curr_timer = max_timer * uniform_dist(rng);
+
+			ElementType elementType = getRandomElementType();
+
+			timer.timer_ms = curr_timer;
+			timer.weakTo = elementType;
+			
+			Animation& animation = registry.animations.get(entity);
+			FINAL_BOSS_SPRITE_STATES state;
+			switch (elementType) {
+				case (ElementType::WATER):
+					state = FINAL_BOSS_SPRITE_STATES::WATER;
+					break;
+				case (ElementType::FIRE):
+					state = FINAL_BOSS_SPRITE_STATES::FIRE;
+					break;
+				case (ElementType::EARTH):
+					state = FINAL_BOSS_SPRITE_STATES::EARTH;
+					break;
+				case (ElementType::LIGHTNING):
+					state = FINAL_BOSS_SPRITE_STATES::LIGHTNING;
+					break;
+				default:
+					state = FINAL_BOSS_SPRITE_STATES::WEST;
+					break;
+			}
+			animation.setState((int)state);
+			animation.is_animating = false;
 		}
 	}
 
@@ -652,6 +695,11 @@ void WorldSystem::restart_game() {
 	projectileSelectDisplay = createProjectileSelectDisplay(renderer, player, PROJECTILE_SELECT_DISPLAY_Y_OFFSET, PROJECTILE_SELECT_DISPLAY_X_OFFSET);
 
 	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
+	if (this->curr_level.getCurrLevel() == FINAL_BOSS) {
+		if (registry.bosses.size() > 0) {
+			registry.weaknessTimers.emplace(registry.bosses.entities[0]);
+		}
+	}
 
 	if (this->curr_level.getCurrLevel() == CUTSCENE_1 ||
 		this->curr_level.getCurrLevel() == CUTSCENE_4) {
@@ -999,7 +1047,13 @@ void WorldSystem::handle_collisions() {
 					enemy_resource.currentHealth = std::min(enemy_resource.maxHealth, enemy_resource.currentHealth + damage_dealt / 2);
 				}
 				else {
-					if (isWeakTo(registry.enemies.get(entity_other).type, registry.projectiles.get(entity).type)) {
+					ElementType projectile_type = registry.projectiles.get(entity).type;
+					ElementType enemy_type = registry.enemies.get(entity_other).type;
+					if (enemy_type == ElementType::COMBO) {
+						enemy_type = registry.weaknessTimers.get(entity_other).weakTo;
+					}
+
+					if (isWeakTo(enemy_type, projectile_type)) {
 						damage_dealt *= 3;
 					}
 					enemy_resource.currentHealth -= damage_dealt;
@@ -1022,7 +1076,7 @@ void WorldSystem::handle_collisions() {
 					// drop a life orb shard and change background music if boss died
 					if (boss) {
 						Mix_FadeInMusic(background_music, -1, 1500);
-						
+						registry.weaknessTimers.clear();
 						// fire boss does not drop a shard, so win level and return
 						if (this->curr_level.getCurrLevel() == FIRE_BOSS) {
 							win_level();
