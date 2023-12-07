@@ -163,7 +163,7 @@ void updateShadows() {
 
 		float dist = abs(distance(owner_pos.position, light_source_pos.position));
 		shadow_pos.scale = owner_pos.scale * (max_dist - dist) / max_dist;
-		shadow_pos.scale.y *= 2;
+		shadow_pos.scale.y *= 1.5;
 
 		shadow_pos.position.x += cos(shadow_pos.angle - M_PI / 2) * (shadow_pos.scale.y / 2);
 		shadow_pos.position.y += owner_pos.scale.y / 2 + shadow_pos.scale.y / 2 * sin(shadow_pos.angle - M_PI/2);

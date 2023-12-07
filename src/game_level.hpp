@@ -33,7 +33,10 @@ enum Level {
 	WATER_BOSS = LEVEL_4 + 1,
 	CUTSCENE_5 = WATER_BOSS + 1,
 	FINAL_BOSS = CUTSCENE_5 + 1,
-	POWER_UP = FINAL_BOSS + 1,
+	CUTSCENE_6 = FINAL_BOSS + 1,
+	THE_END = CUTSCENE_6 + 1,
+	POWER_UP = THE_END + 1,
+	LEVEL_LEO = POWER_UP + 1,
 };
 
 //Enemy types to re-use later
@@ -49,14 +52,15 @@ const Enemy EARTH_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::EARTH, f
 const Enemy LIGHTNING_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING, true };
 const Enemy LIGHTNING_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING, false };
 
-const Enemy COMBO_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::COMBO, false };
+const Enemy FINAL_BOSS_ATTRS = { 20.f, 3000.f, 0.5f, 1.f, ElementType::COMBO, false };
 
 // Terrain types
-const Terrain NORTH_STATIONARY = {DIRECTION::N, false};
-const Terrain SIDE_STATIONARY = {DIRECTION::E, false};
-const Terrain SOUTH_STATIONARY = {DIRECTION::S, false};
-const Terrain GENERIC_STATIONARY = {DIRECTION::W, false};
-const Terrain GENERIC_MOVABLE = {DIRECTION::W, true};
+const Terrain NORTH_STATIONARY = {DIRECTION::N, 0.f, false};
+const Terrain SIDE_STATIONARY = {DIRECTION::E, 0.f, false};
+const Terrain SOUTH_STATIONARY = {DIRECTION::S, 0.f, false};
+const Terrain GENERIC_STATIONARY = {DIRECTION::W, 0.f, false};
+const Terrain GENERIC_MOVABLE_SLOW = {DIRECTION::W, 150.f, true};
+const Terrain GENERIC_MOVABLE_FAST = {DIRECTION::W, 200.f, true};
 
 class GameLevel
 {
@@ -68,6 +72,7 @@ public:
 	bool is_boss_level;
 	vec2 cutscene_player_velocity;
 	int life_orb_piece;
+	bool hasEnemies;
 
 	std::vector<vec2> health_packs_pos;
 

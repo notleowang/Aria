@@ -43,16 +43,16 @@ class RenderSystem {
 			textures_path("south_dungeon_wall.png"),
 			textures_path("side_dungeon_wall.png"),
 			textures_path("generic_dungeon_wall.png"),
-			textures_path("landscape.png"),
 			textures_path("water_enemy.png"),						// start of regular enemies
 			textures_path("fire_enemy.png") ,
 			textures_path("earth_enemy.png"),
 			textures_path("lightning_enemy.png"),
-			textures_path("water_enemy.png"),						// start of bosses
+			textures_path("water_boss.png"),						// start of bosses
 			textures_path("fire_boss.png") ,
-			textures_path("earth_enemy.png"),
-			textures_path("lightning_enemy.png"),
-			textures_path("lost_soul.png"),								// final boss
+			textures_path("earth_boss.png"),
+			textures_path("lightning_boss.png"),
+			textures_path("FINAL_BOSS_AWAKENED_SPRITESHEET.png"),	// final boss
+			textures_path("final_boss_frame.png"),
 			textures_path("ghost.png"),
 			textures_path("life_orb_full.png"),
 			textures_path("life_orb_1.png"),
@@ -63,12 +63,19 @@ class RenderSystem {
 			textures_path("projectile_earth.png"),
 			textures_path("projectile_lightning.png"),
 			textures_path("dungeon_floor.png"),
-			textures_path("health_bar.png"),
-			textures_path("mana_bar.png"),
+			textures_path("boss_health_bar.png"),
+			textures_path("enemy_health_bar.png"),
+			textures_path("enemy_mana_bar.png"),
+			textures_path("player_health_bar.png"),
+			textures_path("player_mana_bar.png"),
 			textures_path("power_up_block.png"),
 			textures_path("aria.png"),
 			textures_path("portal.png"),
 			textures_path("projectile_select_display_vertical.png"),
+			textures_path("faster_movement.png"),
+			textures_path("power_up_increase_damage_arrow.png"),
+			textures_path("power_up_triple_shot_icon.png"),
+			textures_path("power_up_bounce_icon.png"),
 			textures_path("medkit.png"),
 			textures_path("lost_soul.png")
 	};
@@ -145,17 +152,19 @@ private:
 	void initializePowerUpBlockSpriteSheet();
 	void initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols);
 	void initializePlayerSpriteSheet();
+	void initializeFinalBossSpriteSheet();
 	void initializeProjectileSelectDisplaySpriteSheet();
 
 	// Helper functions for initializeGlGeometryBuffers()
 	void initializePlayerGeometryBuffer();
+	void initializeSmallEnemyGeometryBuffer();
 	void initializeSpriteGeometryBuffer();
 	void initializeDebugLineGeometryBuffer();
 	void initializeScreenTriangleGeometryBuffer();
 	void initializeTerrainGeometryBuffer();
 	void initializeExitDoorGeometryBuffer();
 	void initializeResourceBarGeometryBuffer();
-	void initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID goem_buffer_id, SPRITE_SHEET_DATA_ID ss_id);
+	void initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID geom_buffer_id, SPRITE_SHEET_DATA_ID ss_id);
 
 	// Window handle
 	GLFWwindow* window;

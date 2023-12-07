@@ -19,6 +19,7 @@ public:
 	ComponentContainer<Projectile> projectiles;
 	ComponentContainer<CharacterProjectileType> characterProjectileTypes;
 	ComponentContainer<ProjectileSelectDisplay> projectileSelectDisplays;
+	ComponentContainer<PowerUpIndicator> powerUpIndicators;
 	ComponentContainer<Follower> followers;
 	ComponentContainer<Text> texts;
 	ComponentContainer<InvulnerableTimer> invulnerableTimers;
@@ -39,6 +40,7 @@ public:
 	ComponentContainer<Shadow> shadows;
 	ComponentContainer<ExitDoor> exitDoors;
 	ComponentContainer<LifeOrb> lifeOrbs;
+	ComponentContainer<Cutscene> cutscenes;
 	ComponentContainer<Mesh*> meshPtrs;
 	ComponentContainer<SpriteSheet*> spriteSheetPtrs;
 	ComponentContainer<Animation> animations;
@@ -60,6 +62,7 @@ public:
 		registry_list.push_back(&manaBars);
 		registry_list.push_back(&characterProjectileTypes);
 		registry_list.push_back(&projectileSelectDisplays);
+		registry_list.push_back(&powerUpIndicators);
 		registry_list.push_back(&followers);
 		registry_list.push_back(&invulnerableTimers);
 		registry_list.push_back(&positions);
@@ -79,6 +82,7 @@ public:
 		registry_list.push_back(&shadows);
 		registry_list.push_back(&exitDoors);
 		registry_list.push_back(&lifeOrbs);
+		registry_list.push_back(&cutscenes);
 		registry_list.push_back(&meshPtrs);
 		registry_list.push_back(&spriteSheetPtrs);
 		registry_list.push_back(&animations);

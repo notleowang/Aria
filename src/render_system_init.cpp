@@ -285,6 +285,39 @@ void RenderSystem::initializePlayerSpriteSheet()
 	sprite_sheets[ss_index].states = states;
 }
 
+void RenderSystem::initializeFinalBossSpriteSheet()
+{
+	int num_rows = 6;
+	int num_cols = 2;
+	int ss_index = (int)SPRITE_SHEET_DATA_ID::FINAL_BOSS;
+
+	/*
+	* Final boss sprite sheet frames:
+	* 
+	* | 0 | 1 |		EAST
+	* | 2 | 3 |		WEST
+	* | 4 | x |		WATER
+	* | 6 | x |		EARTH
+	* | 8 | x |		FIRE
+	* |10 | x |		LIGHTNING
+	* 
+	* NOTE: x's are blanks
+	*/
+	std::vector<AnimState> states((int)FINAL_BOSS_SPRITE_STATES::STATE_COUNT);
+	states[(int)FINAL_BOSS_SPRITE_STATES::EAST] = AnimState(0, 1);
+	states[(int)FINAL_BOSS_SPRITE_STATES::WEST] = AnimState(2, 3);
+	states[(int)FINAL_BOSS_SPRITE_STATES::WATER] = AnimState(4, 4);
+	states[(int)FINAL_BOSS_SPRITE_STATES::EARTH] = AnimState(6, 6);
+	states[(int)FINAL_BOSS_SPRITE_STATES::FIRE] = AnimState(8, 8);
+	states[(int)FINAL_BOSS_SPRITE_STATES::LIGHTNING] = AnimState(10, 10);
+
+	sprite_sheets[ss_index].num_rows = num_rows;
+	sprite_sheets[ss_index].num_cols = num_cols;
+	sprite_sheets[ss_index].states = states;
+	sprite_sheets[ss_index].frame_height = 128.f;
+	sprite_sheets[ss_index].frame_width = 128.f;
+}
+
 void RenderSystem::initializeProjectileSelectDisplaySpriteSheet()
 {
 	int num_rows = 1;
@@ -311,6 +344,7 @@ void RenderSystem::initializeSpriteSheets()
 	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET, 1);
 	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET, 1);
 	initializePlayerSpriteSheet();
+	initializeFinalBossSpriteSheet();
 	initializeProjectileSelectDisplaySpriteSheet();
 }
 
@@ -344,6 +378,72 @@ void RenderSystem::initializePlayerGeometryBuffer()
 	meshes[geom_index].vertices = vertices;
 	meshes[geom_index].vertex_indices = textured_indices;
 	bindVBOandIBO(GEOMETRY_BUFFER_ID::PLAYER, textured_vertices, textured_indices);
+}
+
+void RenderSystem::initializeSmallEnemyGeometryBuffer()
+{
+	static const std::vector<GEOMETRY_BUFFER_ID> enemies = { GEOMETRY_BUFFER_ID::SMALL_WATER_ENEMY, 
+		GEOMETRY_BUFFER_ID::SMALL_FIRE_ENEMY, 
+		GEOMETRY_BUFFER_ID::SMALL_EARTH_ENEMY, 
+		GEOMETRY_BUFFER_ID::SMALL_LIGHTNING_ENEMY };
+	for (uint i = 0; i < enemies.size(); i++) {
+		int geom_index = (int)enemies[i];
+		float left_x_cutoff = 0.f;
+		float right_x_cutoff = 0.f;
+		float top_y_cutoff = 0.f;
+		float bottom_y_cutoff = 0.f;
+		switch ((GEOMETRY_BUFFER_ID)geom_index) {
+			case (GEOMETRY_BUFFER_ID::SMALL_WATER_ENEMY):
+				left_x_cutoff = 0.12f;
+				right_x_cutoff = 0.1f;
+				top_y_cutoff = 0.17f;
+				bottom_y_cutoff = 0.07f;
+				break;			
+			case (GEOMETRY_BUFFER_ID::SMALL_FIRE_ENEMY):
+				left_x_cutoff = 0.12f;
+				right_x_cutoff = 0.10f;
+				top_y_cutoff = 0.10f;
+				bottom_y_cutoff = 0.15f;
+				break;			
+			case (GEOMETRY_BUFFER_ID::SMALL_EARTH_ENEMY):
+				left_x_cutoff = 0.09f;
+				right_x_cutoff = 0.07f;
+				top_y_cutoff = 0.15f;
+				bottom_y_cutoff = 0.15f;
+				break;
+			case (GEOMETRY_BUFFER_ID::SMALL_LIGHTNING_ENEMY):
+				left_x_cutoff = 0.18f;
+				right_x_cutoff = 0.12f;
+				top_y_cutoff = 0.21f;
+				bottom_y_cutoff = 0.23f;
+				break;
+			default:
+				break;
+			
+		}
+		std::vector<TexturedVertex> textured_vertices(4);
+		textured_vertices[0].position = { -1.f / 2, +1.f / 2, 0.f };
+		textured_vertices[1].position = { +1.f / 2, +1.f / 2, 0.f };
+		textured_vertices[2].position = { +1.f / 2, -1.f / 2, 0.f };
+		textured_vertices[3].position = { -1.f / 2, -1.f / 2, 0.f };
+		textured_vertices[0].texcoord = { left_x_cutoff, 1-top_y_cutoff};
+		textured_vertices[1].texcoord = { 1-right_x_cutoff, 1-top_y_cutoff};
+		textured_vertices[2].texcoord = { 1-right_x_cutoff, bottom_y_cutoff};
+		textured_vertices[3].texcoord = { left_x_cutoff, bottom_y_cutoff };
+
+		// Counterclockwise as it's the default opengl front winding direction.
+		const std::vector<uint16_t> textured_indices = { 0, 3, 1, 1, 3, 2 };
+
+		std::vector<ColoredVertex> vertices(4);
+		vertices[0].position = textured_vertices[0].position;
+		vertices[1].position = textured_vertices[1].position;
+		vertices[2].position = textured_vertices[2].position;
+		vertices[3].position = textured_vertices[3].position;
+
+		meshes[geom_index].vertices = vertices;
+		meshes[geom_index].vertex_indices = textured_indices;
+		bindVBOandIBO((GEOMETRY_BUFFER_ID)geom_index, textured_vertices, textured_indices);
+	}
 }
 
 void RenderSystem::initializeSpriteGeometryBuffer()
@@ -524,12 +624,14 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeExitDoorGeometryBuffer();
 	// function initializeSpriteSheets must be called before this point
 	initializePlayerGeometryBuffer();
+	initializeSmallEnemyGeometryBuffer();
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FIRE_PROJECTILE, SPRITE_SHEET_DATA_ID::FIRE_PROJECTILE);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::WATER_PROJECTILE, SPRITE_SHEET_DATA_ID::WATER_PROJECTILE);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::EARTH_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIGHTNING_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::POWER_UP_BLOCK, SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PROJECTILE_SELECT_DISPLAY, SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FINAL_BOSS, SPRITE_SHEET_DATA_ID::FINAL_BOSS);
 	initializeResourceBarGeometryBuffer();
 }
 

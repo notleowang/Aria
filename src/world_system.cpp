@@ -43,6 +43,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeChunk(projectile_sound);
 	if (heal_sound != nullptr)
 		Mix_FreeChunk(heal_sound);
+	if (last_enemy_death_sound != nullptr)
+		Mix_FreeChunk(last_enemy_death_sound);
 	if (aria_death_sound != nullptr)
 		Mix_FreeChunk(aria_death_sound);
 	if (enemy_death_sound != nullptr)
@@ -175,6 +177,7 @@ GLFWwindow* WorldSystem::create_window() {
 	cutscene_background = Mix_LoadMUS(audio_path("cutscene_1_background.wav").c_str());
 	projectile_sound = Mix_LoadWAV(audio_path("projectile.wav").c_str());
 	heal_sound = Mix_LoadWAV(audio_path("heal.wav").c_str());
+	last_enemy_death_sound = Mix_LoadWAV(audio_path("last_enemy_death.wav").c_str());
 	aria_death_sound = Mix_LoadWAV(audio_path("aria_death.wav").c_str());
 	enemy_death_sound = Mix_LoadWAV(audio_path("enemy_death.wav").c_str());
 	damage_tick_sound = Mix_LoadWAV(audio_path("damage_tick.wav").c_str());
@@ -263,7 +266,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (player_resource.currentMana > 10.f) player_resource.currentMana = 10.f;
 	}
 
-    float min_death_timer_ms = 3000.f;
+    float min_death_timer_ms = 2700.f;
 	for (Entity entity : registry.deathTimers.entities) {
 		DeathTimer& timer = registry.deathTimers.get(entity);
 		timer.timer_ms -= elapsed_ms_since_last_update;
@@ -278,7 +281,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			return true;
 		}
 	}
-	screen.screen_darken_factor = 1 - min_death_timer_ms / 3000;
+	screen.screen_darken_factor = 1 - min_death_timer_ms / 2700;
 
 	float min_win_timer_ms = 3600.f;
 	for (Entity entity : registry.winTimers.entities) {
@@ -319,10 +322,15 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	}
 
 	// create exit door once all enemies are dead
-	if (registry.enemies.entities.size() == 0 && 
-		registry.exitDoors.entities.size() == 0 && 
+	if (registry.enemies.entities.size() == 0 &&
+		registry.exitDoors.entities.size() == 0 &&
 		this->curr_level.getExitDoorPos() != NULL_POS)
+	{
+		if (this->curr_level.hasEnemies) {
+			Mix_PlayChannel(-1, last_enemy_death_sound, 0);
+		}
 		createExitDoor(renderer, this->curr_level.getExitDoorPos());
+	}
 
 	if (this->curr_level.curr_level == CUTSCENE_2) {
 		//First turn downwards
@@ -371,7 +379,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			}
 		}
 	}
-	if (this->curr_level.curr_level == CUTSCENE_3) {
+	else if (this->curr_level.curr_level == CUTSCENE_3) {
 		Entity& lost_soul = registry.lostSouls.entities[0];
 		Entity& life_orb = registry.lifeOrbs.entities[0];
 		vec2 lost_soul_pos = registry.positions.get(lost_soul).position;
@@ -384,6 +392,73 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			win_level();
 		}
 	}
+	else if (this->curr_level.curr_level == CUTSCENE_5) {
+		Entity& timer = registry.obstacles.entities[0];
+		float timer_x_pos = registry.positions.get(timer).position.x;
+		Entity& life_orb = registry.lifeOrbs.entities[0];
+		Position& player_position = registry.positions.get(player);
+
+		//Velocity
+		Velocity& player_vel = registry.velocities.get(player);
+		Velocity& life_orb_vel = registry.velocities.get(life_orb);
+
+		//Animation
+		Animation& player_animation = registry.animations.get(player);
+		//150
+		if (timer_x_pos > 130 && timer_x_pos < 150) {
+			Entity& lost_soul = registry.lostSouls.entities[0];
+			Velocity& lost_soul_vel = registry.velocities.get(lost_soul);
+			lost_soul_vel.velocity = { 400.f,0.f };
+			life_orb_vel.velocity = { 400.f,0.f };
+		}
+
+		// delete lost soul and spawn final boss
+		if (timer_x_pos > 200 && registry.bosses.size() == 0) {
+			registry.remove_all_components_of(registry.lostSouls.entities[0]);
+			registry.remove_all_components_of(registry.lifeOrbs.entities[0]);
+
+			Entity orb = createLifeOrb(renderer, vec2(1050.f, 150.f), 0); // light source should be behind boss so it looks like boss is glowing
+			registry.positions.get(orb).scale = { 0, 0 };
+			Entity final_boss = createBoss(renderer, vec2(1050.f, 200.f), FINAL_BOSS_ATTRS);
+			// set direction of boss to left
+		}
+
+		//200 
+		if (timer_x_pos >= 195 && timer_x_pos < 235) {
+			//aria walk towards boss
+			player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
+			player_vel.velocity = {250.f,0.f};
+		}
+		if (timer_x_pos >= 235 && timer_x_pos<= 270) {
+			player_vel.velocity = { 0.f,0.f };
+			player_animation.is_animating = false; // default direction is East so setting this true makes Aria walk
+		}
+		if (timer_x_pos >= 320 && timer_x_pos<=450 ) {
+			player_animation.is_animating = false; // default direction is East so setting this true makes Aria walk
+			if (int(timer_x_pos) % 2 ==0 ) {
+				player_vel.velocity = { -250.f,0.f };
+			}
+			else {
+				player_vel.velocity = { 250.f,0.f };
+			}
+			registry.velocities.get(registry.bosses.entities[0]).velocity = player_vel.velocity;
+			registry.velocities.get(registry.lifeOrbs.entities[0]).velocity = player_vel.velocity;
+		}
+		if (timer_x_pos >= 450) {
+			player_vel.velocity = { 0.f, 0.f };
+			registry.velocities.get(registry.bosses.entities[0]).velocity = player_vel.velocity;
+			registry.velocities.get(registry.lifeOrbs.entities[0]).velocity = player_vel.velocity;
+		}
+		
+
+		//453
+		//winLevel
+		if (timer_x_pos >= 545 && registry.winTimers.size()==0) {
+			win_level();
+		}
+	}
+
+
 	if (registry.lifeOrbs.entities.size() > 0) {
 		createShadow(renderer, player, TEXTURE_ASSET_ID::PLAYER, GEOMETRY_BUFFER_ID::PLAYER);
 	}
@@ -463,6 +538,10 @@ void WorldSystem::restart_game() {
 		Mix_FadeInMusic(cutscene_background, 0, 500);
 		Mix_PlayChannel(-1, cutscene5_voiceline, 0);
 	}
+	else if (curr_level == CUTSCENE_6) {
+		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_PlayChannel(-1, cutscene4_voiceline, 0);
+	}
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
 	for (uint i = 0; i < floors.size(); i++) {
@@ -472,6 +551,7 @@ void WorldSystem::restart_game() {
 
 
 	player = createAria(renderer, player_starting_pos);
+	if (this->curr_level.getIsCutscene()) registry.cutscenes.emplace(player);
 
 	if (curr_level == Level::TUTORIAL) {
 		// Familarize player with health pack
@@ -490,6 +570,7 @@ void WorldSystem::restart_game() {
 			vec2(terrain_pos[0], terrain_pos[1]), 
 			vec2(terrain_pos[2], terrain_pos[3]), 
 			terrain_attr.direction,
+			terrain_attr.speed,
 			terrain_attr.moveable);
 	}
 
@@ -528,8 +609,7 @@ void WorldSystem::restart_game() {
 	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
 
 	if (this->curr_level.getCurrLevel() == CUTSCENE_1 ||
-		this->curr_level.getCurrLevel() == CUTSCENE_4 ||
-		this->curr_level.getCurrLevel() == CUTSCENE_5) {
+		this->curr_level.getCurrLevel() == CUTSCENE_4) {
 		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
 		Animation& player_animation = registry.animations.get(player);
 		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
@@ -543,10 +623,27 @@ void WorldSystem::restart_game() {
 	} 
 	else if (this->curr_level.getCurrLevel() == CUTSCENE_3) {
 		Entity life_orb = createLifeOrb(renderer, {362,-100}, this->curr_level.getLifeOrbPiece());
+		registry.lifeOrbs.get(life_orb).centered_on_screen = true;
 		registry.velocities.get(life_orb).velocity = { 0.f,20.f };
 		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
 		Position& player_position = registry.positions.get(player);
 		if (player_position.scale.x > 0) player_position.scale.x *= -1;
+	}
+	else if (this->curr_level.getCurrLevel() == CUTSCENE_5) {
+		Entity life_orb = createLifeOrb(renderer, { 55, 200 }, this->curr_level.getLifeOrbPiece());
+		
+		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
+	}
+	else if (this->curr_level.getCurrLevel() == CUTSCENE_6) {
+		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
+		Animation& player_animation = registry.animations.get(player);
+		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
+		createExitDoor(renderer, this->curr_level.getExitDoorPos());
+	}
+	else if (this->curr_level.getCurrLevel() == THE_END) {
+		Animation& player_animation = registry.animations.get(player);
+		player_animation.setState(player_animation.sprite_sheet_ptr->getPlayerStateFromDirection(DIRECTION::S));
+		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
 	}
 
 	for (uint i = 0; i < lost_soul_attrs.size(); i++) {
@@ -626,7 +723,7 @@ void WorldSystem::win_level() {
 
 void WorldSystem::new_game() {
 	if (player != NULL) registry.remove_all_components_of(player);
-	curr_level.init(CUTSCENE_3);
+	curr_level.init(CUTSCENE_1);
 	restart_game();
 }
 
@@ -726,9 +823,35 @@ void WorldSystem::handle_collisions() {
 				registry.invulnerableTimers.emplace(entity);
 				registry.deathTimers.emplace(entity);
 				registry.velocities.get(player).velocity = { 0.f, 0.f };
+				// ADD ARIA DEATH SOUND
 				Mix_PlayChannel(-1, aria_death_sound, 0);
 				if (this->curr_level.getCurrLevel() != FINAL_BOSS && !this->curr_level.getIsBossLevel()) Mix_PlayChannel(-1, aria_death_lsvl, 0);
 			}
+		}
+
+		// Checking obstacle - obstacle collisions
+		if (registry.obstacles.has(entity) && registry.obstacles.has(entity_other)) {
+			Position& pos_1 = registry.positions.get(entity);
+			Position& pos_2 = registry.positions.get(entity_other);
+			Velocity& vel_1 = registry.velocities.get(entity);
+			Velocity& vel_2 = registry.velocities.get(entity_other);
+
+			vec2 delt_v = vel_2.velocity - vel_1.velocity;
+			vec2 delt_p = pos_2.position - pos_1.position;
+
+			if (dot(delt_v, delt_p) <= 0) {
+				vec2 pi = pos_1.position;
+				vec2 pj = pos_2.position;
+				vec2 vi = vel_1.velocity;
+				vec2 vj = vel_2.velocity;
+				vec2 new_vi = vi - dot(vi - vj, pi - pj) / dot(pi - pj, pi - pj) * (pi - pj);
+				vec2 new_vj = vj - dot(vj - vi, pj - pi) / dot(pj - pi, pj - pi) * (pj - pi);
+
+				vel_1.velocity.x = new_vi.x;
+				vel_1.velocity.y = new_vi.y;
+				vel_2.velocity.x = new_vj.x;
+				vel_2.velocity.y = new_vj.y;
+			};
 		}
 
 		// Checking Player - Terrain Collisions
@@ -958,7 +1081,7 @@ void WorldSystem::handle_collisions() {
 		if (registry.players.has(entity) && registry.exitDoors.has(entity_other)) {
 			if (curr_level.getIsCutscene()) {
 				Mix_FadeInMusic(background_music, -1, 1500);
-				registry.velocities.get(registry.lostSouls.entities[0]).velocity = vec2(0, 0);
+				if (registry.lostSouls.size() > 0) registry.velocities.get(registry.lostSouls.entities[0]).velocity = vec2(0, 0);
 			}
 			win_level();
 		}
@@ -1097,9 +1220,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 			break;
 		case GLFW_KEY_4:
 			characterProjectileType.projectileType = ElementType::LIGHTNING;
-			break;
-		case GLFW_KEY_9:
-			win_level();
 			break;
 		case GLFW_KEY_0:
 			registry.resources.get(player).maxHealth = 10000.f;

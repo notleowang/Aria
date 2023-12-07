@@ -38,9 +38,13 @@ struct LostSoul {
 
 };
 
+struct Cutscene {
+
+};
+
 // life orb
 struct LifeOrb {
-
+	bool centered_on_screen = false;
 };
 
 // Boss
@@ -105,21 +109,31 @@ struct Resources
 	float currentHealth = 100.f;
 	float maxMana = 10.f;
 	float currentMana = 10.f;
+	float logoRatio = 0.f;
+	float barRatio = 1.f;
 	Entity healthBar;
 	Entity manaBar;
 };
 
 struct HealthBar
 {
-
+	Entity owner;
 };
 
 struct ManaBar
 {
-
+	Entity owner;
 };
 
 struct ProjectileSelectDisplay
+{
+	Entity fasterMovement;
+	Entity increasedDamage[4];
+	Entity tripleShot[4];
+	Entity bounceOffWalls[4];
+};
+
+struct PowerUpIndicator
 {
 
 };
@@ -129,6 +143,7 @@ struct Follower
 	Entity owner;
 	float y_offset = 0.f;
 	float x_offset = 0.f;
+	bool adjust = true;
 };
 
 // Structure to store projectile entities
@@ -197,6 +212,7 @@ struct Collision
 struct Terrain
 {
 	DIRECTION direction = DIRECTION::N;
+	float speed = 0.f;
 	bool moveable = false;
 };
 
@@ -237,7 +253,7 @@ struct InvulnerableTimer
 // A timer that will be associated to an entity dying
 struct DeathTimer
 {
-	float timer_ms = 3000.f;
+	float timer_ms = 2700.f;
 };
 
 // Timer that signifies level change
@@ -339,7 +355,6 @@ enum class TEXTURE_ASSET_ID {
 	SOUTH_TERRAIN,
 	SIDE_TERRAIN,
 	GENERIC_TERRAIN,
-	LANDSCAPE,
 	WATER_ENEMY,
 	FIRE_ENEMY,
 	EARTH_ENEMY,
@@ -349,6 +364,7 @@ enum class TEXTURE_ASSET_ID {
 	EARTH_BOSS,
 	LIGHTNING_BOSS,
 	FINAL_BOSS,
+	FINAL_BOSS_SHADOW,
 	GHOST,
 	LIFE_ORB,
 	LIFE_ORB_PIECE_1,
@@ -359,12 +375,19 @@ enum class TEXTURE_ASSET_ID {
 	EARTH_PROJECTILE_SHEET,
 	LIGHTNING_PROJECTILE_SHEET,
 	FLOOR,
-	HEALTH_BAR,
-	MANA_BAR,
+	BOSS_HEALTH_BAR,
+	ENEMY_HEALTH_BAR,
+	ENEMY_MANA_BAR,
+	PLAYER_HEALTH_BAR,
+	PLAYER_MANA_BAR,
 	POWER_UP_BLOCK,
 	PLAYER,
 	PORTAL,
 	PROJECTILE_SELECT_DISPLAY,
+	FASTER_MOVEMENT,
+	DAMAGE_ARROW,
+	TRIPLE_SHOT,
+	BOUNCE,
 	HEALTH_PACK,
 	LOST_SOUL,
 	TEXTURE_COUNT
@@ -390,7 +413,11 @@ const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 enum class GEOMETRY_BUFFER_ID {
 	SALMON = 0,
 	SPRITE = SALMON + 1,
-	DEBUG_LINE = SPRITE + 1,
+	SMALL_WATER_ENEMY = SPRITE + 1,
+	SMALL_FIRE_ENEMY = SMALL_WATER_ENEMY + 1,
+	SMALL_EARTH_ENEMY = SMALL_FIRE_ENEMY + 1,
+	SMALL_LIGHTNING_ENEMY = SMALL_EARTH_ENEMY + 1,
+	DEBUG_LINE = SMALL_LIGHTNING_ENEMY + 1,
 	SCREEN_TRIANGLE = DEBUG_LINE + 1,
 	TERRAIN = SCREEN_TRIANGLE + 1,
 	EXIT_DOOR = TERRAIN + 1,
@@ -402,7 +429,8 @@ enum class GEOMETRY_BUFFER_ID {
 	LIGHTNING_PROJECTILE_SHEET = EARTH_PROJECTILE_SHEET + 1,
 	POWER_UP_BLOCK = LIGHTNING_PROJECTILE_SHEET + 1,
 	PLAYER = POWER_UP_BLOCK + 1,
-	PROJECTILE_SELECT_DISPLAY = PLAYER + 1,
+	FINAL_BOSS = PLAYER + 1,
+	PROJECTILE_SELECT_DISPLAY = FINAL_BOSS + 1,
 	GEOMETRY_COUNT = PROJECTILE_SELECT_DISPLAY + 1
 };
 const int geometry_count = (int)GEOMETRY_BUFFER_ID::GEOMETRY_COUNT;
@@ -415,7 +443,8 @@ enum class SPRITE_SHEET_DATA_ID {
 	LIGHTNING_PROJECTILE_SHEET = EARTH_PROJECTILE_SHEET + 1,
 	POWER_UP_BLOCK = LIGHTNING_PROJECTILE_SHEET + 1,
 	PLAYER = POWER_UP_BLOCK + 1,
-	PROJECTILE_SELECT_DISPLAY = PLAYER + 1,
+	FINAL_BOSS = PLAYER + 1,
+	PROJECTILE_SELECT_DISPLAY = FINAL_BOSS + 1,
 	SPRITE_SHEET_COUNT = PROJECTILE_SELECT_DISPLAY + 1
 };
 const int sprite_sheet_count = (int)SPRITE_SHEET_DATA_ID::SPRITE_SHEET_COUNT;
@@ -445,5 +474,15 @@ enum class PLAYER_SPRITE_STATES {
 	NORTH_EAST,
 	NORTH,
 	SOUTH,
+	STATE_COUNT
+};
+
+enum class FINAL_BOSS_SPRITE_STATES {
+	EAST,
+	WEST,
+	WATER,
+	EARTH,
+	FIRE,
+	LIGHTNING,
 	STATE_COUNT
 };
