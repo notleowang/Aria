@@ -143,7 +143,13 @@ struct Follower
 	Entity owner;
 	float y_offset = 0.f;
 	float x_offset = 0.f;
-	bool adjust = true;
+};
+
+struct SecondaryFollower
+{
+	Entity owner;
+	float y_offset = 0.f;
+	float x_offset = 0.f;
 };
 
 // Structure to store projectile entities

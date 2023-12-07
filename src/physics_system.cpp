@@ -216,4 +216,16 @@ void PhysicsSystem::step(float elapsed_ms)
 		position.position.y += follower.y_offset;
 		position.position.x += follower.x_offset;
 	}
+
+	// 2nd phase of position correction strictly after first phase
+	for (int i = 0; i < registry.secondaryFollowers.size(); i++) {
+		SecondaryFollower& follower = registry.secondaryFollowers.components[i];
+		Entity entity = registry.secondaryFollowers.entities[i];
+		Position& position = registry.positions.get(entity);
+		Position& owner_position = registry.positions.get(follower.owner);
+		position.position = owner_position.position;
+		position.position.y += follower.y_offset;
+		position.position.x += follower.x_offset;
+	}
+
 }
