@@ -259,8 +259,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	ScreenState& screen = registry.screenStates.components[0];
 
 	if (this->curr_level.getCurrLevel() == TUTORIAL_2) {
-		Resources& resource = registry.resources.get(player);
-		resource.currentHealth = 100000.f;
+		for (Enemy& enemy : registry.enemies.components) {
+			enemy.isAggravated = false;
+		}
 	}
 
 	for (Entity entity : registry.invulnerableTimers.entities) {
@@ -708,6 +709,7 @@ void WorldSystem::restart_game() {
 		createExitDoor(renderer, this->curr_level.getExitDoorPos());
 	}
 	else if (this->curr_level.getCurrLevel() == CUTSCENE_2) {
+		registry.resources.get(player).currentHealth = 1000000.f;
 		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
 		Animation& player_animation = registry.animations.get(player);
 		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
