@@ -100,7 +100,7 @@ GLFWwindow* WorldSystem::create_window() {
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 	// To disable fullscreen-mode, change "monitor" to "nullptr" on next line:
-	window = glfwCreateWindow(mode->width, mode->height, "Aria", monitor, nullptr);
+	window = glfwCreateWindow(mode->width, mode->height, "Aria", nullptr, nullptr);
 
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");

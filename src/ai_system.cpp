@@ -168,7 +168,7 @@ void AISystem::step(float elapsed_ms)
 						break;
 					case 17:
 						while (0 != registry.projectiles.size()) {
-							if (registry.projectiles.has(registry.projectiles.entities[0])) {
+							if (registry.projectiles.entities.size() != 0) {
 								registry.remove_all_components_of_no_collision(registry.projectiles.entities[0]);
 							}
 						}
