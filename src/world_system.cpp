@@ -1098,7 +1098,6 @@ void WorldSystem::handle_collisions() {
 		// Checking Projectile - Player collisions
 		if (registry.players.has(entity_other) && registry.projectiles.has(entity) && registry.projectiles.get(entity).hostile) {
 			Mix_PlayChannel(-1, damage_tick_sound, 0);
-			assert(registry.resources.has(entity_other));
 			Resources& player_resource = registry.resources.get(entity_other);
 			float damage_dealt = registry.projectiles.get(entity).damage; // any damage modifications should be performed on this value
 			/* TODO: Can the player be weak to any element?
