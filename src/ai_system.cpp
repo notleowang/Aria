@@ -246,7 +246,7 @@ void AISystem::step(float elapsed_ms)
 
 		if (!isDodging && !isFlanking) {
 			// bosses never give chase
-			if (dist <= 350 && dist > 15 && !registry.bosses.has(entity_i)) {
+			if (dist <= 350 && dist > 15 && !registry.bosses.has(entity_i) && enemy.isAggravated) {
 				if (canSprint) {
 					isSprinting = true;
 					enemy.stamina -= elapsed_ms / 1000;
