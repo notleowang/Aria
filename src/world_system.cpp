@@ -181,6 +181,12 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	assert(registry.screenStates.components.size() <= 1);
 	ScreenState& screen = registry.screenStates.components[0];
 
+	if (this->curr_level.getCurrLevel() == TUTORIAL_2) {
+		for (Enemy& enemy : registry.enemies.components) {
+			enemy.isAggravated = false;
+		}
+	}
+
 	for (Entity entity : registry.invulnerableTimers.entities) {
 		InvulnerableTimer& timer = registry.invulnerableTimers.get(entity);
 		timer.timer_ms -= elapsed_ms_since_last_update;
