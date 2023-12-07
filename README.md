@@ -28,6 +28,7 @@ The ECS design pattern has not been changed since Milestone 1.
 - PowerUpBlock
 - Shadow
 - Obstacle
+- Boss
 
 ### New Game Entities:
 
@@ -53,7 +54,8 @@ The ECS design pattern has not been changed since Milestone 1.
 - Follower
 
 ### New Actionable Components
+- WeaknessTimer
 
 ## Entity Component Diagram
 Highlight any changes versus the previous milestone.
-![ECS diagram](docu/images/M3_ECS_diagram.png)
+![ECS diagram](docu/images/M4_ECS_diagram.png)
