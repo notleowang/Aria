@@ -384,6 +384,8 @@ bool GameLevel::init(uint level) {
 
 		floors.push_back(vec4(-200, 3300, 500, 200));
 
+		this->hasEnemies = true;
+
 		// Portal room
 		terrains.push_back(std::make_pair(vec4(-200, 3200, default_side_width, 300), SIDE_STATIONARY));
 		break;
