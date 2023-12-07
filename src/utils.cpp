@@ -70,6 +70,7 @@ bool isWeakTo(ElementType t1, ElementType t2) {
     case ElementType::LIGHTNING:
         return t2 == ElementType::EARTH;
     case ElementType:: COMBO:
+        // get the weakness timer's current weakTo element
         return t2 == getRandomElementType(); // randomize weakness
     default:
         return false;

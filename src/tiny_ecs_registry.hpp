@@ -13,6 +13,7 @@ public:
 	// Manually created list of all components this game has
 	ComponentContainer<DeathTimer> deathTimers;
 	ComponentContainer<WinTimer> winTimers;
+	ComponentContainer<WeaknessTimer> weaknessTimers;
 	ComponentContainer<Resources> resources;
 	ComponentContainer<HealthBar> healthBars;
 	ComponentContainer<ManaBar> manaBars;
@@ -55,6 +56,7 @@ public:
 	ECSRegistry()
 	{
 		registry_list.push_back(&deathTimers);
+		registry_list.push_back(&weaknessTimers);
 		registry_list.push_back(&projectiles);
 		registry_list.push_back(&texts);
 		registry_list.push_back(&resources);
