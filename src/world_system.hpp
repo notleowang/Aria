@@ -62,14 +62,16 @@ private:
 	Entity projectileSelectDisplay;
 
 	GameLevel curr_level;
-	uint next_level;
+	uint next_level = NULL;
 
 	// music references
 	Mix_Music* background_music; // TODO: change background music for our game
+	Mix_Music* main_menu_music;
 	Mix_Music* boss_music;
 	Mix_Music* boss_intro_music;
 	Mix_Music* final_boss_music;
 	Mix_Music* final_boss_intro_music;
+	Mix_Music* cutscene_background;
 	Mix_Chunk* projectile_sound;
 	Mix_Chunk* heal_sound;
 	Mix_Chunk* last_enemy_death_sound;
@@ -79,6 +81,30 @@ private:
 	Mix_Chunk* obstacle_collision_sound;
 	Mix_Chunk* end_level_sound;
 	Mix_Chunk* power_up_sound;
+	Mix_Chunk* final_boss_death_sound;
+
+	// cutscene voicelines
+	Mix_Chunk* cutscene1_voiceline;
+	Mix_Chunk* cutscene2_voiceline;
+	Mix_Chunk* cutscene3_voiceline;
+	Mix_Chunk* cutscene4_voiceline;
+	Mix_Chunk* cutscene5_voiceline;
+	Mix_Chunk* cutscene6_voiceline;
+
+	// lost soul voicelines (lsvl)
+	Mix_Chunk* fire_boss_lsvl;
+	Mix_Chunk* earth_boss_lsvl;
+	Mix_Chunk* lightning_boss_lsvl;
+	Mix_Chunk* water_boss_lsvl;
+	Mix_Chunk* final_boss_lsvl;
+	Mix_Chunk* aria_death_lsvl;
+
+	// aria voice lines (avl)
+	Mix_Chunk* first_shard_avl;
+	Mix_Chunk* third_shard_avl;
+	Mix_Chunk* deceived_avl;
+	Mix_Chunk* final_cutscene_avl;
+
 
 	// C++ random number generator
 	std::default_random_engine rng;

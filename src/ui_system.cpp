@@ -137,11 +137,11 @@ void UISystem::showPauseMenu(bool* p_open) {
 			*p_open = false;
 		}
 		
-		ImGui::SetCursorPosX((w - 1000.f) * 0.5f);
-		if (ImGui::SliderInt("Volume", &volume, 0, MIX_MAX_VOLUME)) {
-			Mix_VolumeMusic(volume); // set background music volume
-			Mix_Volume(-1, volume); // set sound effects volume
-		}
+		//ImGui::SetCursorPosX((w - 1000.f) * 0.5f);
+		//if (ImGui::SliderInt("Volume", &volume, 0, MIX_MAX_VOLUME)) {
+		//	Mix_VolumeMusic(volume); // set background music volume
+		//	Mix_Volume(-1, volume); // set sound effects volume
+		//}
 
 		ImGui::SetCursorPosX((w - button_size.x) * 0.5f);
 		if (ImGui::Button("Exit Level", button_size)) {

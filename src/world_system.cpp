@@ -15,6 +15,7 @@ using namespace std;
 // Game configuration
 float PLAYER_SPEED = 300.f;
 const float PROJECTILE_SPEED = 700.f;
+const int VOLUME = 30;
 
 // Create the world
 WorldSystem::WorldSystem() {
@@ -26,6 +27,8 @@ WorldSystem::~WorldSystem() {
 	// Destroy music components
 	if (background_music != nullptr)
 		Mix_FreeMusic(background_music);
+	if (main_menu_music != nullptr)
+		Mix_FreeMusic(main_menu_music);
 	if (boss_music != nullptr)
 		Mix_FreeMusic(boss_music);
 	if (boss_intro_music != nullptr)
@@ -34,6 +37,8 @@ WorldSystem::~WorldSystem() {
 		Mix_FreeMusic(final_boss_music);
 	if (final_boss_intro_music != nullptr)
 		Mix_FreeMusic(final_boss_intro_music);
+	if (cutscene_background != nullptr)
+		Mix_FreeMusic(cutscene_background);
 	if (projectile_sound != nullptr)
 		Mix_FreeChunk(projectile_sound);
 	if (heal_sound != nullptr)
@@ -51,7 +56,42 @@ WorldSystem::~WorldSystem() {
 	if (end_level_sound != nullptr)
 		Mix_FreeChunk(end_level_sound);
 	if (power_up_sound != nullptr)
-		Mix_FreeChunk(power_up_sound);
+		Mix_FreeChunk(power_up_sound); 
+	if (final_boss_death_sound != nullptr)
+		Mix_FreeChunk(final_boss_death_sound);
+	if (cutscene1_voiceline != nullptr)
+		Mix_FreeChunk(cutscene1_voiceline);
+	if (cutscene2_voiceline != nullptr)
+		Mix_FreeChunk(cutscene2_voiceline);
+	if (cutscene3_voiceline != nullptr)
+		Mix_FreeChunk(cutscene3_voiceline);
+	if (cutscene4_voiceline != nullptr)
+		Mix_FreeChunk(cutscene4_voiceline);
+	if (cutscene5_voiceline != nullptr)
+		Mix_FreeChunk(cutscene5_voiceline);
+	if (cutscene6_voiceline != nullptr)
+		Mix_FreeChunk(cutscene6_voiceline);
+	if (fire_boss_lsvl != nullptr)
+		Mix_FreeChunk(fire_boss_lsvl);
+	if (water_boss_lsvl != nullptr)
+		Mix_FreeChunk(water_boss_lsvl);
+	if (earth_boss_lsvl != nullptr)
+		Mix_FreeChunk(earth_boss_lsvl);
+	if (lightning_boss_lsvl != nullptr)
+		Mix_FreeChunk(lightning_boss_lsvl);
+	if (final_boss_lsvl != nullptr)
+		Mix_FreeChunk(final_boss_lsvl);
+	if (aria_death_lsvl != nullptr)
+		Mix_FreeChunk(aria_death_lsvl);
+	if (first_shard_avl != nullptr)
+		Mix_FreeChunk(first_shard_avl);
+	if (third_shard_avl != nullptr)
+		Mix_FreeChunk(third_shard_avl);
+	if (deceived_avl != nullptr)
+		Mix_FreeChunk(deceived_avl);
+	if (final_cutscene_avl != nullptr)
+		Mix_FreeChunk(final_cutscene_avl);
+
 	Mix_CloseAudio();
 
 	// Destroy all created components
@@ -100,7 +140,7 @@ GLFWwindow* WorldSystem::create_window() {
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 	// To disable fullscreen-mode, change "monitor" to "nullptr" on next line:
-	window = glfwCreateWindow(mode->width, mode->height, "Aria", monitor, nullptr);
+	window = glfwCreateWindow(mode->width, mode->height, "Aria", nullptr, nullptr);
 
 	if (window == nullptr) {
 		fprintf(stderr, "Failed to glfwCreateWindow");
@@ -133,10 +173,12 @@ GLFWwindow* WorldSystem::create_window() {
 	}
 
 	background_music = Mix_LoadMUS(audio_path("fast_pace_background.wav").c_str());
+	main_menu_music = Mix_LoadMUS(audio_path("eerie_ambience.wav").c_str());
 	boss_music = Mix_LoadMUS(audio_path("boss_battle.wav").c_str());
 	boss_intro_music = Mix_LoadMUS(audio_path("boss_battle_intro.wav").c_str());
 	final_boss_music = Mix_LoadMUS(audio_path("final_boss_battle.wav").c_str());
 	final_boss_intro_music = Mix_LoadMUS(audio_path("final_boss_battle_intro.wav").c_str());
+	cutscene_background = Mix_LoadMUS(audio_path("cutscene_1_background.wav").c_str());
 	projectile_sound = Mix_LoadWAV(audio_path("projectile.wav").c_str());
 	heal_sound = Mix_LoadWAV(audio_path("heal.wav").c_str());
 	last_enemy_death_sound = Mix_LoadWAV(audio_path("last_enemy_death.wav").c_str());
@@ -146,6 +188,40 @@ GLFWwindow* WorldSystem::create_window() {
 	obstacle_collision_sound = Mix_LoadWAV(audio_path("obstacle_collision.wav").c_str());
 	end_level_sound = Mix_LoadWAV(audio_path("portal.wav").c_str());
 	power_up_sound = Mix_LoadWAV(audio_path("power_up.wav").c_str());
+	final_boss_death_sound = Mix_LoadWAV(audio_path("final_boss_death_sound.wav").c_str());
+	
+	Mix_VolumeChunk(projectile_sound, VOLUME);
+	Mix_VolumeChunk(heal_sound, VOLUME);
+	Mix_VolumeChunk(aria_death_sound, VOLUME);
+	Mix_VolumeChunk(enemy_death_sound, VOLUME);
+	Mix_VolumeChunk(end_level_sound, VOLUME);
+	Mix_VolumeChunk(power_up_sound, VOLUME);
+	Mix_VolumeChunk(obstacle_collision_sound, VOLUME);
+	Mix_VolumeChunk(damage_tick_sound, VOLUME);
+	//Mix_VolumeChunk(final_boss_death_sound, VOLUME);
+
+	// voicelines
+	cutscene1_voiceline = Mix_LoadWAV(audio_path("cutscene_1_voiceline.wav").c_str());
+	cutscene2_voiceline = Mix_LoadWAV(audio_path("cutscene_2_voiceline.wav").c_str());
+	cutscene3_voiceline = Mix_LoadWAV(audio_path("cutscene_3_voiceline.wav").c_str());
+	Mix_VolumeChunk(cutscene3_voiceline, 100);
+	cutscene4_voiceline = Mix_LoadWAV(audio_path("aria_second_shard.wav").c_str());
+	cutscene5_voiceline = Mix_LoadWAV(audio_path("cutscene_5_voiceline.wav").c_str());
+	cutscene6_voiceline = Mix_LoadWAV(audio_path("cutscene_6_voiceline.wav").c_str());
+
+	// lost soul voicelines (lsvl)
+	fire_boss_lsvl = Mix_LoadWAV(audio_path("fire_boss_lsvl.wav").c_str());
+	earth_boss_lsvl = Mix_LoadWAV(audio_path("earth_boss_lsvl.wav").c_str());
+	lightning_boss_lsvl = Mix_LoadWAV(audio_path("lightning_boss_lsvl.wav").c_str());
+	water_boss_lsvl = Mix_LoadWAV(audio_path("water_boss_lsvl.wav").c_str());
+	final_boss_lsvl = Mix_LoadWAV(audio_path("final_boss_lsvl.wav").c_str());
+	aria_death_lsvl = Mix_LoadWAV(audio_path("aria_death_lsvl.wav").c_str());
+
+	// aria voicelines (avl)
+	first_shard_avl = Mix_LoadWAV(audio_path("aria_first_shard.wav").c_str());
+	third_shard_avl = Mix_LoadWAV(audio_path("aria_third_shard.wav").c_str());
+	deceived_avl = Mix_LoadWAV(audio_path("aria_deceived.wav").c_str());
+	final_cutscene_avl = Mix_LoadWAV(audio_path("aria_final_cutscene.wav").c_str());
 
 	if (background_music == nullptr) {
 		fprintf(stderr, "Failed to load sounds\n %s\n %s\n %s\n make sure the data directory is present",
@@ -160,7 +236,8 @@ void WorldSystem::init(RenderSystem* renderer_arg, GameLevel level) {
 	this->renderer = renderer_arg;
 	this->curr_level = level;
 	// Playing background music indefinitely
-	Mix_PlayMusic(background_music, -1);
+	Mix_PlayMusic(main_menu_music, -1);
+	Mix_VolumeMusic(VOLUME);
 	fprintf(stderr, "Loaded music\n");
 
 	// Set all states to default
@@ -235,12 +312,18 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			// Change level here
 			if (!timer.changedLevel) {
 				timer.changedLevel = true;
-				if (this->curr_level.getCurrLevel() != POWER_UP) {
+				if (this->curr_level.getPowerUpNextLevel()) {
 					this->next_level = this->curr_level.getCurrLevel() + 1;
 					this->curr_level.init(POWER_UP);
 				}
 				else {
-					this->curr_level.init(this->next_level);
+					if (this->next_level != NULL) {
+						this->curr_level.init(this->next_level);
+						this->next_level = NULL;
+					}
+					else {
+						this->curr_level.init(this->curr_level.getCurrLevel() + 1);
+					}
 				}
 				restart_game();
 			}
@@ -298,6 +381,168 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		}
 		createExitDoor(renderer, this->curr_level.getExitDoorPos());
 	}
+
+	if (this->curr_level.curr_level == CUTSCENE_2) {
+		//First turn downwards
+		float initial_speed = this->curr_level.cutscene_player_velocity.x;
+		Position& player_position = registry.positions.get(player);
+		Entity& lost_soul = registry.lostSouls.entities[0];
+		vec2 player_pos = registry.positions.get(player).position;
+		vec2 lost_soul_pos = registry.positions.get(lost_soul).position;
+		if (player_pos.x > 2960 && player_pos.y > 200 && player_pos.y < 300) {
+			registry.velocities.get(player).velocity = { 0,initial_speed };
+			Animation& player_animation = registry.animations.get(player);
+			player_animation.setState(player_animation.sprite_sheet_ptr->getPlayerStateFromDirection(DIRECTION::S));
+		}
+		//Second turn to the left
+		if (player_pos.x > 2950 && player_pos.x < 3000 && player_pos.y >2700) {
+			registry.velocities.get(player).velocity = { -initial_speed,0.f };
+			Animation& player_animation = registry.animations.get(player);
+			player_animation.setState(player_animation.sprite_sheet_ptr->getPlayerStateFromDirection(DIRECTION::W));
+			if (player_position.scale.x > 0) player_position.scale.x *= -1;
+		}
+		printf("x:%f\n", player_pos.x);
+		printf("y:%f\n", player_pos.y);
+		
+		//Lost soul pathing
+		if (0 < lost_soul_pos.x && lost_soul_pos.x < 2960 && lost_soul_pos.y < 500.f) {
+			if (lost_soul_pos.y<175.f) {
+				registry.velocities.get(lost_soul).velocity = { initial_speed,50.f};
+			} else if (lost_soul_pos.y>250.f)
+				registry.velocities.get(lost_soul).velocity = { initial_speed,-50.f };
+		}
+		if (lost_soul_pos.x > 2960 && lost_soul_pos.y > 150 && lost_soul_pos.y < 300) {
+			registry.velocities.get(lost_soul).velocity = { 0.f,initial_speed };
+		}
+
+		if (lost_soul_pos.x > 2960 && lost_soul_pos.y > 2700 && lost_soul_pos.y < 3000) {
+			registry.velocities.get(lost_soul).velocity = { -initial_speed,-50.f };
+		}
+		if (0 < lost_soul_pos.x && lost_soul_pos.x < 2950 && lost_soul_pos.y > 2500) {
+			if (lost_soul_pos.y < 2650.f) {
+				registry.velocities.get(lost_soul).velocity = { -initial_speed,50.f };
+			}
+			else if (lost_soul_pos.y > 2750)
+				registry.velocities.get(lost_soul).velocity = { -initial_speed,-50.f };
+			if (lost_soul_pos.x < 200) {
+				registry.velocities.get(lost_soul).velocity *= vec2(0.7,1);
+			}
+		}
+	}
+	else if (this->curr_level.curr_level == CUTSCENE_3) {
+		Entity& lost_soul = registry.lostSouls.entities[0];
+		Entity& life_orb = registry.lifeOrbs.entities[0];
+		vec2 lost_soul_pos = registry.positions.get(lost_soul).position;
+		vec2 life_orb_pos = registry.positions.get(life_orb).position;
+		if (life_orb_pos.y > lost_soul_pos.y && registry.velocities.get(player).velocity == vec2(0, 0)) {
+			registry.velocities.get(life_orb).velocity = { 0.f,0.f };
+			registry.velocities.get(lost_soul).velocity = { 50.f,0.f };
+			registry.velocities.get(player).velocity = { -100.f,0.f };
+			Mix_FadeInMusic(background_music, -1, 1500);
+			win_level();
+		}
+	}
+	else if (this->curr_level.curr_level == CUTSCENE_5) {
+		Entity& timer = registry.obstacles.entities[0];
+		float timer_x_pos = registry.positions.get(timer).position.x;
+		Entity& life_orb = registry.lifeOrbs.entities[0];
+		Position& player_position = registry.positions.get(player);
+
+		//Velocity
+		Velocity& player_vel = registry.velocities.get(player);
+		Velocity& life_orb_vel = registry.velocities.get(life_orb);
+
+		//Animation
+		Animation& player_animation = registry.animations.get(player);
+		//150
+		if (timer_x_pos > 130 && timer_x_pos < 150) {
+			Entity& lost_soul = registry.lostSouls.entities[0];
+			Velocity& lost_soul_vel = registry.velocities.get(lost_soul);
+			lost_soul_vel.velocity = { 400.f,0.f };
+			life_orb_vel.velocity = { 400.f,0.f };
+		}
+
+		// delete lost soul and spawn final boss
+		if (timer_x_pos > 200 && registry.bosses.size() == 0) {
+			registry.remove_all_components_of(registry.lostSouls.entities[0]);
+			registry.remove_all_components_of(registry.lifeOrbs.entities[0]);
+
+			Entity orb = createLifeOrb(renderer, vec2(1050.f, 150.f), 0); // light source should be behind boss so it looks like boss is glowing
+			registry.positions.get(orb).scale = { 0, 0 };
+			Entity final_boss = createBoss(renderer, vec2(1050.f, 200.f), FINAL_BOSS_ATTRS);
+			// set direction of boss to left
+		}
+
+		//200 
+		if (timer_x_pos >= 195 && timer_x_pos < 235) {
+			//aria walk towards boss
+			player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
+			player_vel.velocity = {250.f,0.f};
+		}
+		if (timer_x_pos >= 235 && timer_x_pos<= 270) {
+			player_vel.velocity = { 0.f,0.f };
+			player_animation.is_animating = false; // default direction is East so setting this true makes Aria walk
+		}
+		if (timer_x_pos >= 320 && timer_x_pos<=450 ) {
+			player_animation.is_animating = false; // default direction is East so setting this true makes Aria walk
+			if (int(timer_x_pos) % 2 ==0 ) {
+				player_vel.velocity = { -250.f,0.f };
+			}
+			else {
+				player_vel.velocity = { 250.f,0.f };
+			}
+			registry.velocities.get(registry.bosses.entities[0]).velocity = player_vel.velocity;
+			registry.velocities.get(registry.lifeOrbs.entities[0]).velocity = player_vel.velocity;
+		}
+		if (timer_x_pos >= 450) {
+			player_vel.velocity = { 0.f, 0.f };
+			registry.velocities.get(registry.bosses.entities[0]).velocity = player_vel.velocity;
+			registry.velocities.get(registry.lifeOrbs.entities[0]).velocity = player_vel.velocity;
+		}
+		
+
+		//453
+		//winLevel
+		if (timer_x_pos >= 545 && registry.winTimers.size()==0) {
+			win_level();
+		}
+	}
+
+	else if (this->curr_level.curr_level == CUTSCENE_6) {
+		if (registry.lifeOrbs.size() == 0) return true;
+		Entity& timer = registry.obstacles.entities[0];
+		float timer_x_pos = registry.positions.get(timer).position.x;
+		Entity& life_orb = registry.lifeOrbs.entities[0];
+		Position& player_position = registry.positions.get(player);
+		
+		//Velocity
+		Velocity& player_vel = registry.velocities.get(player);
+		Velocity& life_orb_vel = registry.velocities.get(life_orb);
+
+		if (timer_x_pos < 150){
+			Entity& lost_soul = registry.lostSouls.entities[0];
+
+			Velocity& lost_soul_vel = registry.velocities.get(lost_soul);
+
+			lost_soul_vel = player_vel;
+			life_orb_vel = player_vel;
+		}
+		else if (timer_x_pos < 330) {
+			if (registry.lostSouls.size()>0){
+				registry.remove_all_components_of((registry.lostSouls.entities[0]));
+			}
+		}
+		else if (timer_x_pos >= 330) {
+			win_level();
+			registry.velocities.get(life_orb).velocity = vec2{ 0.f,0.f };
+		}
+
+	}
+
+
+	if (registry.lifeOrbs.entities.size() > 0) {
+		createShadow(renderer, player, TEXTURE_ASSET_ID::PLAYER, GEOMETRY_BUFFER_ID::PLAYER);
+	}
 	return true;
 }
 
@@ -339,16 +584,47 @@ void WorldSystem::restart_game() {
 	std::vector<std::array<float, TEXT_ATTRIBUTES>> text_attrs = current_level.getTextAttrs();
 	std::vector<std::pair<vec2, Enemy>> enemies_attrs = current_level.getEnemies();
 	std::vector<std::pair<vec2, Enemy>> bosses_attrs = current_level.getBosses();
+	std::vector<std::pair<vec2, LostSoul>> lost_soul_attrs = current_level.getLostSouls();
 	std::vector<std::array<vec2, OBSTACLE_ATTRIBUTES >> obstacles = current_level.getObstacleAttrs();
 
-	if (curr_level == Level::FIRE_BOSS ||
-		curr_level == Level::EARTH_BOSS ||
-		curr_level == Level::LIGHTNING_BOSS ||
-		curr_level == Level::WATER_BOSS) {
-		Mix_FadeInMusic(boss_intro_music, 1, 500);
+	if (this->curr_level.getIsBossLevel()) {
+		Mix_FadeInMusic(boss_intro_music, 0, 500);
+
+		if (curr_level == FIRE_BOSS) Mix_PlayChannel(-1, fire_boss_lsvl, 0);
+		else if (curr_level == EARTH_BOSS) Mix_PlayChannel(-1, earth_boss_lsvl, 0);
+		else if (curr_level == LIGHTNING_BOSS) Mix_PlayChannel(-1, lightning_boss_lsvl, 0);
+		else if (curr_level == WATER_BOSS) Mix_PlayChannel(-1, water_boss_lsvl, 0);
 	}
-	else if (curr_level == Level::FINAL_BOSS) {
-		Mix_FadeInMusic(final_boss_intro_music, 1, 500);
+	else if (curr_level == FINAL_BOSS) {
+		Mix_FadeInMusic(final_boss_intro_music, 0, 500);
+		Mix_PlayChannel(-1, final_boss_lsvl, 0);
+	} 
+	else if (curr_level == CUTSCENE_1) {
+		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_PlayChannel(-1, cutscene1_voiceline, 0);
+	}
+	else if (curr_level == CUTSCENE_2) {
+		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_PlayChannel(-1, cutscene2_voiceline, 0);
+	}
+	else if (curr_level == CUTSCENE_3) {
+		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_PlayChannel(-1, cutscene3_voiceline, 0);
+	}
+	else if (curr_level == CUTSCENE_4) {
+		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_PlayChannel(-1, cutscene4_voiceline, 0);
+	}
+	else if (curr_level == CUTSCENE_5) {
+		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_PlayChannel(-1, cutscene5_voiceline, 0);
+	}
+	else if (curr_level == CUTSCENE_6) {
+		Mix_FadeInMusic(cutscene_background, 0, 500);
+		Mix_PlayChannel(-1, cutscene6_voiceline, 0);
+	}
+	else if (curr_level == THE_END) {
+		Mix_FadeInMusic(background_music, 0, 500);
 	}
 
 	// Screen is currently 1200 x 800 (refer to common.hpp to change screen size)
@@ -356,7 +632,14 @@ void WorldSystem::restart_game() {
 		createFloor(renderer, vec2(floors[i].x, floors[i].y), vec2(floors[i].z, floors[i].w));
 	}
 
+
+
 	player = createAria(renderer, player_starting_pos);
+	if (this->curr_level.getIsCutscene()) {
+		Cutscene& cutscene = registry.cutscenes.emplace(player);
+		if (this->curr_level.curr_level == CUTSCENE_6) cutscene.is_cutscene_6 = true;
+	}
+
 
 	if (curr_level == Level::TUTORIAL) {
 		// Familarize player with health pack
@@ -415,6 +698,54 @@ void WorldSystem::restart_game() {
 	if (this->curr_level.getCurrLevel() == FINAL_BOSS) {
 		if (registry.bosses.size() > 0) {
 			registry.weaknessTimers.emplace(registry.bosses.entities[0]);
+		}
+	}
+
+	if (this->curr_level.getCurrLevel() == CUTSCENE_1 ||
+		this->curr_level.getCurrLevel() == CUTSCENE_4) {
+		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
+		Animation& player_animation = registry.animations.get(player);
+		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
+		createExitDoor(renderer, this->curr_level.getExitDoorPos());
+	}
+	else if (this->curr_level.getCurrLevel() == CUTSCENE_2) {
+		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
+		Animation& player_animation = registry.animations.get(player);
+		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
+		createExitDoor(renderer, this->curr_level.getExitDoorPos());
+	} 
+	else if (this->curr_level.getCurrLevel() == CUTSCENE_3) {
+		Entity life_orb = createLifeOrb(renderer, {362,-100}, this->curr_level.getLifeOrbPiece());
+		registry.lifeOrbs.get(life_orb).centered_on_screen = true;
+		registry.velocities.get(life_orb).velocity = { 0.f,20.f };
+		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
+		Position& player_position = registry.positions.get(player);
+		if (player_position.scale.x > 0) player_position.scale.x *= -1;
+	}
+	else if (this->curr_level.getCurrLevel() == CUTSCENE_5) {
+		Entity life_orb = createLifeOrb(renderer, { 55, 200 }, this->curr_level.getLifeOrbPiece());
+		
+		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
+	}
+	else if (this->curr_level.getCurrLevel() == CUTSCENE_6) {
+		Entity life_orb = createLifeOrb(renderer, {115,305}, this->curr_level.getLifeOrbPiece());
+		registry.velocities.get(player).velocity = this->curr_level.cutscene_player_velocity;
+		Animation& player_animation = registry.animations.get(player);
+		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
+		createExitDoor(renderer, this->curr_level.getExitDoorPos());
+	}
+	else if (this->curr_level.getCurrLevel() == THE_END) {
+		Animation& player_animation = registry.animations.get(player);
+		player_animation.setState(player_animation.sprite_sheet_ptr->getPlayerStateFromDirection(DIRECTION::S));
+		player_animation.is_animating = true; // default direction is East so setting this true makes Aria walk
+	}
+
+	for (uint i = 0; i < lost_soul_attrs.size(); i++) {
+		vec2 pos = lost_soul_attrs[i].first;
+		Entity lost_soul = createLostSoul(renderer, pos);
+
+		if (this->curr_level.curr_level == CUTSCENE_2) {
+			registry.velocities.get(lost_soul).velocity = { 225.f,300.f };
 		}
 	}
 
@@ -486,7 +817,7 @@ void WorldSystem::win_level() {
 
 void WorldSystem::new_game() {
 	if (player != NULL) registry.remove_all_components_of(player);
-	curr_level.init(TUTORIAL);
+	curr_level.init(CUTSCENE_1);
 	restart_game();
 }
 
@@ -495,7 +826,7 @@ void WorldSystem::display_power_up() {
 
 	// figure out what power ups are available
 	vector<pair<string, bool*>> availPowerUps;
-
+	
 	if (!powerUp.fasterMovement) availPowerUps.push_back(make_pair("Faster Movement Speed", &powerUp.fasterMovement));
 
 	for (int element = ElementType::WATER; element <= ElementType::LIGHTNING; element++) {
@@ -575,6 +906,7 @@ void WorldSystem::handle_collisions() {
 					registry.deathTimers.emplace(entity);
 					registry.velocities.get(player).velocity = { 0.f, 0.f };
 					Mix_PlayChannel(-1, aria_death_sound, 0);
+					if (this->curr_level.getCurrLevel() != FINAL_BOSS && !this->curr_level.getIsBossLevel()) Mix_PlayChannel(-1, aria_death_lsvl, 0);
 				}
 			}
 		}
@@ -587,6 +919,7 @@ void WorldSystem::handle_collisions() {
 				registry.velocities.get(player).velocity = { 0.f, 0.f };
 				// ADD ARIA DEATH SOUND
 				Mix_PlayChannel(-1, aria_death_sound, 0);
+				if (this->curr_level.getCurrLevel() != FINAL_BOSS && !this->curr_level.getIsBossLevel()) Mix_PlayChannel(-1, aria_death_lsvl, 0);
 			}
 		}
 
@@ -733,15 +1066,30 @@ void WorldSystem::handle_collisions() {
 				// remove enemy if health <= 0
 				if (enemy_resource.currentHealth <= 0) {
 					bool boss = registry.bosses.has(entity_other); // store bool before removing all components
+					vec2 boss_position;
+					if (boss) boss_position = registry.positions.get(entity_other).position; // store in case boss died so we can spawn life orb
+
 					registry.remove_all_components_of(enemy_resource.healthBar);
 					registry.remove_all_components_of_no_collision(entity_other);
 					Mix_PlayChannel(-1, enemy_death_sound, 0);
 
-					// win level and change background music if boss died
+					// drop a life orb shard and change background music if boss died
 					if (boss) {
-						registry.weaknessTimers.clear();
-						win_level();
 						Mix_FadeInMusic(background_music, -1, 1500);
+						registry.weaknessTimers.clear();
+						// fire boss does not drop a shard, so win level and return
+						if (this->curr_level.getCurrLevel() == FIRE_BOSS) {
+							win_level();
+							return;
+						}
+
+						if (this->curr_level.getCurrLevel() == FINAL_BOSS) {
+							Mix_PlayChannel(-1, final_boss_death_sound, 0);
+						}
+						
+						createLifeOrb(renderer, boss_position, this->curr_level.getLifeOrbPiece());
+						if (this->curr_level.getLifeOrbPiece() == 1) Mix_PlayChannel(-1, first_shard_avl, 0);
+						if (this->curr_level.getLifeOrbPiece() == 3) Mix_PlayChannel(-1, third_shard_avl, 0);
 					}
 				}
 			}
@@ -762,6 +1110,7 @@ void WorldSystem::handle_collisions() {
 				registry.deathTimers.emplace(entity_other);
 				registry.velocities.get(player).velocity = vec2(0.f, 0.f);
 				Mix_PlayChannel(-1, aria_death_sound, 0);
+				if (this->curr_level.getCurrLevel() != FINAL_BOSS && !this->curr_level.getIsBossLevel()) Mix_PlayChannel(-1, aria_death_lsvl, 0);
 			}
 			registry.remove_all_components_of_no_collision(entity);
 		}
@@ -834,6 +1183,10 @@ void WorldSystem::handle_collisions() {
 
 		// Checking Player - Exit Door collision
 		if (registry.players.has(entity) && registry.exitDoors.has(entity_other)) {
+			if (curr_level.getIsCutscene()) {
+				Mix_FadeInMusic(background_music, -1, 1500);
+				if (registry.lostSouls.size() > 0) registry.velocities.get(registry.lostSouls.entities[0]).velocity = vec2(0, 0);
+			}
 			win_level();
 		}
 
@@ -846,6 +1199,26 @@ void WorldSystem::handle_collisions() {
 			printf("Player hp: %f\n", player_resource.currentHealth);
 			registry.remove_all_components_of_no_collision(entity_other);
 		}
+
+		// Player - Life Orb collision
+		if (registry.players.has(entity) && registry.lifeOrbs.has(entity_other)) {
+			// play a sound??
+			registry.remove_all_components_of_no_collision(entity_other); 
+			win_level();
+		}
+
+		// Checking Player - Lost Soul collision
+		if (registry.players.has(entity) && registry.lostSouls.has(entity_other)) {
+			if (this->curr_level.getCurrLevel() == CUTSCENE_1 ||
+				this->curr_level.getCurrLevel() == CUTSCENE_3 ||
+				this->curr_level.getCurrLevel() == CUTSCENE_4 ||
+				this->curr_level.getCurrLevel() == CUTSCENE_5) {
+				Velocity& ls_velocity = registry.velocities.get(entity_other);
+				Velocity& player_velocity = registry.velocities.get(entity);
+				ls_velocity.velocity = player_velocity.velocity;
+			}
+		}
+
 	}
 	registry.collisions.clear();
 }
@@ -856,6 +1229,8 @@ bool WorldSystem::is_over() const {
 }
 
 void WorldSystem::on_scroll(double x_offset, double y_offset) {
+	if (registry.deathTimers.has(player) || registry.winTimers.has(player) || this->curr_level.getIsCutscene()) { return; }
+
 	CharacterProjectileType& characterProjectileType = registry.characterProjectileTypes.get(player);
 	int new_element = (int) characterProjectileType.projectileType;
 	if (y_offset < 0) {
@@ -875,8 +1250,10 @@ void WorldSystem::on_scroll(double x_offset, double y_offset) {
 
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
+	if (action == GLFW_PRESS && key == GLFW_KEY_9) win_level();
+
 	//Disables keys when death or win timer happening
-	if (registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; }
+	if (registry.deathTimers.has(player) || registry.winTimers.has(player) || this->curr_level.getIsCutscene()) { return; }
 
 	Velocity& player_velocity = registry.velocities.get(player);
 	Position& player_position = registry.positions.get(player);
@@ -948,10 +1325,6 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 		case GLFW_KEY_4:
 			characterProjectileType.projectileType = ElementType::LIGHTNING;
 			break;
-		case GLFW_KEY_9:
-			registry.winTimers.emplace(player);
-			registry.winTimers.get(player).timer_ms = 0;
-			break;
 		case GLFW_KEY_0:
 			registry.resources.get(player).maxHealth = 10000.f;
 			registry.resources.get(player).currentHealth = 10000.f;
@@ -1016,8 +1389,8 @@ void WorldSystem::on_key(int key, int, int action, int mod) {
 
 void WorldSystem::on_mouse_button(int button, int action, int mod) {	
 	//Disables mouse when death or win timer happening
-	if (UISystem::getInstance()->getState() != PLAY_GAME || registry.deathTimers.has(player) || registry.winTimers.has(player)) { return; }
-
+	if (UISystem::getInstance()->getState() != PLAY_GAME || registry.deathTimers.has(player) || registry.winTimers.has(player) || curr_level.getIsCutscene()) { return; }
+	
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		// check mana
 		if (registry.resources.get(player).currentMana < 1) {

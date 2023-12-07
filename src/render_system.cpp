@@ -421,9 +421,14 @@ void RenderSystem::draw()
 	Entity entity = registry.players.entities[0];
 	Position& player_pos = registry.positions.get(entity);
 
-	// center the camera on the player
+	// center the camera on the player (or life orb if specified)
 	Camera camera;
-	camera.centerAt(player_pos.position);
+	if (registry.lifeOrbs.size() > 0 && registry.lifeOrbs.components[0].centered_on_screen) {
+		camera.centerAt(registry.positions.get(registry.lifeOrbs.entities[0]).position);
+	}
+	else {
+		camera.centerAt(player_pos.position);
+	}
 
 	// Handle drawing floors first
 	for (Entity entity : registry.floors.entities) {
@@ -455,12 +460,14 @@ void RenderSystem::draw()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// We do this after post processing the lighting effect
-	for (Entity entity : registry.healthBars.entities) {
-		drawTexturedMesh(entity, camera.projectionMat);
-	}
+	if (registry.cutscenes.size() == 0) {
+		for (Entity entity : registry.healthBars.entities) {
+			drawTexturedMesh(entity, camera.projectionMat);
+		}
 
-	for (Entity entity : registry.manaBars.entities) {
-		drawTexturedMesh(entity, camera.projectionMat);
+		for (Entity entity : registry.manaBars.entities) {
+			drawTexturedMesh(entity, camera.projectionMat);
+		}
 	}
 
 	for (Entity entity : registry.texts.entities)
@@ -468,17 +475,19 @@ void RenderSystem::draw()
 		drawText(entity);
 	}
 
-	for (Entity entity : registry.projectileSelectDisplays.entities) {
-		drawArsenal(entity, camera.projectionMat);
+	if (registry.cutscenes.size() == 0) {
+		for (Entity entity : registry.projectileSelectDisplays.entities) {
+			drawArsenal(entity, camera.projectionMat);
 
-		ProjectileSelectDisplay& selectDisplay = registry.projectileSelectDisplays.get(entity);
-		PowerUp& powerUp = registry.powerUps.components[0]; // lowkey unsafe
+			ProjectileSelectDisplay& selectDisplay = registry.projectileSelectDisplays.get(entity);
+			PowerUp& powerUp = registry.powerUps.components[0]; // lowkey unsafe
 
-		if (powerUp.fasterMovement) drawTexturedMesh(selectDisplay.fasterMovement, camera.projectionMat);
-		for (int i = 0; i < 4; i++) {
-			if (powerUp.increasedDamage[i]) drawTexturedMesh(selectDisplay.increasedDamage[i], camera.projectionMat);
-			if (powerUp.tripleShot[i]) drawTexturedMesh(selectDisplay.tripleShot[i], camera.projectionMat);
-			if (powerUp.bounceOffWalls[i]) drawTexturedMesh(selectDisplay.bounceOffWalls[i], camera.projectionMat);
+			if (powerUp.fasterMovement) drawTexturedMesh(selectDisplay.fasterMovement, camera.projectionMat);
+			for (int i = 0; i < 4; i++) {
+				if (powerUp.increasedDamage[i]) drawTexturedMesh(selectDisplay.increasedDamage[i], camera.projectionMat);
+				if (powerUp.tripleShot[i]) drawTexturedMesh(selectDisplay.tripleShot[i], camera.projectionMat);
+				if (powerUp.bounceOffWalls[i]) drawTexturedMesh(selectDisplay.bounceOffWalls[i], camera.projectionMat);
+			}
 		}
 	}
   

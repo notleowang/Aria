@@ -20,16 +20,23 @@ const vec2 NULL_POS = vec2(-1, -1);
 enum Level {
 	TUTORIAL = 0,
 	TUTORIAL_2 = TUTORIAL + 1,
-	LEVEL_1 = TUTORIAL_2 + 1,
+	CUTSCENE_1 = TUTORIAL_2 + 1,
+	LEVEL_1 = CUTSCENE_1 + 1,
 	FIRE_BOSS = LEVEL_1 + 1,
-	LEVEL_2 = FIRE_BOSS + 1,
+	CUTSCENE_2 = FIRE_BOSS + 1,
+	LEVEL_2 = CUTSCENE_2 + 1,
 	EARTH_BOSS = LEVEL_2 + 1,
-	LEVEL_3 = EARTH_BOSS + 1,
+	CUTSCENE_3 = EARTH_BOSS + 1,
+	LEVEL_3 = CUTSCENE_3 + 1,
 	LIGHTNING_BOSS = LEVEL_3 + 1,
-	LEVEL_4 = LIGHTNING_BOSS + 1,
+	CUTSCENE_4 = LIGHTNING_BOSS + 1,
+	LEVEL_4 = CUTSCENE_4 + 1,
 	WATER_BOSS = LEVEL_4 + 1,
-	FINAL_BOSS = WATER_BOSS + 1,
-	POWER_UP = FINAL_BOSS + 1
+	CUTSCENE_5 = WATER_BOSS + 1,
+	FINAL_BOSS = CUTSCENE_5 + 1,
+	CUTSCENE_6 = FINAL_BOSS + 1,
+	THE_END = CUTSCENE_6 + 1,
+	POWER_UP = THE_END + 1
 };
 
 //Enemy types to re-use later
@@ -45,7 +52,7 @@ const Enemy EARTH_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::EARTH, f
 const Enemy LIGHTNING_NORMAL = { 10.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING, true };
 const Enemy LIGHTNING_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::LIGHTNING, false };
 
-const Enemy COMBO_HIGH_DAMAGE = { 20.f, 3000.f, 0.5f, 1.f, ElementType::COMBO, false };
+const Enemy FINAL_BOSS_ATTRS = { 20.f, 3000.f, 0.5f, 1.f, ElementType::COMBO, false };
 
 // Terrain types
 const Terrain NORTH_STATIONARY = {DIRECTION::N, 0.f, false};
@@ -61,7 +68,12 @@ public:
 	uint curr_level;
 	vec2 player_starting_pos;
 	vec2 exit_door_pos;
+	bool is_cutscene;
+	bool is_boss_level;
+	vec2 cutscene_player_velocity;
+	int life_orb_piece;
 	bool hasEnemies;
+	bool power_up_next_level = false;
 
 	std::vector<vec2> health_packs_pos;
 
@@ -84,11 +96,26 @@ public:
 
 	// pos_x, pos_y, vel_x, vel_y, scale_x, scale_y
 	std::vector<std::pair<vec2, Enemy>> bosses_attr;
+	
+	// pos_x, pos_y, vel_x, vel_y, scale_x, scale_y
+	std::vector<std::pair<vec2, LostSoul>> lost_souls_attr;
 
 	bool init(uint level);
 
 	uint getCurrLevel() {
 		return curr_level;
+	}
+	
+	bool getIsCutscene() {
+		return is_cutscene;
+	}
+
+	bool getIsBossLevel() {
+		return is_boss_level;
+	}
+
+	bool getPowerUpNextLevel() {
+		return power_up_next_level;
 	}
 
 	vec2& getPlayerStartingPos() {
@@ -130,4 +157,10 @@ public:
 	std::vector<std::pair<vec2, Enemy>>& getBosses() {
 		return bosses_attr;
 	}
+
+	std::vector<std::pair<vec2, LostSoul>>& getLostSouls() {
+		return lost_souls_attr;
+	}
+
+	int getLifeOrbPiece() { return life_orb_piece; }
 };

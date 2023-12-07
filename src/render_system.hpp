@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "common.hpp"
+
 #include "components.hpp"
 #include "tiny_ecs.hpp"
 
@@ -53,6 +54,10 @@ class RenderSystem {
 			textures_path("FINAL_BOSS_AWAKENED_SPRITESHEET.png"),	// final boss
 			textures_path("final_boss_frame.png"),
 			textures_path("ghost.png"),
+			textures_path("life_orb_full.png"),
+			textures_path("life_orb_1.png"),
+      textures_path("life_orb_2.png"),
+      textures_path("life_orb_3.png"),
 			textures_path("projectile_sprite_sheet_water.png"),
 			textures_path("projectile_sprite_sheet_fire.png"),
 			textures_path("projectile_sprite_sheet_earth.png"),
@@ -71,7 +76,8 @@ class RenderSystem {
 			textures_path("power_up_increase_damage_arrow.png"),
 			textures_path("power_up_triple_shot_icon.png"),
 			textures_path("power_up_bounce_icon.png"),
-			textures_path("medkit.png")
+			textures_path("medkit.png"),
+			textures_path("lost_soul.png")
 	};
 
 	std::array<GLuint, effect_count> effects;

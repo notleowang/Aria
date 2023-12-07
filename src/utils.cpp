@@ -88,3 +88,4 @@ ElementType getRandomElementType() {
 
     return elementTypes[distribution(gen)];
 }
+

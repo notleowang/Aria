@@ -40,6 +40,9 @@ Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp, 
 // mock enemy TODO: change enemy implementation
 Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes);
 
+// creates the hooded guy
+Entity createLostSoul(RenderSystem* renderer, vec2 pos);
+
 // creates a boss
 Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes);
 
@@ -66,3 +69,5 @@ Entity createShadow(RenderSystem* renderer, Entity& owner_entity, TEXTURE_ASSET_
 // test entity
 Entity createTestSalmon(RenderSystem* renderer, vec2 pos);
 
+// create life orb
+Entity createLifeOrb(RenderSystem* renderer, vec2 pos, int piece_number);

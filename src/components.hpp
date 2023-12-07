@@ -33,6 +33,20 @@ struct Enemy
 	float isAggravated = true;
 };
 
+// hooded guy
+struct LostSoul {
+
+};
+
+struct Cutscene {
+	bool is_cutscene_6 = false;
+};
+
+// life orb
+struct LifeOrb {
+	bool centered_on_screen = false;
+};
+
 // Boss
 struct Boss {
 	int phase = 0;
@@ -358,6 +372,10 @@ enum class TEXTURE_ASSET_ID {
 	FINAL_BOSS,
 	FINAL_BOSS_SHADOW,
 	GHOST,
+	LIFE_ORB,
+	LIFE_ORB_PIECE_1,
+	LIFE_ORB_PIECE_2,
+	LIFE_ORB_PIECE_3,
 	WATER_PROJECTILE_SHEET,
 	FIRE_PROJECTILE_SHEET,
 	EARTH_PROJECTILE_SHEET,
@@ -377,6 +395,7 @@ enum class TEXTURE_ASSET_ID {
 	TRIPLE_SHOT,
 	BOUNCE,
 	HEALTH_PACK,
+	LOST_SOUL,
 	TEXTURE_COUNT
 };
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
