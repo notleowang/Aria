@@ -20,8 +20,15 @@ Below is the documentation for our `README.md` submission for Milestone 4.
 Most of the work in this milestone aligned with our development plan for this milestone.
 
 ### Aligned with the proposal:
+- Balanced game
+- Tutorial implementation finished
+- Fixed all bugs from previous milestones
+- Finished sprites
+- Added many new sounds (music and sound effects)
 
 ### Discreprancies:
+- Did not do parallax background scrolling creative component
+- Decided to use advanced integrated assets creative component
 
 ## ECS Design Pattern
 The ECS design pattern has not been changed since Milestone 1.
