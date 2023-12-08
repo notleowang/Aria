@@ -46,19 +46,21 @@ Entity createLostSoul(RenderSystem* renderer, vec2 pos);
 // creates a boss
 Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes);
 
+Entity createFinalBossAura(RenderSystem* renderer, Entity& owner_entity, float x_offset, float y_offset);
+
 //Creates a ghost obstacle
 Entity createObstacle(RenderSystem* renderer, vec2 pos, vec2 size, vec2 vel);
 
 // creates a health bar associated with an owner entity
-Entity createHealthBar(RenderSystem* renderer, Entity& resource_entity, Entity& position_entity, float y_offset, float x_offset);
+Entity createHealthBar(RenderSystem* renderer, Entity& resource_entity, Entity& position_entity, float x_offset, float y_offset);
 
 // creates a mana bar associated with an owner entity
-Entity createManaBar(RenderSystem* renderer, Entity& resource_entity, Entity& position_entity, float y_offset, float x_offset);
+Entity createManaBar(RenderSystem* renderer, Entity& resource_entity, Entity& position_entity, float x_offset, float y_offset);
 
 // creates UI that displays the currently selected projectile element
-Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entity, float y_offset, float x_offset);
+Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entity, float x_offset, float y_offset);
 
-Entity createPowerUpIndicator(RenderSystem* renderer, Entity& owner_entity, vec2 size, TEXTURE_ASSET_ID texture, float y_offset, float x_offset);
+Entity createPowerUpIndicator(RenderSystem* renderer, Entity& owner_entity, vec2 size, TEXTURE_ASSET_ID texture, float x_offset, float y_offset);
 
 Entity createFloor(RenderSystem* renderer, vec2 pos, vec2 size);
 

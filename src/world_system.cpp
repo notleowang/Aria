@@ -339,7 +339,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		timer.timer_ms -= elapsed_ms_since_last_update;
 		if (timer.timer_ms <= 0.f) {
 			// Weakness to this element has expired
-			float max_timer = 5000.f;
+			float max_timer = 12000.f;
 			float curr_timer = max_timer * uniform_dist(rng);
 
 			ElementType elementType = getRandomElementType();
@@ -347,27 +347,34 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			timer.timer_ms = curr_timer;
 			timer.weakTo = elementType;
 			
-			Animation& animation = registry.animations.get(entity);
-			FINAL_BOSS_SPRITE_STATES state;
-			switch (elementType) {
-				case (ElementType::WATER):
-					state = FINAL_BOSS_SPRITE_STATES::WATER;
-					break;
-				case (ElementType::FIRE):
-					state = FINAL_BOSS_SPRITE_STATES::FIRE;
-					break;
-				case (ElementType::EARTH):
-					state = FINAL_BOSS_SPRITE_STATES::EARTH;
-					break;
-				case (ElementType::LIGHTNING):
-					state = FINAL_BOSS_SPRITE_STATES::LIGHTNING;
-					break;
-				default:
-					state = FINAL_BOSS_SPRITE_STATES::WEST;
-					break;
+			if (registry.bosses.has(entity) && registry.animations.has(entity)) {
+				Animation& animation = registry.animations.get(entity);
+				if (animation.curr_state_index != (int)FINAL_BOSS_SPRITE_STATES::SOUTH) animation.setState((int)FINAL_BOSS_SPRITE_STATES::SOUTH);
+				Boss& boss = registry.bosses.get(entity);
+				if (registry.animations.has(boss.aura)) {
+					Animation& aura_anim = registry.animations.get(boss.aura);
+					FINAL_BOSS_AURA_SPRITE_STATES state;
+					switch (elementType) {
+					case (ElementType::WATER):
+						state = FINAL_BOSS_AURA_SPRITE_STATES::WATER;
+						break;
+					case (ElementType::FIRE):
+						state = FINAL_BOSS_AURA_SPRITE_STATES::FIRE;
+						break;
+					case (ElementType::EARTH):
+						state = FINAL_BOSS_AURA_SPRITE_STATES::EARTH;
+						break;
+					case (ElementType::LIGHTNING):
+						state = FINAL_BOSS_AURA_SPRITE_STATES::LIGHTNING;
+						break;
+					default:
+						state = FINAL_BOSS_AURA_SPRITE_STATES::NONE;
+						break;
+					}
+					aura_anim.setState((int)state);
+					aura_anim.is_animating = false;
+				}
 			}
-			animation.setState((int)state);
-			animation.is_animating = false;
 		}
 	}
 
@@ -692,7 +699,7 @@ void WorldSystem::restart_game() {
 		createObstacle(renderer, pos, scale, vel);
 	}
 
-	projectileSelectDisplay = createProjectileSelectDisplay(renderer, player, PROJECTILE_SELECT_DISPLAY_Y_OFFSET, PROJECTILE_SELECT_DISPLAY_X_OFFSET);
+	projectileSelectDisplay = createProjectileSelectDisplay(renderer, player, PROJECTILE_SELECT_DISPLAY_X_OFFSET, PROJECTILE_SELECT_DISPLAY_Y_OFFSET);
 
 	if (this->curr_level.getCurrLevel() == POWER_UP) display_power_up();
 	if (this->curr_level.getCurrLevel() == FINAL_BOSS) {
@@ -1077,16 +1084,22 @@ void WorldSystem::handle_collisions() {
 
 				// remove enemy if health <= 0
 				if (enemy_resource.currentHealth <= 0) {
-					bool boss = registry.bosses.has(entity_other); // store bool before removing all components
+					bool is_boss = registry.bosses.has(entity_other); // store bool before removing all components
 					vec2 boss_position;
-					if (boss) boss_position = registry.positions.get(entity_other).position; // store in case boss died so we can spawn life orb
+					if (is_boss) {
+						boss_position = registry.positions.get(entity_other).position; // store in case boss died so we can spawn life orb
+						Boss& boss = registry.bosses.get(entity_other);
+						if (registry.animations.has(boss.aura)) {
+							registry.remove_all_components_of(boss.aura);
+						}
+					}
 
 					registry.remove_all_components_of(enemy_resource.healthBar);
 					registry.remove_all_components_of_no_collision(entity_other);
 					Mix_PlayChannel(-1, enemy_death_sound, 0);
 
 					// drop a life orb shard and change background music if boss died
-					if (boss) {
+					if (is_boss) {
 						Mix_FadeInMusic(background_music, -1, 1500);
 						registry.weaknessTimers.clear();
 						// fire boss does not drop a shard, so win level and return
