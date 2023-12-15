@@ -14,12 +14,12 @@ struct Player
 
 // All data relevant to elements and weaknesses
 enum ElementType {
-	WATER = 0,
-	FIRE = 1,
-	EARTH = 2,
-	LIGHTNING = 3,
-	COUNT = 4,
-	COMBO = 5 // this is reserved for the final boss only
+	WATER,
+	FIRE,
+	EARTH,
+	LIGHTNING,
+	COUNT,
+	COMBO		// this is reserved for the final boss only
 };
 
 // Enemy component
