@@ -52,6 +52,9 @@ class RenderSystem {
 			textures_path("earth_boss.png"),
 			textures_path("lightning_boss.png"),
 			textures_path("boss_sheet_earth.png"),
+			textures_path("boss_sheet_fire.png"),
+			textures_path("boss_sheet_lightning.png"),
+			textures_path("boss_sheet_water.png"),
 			textures_path("FINAL_BOSS_AWAKENED_SPRITESHEET.png"),	// final boss
 			textures_path("final_boss_frame.png"),
 			textures_path("ghost.png"),

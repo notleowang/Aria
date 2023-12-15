@@ -284,16 +284,16 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	GEOMETRY_BUFFER_ID geomBuffer;
 	switch (enemy.type) {
 	case ElementType::WATER:
-		textureAsset = TEXTURE_ASSET_ID::WATER_BOSS;
-		shadowTextureAsset = textureAsset;
-		effectAsset = EFFECT_ASSET_ID::TEXTURED;
-		geomBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+		textureAsset = TEXTURE_ASSET_ID::WATER_BOSS_SHEET;
+		shadowTextureAsset = TEXTURE_ASSET_ID::WATER_BOSS;
+		effectAsset = EFFECT_ASSET_ID::ANIMATED;
+		geomBuffer = GEOMETRY_BUFFER_ID::BOSS;
 		break;
 	case ElementType::FIRE:
-		textureAsset = TEXTURE_ASSET_ID::FIRE_BOSS;
-		shadowTextureAsset = textureAsset;
-		effectAsset = EFFECT_ASSET_ID::TEXTURED;
-		geomBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+		textureAsset = TEXTURE_ASSET_ID::FIRE_BOSS_SHEET;
+		shadowTextureAsset = TEXTURE_ASSET_ID::FIRE_BOSS;
+		effectAsset = EFFECT_ASSET_ID::ANIMATED;
+		geomBuffer = GEOMETRY_BUFFER_ID::BOSS;
 		break;
 	case ElementType::EARTH:
 		textureAsset = TEXTURE_ASSET_ID::EARTH_BOSS_SHEET;
@@ -302,10 +302,10 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 		geomBuffer = GEOMETRY_BUFFER_ID::BOSS;
 		break;
 	case ElementType::LIGHTNING:
-		textureAsset = TEXTURE_ASSET_ID::LIGHTNING_BOSS;
-		shadowTextureAsset = textureAsset;
-		effectAsset = EFFECT_ASSET_ID::TEXTURED;
-		geomBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+		textureAsset = TEXTURE_ASSET_ID::LIGHTNING_BOSS_SHEET;
+		shadowTextureAsset = TEXTURE_ASSET_ID::LIGHTNING_BOSS;
+		effectAsset = EFFECT_ASSET_ID::ANIMATED;
+		geomBuffer = GEOMETRY_BUFFER_ID::BOSS;
 		break;
 	case ElementType::COMBO:
 		textureAsset = TEXTURE_ASSET_ID::FINAL_BOSS;
@@ -315,10 +315,10 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 		break;
 	default:
 		// should never reach here
-		textureAsset = TEXTURE_ASSET_ID::WATER_BOSS;
-		shadowTextureAsset = textureAsset;
-		effectAsset = EFFECT_ASSET_ID::TEXTURED;
-		geomBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+		textureAsset = TEXTURE_ASSET_ID::WATER_BOSS_SHEET;
+		shadowTextureAsset = TEXTURE_ASSET_ID::WATER_BOSS;
+		effectAsset = EFFECT_ASSET_ID::ANIMATED;
+		geomBuffer = GEOMETRY_BUFFER_ID::BOSS;
 		break;
 	}
 
@@ -334,7 +334,7 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 		animation.setState((int)FINAL_BOSS_SPRITE_STATES::WEST);
 		animation.is_animating = false;
 	}
-	else if (effectAsset == EFFECT_ASSET_ID::ANIMATED) {
+	else {
 		SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::BOSS);
 		registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
 
