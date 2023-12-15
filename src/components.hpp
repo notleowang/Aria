@@ -14,12 +14,12 @@ struct Player
 
 // All data relevant to elements and weaknesses
 enum ElementType {
-	WATER = 0,
-	FIRE = 1,
-	EARTH = 2,
-	LIGHTNING = 3,
-	COUNT = 4,
-	COMBO = 5 // this is reserved for the final boss only
+	WATER,
+	FIRE,
+	EARTH,
+	LIGHTNING,
+	COUNT,
+	COMBO		// this is reserved for the final boss only
 };
 
 // Enemy component
@@ -411,18 +411,18 @@ enum class TEXTURE_ASSET_ID {
 const int texture_count = (int)TEXTURE_ASSET_ID::TEXTURE_COUNT;
 
 enum class EFFECT_ASSET_ID {
-	PLAYER = 0,
-	COLOURED = PLAYER + 1,
-	SALMON = COLOURED + 1,
-	TEXTURED = SALMON + 1,
-	DARKEN = TEXTURED + 1,
-	REPEAT = DARKEN + 1,
-	EXIT_DOOR = REPEAT + 1,
-	RESOURCE_BAR = EXIT_DOOR + 1,
-	TEXT_2D = RESOURCE_BAR + 1,
-	ANIMATED = TEXT_2D + 1,
-	SHADOW = ANIMATED + 1,
-	EFFECT_COUNT = SHADOW + 1
+	PLAYER,
+	COLOURED,
+	SALMON,
+	TEXTURED,
+	DARKEN,
+	REPEAT,
+	EXIT_DOOR,
+	RESOURCE_BAR,
+	TEXT_2D,
+	ANIMATED,
+	SHADOW,
+	EFFECT_COUNT
 };
 const int effect_count = (int)EFFECT_ASSET_ID::EFFECT_COUNT;
 
@@ -475,14 +475,14 @@ struct RenderRequest {
 
 // One for each sprite sheet to indicate the states
 enum class POWER_UP_BLOCK_STATES {
-	ACTIVE = 0,
-	INACTIVE = ACTIVE + 1,
-	STATE_COUNT = INACTIVE + 1
+	ACTIVE,
+	INACTIVE,
+	STATE_COUNT
 };
 
 enum class PROJECTILE_STATES {
-	MOVING = 0,
-	STATE_COUNT = MOVING + 1
+	MOVING,
+	STATE_COUNT
 };
 
 enum class PLAYER_SPRITE_STATES {
