@@ -296,10 +296,10 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 		geomBuffer = GEOMETRY_BUFFER_ID::SPRITE;
 		break;
 	case ElementType::EARTH:
-		textureAsset = TEXTURE_ASSET_ID::EARTH_BOSS;
-		shadowTextureAsset = textureAsset;
-		effectAsset = EFFECT_ASSET_ID::TEXTURED;
-		geomBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+		textureAsset = TEXTURE_ASSET_ID::EARTH_BOSS_SHEET;
+		shadowTextureAsset = TEXTURE_ASSET_ID::EARTH_BOSS;
+		effectAsset = EFFECT_ASSET_ID::ANIMATED;
+		geomBuffer = GEOMETRY_BUFFER_ID::BOSS;
 		break;
 	case ElementType::LIGHTNING:
 		textureAsset = TEXTURE_ASSET_ID::LIGHTNING_BOSS;
@@ -334,7 +334,19 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 		animation.setState((int)FINAL_BOSS_SPRITE_STATES::WEST);
 		animation.is_animating = false;
 	}
-	if (enemy.type != ElementType::COMBO) createShadow(renderer, entity, shadowTextureAsset, GEOMETRY_BUFFER_ID::SPRITE);
+	else if (effectAsset == EFFECT_ASSET_ID::ANIMATED) {
+		SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::BOSS);
+		registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+		Animation& animation = registry.animations.emplace(entity);
+		animation.sprite_sheet_ptr = &sprite_sheet;
+		animation.setState((int)BOSS_STATES::STANDING);
+		animation.is_animating = true;
+
+		position.scale = vec2({ 3.f * sprite_sheet.frame_width, 3.f * sprite_sheet.frame_height });
+	}
+	
+	createShadow(renderer, entity, shadowTextureAsset, GEOMETRY_BUFFER_ID::SPRITE);
 
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
