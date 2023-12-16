@@ -163,7 +163,7 @@ Entity createLostSoul(RenderSystem* renderer, vec2 pos) {
 
 	Animation& animation = registry.animations.emplace(entity);
 	animation.sprite_sheet_ptr = &sprite_sheet;
-	animation.setState((int)LOST_SOUL_STATES::EAST_MOVING);
+	animation.setState((int)LOST_SOUL_STATES::EAST_IDLE);
 	animation.is_animating = true;
 
 	Position& position = registry.positions.emplace(entity);

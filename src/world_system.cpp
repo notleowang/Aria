@@ -1265,9 +1265,10 @@ void WorldSystem::handle_collisions() {
 				this->curr_level.getCurrLevel() == CUTSCENE_3 ||
 				this->curr_level.getCurrLevel() == CUTSCENE_4 ||
 				this->curr_level.getCurrLevel() == CUTSCENE_5) {
-				Velocity& ls_velocity = registry.velocities.get(entity_other);
+				Velocity& lost_soul_velocity = registry.velocities.get(entity_other);
 				Velocity& player_velocity = registry.velocities.get(entity);
-				ls_velocity.velocity = player_velocity.velocity;
+				lost_soul_velocity.velocity = player_velocity.velocity;
+				animateLostSoul(entity_other);
 			}
 		}
 
