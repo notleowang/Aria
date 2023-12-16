@@ -287,6 +287,28 @@ void RenderSystem::initializePlayerSpriteSheet()
 	sprite_sheets[ss_index].states = states;
 }
 
+void RenderSystem::initializeLostSoulSpriteSheet()
+{
+	int num_rows = 6;
+	int num_cols = 4;
+	int ss_index = (int)SPRITE_SHEET_DATA_ID::LOST_SOUL;
+	int num_states = (int)LOST_SOUL_STATES::STATE_COUNT;
+
+	std::vector<AnimState> states(num_states);
+	for (int i = 0; i < num_rows; i++) {
+		states[i] = AnimState(i * num_cols, (i + 1) * num_cols - 1);
+	}
+	states[(int)LOST_SOUL_STATES::EAST_STILL] = AnimState(13.f, 13.f);
+	states[(int)LOST_SOUL_STATES::WEST_STILL] = AnimState(17.f, 17.f);
+	states[(int)LOST_SOUL_STATES::SOUTH_STILL] = AnimState(21.f, 21.f);
+
+	sprite_sheets[ss_index].num_rows = num_rows;
+	sprite_sheets[ss_index].num_cols = num_cols;
+	sprite_sheets[ss_index].states = states;
+	sprite_sheets[ss_index].frame_height = 31.f;
+	sprite_sheets[ss_index].frame_width = 31.f;
+}
+
 void RenderSystem::initializeFinalBossSpriteSheet()
 {
 	int num_rows = 6;
@@ -346,6 +368,7 @@ void RenderSystem::initializeSpriteSheets()
 	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET, 6, 16.f, 26.f);
 	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET, 6, 16.f, 26.f);
 	initializePlayerSpriteSheet();
+	initializeLostSoulSpriteSheet();
 	initializeFinalBossSpriteSheet();
 	initializeProjectileSelectDisplaySpriteSheet();
 }
@@ -633,6 +656,7 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIGHTNING_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::POWER_UP_BLOCK, SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PROJECTILE_SELECT_DISPLAY, SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LOST_SOUL, SPRITE_SHEET_DATA_ID::LOST_SOUL);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FINAL_BOSS, SPRITE_SHEET_DATA_ID::FINAL_BOSS);
 	initializeResourceBarGeometryBuffer();
 }

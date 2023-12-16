@@ -77,7 +77,8 @@ class RenderSystem {
 			textures_path("power_up_triple_shot_icon.png"),
 			textures_path("power_up_bounce_icon.png"),
 			textures_path("medkit.png"),
-			textures_path("lost_soul.png")
+			textures_path("lost_soul.png"),
+			textures_path("lost_soul_sheet.png")
 	};
 
 	std::array<GLuint, effect_count> effects;
@@ -152,6 +153,7 @@ private:
 	void initializePowerUpBlockSpriteSheet();
 	void initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, float frame_height, float frame_width);
 	void initializePlayerSpriteSheet();
+	void initializeLostSoulSpriteSheet();
 	void initializeFinalBossSpriteSheet();
 	void initializeProjectileSelectDisplaySpriteSheet();
 

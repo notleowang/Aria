@@ -155,8 +155,16 @@ Entity createLostSoul(RenderSystem* renderer, vec2 pos) {
 
 	registry.lostSouls.emplace(entity);
 
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::LOST_SOUL);
 	registry.meshPtrs.emplace(entity, &mesh);
+
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::LOST_SOUL);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)LOST_SOUL_STATES::EAST_MOVING);
+	animation.is_animating = true;
 
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
@@ -175,9 +183,9 @@ Entity createLostSoul(RenderSystem* renderer, vec2 pos) {
 
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::LOST_SOUL,
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE });
+		{ TEXTURE_ASSET_ID::LOST_SOUL_SHEET,
+			EFFECT_ASSET_ID::ANIMATED,
+			GEOMETRY_BUFFER_ID::LOST_SOUL });
 
 	return entity;
 }
