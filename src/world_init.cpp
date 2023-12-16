@@ -533,7 +533,7 @@ Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entit
 
 
 	ProjectileSelectDisplay& display = registry.projectileSelectDisplays.emplace(entity);
-	display.fasterMovement =			createPowerUpIndicator(renderer, entity, vec2(29.f, 29.f), TEXTURE_ASSET_ID::FASTER_MOVEMENT, -160.f, 0.f);
+	display.fasterMovement = createPowerUpIndicator(renderer, entity, vec2(24.f, 29.f), TEXTURE_ASSET_ID::FASTER_MOVEMENT, -160.f, 0.f);
 	for (int i = 0; i < 4; i++) {
 		display.increasedDamage[i] = createPowerUpIndicator(renderer, entity, vec2(5.f, 6.f), TEXTURE_ASSET_ID::DAMAGE_ARROW, (i * 60.f) - 75.f, 16.f);
 		display.tripleShot[i] = createPowerUpIndicator(renderer, entity, vec2(9.f, 9.f), TEXTURE_ASSET_ID::TRIPLE_SHOT, (i * 60.f) - 108.f, -45.f);
