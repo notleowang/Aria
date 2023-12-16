@@ -51,6 +51,10 @@ class RenderSystem {
 			textures_path("fire_boss.png") ,
 			textures_path("earth_boss.png"),
 			textures_path("lightning_boss.png"),
+			textures_path("boss_sheet_earth.png"),
+			textures_path("boss_sheet_fire.png"),
+			textures_path("boss_sheet_lightning.png"),
+			textures_path("boss_sheet_water.png"),
 			textures_path("FINAL_BOSS_AWAKENED_SPRITESHEET.png"),	// final boss
 			textures_path("final_boss_frame.png"),
 			textures_path("ghost.png"),
@@ -152,6 +156,7 @@ private:
 	void initializePowerUpBlockSpriteSheet();
 	void initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, float frame_height, float frame_width);
 	void initializePlayerSpriteSheet();
+	void initializeBossSpriteSheet();
 	void initializeFinalBossSpriteSheet();
 	void initializeProjectileSelectDisplaySpriteSheet();
 
