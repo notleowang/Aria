@@ -39,19 +39,23 @@ class RenderSystem {
 
 	// Make sure these paths remain in sync with the associated enumerators.
 	const std::array<std::string, texture_count> texture_paths = {
-			textures_path("north_dungeon_wall.png"),
-			textures_path("south_dungeon_wall.png"),
-			textures_path("side_dungeon_wall.png"),
-			textures_path("generic_dungeon_wall.png"),
+			textures_path("wall_section_horizontal.png"),
+			textures_path("wall_section_horizontal_south.png"),
+			textures_path("wall_section_vertical.png"),
+			textures_path("wall_section_generic.png"),
 			textures_path("water_enemy.png"),						// start of regular enemies
 			textures_path("fire_enemy.png") ,
 			textures_path("earth_enemy.png"),
 			textures_path("lightning_enemy.png"),
-			textures_path("water_boss.png"),						// start of bosses
-			textures_path("fire_boss.png") ,
+			textures_path("water_boss.png"),						// start of boss shadows
+			textures_path("fire_boss.png"),
 			textures_path("earth_boss.png"),
 			textures_path("lightning_boss.png"),
-			textures_path("final_boss_awakened_triples.png"),	// final boss
+			textures_path("boss_sheet_water.png"),					// start of boss sprite sheets
+			textures_path("boss_sheet_fire.png"),
+			textures_path("boss_sheet_earth.png"),
+			textures_path("boss_sheet_lightning.png"),
+			textures_path("final_boss_awakened_triples.png"),		// final boss
 			textures_path("final_boss_auras.png"),
 			textures_path("final_boss_frame.png"),
 			textures_path("ghost.png"),
@@ -63,7 +67,7 @@ class RenderSystem {
 			textures_path("projectile_sprite_sheet_fire.png"),
 			textures_path("projectile_sprite_sheet_earth.png"),
 			textures_path("projectile_sprite_sheet_lightning.png"),
-			textures_path("dungeon_floor.png"),
+			textures_path("floor_tiles_light.png"),
 			textures_path("boss_health_bar.png"),
 			textures_path("enemy_health_bar.png"),
 			textures_path("enemy_mana_bar.png"),
@@ -73,7 +77,7 @@ class RenderSystem {
 			textures_path("aria.png"),
 			textures_path("portal.png"),
 			textures_path("projectile_select_display_vertical.png"),
-			textures_path("faster_movement.png"),
+			textures_path("faster_movement_icon.png"),
 			textures_path("power_up_increase_damage_arrow.png"),
 			textures_path("power_up_triple_shot_icon.png"),
 			textures_path("power_up_bounce_icon.png"),
@@ -153,6 +157,7 @@ private:
 	void initializePowerUpBlockSpriteSheet();
 	void initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, float frame_height, float frame_width);
 	void initializePlayerSpriteSheet();
+	void initializeBossSpriteSheet();
 	void initializeFinalBossSpriteSheet();
 	void initializeFinalBossAuraSpriteSheet();
 	void initializeProjectileSelectDisplaySpriteSheet();
