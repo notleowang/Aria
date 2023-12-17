@@ -292,28 +292,28 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	GEOMETRY_BUFFER_ID geomBuffer;
 	switch (enemy.type) {
 	case ElementType::WATER:
-		textureAsset = TEXTURE_ASSET_ID::WATER_BOSS;
-		shadowTextureAsset = textureAsset;
-		effectAsset = EFFECT_ASSET_ID::TEXTURED;
-		geomBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+		textureAsset = TEXTURE_ASSET_ID::WATER_BOSS_SHEET;
+		shadowTextureAsset = TEXTURE_ASSET_ID::WATER_BOSS;
+		effectAsset = EFFECT_ASSET_ID::ANIMATED;
+		geomBuffer = GEOMETRY_BUFFER_ID::BOSS;
 		break;
 	case ElementType::FIRE:
-		textureAsset = TEXTURE_ASSET_ID::FIRE_BOSS;
-		shadowTextureAsset = textureAsset;
-		effectAsset = EFFECT_ASSET_ID::TEXTURED;
-		geomBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+		textureAsset = TEXTURE_ASSET_ID::FIRE_BOSS_SHEET;
+		shadowTextureAsset = TEXTURE_ASSET_ID::FIRE_BOSS;
+		effectAsset = EFFECT_ASSET_ID::ANIMATED;
+		geomBuffer = GEOMETRY_BUFFER_ID::BOSS;
 		break;
 	case ElementType::EARTH:
-		textureAsset = TEXTURE_ASSET_ID::EARTH_BOSS;
-		shadowTextureAsset = textureAsset;
-		effectAsset = EFFECT_ASSET_ID::TEXTURED;
-		geomBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+		textureAsset = TEXTURE_ASSET_ID::EARTH_BOSS_SHEET;
+		shadowTextureAsset = TEXTURE_ASSET_ID::EARTH_BOSS;
+		effectAsset = EFFECT_ASSET_ID::ANIMATED;
+		geomBuffer = GEOMETRY_BUFFER_ID::BOSS;
 		break;
 	case ElementType::LIGHTNING:
-		textureAsset = TEXTURE_ASSET_ID::LIGHTNING_BOSS;
-		shadowTextureAsset = textureAsset;
-		effectAsset = EFFECT_ASSET_ID::TEXTURED;
-		geomBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+		textureAsset = TEXTURE_ASSET_ID::LIGHTNING_BOSS_SHEET;
+		shadowTextureAsset = TEXTURE_ASSET_ID::LIGHTNING_BOSS;
+		effectAsset = EFFECT_ASSET_ID::ANIMATED;
+		geomBuffer = GEOMETRY_BUFFER_ID::BOSS;
 		break;
 	case ElementType::COMBO:
 		textureAsset = TEXTURE_ASSET_ID::FINAL_BOSS;
@@ -323,10 +323,10 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 		break;
 	default:
 		// should never reach here
-		textureAsset = TEXTURE_ASSET_ID::WATER_BOSS;
-		shadowTextureAsset = textureAsset;
-		effectAsset = EFFECT_ASSET_ID::TEXTURED;
-		geomBuffer = GEOMETRY_BUFFER_ID::SPRITE;
+		textureAsset = TEXTURE_ASSET_ID::WATER_BOSS_SHEET;
+		shadowTextureAsset = TEXTURE_ASSET_ID::WATER_BOSS;
+		effectAsset = EFFECT_ASSET_ID::ANIMATED;
+		geomBuffer = GEOMETRY_BUFFER_ID::BOSS;
 		break;
 	}
 
@@ -342,7 +342,19 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 		animation.setState((int)FINAL_BOSS_SPRITE_STATES::WEST);
 		animation.is_animating = false;
 	}
-	if (enemy.type != ElementType::COMBO) createShadow(renderer, entity, shadowTextureAsset, GEOMETRY_BUFFER_ID::SPRITE);
+	else {
+		SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::BOSS);
+		registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+		Animation& animation = registry.animations.emplace(entity);
+		animation.sprite_sheet_ptr = &sprite_sheet;
+		animation.setState((int)BOSS_STATES::STANDING);
+		animation.is_animating = true;
+
+		position.scale = vec2({ 3.f * sprite_sheet.frame_width, 3.f * sprite_sheet.frame_height });
+	}
+	
+	createShadow(renderer, entity, shadowTextureAsset, GEOMETRY_BUFFER_ID::SPRITE);
 
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
@@ -529,7 +541,7 @@ Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entit
 
 
 	ProjectileSelectDisplay& display = registry.projectileSelectDisplays.emplace(entity);
-	display.fasterMovement =			createPowerUpIndicator(renderer, entity, vec2(29.f, 29.f), TEXTURE_ASSET_ID::FASTER_MOVEMENT, -160.f, 0.f);
+	display.fasterMovement = createPowerUpIndicator(renderer, entity, vec2(24.f, 29.f), TEXTURE_ASSET_ID::FASTER_MOVEMENT, -160.f, 0.f);
 	for (int i = 0; i < 4; i++) {
 		display.increasedDamage[i] = createPowerUpIndicator(renderer, entity, vec2(5.f, 6.f), TEXTURE_ASSET_ID::DAMAGE_ARROW, (i * 60.f) - 75.f, 16.f);
 		display.tripleShot[i] = createPowerUpIndicator(renderer, entity, vec2(9.f, 9.f), TEXTURE_ASSET_ID::TRIPLE_SHOT, (i * 60.f) - 108.f, -45.f);
