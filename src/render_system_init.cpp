@@ -260,21 +260,6 @@ void RenderSystem::initializePowerUpBlockSpriteSheet()
 	sprite_sheets[ss_index].frame_width = 28.f;
 }
 
-void RenderSystem::initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, float frame_height, float frame_width)
-{
-	int num_rows = 1;
-	int ss_index = (int)ss_id;
-
-	std::vector<AnimState> states((int)PROJECTILE_STATES::STATE_COUNT);
-	states[(int)PROJECTILE_STATES::MOVING] = AnimState(0, num_cols - 1);
-
-	sprite_sheets[ss_index].num_rows = num_rows;
-	sprite_sheets[ss_index].num_cols = num_cols;
-	sprite_sheets[ss_index].states = states;
-	sprite_sheets[ss_index].frame_height = frame_height;
-	sprite_sheets[ss_index].frame_width = frame_width;
-}
-
 void RenderSystem::initializePlayerSpriteSheet()
 {
 	int num_rows = 6;
@@ -412,13 +397,25 @@ void RenderSystem::initializePortalSpriteSheet()
 	sprite_sheets[ss_index].frame_width = 23.f;
 }
 
+void RenderSystem::initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, int num_rows, int num_frames, float frame_width, float frame_height)
+{
+	std::vector<AnimState> states(1);
+	states[0] = AnimState(0, num_frames - 1);
+
+	sprite_sheets[(int)ss_id].num_rows = num_rows;
+	sprite_sheets[(int)ss_id].num_cols = num_cols;
+	sprite_sheets[(int)ss_id].states = states;
+	sprite_sheets[(int)ss_id].frame_height = frame_height;
+	sprite_sheets[(int)ss_id].frame_width = frame_width;
+}
+
 void RenderSystem::initializeSpriteSheets()
 {
 	initializePowerUpBlockSpriteSheet();
-	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::WATER_PROJECTILE, 4, 16.f, 26.f);
-	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::FIRE_PROJECTILE, 4, 16.f, 26.f);
-	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET, 6, 16.f, 26.f);
-	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET, 6, 16.f, 26.f);
+	initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID::WATER_PROJECTILE, 4, 1, 4, 26.f, 16.f);
+	initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID::FIRE_PROJECTILE, 4, 1, 4, 26.f, 16.f);
+	initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET, 6, 1, 6, 26.f, 16.f);
+	initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET, 6, 1, 6, 26.f, 16.f);
 	initializePlayerSpriteSheet();
 	initializeLostSoulSpriteSheet();
 	initializeBossSpriteSheet();
@@ -426,6 +423,8 @@ void RenderSystem::initializeSpriteSheets()
 	initializeFinalBossAuraSpriteSheet();
 	initializeProjectileSelectDisplaySpriteSheet();
 	initializePortalSpriteSheet();
+	initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID::LIFE_ORB, 4, 3, 12, 16.f, 24.f);
+	initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID::LIFE_ORB_SHARD, 9, 1, 9, 7.f, 12.f);
 }
 
 // Helper functions for initializing Gl Geometry Buffers
@@ -716,6 +715,8 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FINAL_BOSS, SPRITE_SHEET_DATA_ID::FINAL_BOSS);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FINAL_BOSS_AURA, SPRITE_SHEET_DATA_ID::FINAL_BOSS_AURA);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PORTAL, SPRITE_SHEET_DATA_ID::PORTAL);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIFE_ORB, SPRITE_SHEET_DATA_ID::LIFE_ORB);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIFE_ORB_SHARD, SPRITE_SHEET_DATA_ID::LIFE_ORB_SHARD);
 	initializeResourceBarGeometryBuffer();
 }
 

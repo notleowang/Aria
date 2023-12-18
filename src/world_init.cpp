@@ -839,32 +839,40 @@ Entity createLifeOrb(RenderSystem* renderer, vec2 pos, int piece_number) {
 
 	LifeOrb& life_orb = registry.lifeOrbs.emplace(entity);
 
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(entity, &mesh);
-
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
-	position.scale = vec2(2 * 23.f, 2 * 23.f);
 	
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = { 0.f,0.f };
 
 	registry.collidables.emplace(entity);
 
+	SPRITE_SHEET_DATA_ID ss_id = SPRITE_SHEET_DATA_ID::LIFE_ORB;
 	TEXTURE_ASSET_ID asset = TEXTURE_ASSET_ID::LIFE_ORB;
-	if (piece_number == 1) {
-		asset = TEXTURE_ASSET_ID::LIFE_ORB_PIECE_1;
-	} else if (piece_number == 2) {
-		asset = TEXTURE_ASSET_ID::LIFE_ORB_PIECE_2;
-	} else if (piece_number == 3) {
-		asset =	TEXTURE_ASSET_ID::LIFE_ORB_PIECE_3;
+	GEOMETRY_BUFFER_ID geom_buffer = GEOMETRY_BUFFER_ID::LIFE_ORB;
+	float scale_factor = 2.f;
+	if (piece_number == 1 || piece_number == 2 || piece_number == 3) {
+		ss_id = SPRITE_SHEET_DATA_ID::LIFE_ORB_SHARD;
+		asset = TEXTURE_ASSET_ID::LIFE_ORB_SHARD;
+		geom_buffer = GEOMETRY_BUFFER_ID::LIFE_ORB_SHARD;
+		scale_factor = 3.f;
 	}
+
+	Mesh& mesh = renderer->getMesh(geom_buffer);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(ss_id);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+	position.scale = vec2(scale_factor * sprite_sheet.frame_width, scale_factor * sprite_sheet.frame_height);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
 
 	registry.renderRequests.insert(
 		entity,
 		{ asset,
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE });
+			EFFECT_ASSET_ID::ANIMATED,
+			geom_buffer });
 
 	return entity;
 }

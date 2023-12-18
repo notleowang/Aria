@@ -59,10 +59,8 @@ class RenderSystem {
 			textures_path("final_boss_auras.png"),
 			textures_path("final_boss_frame.png"),
 			textures_path("ghost.png"),
-			textures_path("life_orb_full.png"),
-			textures_path("life_orb_1.png"),
-			textures_path("life_orb_2.png"),
-			textures_path("life_orb_3.png"),
+			textures_path("life_orb.png"),
+			textures_path("life_shard.png"),
 			textures_path("projectile_water.png"),
 			textures_path("projectile_fire.png"),
 			textures_path("projectile_earth.png"),
@@ -156,7 +154,6 @@ private:
 
 	// Helper functions for initializeSpriteSheets()
 	void initializePowerUpBlockSpriteSheet();
-	void initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, float frame_height, float frame_width);
 	void initializePlayerSpriteSheet();
 	void initializeLostSoulSpriteSheet();
 	void initializeBossSpriteSheet();
@@ -164,6 +161,7 @@ private:
 	void initializeFinalBossAuraSpriteSheet();
 	void initializeProjectileSelectDisplaySpriteSheet();
 	void initializePortalSpriteSheet();
+	void initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, int num_rows, int num_frames, float frame_width, float frame_height);
 
 	// Helper functions for initializeGlGeometryBuffers()
 	void initializePlayerGeometryBuffer();
