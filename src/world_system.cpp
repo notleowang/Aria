@@ -244,6 +244,37 @@ void WorldSystem::init(RenderSystem* renderer_arg, GameLevel level) {
 	restart_game();
 }
 
+void animateLostSoul(Entity& lost_soul) {
+	int prev_state = registry.animations.get(lost_soul).curr_state_index;
+	int next_state = prev_state;
+	vec2 velocity = registry.velocities.get(lost_soul).velocity;
+
+	if (velocity.x > 0.f) {
+		next_state = (int)LOST_SOUL_STATES::EAST_MOVING;
+	}
+	else if (velocity.x < 0.f) {
+		next_state = (int)LOST_SOUL_STATES::WEST_MOVING;
+	}
+	else if (velocity.y != 0.f) {
+		next_state = (int)LOST_SOUL_STATES::SOUTH_MOVING;
+	}
+	else if (velocity.x == 0.f && velocity.y == 0.f) {
+		if (prev_state == (int)LOST_SOUL_STATES::EAST_IDLE || prev_state == (int)LOST_SOUL_STATES::EAST_MOVING || prev_state == (int)LOST_SOUL_STATES::EAST_STILL) {
+			next_state = (int)LOST_SOUL_STATES::EAST_IDLE;
+		} 
+		else if (prev_state == (int)LOST_SOUL_STATES::WEST_IDLE || prev_state == (int)LOST_SOUL_STATES::WEST_MOVING || prev_state == (int)LOST_SOUL_STATES::WEST_STILL) {
+			next_state = (int)LOST_SOUL_STATES::WEST_IDLE;
+		}
+		else {
+			next_state = (int)LOST_SOUL_STATES::SOUTH_IDLE;
+		}
+	}
+
+	if (next_state != prev_state) {
+		registry.animations.get(lost_soul).setState(next_state);
+	}
+}
+
 // Update our game world
 bool WorldSystem::step(float elapsed_ms_since_last_update) {
 	std::stringstream title_ss;
@@ -406,28 +437,33 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		
 		//Lost soul pathing
 		if (0 < lost_soul_pos.x && lost_soul_pos.x < 2960 && lost_soul_pos.y < 500.f) {
-			if (lost_soul_pos.y<175.f) {
-				registry.velocities.get(lost_soul).velocity = { initial_speed,50.f};
-			} else if (lost_soul_pos.y>250.f)
-				registry.velocities.get(lost_soul).velocity = { initial_speed,-50.f };
+			if (lost_soul_pos.y < 175.f) {
+				registry.velocities.get(lost_soul).velocity = { initial_speed, 50.f };
+			} 
+			else if (lost_soul_pos.y > 250.f) {
+				registry.velocities.get(lost_soul).velocity = { initial_speed, -50.f };
+			}
 		}
 		if (lost_soul_pos.x > 2960 && lost_soul_pos.y > 150 && lost_soul_pos.y < 300) {
-			registry.velocities.get(lost_soul).velocity = { 0.f,initial_speed };
+			registry.velocities.get(lost_soul).velocity = { 0.f, initial_speed };
 		}
 
 		if (lost_soul_pos.x > 2960 && lost_soul_pos.y > 2700 && lost_soul_pos.y < 3000) {
-			registry.velocities.get(lost_soul).velocity = { -initial_speed,-50.f };
+			registry.velocities.get(lost_soul).velocity = { -initial_speed, -50.f };
 		}
 		if (0 < lost_soul_pos.x && lost_soul_pos.x < 2950 && lost_soul_pos.y > 2500) {
 			if (lost_soul_pos.y < 2650.f) {
-				registry.velocities.get(lost_soul).velocity = { -initial_speed,50.f };
+				registry.velocities.get(lost_soul).velocity = { -initial_speed, 50.f };
 			}
-			else if (lost_soul_pos.y > 2750)
-				registry.velocities.get(lost_soul).velocity = { -initial_speed,-50.f };
+			else if (lost_soul_pos.y > 2750) {
+				registry.velocities.get(lost_soul).velocity = { -initial_speed, -50.f };
+			}
 			if (lost_soul_pos.x < 200) {
-				registry.velocities.get(lost_soul).velocity *= vec2(0.7,1);
+				registry.velocities.get(lost_soul).velocity *= vec2(0.7, 1);
 			}
 		}
+
+		animateLostSoul(lost_soul);
 	}
 	else if (this->curr_level.curr_level == CUTSCENE_3) {
 		Entity& lost_soul = registry.lostSouls.entities[0];
@@ -437,6 +473,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 		if (life_orb_pos.y > lost_soul_pos.y && registry.velocities.get(player).velocity == vec2(0, 0)) {
 			registry.velocities.get(life_orb).velocity = { 0.f,0.f };
 			registry.velocities.get(lost_soul).velocity = { 50.f,0.f };
+			animateLostSoul(lost_soul);
 			registry.velocities.get(player).velocity = { -100.f,0.f };
 			Mix_FadeInMusic(background_music, -1, 1500);
 			win_level();
@@ -459,6 +496,7 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 			Entity& lost_soul = registry.lostSouls.entities[0];
 			Velocity& lost_soul_vel = registry.velocities.get(lost_soul);
 			lost_soul_vel.velocity = { 400.f,0.f };
+			animateLostSoul(lost_soul);
 			life_orb_vel.velocity = { 400.f,0.f };
 		}
 
@@ -521,10 +559,9 @@ bool WorldSystem::step(float elapsed_ms_since_last_update) {
 
 		if (timer_x_pos < 150){
 			Entity& lost_soul = registry.lostSouls.entities[0];
-
 			Velocity& lost_soul_vel = registry.velocities.get(lost_soul);
-
 			lost_soul_vel = player_vel;
+			animateLostSoul(lost_soul);
 			life_orb_vel = player_vel;
 		}
 		else if (timer_x_pos < 330) {
@@ -746,7 +783,8 @@ void WorldSystem::restart_game() {
 		Entity lost_soul = createLostSoul(renderer, pos);
 
 		if (this->curr_level.curr_level == CUTSCENE_2) {
-			registry.velocities.get(lost_soul).velocity = { 225.f,300.f };
+			registry.velocities.get(lost_soul).velocity = { 225.f, 300.f };
+			animateLostSoul(lost_soul);
 		}
 	}
 
@@ -1227,9 +1265,10 @@ void WorldSystem::handle_collisions() {
 				this->curr_level.getCurrLevel() == CUTSCENE_3 ||
 				this->curr_level.getCurrLevel() == CUTSCENE_4 ||
 				this->curr_level.getCurrLevel() == CUTSCENE_5) {
-				Velocity& ls_velocity = registry.velocities.get(entity_other);
+				Velocity& lost_soul_velocity = registry.velocities.get(entity_other);
 				Velocity& player_velocity = registry.velocities.get(entity);
-				ls_velocity.velocity = player_velocity.velocity;
+				lost_soul_velocity.velocity = player_velocity.velocity;
+				animateLostSoul(entity_other);
 			}
 		}
 
