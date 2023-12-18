@@ -625,6 +625,14 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PORTAL);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+	
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)PORTAL_STATES::OPEN);
+	animation.is_animating = true;
+
 	Position& position = registry.positions.emplace(entity);
 	position.scale = vec2(100.f, 120.f);
 	position.position = vec2(pos.x + position.scale.x/2, pos.y + position.scale.y/2);
@@ -634,8 +642,8 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::PORTAL,
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE});
+			EFFECT_ASSET_ID::ANIMATED,
+			GEOMETRY_BUFFER_ID::PORTAL});
 
 	return entity;
 }

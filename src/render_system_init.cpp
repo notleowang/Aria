@@ -240,24 +240,24 @@ void RenderSystem::initializeGlMeshes()
 
 void RenderSystem::initializePowerUpBlockSpriteSheet()
 {
-	int num_rows = 4;
-	int num_cols = 5;
+	int num_rows = 3;
+	int num_cols = 6;
 	int ss_index = (int)SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK;
 
 	std::vector<AnimState> states((int)POWER_UP_BLOCK_STATES::STATE_COUNT);
-	states[(int)POWER_UP_BLOCK_STATES::ACTIVE] = AnimState(0, 13);
-	states[(int)POWER_UP_BLOCK_STATES::INCREASE_DAMAGE] = AnimState(15, 15);
-	states[(int)POWER_UP_BLOCK_STATES::TRIPLE_SHOT] = AnimState(16, 16);
-	states[(int)POWER_UP_BLOCK_STATES::BOUNCE_SHOT] = AnimState(17, 17);
-	states[(int)POWER_UP_BLOCK_STATES::FASTER_MOVEMENT] = AnimState(18, 18);
-	states[(int)POWER_UP_BLOCK_STATES::EMPTY_LIGHT] = AnimState(14, 14);
-	states[(int)POWER_UP_BLOCK_STATES::EMPTY_DARK] = AnimState(19, 19);
+	states[(int)POWER_UP_BLOCK_STATES::ACTIVE] = AnimState(0, 11);
+	states[(int)POWER_UP_BLOCK_STATES::INCREASE_DAMAGE] = AnimState(13, 13);
+	states[(int)POWER_UP_BLOCK_STATES::TRIPLE_SHOT] = AnimState(14, 14);
+	states[(int)POWER_UP_BLOCK_STATES::BOUNCE_SHOT] = AnimState(15, 15);
+	states[(int)POWER_UP_BLOCK_STATES::FASTER_MOVEMENT] = AnimState(16, 16);
+	states[(int)POWER_UP_BLOCK_STATES::EMPTY_LIGHT] = AnimState(12, 12);
+	states[(int)POWER_UP_BLOCK_STATES::EMPTY_DARK] = AnimState(17, 17);
 
 	sprite_sheets[ss_index].num_rows = num_rows;
 	sprite_sheets[ss_index].num_cols = num_cols;
 	sprite_sheets[ss_index].states = states;
-	sprite_sheets[ss_index].frame_height = 32.f;
-	sprite_sheets[ss_index].frame_width = 32.f;
+	sprite_sheets[ss_index].frame_height = 28.f;
+	sprite_sheets[ss_index].frame_width = 28.f;
 }
 
 void RenderSystem::initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, float frame_height, float frame_width)
@@ -395,6 +395,23 @@ void RenderSystem::initializeProjectileSelectDisplaySpriteSheet()
 	sprite_sheets[ss_index].frame_width = 33.f;
 }
 
+void RenderSystem::initializePortalSpriteSheet()
+{
+	int num_rows = 6;
+	int num_cols = 2;
+	int ss_index = (int)SPRITE_SHEET_DATA_ID::PORTAL;
+
+	std::vector<AnimState> states((int)PORTAL_STATES::STATE_COUNT);
+	states[(int)PORTAL_STATES::OPEN] = AnimState(0, 9);
+	states[(int)PORTAL_STATES::CLOSED] = AnimState(10, 10);
+
+	sprite_sheets[ss_index].num_rows = num_rows;
+	sprite_sheets[ss_index].num_cols = num_cols;
+	sprite_sheets[ss_index].states = states;
+	sprite_sheets[ss_index].frame_height = 27.f;
+	sprite_sheets[ss_index].frame_width = 23.f;
+}
+
 void RenderSystem::initializeSpriteSheets()
 {
 	initializePowerUpBlockSpriteSheet();
@@ -408,6 +425,7 @@ void RenderSystem::initializeSpriteSheets()
 	initializeFinalBossSpriteSheet();
 	initializeFinalBossAuraSpriteSheet();
 	initializeProjectileSelectDisplaySpriteSheet();
+	initializePortalSpriteSheet();
 }
 
 // Helper functions for initializing Gl Geometry Buffers
@@ -697,6 +715,7 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::BOSS, SPRITE_SHEET_DATA_ID::BOSS);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FINAL_BOSS, SPRITE_SHEET_DATA_ID::FINAL_BOSS);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FINAL_BOSS_AURA, SPRITE_SHEET_DATA_ID::FINAL_BOSS_AURA);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PORTAL, SPRITE_SHEET_DATA_ID::PORTAL);
 	initializeResourceBarGeometryBuffer();
 }
 

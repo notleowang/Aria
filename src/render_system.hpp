@@ -75,7 +75,7 @@ class RenderSystem {
 			textures_path("player_mana_bar.png"),
 			textures_path("power_up_block_new.png"),
 			textures_path("aria.png"),
-			textures_path("portal.png"),
+			textures_path("portal_sheet.png"),
 			textures_path("projectile_select_display_vertical.png"),
 			textures_path("faster_movement_icon.png"),
 			textures_path("power_up_increase_damage_arrow.png"),
@@ -163,6 +163,7 @@ private:
 	void initializeFinalBossSpriteSheet();
 	void initializeFinalBossAuraSpriteSheet();
 	void initializeProjectileSelectDisplaySpriteSheet();
+	void initializePortalSpriteSheet();
 
 	// Helper functions for initializeGlGeometryBuffers()
 	void initializePlayerGeometryBuffer();
