@@ -409,6 +409,22 @@ void RenderSystem::initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, 
 	sprite_sheets[(int)ss_id].frame_width = frame_width;
 }
 
+void RenderSystem::initializeEnemySpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, float frame_width, float frame_height)
+{
+	int num_rows = (int)ENEMY_STATES::STATE_COUNT;
+
+	std::vector<AnimState> states(num_rows);
+	for (int i = 0; i < num_rows; i++) {
+		states[i] = AnimState(i * num_cols, (i + 1) * num_cols - 1);
+	}
+
+	sprite_sheets[(int)ss_id].num_rows = num_rows;
+	sprite_sheets[(int)ss_id].num_cols = num_cols;
+	sprite_sheets[(int)ss_id].states = states;
+	sprite_sheets[(int)ss_id].frame_height = frame_height;
+	sprite_sheets[(int)ss_id].frame_width = frame_width;
+}
+
 void RenderSystem::initializeSpriteSheets()
 {
 	initializePowerUpBlockSpriteSheet();
@@ -425,6 +441,10 @@ void RenderSystem::initializeSpriteSheets()
 	initializePortalSpriteSheet();
 	initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID::LIFE_ORB, 4, 3, 12, 16.f, 24.f);
 	initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID::LIFE_ORB_SHARD, 9, 1, 9, 7.f, 12.f);
+	initializeEnemySpriteSheet(SPRITE_SHEET_DATA_ID::WATER_ENEMY_SHEET, 7, 24.f, 21.f);
+	initializeEnemySpriteSheet(SPRITE_SHEET_DATA_ID::FIRE_ENEMY_SHEET, 6, 21.f, 28.f);
+	initializeEnemySpriteSheet(SPRITE_SHEET_DATA_ID::EARTH_ENEMY_SHEET, 8, 27.f, 22.f);
+	initializeEnemySpriteSheet(SPRITE_SHEET_DATA_ID::LIGHTNING_ENEMY_SHEET, 6, 23.f, 16.f);
 }
 
 // Helper functions for initializing Gl Geometry Buffers
@@ -708,6 +728,10 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::WATER_PROJECTILE, SPRITE_SHEET_DATA_ID::WATER_PROJECTILE);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::EARTH_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIGHTNING_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FIRE_ENEMY_SHEET, SPRITE_SHEET_DATA_ID::FIRE_ENEMY_SHEET);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::WATER_ENEMY_SHEET, SPRITE_SHEET_DATA_ID::WATER_ENEMY_SHEET);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::EARTH_ENEMY_SHEET, SPRITE_SHEET_DATA_ID::EARTH_ENEMY_SHEET);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIGHTNING_ENEMY_SHEET, SPRITE_SHEET_DATA_ID::LIGHTNING_ENEMY_SHEET);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::POWER_UP_BLOCK, SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PROJECTILE_SELECT_DISPLAY, SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LOST_SOUL, SPRITE_SHEET_DATA_ID::LOST_SOUL);

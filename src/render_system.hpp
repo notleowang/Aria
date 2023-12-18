@@ -47,6 +47,10 @@ class RenderSystem {
 			textures_path("fire_enemy.png") ,
 			textures_path("earth_enemy.png"),
 			textures_path("lightning_enemy.png"),
+			textures_path("water_enemy_sheet.png"),
+			textures_path("fire_enemy_sheet.png"),
+			textures_path("earth_enemy_sheet.png"),
+			textures_path("lightning_enemy_sheet.png"),
 			textures_path("water_boss.png"),						// start of boss shadows
 			textures_path("fire_boss.png"),
 			textures_path("earth_boss.png"),
@@ -162,6 +166,7 @@ private:
 	void initializeProjectileSelectDisplaySpriteSheet();
 	void initializePortalSpriteSheet();
 	void initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, int num_rows, int num_frames, float frame_width, float frame_height);
+	void initializeEnemySpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, float frame_width, float frame_height);
 
 	// Helper functions for initializeGlGeometryBuffers()
 	void initializePlayerGeometryBuffer();

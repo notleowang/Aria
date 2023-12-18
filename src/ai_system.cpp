@@ -10,6 +10,12 @@
 
 #define ENEMY_PROJECTILE_SPEED 500
 
+void animateEnemy(Entity& enemy_entity, vec2 velocity) {
+	Animation& animation = registry.animations.get(enemy_entity);
+	ENEMY_STATES state = (velocity.x > 0.f) ? ENEMY_STATES::WEST : ENEMY_STATES::EAST;
+	if ((int)state != animation.curr_state_index) animation.setState((int)state);
+}
+
 void AISystem::step(float elapsed_ms)
 {
 	auto& enemy_container = registry.enemies;
@@ -277,6 +283,8 @@ void AISystem::step(float elapsed_ms)
 			// replenish 1 stamina per second if not sprinting
 			enemy.stamina += elapsed_ms / 1000;
 		}
+
+		animateEnemy(entity_i, vel_i.velocity);
 
 		// Decision tree:
 		// Is there a player-made projectile within 50 pixels?
