@@ -31,8 +31,8 @@ Entity createAria(RenderSystem* renderer, vec2 pos)
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity, entity, PLAYER_HEALTH_BAR_Y_OFFSET, PLAYER_BAR_X_OFFSET);
-	resources.manaBar = createManaBar(renderer, entity, entity, PLAYER_MANA_BAR_Y_OFFSET, PLAYER_BAR_X_OFFSET);
+	resources.healthBar = createHealthBar(renderer, entity, entity, PLAYER_BAR_X_OFFSET, PLAYER_HEALTH_BAR_Y_OFFSET);
+	resources.manaBar = createManaBar(renderer, entity, entity, PLAYER_BAR_X_OFFSET, PLAYER_MANA_BAR_Y_OFFSET);
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;
@@ -204,7 +204,7 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	velocity.velocity.x = 50;
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity, entity, ENEMY_HEALTH_BAR_Y_OFFSET, 0.f);
+	resources.healthBar = createHealthBar(renderer, entity, entity, 0.f, ENEMY_HEALTH_BAR_Y_OFFSET);
 
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy = enemyAttributes;
@@ -261,7 +261,7 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 {
 	auto entity = Entity();
 
-	registry.bosses.emplace(entity);
+	Boss& boss = registry.bosses.emplace(entity);
 
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
@@ -277,10 +277,10 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 
 	if (registry.players.entities.size() > 0) {
 		Entity player = registry.players.entities[0];
-		resources.healthBar = createHealthBar(renderer, entity, player, BOSS_HEALTH_BAR_Y_OFFSET, 0.f);
+		resources.healthBar = createHealthBar(renderer, entity, player, 0.f, BOSS_HEALTH_BAR_Y_OFFSET);
 	}
 	else {
-		resources.healthBar = createHealthBar(renderer, entity, entity, -110.f, 0.f);
+		resources.healthBar = createHealthBar(renderer, entity, entity, 0.f, -110.f);
 	}
 
 	Enemy& enemy = registry.enemies.emplace(entity);
@@ -340,7 +340,11 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 		Animation& animation = registry.animations.emplace(entity);
 		animation.sprite_sheet_ptr = &sprite_sheet;
 		animation.setState((int)FINAL_BOSS_SPRITE_STATES::WEST);
-		animation.is_animating = false;
+		animation.is_animating = true;
+
+		position.scale = vec2({ 2.f * sprite_sheet.frame_width, 2.f * sprite_sheet.frame_height });
+
+		boss.aura = createFinalBossAura(renderer, entity, 0.f, -25.f);
 	}
 	else {
 		SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::BOSS);
@@ -366,7 +370,38 @@ Entity createBoss(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	return entity;
 }
 
-Entity createHealthBar(RenderSystem* renderer, Entity& resource_entity, Entity& position_entity, float y_offset, float x_offset)
+Entity createFinalBossAura(RenderSystem* renderer, Entity& owner_entity, float x_offset, float y_offset)
+{
+	auto entity = Entity();
+
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::FINAL_BOSS_AURA);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::FINAL_BOSS_AURA);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)FINAL_BOSS_AURA_SPRITE_STATES::NONE);
+	animation.is_animating = false;
+	
+	Follower& follower = registry.followers.emplace(entity);
+	follower.owner = owner_entity;
+	follower.y_offset = y_offset;
+	follower.x_offset = x_offset;
+
+	Position& position = registry.positions.emplace(entity);
+	position.scale = vec2(2.f * sprite_sheet.frame_width, 2.f * sprite_sheet.frame_height);
+
+	registry.renderRequests.insert(
+		entity,
+		{ TEXTURE_ASSET_ID::FINAL_BOSS_AURA,
+		 EFFECT_ASSET_ID::ANIMATED,
+		 GEOMETRY_BUFFER_ID::FINAL_BOSS_AURA });
+
+	return entity;
+}
+
+Entity createHealthBar(RenderSystem* renderer, Entity& resource_entity, Entity& position_entity, float x_offset, float y_offset)
 {
 	auto entity = Entity();
 
@@ -418,7 +453,7 @@ Entity createHealthBar(RenderSystem* renderer, Entity& resource_entity, Entity& 
 	return entity;
 }
 
-Entity createManaBar(RenderSystem* renderer, Entity& resource_entity, Entity& position_entity, float y_offset, float x_offset)
+Entity createManaBar(RenderSystem* renderer, Entity& resource_entity, Entity& position_entity, float x_offset, float y_offset)
 {
 	auto entity = Entity();
 
@@ -517,7 +552,7 @@ Entity createShadow(RenderSystem* renderer, Entity& owner_entity, TEXTURE_ASSET_
 	return entity;
 }
 
-Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entity, float y_offset, float x_offset)
+Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entity, float x_offset, float y_offset)
 {
 	auto entity = Entity();
 
@@ -541,11 +576,11 @@ Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entit
 
 
 	ProjectileSelectDisplay& display = registry.projectileSelectDisplays.emplace(entity);
-	display.fasterMovement = createPowerUpIndicator(renderer, entity, vec2(24.f, 29.f), TEXTURE_ASSET_ID::FASTER_MOVEMENT, -160.f, 0.f);
+	display.fasterMovement = createPowerUpIndicator(renderer, entity, vec2(24.f, 29.f), TEXTURE_ASSET_ID::FASTER_MOVEMENT, 0.f, -160.f);
 	for (int i = 0; i < 4; i++) {
-		display.increasedDamage[i] = createPowerUpIndicator(renderer, entity, vec2(5.f, 6.f), TEXTURE_ASSET_ID::DAMAGE_ARROW, (i * 60.f) - 75.f, 16.f);
-		display.tripleShot[i] = createPowerUpIndicator(renderer, entity, vec2(9.f, 9.f), TEXTURE_ASSET_ID::TRIPLE_SHOT, (i * 60.f) - 108.f, -45.f);
-		display.bounceOffWalls[i] = createPowerUpIndicator(renderer, entity, vec2(9.f, 9.f), TEXTURE_ASSET_ID::BOUNCE, (i * 60.f) - 83.f, -45.f);
+		display.increasedDamage[i] = createPowerUpIndicator(renderer, entity, vec2(5.f, 6.f), TEXTURE_ASSET_ID::DAMAGE_ARROW, 16.f, (i * 60.f) - 75.f);
+		display.tripleShot[i] = createPowerUpIndicator(renderer, entity, vec2(9.f, 9.f), TEXTURE_ASSET_ID::TRIPLE_SHOT, -45.f, (i * 60.f) - 108.f);
+		display.bounceOffWalls[i] = createPowerUpIndicator(renderer, entity, vec2(9.f, 9.f), TEXTURE_ASSET_ID::BOUNCE, -45.f, (i * 60.f) - 83.f);
 	}
 
 	registry.renderRequests.insert(
@@ -557,7 +592,7 @@ Entity createProjectileSelectDisplay(RenderSystem* renderer, Entity& owner_entit
 	return entity;
 }
 
-Entity createPowerUpIndicator(RenderSystem* renderer, Entity& owner_entity, vec2 size, TEXTURE_ASSET_ID texture, float y_offset, float x_offset)
+Entity createPowerUpIndicator(RenderSystem* renderer, Entity& owner_entity, vec2 size, TEXTURE_ASSET_ID texture, float x_offset, float y_offset)
 {
 	auto entity = Entity();
 
@@ -656,7 +691,7 @@ Entity createTestSalmon(RenderSystem* renderer, vec2 pos)
 	velocity.velocity = { 0.f, 0.f };
 
 	Resources& resources = registry.resources.emplace(entity);
-	resources.healthBar = createHealthBar(renderer, entity, entity, PLAYER_HEALTH_BAR_Y_OFFSET, 0.f);
+	resources.healthBar = createHealthBar(renderer, entity, entity, 0.f, PLAYER_HEALTH_BAR_Y_OFFSET);
 
 	Direction& direction = registry.directions.emplace(entity);
 	direction.direction = DIRECTION::E;

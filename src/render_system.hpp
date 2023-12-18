@@ -47,15 +47,16 @@ class RenderSystem {
 			textures_path("fire_enemy.png") ,
 			textures_path("earth_enemy.png"),
 			textures_path("lightning_enemy.png"),
-			textures_path("water_boss.png"),						// start of bosses
-			textures_path("fire_boss.png") ,
+			textures_path("water_boss.png"),						// start of boss shadows
+			textures_path("fire_boss.png"),
 			textures_path("earth_boss.png"),
 			textures_path("lightning_boss.png"),
-			textures_path("boss_sheet_earth.png"),
+			textures_path("boss_sheet_water.png"),					// start of boss sprite sheets
 			textures_path("boss_sheet_fire.png"),
+			textures_path("boss_sheet_earth.png"),
 			textures_path("boss_sheet_lightning.png"),
-			textures_path("boss_sheet_water.png"),
-			textures_path("FINAL_BOSS_AWAKENED_SPRITESHEET.png"),	// final boss
+			textures_path("final_boss_awakened_triples.png"),		// final boss
+			textures_path("final_boss_auras.png"),
 			textures_path("final_boss_frame.png"),
 			textures_path("ghost.png"),
 			textures_path("life_orb_full.png"),
@@ -160,6 +161,7 @@ private:
 	void initializeLostSoulSpriteSheet();
 	void initializeBossSpriteSheet();
 	void initializeFinalBossSpriteSheet();
+	void initializeFinalBossAuraSpriteSheet();
 	void initializeProjectileSelectDisplaySpriteSheet();
 
 	// Helper functions for initializeGlGeometryBuffers()

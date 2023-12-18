@@ -327,29 +327,41 @@ void RenderSystem::initializeBossSpriteSheet()
 
 void RenderSystem::initializeFinalBossSpriteSheet()
 {
-	int num_rows = 6;
-	int num_cols = 2;
+	int num_rows = 3;
+	int num_cols = 9;
 	int ss_index = (int)SPRITE_SHEET_DATA_ID::FINAL_BOSS;
 
 	/*
 	* Final boss sprite sheet frames:
 	* 
-	* | 0 | 1 |		EAST
-	* | 2 | 3 |		WEST
-	* | 4 | x |		WATER
-	* | 6 | x |		EARTH
-	* | 8 | x |		FIRE
-	* |10 | x |		LIGHTNING
+	* | 0-2   | 3-5   |	xxx     | 	EAST
+	* | 9-11  | 12-14 |	xxx     | 	WEST
+	* | 18-20 | 21-23 |	24-26   | 	SOUTH
 	* 
 	* NOTE: x's are blanks
 	*/
 	std::vector<AnimState> states((int)FINAL_BOSS_SPRITE_STATES::STATE_COUNT);
-	states[(int)FINAL_BOSS_SPRITE_STATES::EAST] = AnimState(0, 1);
-	states[(int)FINAL_BOSS_SPRITE_STATES::WEST] = AnimState(2, 3);
-	states[(int)FINAL_BOSS_SPRITE_STATES::WATER] = AnimState(4, 4);
-	states[(int)FINAL_BOSS_SPRITE_STATES::EARTH] = AnimState(6, 6);
-	states[(int)FINAL_BOSS_SPRITE_STATES::FIRE] = AnimState(8, 8);
-	states[(int)FINAL_BOSS_SPRITE_STATES::LIGHTNING] = AnimState(10, 10);
+	states[(int)FINAL_BOSS_SPRITE_STATES::EAST] = AnimState(0, 5);
+	states[(int)FINAL_BOSS_SPRITE_STATES::WEST] = AnimState(9, 14);
+	states[(int)FINAL_BOSS_SPRITE_STATES::SOUTH] = AnimState(18, 26);
+
+	sprite_sheets[ss_index].num_rows = num_rows;
+	sprite_sheets[ss_index].num_cols = num_cols;
+	sprite_sheets[ss_index].states = states;
+	sprite_sheets[ss_index].frame_height = 324.f / num_rows;
+	sprite_sheets[ss_index].frame_width = 648.f / num_cols;
+}
+
+void RenderSystem::initializeFinalBossAuraSpriteSheet()
+{
+	int num_rows = 1;
+	int num_cols = 5;
+	int ss_index = (int)SPRITE_SHEET_DATA_ID::FINAL_BOSS_AURA;
+
+	std::vector<AnimState> states((int)FINAL_BOSS_AURA_SPRITE_STATES::STATE_COUNT);
+	for (int i = 0; i < (int)FINAL_BOSS_AURA_SPRITE_STATES::STATE_COUNT; i++) {
+		states[i] = AnimState(i, i);
+	}
 
 	sprite_sheets[ss_index].num_rows = num_rows;
 	sprite_sheets[ss_index].num_cols = num_cols;
@@ -387,6 +399,7 @@ void RenderSystem::initializeSpriteSheets()
 	initializeLostSoulSpriteSheet();
 	initializeBossSpriteSheet();
 	initializeFinalBossSpriteSheet();
+	initializeFinalBossAuraSpriteSheet();
 	initializeProjectileSelectDisplaySpriteSheet();
 }
 
@@ -676,6 +689,7 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LOST_SOUL, SPRITE_SHEET_DATA_ID::LOST_SOUL);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::BOSS, SPRITE_SHEET_DATA_ID::BOSS);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FINAL_BOSS, SPRITE_SHEET_DATA_ID::FINAL_BOSS);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FINAL_BOSS_AURA, SPRITE_SHEET_DATA_ID::FINAL_BOSS_AURA);
 	initializeResourceBarGeometryBuffer();
 }
 
