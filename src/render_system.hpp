@@ -73,7 +73,7 @@ class RenderSystem {
 			textures_path("enemy_mana_bar.png"),
 			textures_path("player_health_bar.png"),
 			textures_path("player_mana_bar.png"),
-			textures_path("power_up_block.png"),
+			textures_path("power_up_block_new.png"),
 			textures_path("aria.png"),
 			textures_path("portal.png"),
 			textures_path("projectile_select_display_vertical.png"),

@@ -240,17 +240,24 @@ void RenderSystem::initializeGlMeshes()
 
 void RenderSystem::initializePowerUpBlockSpriteSheet()
 {
-	int num_rows = 2;
-	int num_cols = 15;
+	int num_rows = 4;
+	int num_cols = 5;
 	int ss_index = (int)SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK;
 
 	std::vector<AnimState> states((int)POWER_UP_BLOCK_STATES::STATE_COUNT);
-	states[(int)POWER_UP_BLOCK_STATES::ACTIVE] = AnimState(0, num_cols - 1);
-	states[(int)POWER_UP_BLOCK_STATES::INACTIVE] = AnimState(num_cols, num_cols);
+	states[(int)POWER_UP_BLOCK_STATES::ACTIVE] = AnimState(0, 13);
+	states[(int)POWER_UP_BLOCK_STATES::INCREASE_DAMAGE] = AnimState(15, 15);
+	states[(int)POWER_UP_BLOCK_STATES::TRIPLE_SHOT] = AnimState(16, 16);
+	states[(int)POWER_UP_BLOCK_STATES::BOUNCE_SHOT] = AnimState(17, 17);
+	states[(int)POWER_UP_BLOCK_STATES::FASTER_MOVEMENT] = AnimState(18, 18);
+	states[(int)POWER_UP_BLOCK_STATES::EMPTY_LIGHT] = AnimState(14, 14);
+	states[(int)POWER_UP_BLOCK_STATES::EMPTY_DARK] = AnimState(19, 19);
 
 	sprite_sheets[ss_index].num_rows = num_rows;
 	sprite_sheets[ss_index].num_cols = num_cols;
 	sprite_sheets[ss_index].states = states;
+	sprite_sheets[ss_index].frame_height = 32.f;
+	sprite_sheets[ss_index].frame_width = 32.f;
 }
 
 void RenderSystem::initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, float frame_height, float frame_width)

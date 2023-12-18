@@ -656,7 +656,7 @@ Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp, 
 
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
-	position.scale = vec2(100.f, 100.f);
+	position.scale = vec2(90.f, 90.f);
 
 	PowerUpBlock& powerUpBlock = registry.powerUpBlocks.emplace(entity);
 	powerUpBlock.powerUpText = powerUp->first;
