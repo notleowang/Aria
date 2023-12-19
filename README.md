@@ -175,3 +175,7 @@ The ECS design pattern has not been changed since Milestone 1.
 ## Entity Component Diagram
 Highlight any changes versus the previous milestone.
 ![ECS diagram](docu/images/M4_ECS_diagram.png)
+
+## Citations
+### Audio
+["The Corrupted Gates"](https://freesound.org/people/SquashedSkinner/sounds/564497/). [SquashedSkinner](https://freesound.org/people/SquashedSkinner/). [Licensed under a Creative Commons Attribution 4.0 License](https://creativecommons.org/licenses/by/4.0/).
