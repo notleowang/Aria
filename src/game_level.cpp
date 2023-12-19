@@ -76,6 +76,9 @@ bool GameLevel::init(uint level) {
 
 	switch (level) {
 	case CUTSCENE_1:
+		texts.push_back("Press SPACE to skip");
+		text_attrs.push_back({ 0.f,20.f,0.8f,1.0f,1.0f,0.f });
+
 		this->is_cutscene = true;
 		floors.push_back(vec4(25, 25, 10000, 400));
 
@@ -102,6 +105,8 @@ bool GameLevel::init(uint level) {
 		health_packs_pos.push_back(vec2(800, 500));
 		health_packs_pos.push_back(vec2(1000, 600));
 
+		texts.push_back("ESC to pause");
+		text_attrs.push_back({ 0.f,260.f,0.8f,1.0f,1.0f,0.f });
 		texts.push_back("Use WASD to move around");
 		text_attrs.push_back({ 0.f,220.f,0.8f,1.0f,1.0f,0.f });
 		texts.push_back("Use M1 button to shoot");
@@ -720,6 +725,8 @@ bool GameLevel::init(uint level) {
 		texts.push_back("THE END");
 		text_attrs.push_back({ 500.f,307.f,1.0f,1.0f,1.0f,0.f });
 
+		texts.push_back("Press ESC to restart");
+		text_attrs.push_back({ 0.f,20.f,0.8f,1.0f,1.0f,0.f });
 
 		break;
 	case POWER_UP:
