@@ -17,6 +17,11 @@ float PLAYER_SPEED = 300.f;
 const float PROJECTILE_SPEED = 700.f;
 const int VOLUME = 30;
 
+const string FASTER_MOVEMENT_STRING = "Faster Movement Speed";
+const string TRIPLE_STRING = "Triple";
+const string BOUNCY_STRING = "Bouncy";
+const string INCREASE_STRING = "Increase";
+
 // Create the world
 WorldSystem::WorldSystem() {
 	// Seeding rng with random device
@@ -873,7 +878,7 @@ void WorldSystem::display_power_up() {
 	// figure out what power ups are available
 	vector<pair<string, bool*>> availPowerUps;
 	
-	if (!powerUp.fasterMovement) availPowerUps.push_back(make_pair("Faster Movement Speed", &powerUp.fasterMovement));
+	if (!powerUp.fasterMovement) availPowerUps.push_back(make_pair(FASTER_MOVEMENT_STRING, &powerUp.fasterMovement));
 
 	for (int element = ElementType::WATER; element <= ElementType::LIGHTNING; element++) {
 		string elementName;
@@ -882,9 +887,9 @@ void WorldSystem::display_power_up() {
 		if (element == ElementType::EARTH) elementName = "Earth";
 		if (element == ElementType::LIGHTNING) elementName = "Lightning";
 
-		if (!powerUp.increasedDamage[element]) availPowerUps.push_back(make_pair("Increase " + elementName + " Damage", &powerUp.increasedDamage[element]));
-		if (!powerUp.tripleShot[element]) availPowerUps.push_back(make_pair("Triple " + elementName + " Shot", &powerUp.tripleShot[element]));
-		if (!powerUp.bounceOffWalls[element]) availPowerUps.push_back(make_pair("Bouncy " + elementName + " Shot", &powerUp.bounceOffWalls[element]));
+		if (!powerUp.increasedDamage[element]) availPowerUps.push_back(make_pair(INCREASE_STRING + " " + elementName + " Damage", &powerUp.increasedDamage[element]));
+		if (!powerUp.tripleShot[element]) availPowerUps.push_back(make_pair(TRIPLE_STRING + " " + elementName + " Shot", &powerUp.tripleShot[element]));
+		if (!powerUp.bounceOffWalls[element]) availPowerUps.push_back(make_pair(BOUNCY_STRING + " " + elementName + " Shot", &powerUp.bounceOffWalls[element]));
 	}
 
 	if (availPowerUps.size() == 0) {
@@ -908,6 +913,24 @@ void WorldSystem::display_power_up() {
 		createPowerUpBlock(renderer, &availPowerUps[0], vec2(500, 300));
 		createPowerUpBlock(renderer, &availPowerUps[1], vec2(700, 300));
 		createPowerUpBlock(renderer, &availPowerUps[2], vec2(900, 300));
+	}
+}
+
+POWER_UP_BLOCK_STATES getPowerUpBlockStateFromString(string powerUpText) {
+	if (powerUpText.find(INCREASE_STRING) != string::npos) {
+		return POWER_UP_BLOCK_STATES::INCREASE_DAMAGE;
+	}
+	else if (powerUpText.find(TRIPLE_STRING) != string::npos) {
+		return POWER_UP_BLOCK_STATES::TRIPLE_SHOT;
+	}
+	else if (powerUpText.find(BOUNCY_STRING) != string::npos) {
+		return POWER_UP_BLOCK_STATES::BOUNCE_SHOT;
+	}
+	else if (powerUpText.find(FASTER_MOVEMENT_STRING) != string::npos) {
+		return POWER_UP_BLOCK_STATES::FASTER_MOVEMENT;
+	}
+	else {
+		return POWER_UP_BLOCK_STATES::EMPTY_DARK;
 	}
 }
 
@@ -1232,12 +1255,12 @@ void WorldSystem::handle_collisions() {
 				registry.remove_all_components_of(pub.textEntity);
 			}
 
-			// enable newly selected power up
 			Animation& animation = registry.animations.get(entity_other);
-			animation.setState((int)POWER_UP_BLOCK_STATES::INACTIVE);
+			animation.setState((int)getPowerUpBlockStateFromString(powerUpBlock.powerUpText));
 			animation.is_animating = false;
 			animation.rainbow_enabled = false;
 
+			// enable newly selected power up
 			*(powerUpBlock.powerUpToggle) = true;
 			powerUpBlock.textEntity = createText("You unlocked: " + powerUpBlock.powerUpText, vec2(0.f, 50.f), 1.f, vec3(0.f, 1.f, 0.f));
 

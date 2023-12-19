@@ -125,13 +125,20 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, DIRECTION dir,
 Entity createObstacle(RenderSystem* renderer, vec2 pos, vec2 size, vec2 vel) {
 	auto entity = Entity();
 
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::GHOST_SHEET);
 	registry.meshPtrs.emplace(entity, &mesh);
+
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::GHOST_SHEET);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
 
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 
-	position.scale = size;
+	float scale_factor = size.y / sprite_sheet.frame_height;
+	position.scale = vec2(scale_factor * sprite_sheet.frame_width, scale_factor * sprite_sheet.frame_height);
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = vel;
@@ -143,9 +150,9 @@ Entity createObstacle(RenderSystem* renderer, vec2 pos, vec2 size, vec2 vel) {
 
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::GHOST,
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE });
+		{ TEXTURE_ASSET_ID::GHOST_SHEET,
+			EFFECT_ASSET_ID::ANIMATED,
+			GEOMETRY_BUFFER_ID::GHOST_SHEET });
 
 	return entity;
 }
@@ -193,12 +200,10 @@ Entity createLostSoul(RenderSystem* renderer, vec2 pos) {
 
 Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 {
-	// TODO: change enemy implementation to include different enemy types
 	auto entity = Entity();
 
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
-
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity.x = 50;
@@ -209,50 +214,66 @@ Entity createEnemy(RenderSystem* renderer, vec2 pos, Enemy enemyAttributes)
 	Enemy& enemy = registry.enemies.emplace(entity);
 	enemy = enemyAttributes;
 	
-	TEXTURE_ASSET_ID textureAsset;
-	GEOMETRY_BUFFER_ID geomBuffer;
-	float x_scale = 80.f;
-	float y_scale = 80.f;
+	TEXTURE_ASSET_ID texture_asset;
+	TEXTURE_ASSET_ID shadow_texture_asset;
+	GEOMETRY_BUFFER_ID geom_buffer;
+	SPRITE_SHEET_DATA_ID ss_id;
+	float scale_factor = 3.f;
 	switch (enemy.type) {
 	case ElementType::WATER:
-		textureAsset = TEXTURE_ASSET_ID::WATER_ENEMY;
-		geomBuffer = GEOMETRY_BUFFER_ID::SMALL_WATER_ENEMY;
+		texture_asset = TEXTURE_ASSET_ID::WATER_ENEMY_SHEET;
+		shadow_texture_asset = TEXTURE_ASSET_ID::WATER_ENEMY;
+		geom_buffer = GEOMETRY_BUFFER_ID::WATER_ENEMY_SHEET;
+		ss_id = SPRITE_SHEET_DATA_ID::WATER_ENEMY_SHEET;
 		break;
 	case ElementType::FIRE:
-		textureAsset = TEXTURE_ASSET_ID::FIRE_ENEMY;
-		geomBuffer = GEOMETRY_BUFFER_ID::SMALL_FIRE_ENEMY;
+		texture_asset = TEXTURE_ASSET_ID::FIRE_ENEMY_SHEET;
+		shadow_texture_asset = TEXTURE_ASSET_ID::FIRE_ENEMY;
+		geom_buffer = GEOMETRY_BUFFER_ID::FIRE_ENEMY_SHEET;
+		ss_id = SPRITE_SHEET_DATA_ID::FIRE_ENEMY_SHEET;
 		break;
 	case ElementType::EARTH:
-		y_scale = 70.f;
-		textureAsset = TEXTURE_ASSET_ID::EARTH_ENEMY;
-		geomBuffer = GEOMETRY_BUFFER_ID::SMALL_EARTH_ENEMY;
+		texture_asset = TEXTURE_ASSET_ID::EARTH_ENEMY_SHEET;
+		shadow_texture_asset = TEXTURE_ASSET_ID::EARTH_ENEMY;
+		geom_buffer = GEOMETRY_BUFFER_ID::EARTH_ENEMY_SHEET;
+		ss_id = SPRITE_SHEET_DATA_ID::EARTH_ENEMY_SHEET;
 		break;
 	case ElementType::LIGHTNING:
-		y_scale = 70.f;
-		textureAsset = TEXTURE_ASSET_ID::LIGHTNING_ENEMY;
-		geomBuffer = GEOMETRY_BUFFER_ID::SMALL_LIGHTNING_ENEMY;
+		texture_asset = TEXTURE_ASSET_ID::LIGHTNING_ENEMY_SHEET;
+		shadow_texture_asset = TEXTURE_ASSET_ID::LIGHTNING_ENEMY;
+		geom_buffer = GEOMETRY_BUFFER_ID::LIGHTNING_ENEMY_SHEET;
+		ss_id = SPRITE_SHEET_DATA_ID::LIGHTNING_ENEMY_SHEET;
 		break;
 	default:
-		//Should never reach here
-		textureAsset = TEXTURE_ASSET_ID::FIRE_ENEMY;
-		geomBuffer = GEOMETRY_BUFFER_ID::SMALL_FIRE_ENEMY;
+		// Should never reach here
+		texture_asset = TEXTURE_ASSET_ID::FIRE_ENEMY_SHEET;
+		shadow_texture_asset = TEXTURE_ASSET_ID::FIRE_ENEMY;
+		geom_buffer = GEOMETRY_BUFFER_ID::FIRE_ENEMY_SHEET;
+		ss_id = SPRITE_SHEET_DATA_ID::FIRE_ENEMY_SHEET;
 		break;
 	}
 
-	position.scale = vec2({ x_scale, y_scale});
-
-	// Store a reference to the potentially re-used mesh object (the value is stored in the resource cache)
-	Mesh& mesh = renderer->getMesh(geomBuffer);
+	Mesh& mesh = renderer->getMesh(geom_buffer);
 	registry.meshPtrs.emplace(entity, &mesh);
 
-	createShadow(renderer, entity, textureAsset, geomBuffer);
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(ss_id);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)ENEMY_STATES::WEST);
+	animation.is_animating = true;
+
+	position.scale = vec2({ scale_factor * sprite_sheet.frame_width, scale_factor * sprite_sheet.frame_height });
+
+	createShadow(renderer, entity, shadow_texture_asset, GEOMETRY_BUFFER_ID::SPRITE);
 
 	registry.collidables.emplace(entity);
 	registry.renderRequests.insert(
 		entity,
-		{textureAsset,
-		 EFFECT_ASSET_ID::TEXTURED,
-		 geomBuffer });
+		{texture_asset,
+		 EFFECT_ASSET_ID::ANIMATED,
+		 geom_buffer });
 
 	return entity;
 }
@@ -625,6 +646,14 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
 	registry.meshPtrs.emplace(entity, &mesh);
 
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::PORTAL);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+	
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
+	animation.setState((int)PORTAL_STATES::OPEN);
+	animation.is_animating = true;
+
 	Position& position = registry.positions.emplace(entity);
 	position.scale = vec2(100.f, 120.f);
 	position.position = vec2(pos.x + position.scale.x/2, pos.y + position.scale.y/2);
@@ -634,8 +663,8 @@ Entity createExitDoor(RenderSystem* renderer, vec2 pos) {
 	registry.renderRequests.insert(
 		entity,
 		{ TEXTURE_ASSET_ID::PORTAL,
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE});
+			EFFECT_ASSET_ID::ANIMATED,
+			GEOMETRY_BUFFER_ID::PORTAL});
 
 	return entity;
 }
@@ -656,7 +685,7 @@ Entity createPowerUpBlock(RenderSystem* renderer, pair<string, bool*>* powerUp, 
 
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
-	position.scale = vec2(100.f, 100.f);
+	position.scale = vec2(90.f, 90.f);
 
 	PowerUpBlock& powerUpBlock = registry.powerUpBlocks.emplace(entity);
 	powerUpBlock.powerUpText = powerUp->first;
@@ -831,32 +860,40 @@ Entity createLifeOrb(RenderSystem* renderer, vec2 pos, int piece_number) {
 
 	LifeOrb& life_orb = registry.lifeOrbs.emplace(entity);
 
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
-	registry.meshPtrs.emplace(entity, &mesh);
-
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
-	position.scale = vec2(2 * 23.f, 2 * 23.f);
 	
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = { 0.f,0.f };
 
 	registry.collidables.emplace(entity);
 
+	SPRITE_SHEET_DATA_ID ss_id = SPRITE_SHEET_DATA_ID::LIFE_ORB;
 	TEXTURE_ASSET_ID asset = TEXTURE_ASSET_ID::LIFE_ORB;
-	if (piece_number == 1) {
-		asset = TEXTURE_ASSET_ID::LIFE_ORB_PIECE_1;
-	} else if (piece_number == 2) {
-		asset = TEXTURE_ASSET_ID::LIFE_ORB_PIECE_2;
-	} else if (piece_number == 3) {
-		asset =	TEXTURE_ASSET_ID::LIFE_ORB_PIECE_3;
+	GEOMETRY_BUFFER_ID geom_buffer = GEOMETRY_BUFFER_ID::LIFE_ORB;
+	float scale_factor = 2.f;
+	if (piece_number == 1 || piece_number == 2 || piece_number == 3) {
+		ss_id = SPRITE_SHEET_DATA_ID::LIFE_ORB_SHARD;
+		asset = TEXTURE_ASSET_ID::LIFE_ORB_SHARD;
+		geom_buffer = GEOMETRY_BUFFER_ID::LIFE_ORB_SHARD;
+		scale_factor = 3.f;
 	}
+
+	Mesh& mesh = renderer->getMesh(geom_buffer);
+	registry.meshPtrs.emplace(entity, &mesh);
+
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(ss_id);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+	position.scale = vec2(scale_factor * sprite_sheet.frame_width, scale_factor * sprite_sheet.frame_height);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
 
 	registry.renderRequests.insert(
 		entity,
 		{ asset,
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE });
+			EFFECT_ASSET_ID::ANIMATED,
+			geom_buffer });
 
 	return entity;
 }

@@ -47,6 +47,10 @@ class RenderSystem {
 			textures_path("fire_enemy.png") ,
 			textures_path("earth_enemy.png"),
 			textures_path("lightning_enemy.png"),
+			textures_path("water_enemy_sheet.png"),
+			textures_path("fire_enemy_sheet.png"),
+			textures_path("earth_enemy_sheet.png"),
+			textures_path("lightning_enemy_sheet.png"),
 			textures_path("water_boss.png"),						// start of boss shadows
 			textures_path("fire_boss.png"),
 			textures_path("earth_boss.png"),
@@ -58,11 +62,10 @@ class RenderSystem {
 			textures_path("final_boss_awakened_triples.png"),		// final boss
 			textures_path("final_boss_auras.png"),
 			textures_path("final_boss_frame.png"),
-			textures_path("ghost.png"),
-			textures_path("life_orb_full.png"),
-			textures_path("life_orb_1.png"),
-			textures_path("life_orb_2.png"),
-			textures_path("life_orb_3.png"),
+			textures_path("ghost_sheet.png"),
+			textures_path("ghost_new.png"),
+			textures_path("life_orb.png"),
+			textures_path("life_shard.png"),
 			textures_path("projectile_water.png"),
 			textures_path("projectile_fire.png"),
 			textures_path("projectile_earth.png"),
@@ -73,9 +76,9 @@ class RenderSystem {
 			textures_path("enemy_mana_bar.png"),
 			textures_path("player_health_bar.png"),
 			textures_path("player_mana_bar.png"),
-			textures_path("power_up_block.png"),
+			textures_path("power_up_block_new.png"),
 			textures_path("aria.png"),
-			textures_path("portal.png"),
+			textures_path("portal_sheet.png"),
 			textures_path("projectile_select_display_vertical.png"),
 			textures_path("faster_movement_icon.png"),
 			textures_path("power_up_increase_damage_arrow.png"),
@@ -156,13 +159,15 @@ private:
 
 	// Helper functions for initializeSpriteSheets()
 	void initializePowerUpBlockSpriteSheet();
-	void initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, float frame_height, float frame_width);
 	void initializePlayerSpriteSheet();
 	void initializeLostSoulSpriteSheet();
 	void initializeBossSpriteSheet();
 	void initializeFinalBossSpriteSheet();
 	void initializeFinalBossAuraSpriteSheet();
 	void initializeProjectileSelectDisplaySpriteSheet();
+	void initializePortalSpriteSheet();
+	void initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, int num_rows, int num_frames, float frame_width, float frame_height);
+	void initializeEnemySpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, float frame_width, float frame_height);
 
 	// Helper functions for initializeGlGeometryBuffers()
 	void initializePlayerGeometryBuffer();

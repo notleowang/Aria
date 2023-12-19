@@ -240,32 +240,24 @@ void RenderSystem::initializeGlMeshes()
 
 void RenderSystem::initializePowerUpBlockSpriteSheet()
 {
-	int num_rows = 2;
-	int num_cols = 15;
+	int num_rows = 3;
+	int num_cols = 6;
 	int ss_index = (int)SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK;
 
 	std::vector<AnimState> states((int)POWER_UP_BLOCK_STATES::STATE_COUNT);
-	states[(int)POWER_UP_BLOCK_STATES::ACTIVE] = AnimState(0, num_cols - 1);
-	states[(int)POWER_UP_BLOCK_STATES::INACTIVE] = AnimState(num_cols, num_cols);
+	states[(int)POWER_UP_BLOCK_STATES::ACTIVE] = AnimState(0, 11);
+	states[(int)POWER_UP_BLOCK_STATES::INCREASE_DAMAGE] = AnimState(13, 13);
+	states[(int)POWER_UP_BLOCK_STATES::TRIPLE_SHOT] = AnimState(14, 14);
+	states[(int)POWER_UP_BLOCK_STATES::BOUNCE_SHOT] = AnimState(15, 15);
+	states[(int)POWER_UP_BLOCK_STATES::FASTER_MOVEMENT] = AnimState(16, 16);
+	states[(int)POWER_UP_BLOCK_STATES::EMPTY_LIGHT] = AnimState(12, 12);
+	states[(int)POWER_UP_BLOCK_STATES::EMPTY_DARK] = AnimState(17, 17);
 
 	sprite_sheets[ss_index].num_rows = num_rows;
 	sprite_sheets[ss_index].num_cols = num_cols;
 	sprite_sheets[ss_index].states = states;
-}
-
-void RenderSystem::initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, float frame_height, float frame_width)
-{
-	int num_rows = 1;
-	int ss_index = (int)ss_id;
-
-	std::vector<AnimState> states((int)PROJECTILE_STATES::STATE_COUNT);
-	states[(int)PROJECTILE_STATES::MOVING] = AnimState(0, num_cols - 1);
-
-	sprite_sheets[ss_index].num_rows = num_rows;
-	sprite_sheets[ss_index].num_cols = num_cols;
-	sprite_sheets[ss_index].states = states;
-	sprite_sheets[ss_index].frame_height = frame_height;
-	sprite_sheets[ss_index].frame_width = frame_width;
+	sprite_sheets[ss_index].frame_height = 28.f;
+	sprite_sheets[ss_index].frame_width = 28.f;
 }
 
 void RenderSystem::initializePlayerSpriteSheet()
@@ -388,19 +380,72 @@ void RenderSystem::initializeProjectileSelectDisplaySpriteSheet()
 	sprite_sheets[ss_index].frame_width = 33.f;
 }
 
+void RenderSystem::initializePortalSpriteSheet()
+{
+	int num_rows = 6;
+	int num_cols = 2;
+	int ss_index = (int)SPRITE_SHEET_DATA_ID::PORTAL;
+
+	std::vector<AnimState> states((int)PORTAL_STATES::STATE_COUNT);
+	states[(int)PORTAL_STATES::OPEN] = AnimState(0, 9);
+	states[(int)PORTAL_STATES::CLOSED] = AnimState(10, 10);
+
+	sprite_sheets[ss_index].num_rows = num_rows;
+	sprite_sheets[ss_index].num_cols = num_cols;
+	sprite_sheets[ss_index].states = states;
+	sprite_sheets[ss_index].frame_height = 27.f;
+	sprite_sheets[ss_index].frame_width = 23.f;
+}
+
+void RenderSystem::initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, int num_rows, int num_frames, float frame_width, float frame_height)
+{
+	std::vector<AnimState> states(1);
+	states[0] = AnimState(0, num_frames - 1);
+
+	sprite_sheets[(int)ss_id].num_rows = num_rows;
+	sprite_sheets[(int)ss_id].num_cols = num_cols;
+	sprite_sheets[(int)ss_id].states = states;
+	sprite_sheets[(int)ss_id].frame_height = frame_height;
+	sprite_sheets[(int)ss_id].frame_width = frame_width;
+}
+
+void RenderSystem::initializeEnemySpriteSheet(SPRITE_SHEET_DATA_ID ss_id, int num_cols, float frame_width, float frame_height)
+{
+	int num_rows = (int)ENEMY_STATES::STATE_COUNT;
+
+	std::vector<AnimState> states(num_rows);
+	for (int i = 0; i < num_rows; i++) {
+		states[i] = AnimState(i * num_cols, (i + 1) * num_cols - 1);
+	}
+
+	sprite_sheets[(int)ss_id].num_rows = num_rows;
+	sprite_sheets[(int)ss_id].num_cols = num_cols;
+	sprite_sheets[(int)ss_id].states = states;
+	sprite_sheets[(int)ss_id].frame_height = frame_height;
+	sprite_sheets[(int)ss_id].frame_width = frame_width;
+}
+
 void RenderSystem::initializeSpriteSheets()
 {
 	initializePowerUpBlockSpriteSheet();
-	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::WATER_PROJECTILE, 4, 16.f, 26.f);
-	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::FIRE_PROJECTILE, 4, 16.f, 26.f);
-	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET, 6, 16.f, 26.f);
-	initializeProjectileSpriteSheet(SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET, 6, 16.f, 26.f);
+	initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID::WATER_PROJECTILE, 4, 1, 4, 26.f, 16.f);
+	initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID::FIRE_PROJECTILE, 4, 1, 4, 26.f, 16.f);
+	initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET, 6, 1, 6, 26.f, 16.f);
+	initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET, 6, 1, 6, 26.f, 16.f);
 	initializePlayerSpriteSheet();
 	initializeLostSoulSpriteSheet();
 	initializeBossSpriteSheet();
 	initializeFinalBossSpriteSheet();
 	initializeFinalBossAuraSpriteSheet();
 	initializeProjectileSelectDisplaySpriteSheet();
+	initializePortalSpriteSheet();
+	initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID::LIFE_ORB, 4, 3, 12, 16.f, 24.f);
+	initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID::LIFE_ORB_SHARD, 9, 1, 9, 7.f, 12.f);
+	initializeEnemySpriteSheet(SPRITE_SHEET_DATA_ID::WATER_ENEMY_SHEET, 7, 24.f, 21.f);
+	initializeEnemySpriteSheet(SPRITE_SHEET_DATA_ID::FIRE_ENEMY_SHEET, 6, 21.f, 28.f);
+	initializeEnemySpriteSheet(SPRITE_SHEET_DATA_ID::EARTH_ENEMY_SHEET, 8, 27.f, 22.f);
+	initializeEnemySpriteSheet(SPRITE_SHEET_DATA_ID::LIGHTNING_ENEMY_SHEET, 6, 23.f, 16.f);
+	initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID::GHOST_SHEET, 4, 1, 4, 17.f, 31.f);
 }
 
 // Helper functions for initializing Gl Geometry Buffers
@@ -684,12 +729,20 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::WATER_PROJECTILE, SPRITE_SHEET_DATA_ID::WATER_PROJECTILE);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::EARTH_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::EARTH_PROJECTILE_SHEET);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIGHTNING_PROJECTILE_SHEET, SPRITE_SHEET_DATA_ID::LIGHTNING_PROJECTILE_SHEET);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FIRE_ENEMY_SHEET, SPRITE_SHEET_DATA_ID::FIRE_ENEMY_SHEET);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::WATER_ENEMY_SHEET, SPRITE_SHEET_DATA_ID::WATER_ENEMY_SHEET);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::EARTH_ENEMY_SHEET, SPRITE_SHEET_DATA_ID::EARTH_ENEMY_SHEET);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIGHTNING_ENEMY_SHEET, SPRITE_SHEET_DATA_ID::LIGHTNING_ENEMY_SHEET);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::POWER_UP_BLOCK, SPRITE_SHEET_DATA_ID::POWER_UP_BLOCK);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PROJECTILE_SELECT_DISPLAY, SPRITE_SHEET_DATA_ID::PROJECTILE_SELECT_DISPLAY);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LOST_SOUL, SPRITE_SHEET_DATA_ID::LOST_SOUL);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::BOSS, SPRITE_SHEET_DATA_ID::BOSS);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FINAL_BOSS, SPRITE_SHEET_DATA_ID::FINAL_BOSS);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::FINAL_BOSS_AURA, SPRITE_SHEET_DATA_ID::FINAL_BOSS_AURA);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PORTAL, SPRITE_SHEET_DATA_ID::PORTAL);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIFE_ORB, SPRITE_SHEET_DATA_ID::LIFE_ORB);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIFE_ORB_SHARD, SPRITE_SHEET_DATA_ID::LIFE_ORB_SHARD);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::GHOST_SHEET, SPRITE_SHEET_DATA_ID::GHOST_SHEET);
 	initializeResourceBarGeometryBuffer();
 }
 
