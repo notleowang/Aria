@@ -62,7 +62,8 @@ class RenderSystem {
 			textures_path("final_boss_awakened_triples.png"),		// final boss
 			textures_path("final_boss_auras.png"),
 			textures_path("final_boss_frame.png"),
-			textures_path("ghost.png"),
+			textures_path("ghost_sheet.png"),
+			textures_path("ghost_new.png"),
 			textures_path("life_orb.png"),
 			textures_path("life_shard.png"),
 			textures_path("projectile_water.png"),

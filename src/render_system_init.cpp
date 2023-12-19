@@ -445,6 +445,7 @@ void RenderSystem::initializeSpriteSheets()
 	initializeEnemySpriteSheet(SPRITE_SHEET_DATA_ID::FIRE_ENEMY_SHEET, 6, 21.f, 28.f);
 	initializeEnemySpriteSheet(SPRITE_SHEET_DATA_ID::EARTH_ENEMY_SHEET, 8, 27.f, 22.f);
 	initializeEnemySpriteSheet(SPRITE_SHEET_DATA_ID::LIGHTNING_ENEMY_SHEET, 6, 23.f, 16.f);
+	initializeSingleStateSpriteSheet(SPRITE_SHEET_DATA_ID::GHOST_SHEET, 4, 1, 4, 17.f, 31.f);
 }
 
 // Helper functions for initializing Gl Geometry Buffers
@@ -741,6 +742,7 @@ void RenderSystem::initializeGlGeometryBuffers()
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::PORTAL, SPRITE_SHEET_DATA_ID::PORTAL);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIFE_ORB, SPRITE_SHEET_DATA_ID::LIFE_ORB);
 	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::LIFE_ORB_SHARD, SPRITE_SHEET_DATA_ID::LIFE_ORB_SHARD);
+	initializeSpriteSheetGeometryBuffer(GEOMETRY_BUFFER_ID::GHOST_SHEET, SPRITE_SHEET_DATA_ID::GHOST_SHEET);
 	initializeResourceBarGeometryBuffer();
 }
 

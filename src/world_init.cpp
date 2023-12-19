@@ -125,13 +125,20 @@ Entity createTerrain(RenderSystem* renderer, vec2 pos, vec2 size, DIRECTION dir,
 Entity createObstacle(RenderSystem* renderer, vec2 pos, vec2 size, vec2 vel) {
 	auto entity = Entity();
 
-	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::SPRITE);
+	Mesh& mesh = renderer->getMesh(GEOMETRY_BUFFER_ID::GHOST_SHEET);
 	registry.meshPtrs.emplace(entity, &mesh);
+
+	SpriteSheet& sprite_sheet = renderer->getSpriteSheet(SPRITE_SHEET_DATA_ID::GHOST_SHEET);
+	registry.spriteSheetPtrs.emplace(entity, &sprite_sheet);
+
+	Animation& animation = registry.animations.emplace(entity);
+	animation.sprite_sheet_ptr = &sprite_sheet;
 
 	Position& position = registry.positions.emplace(entity);
 	position.position = pos;
 
-	position.scale = size;
+	float scale_factor = size.y / sprite_sheet.frame_height;
+	position.scale = vec2(scale_factor * sprite_sheet.frame_width, scale_factor * sprite_sheet.frame_height);
 
 	Velocity& velocity = registry.velocities.emplace(entity);
 	velocity.velocity = vel;
@@ -143,9 +150,9 @@ Entity createObstacle(RenderSystem* renderer, vec2 pos, vec2 size, vec2 vel) {
 
 	registry.renderRequests.insert(
 		entity,
-		{ TEXTURE_ASSET_ID::GHOST,
-			EFFECT_ASSET_ID::TEXTURED,
-			GEOMETRY_BUFFER_ID::SPRITE });
+		{ TEXTURE_ASSET_ID::GHOST_SHEET,
+			EFFECT_ASSET_ID::ANIMATED,
+			GEOMETRY_BUFFER_ID::GHOST_SHEET });
 
 	return entity;
 }
