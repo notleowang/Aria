@@ -273,6 +273,7 @@ bool GameLevel::init(uint level) {
 	case LEVEL_2:
 		this->player_starting_pos = vec2(200, 200);
 		this->exit_door_pos = vec2(3900, 1880);
+		this->power_up_next_level = true;
 
 		floors.push_back(vec4(0, 0, 4000, 2000));
 
@@ -556,6 +557,7 @@ bool GameLevel::init(uint level) {
 
 	case LEVEL_4:
 		this->player_starting_pos = vec2(100, 3750);
+		this->power_up_next_level = true;
 
 		texts.push_back("Don't get haunted by the ghosts!");
 		text_attrs.push_back({ 0.f,50.f,1.0f,1.0f,1.0f,0.f });
