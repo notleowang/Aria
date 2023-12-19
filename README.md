@@ -179,3 +179,14 @@ Highlight any changes versus the previous milestone.
 ## Citations
 ### Audio
 ["The Corrupted Gates"](https://freesound.org/people/SquashedSkinner/sounds/564497/). [SquashedSkinner](https://freesound.org/people/SquashedSkinner/). [Licensed under a Creative Commons Attribution 4.0 License](https://creativecommons.org/licenses/by/4.0/).
+
+["Under the Boot of the Devil"](https://freesound.org/people/SquashedSkinner/sounds/565028/). [SquashedSkinner](https://freesound.org/people/SquashedSkinner/). [Licensed under a Creative Commons Attribution 4.0 License](https://creativecommons.org/licenses/by/4.0/).
+
+["The Demon with Wings"](https://freesound.org/people/SquashedSkinner/sounds/565025/). [SquashedSkinner](https://freesound.org/people/SquashedSkinner/). [Licensed under a Creative Commons Attribution 4.0 License](https://creativecommons.org/licenses/by/4.0/).
+
+["Super Mega Ultimate Final Boss Battle"](https://freesound.org/people/FoolBoyMedia/sounds/530064/). [FoolBoyMedia](https://freesound.org/people/FoolBoyMedia/). [Licensed under a Creative Commons Attribution 4.0 License](https://creativecommons.org/licenses/by/4.0/).
+
+["Cave Monster Die Sound"](https://freesound.org/people/FiveBrosStopMosYT/sounds/535320/). [FiveBrosStopMosYT](https://freesound.org/people/FiveBrosStopMosYT/). [Licensed under a Creative Commons Attribution 4.0 License](https://creativecommons.org/licenses/by/4.0/).
+
+["Dark Teleport"](https://freesound.org/people/oldestmillennial/sounds/533025/). [oldestmillennial](https://freesound.org/people/oldestmillennial/). [Licensed under a Creative Commons Attribution 3.0 License](https://creativecommons.org/licenses/by/3.0/).
+
