@@ -1339,7 +1339,19 @@ void WorldSystem::on_scroll(double x_offset, double y_offset) {
 
 // On key callback
 void WorldSystem::on_key(int key, int, int action, int mod) {
-	if (action == GLFW_PRESS && key == GLFW_KEY_9) win_level();
+	if (action == GLFW_PRESS && key == GLFW_KEY_9) {
+		Mix_HaltChannel(-1);
+		win_level();
+	}
+
+	// skip cutscene
+	if (action == GLFW_RELEASE && key == GLFW_KEY_SPACE && this->curr_level.getIsCutscene()) {
+		Mix_HaltChannel(-1);
+		if (this->curr_level.getCurrLevel() != CUTSCENE_5 && this->curr_level.getCurrLevel() != CUTSCENE_6) {
+			Mix_FadeInMusic(background_music, -1, 1500);
+		}
+		win_level();
+	}
 
 	//Disables keys when death or win timer happening
 	if (registry.deathTimers.has(player) || registry.winTimers.has(player) || (this->curr_level.getIsCutscene() && this->curr_level.curr_level != THE_END)) { return; }
