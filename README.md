@@ -1,6 +1,7 @@
 # Aria: Whispers of Darkness
 In the eerie village of Grimhaven, shrouded in perpetual mist and shadows, Aria's journey begins. 
 
+<!--
 # Milestone 4
 Below is the documentation for our `README.md` submission for Milestone 4.
 
@@ -189,4 +190,4 @@ Highlight any changes versus the previous milestone.
 ["Cave Monster Die Sound"](https://freesound.org/people/FiveBrosStopMosYT/sounds/535320/). [FiveBrosStopMosYT](https://freesound.org/people/FiveBrosStopMosYT/). [Licensed under a Creative Commons Attribution 4.0 License](https://creativecommons.org/licenses/by/4.0/).
 
 ["Dark Teleport"](https://freesound.org/people/oldestmillennial/sounds/533025/). [oldestmillennial](https://freesound.org/people/oldestmillennial/). [Licensed under a Creative Commons Attribution 3.0 License](https://creativecommons.org/licenses/by/3.0/).
-
+-->
