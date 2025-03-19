@@ -17,7 +17,7 @@
 #ifdef __linux__
 	#define FONT_PATH "data/fonts/PixeloidSans.ttf"
 #else
-	#define FONT_PATH "../../../data/fonts/PixeloidSans.ttf"
+	#define FONT_PATH "../../data/fonts/PixeloidSans.ttf"
 #endif
 
 // World initialization
